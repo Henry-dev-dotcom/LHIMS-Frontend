@@ -30,14 +30,14 @@ export function AccessRestrictedPage({ pageId }) {
             <div className="grid h-12 w-12 place-items-center rounded-2xl bg-danger text-white">
               <LockKeyhole className="h-6 w-6" />
             </div>
-            <h3 className="mt-4 text-xl font-black text-slate-950">Current role: {getRoleLabel(role)}</h3>
+            <h3 className="mt-4 text-xl font-bold text-slate-900">Current role: {getRoleLabel(role)}</h3>
             <p className="mt-2 text-sm leading-6 text-slate-600">The requested page is blocked by the permission matrix.</p>
             <Button className="mt-5" onClick={() => dispatch({ type: 'NAVIGATE', pageId: getDefaultPageForRole(role) })}>
               Return to my dashboard
             </Button>
           </div>
           <div>
-            <div className="flex items-center gap-2 text-sm font-black text-slate-900">
+            <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
               <ShieldAlert className="h-5 w-5 text-amber-500" /> Allowed roles for this route
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -46,7 +46,7 @@ export function AccessRestrictedPage({ pageId }) {
                 return (
                   <div key={item.id} className="rounded-2xl border border-slate-200 bg-white p-4">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="font-black text-slate-950">{item.label}</p>
+                      <p className="font-bold text-slate-900">{item.label}</p>
                       <StatusBadge status={isAllowed ? 'Allowed' : 'Blocked'} />
                     </div>
                     <p className="mt-2 text-xs leading-5 text-slate-500">{item.accessSummary}</p>

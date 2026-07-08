@@ -24,25 +24,11 @@ body {
   min-width: 320px;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 0% 0%, rgba(26, 115, 232, 0.11), transparent 34%),
-    radial-gradient(circle at 88% 10%, rgba(52, 168, 83, 0.10), transparent 30%),
-    linear-gradient(180deg, #f8fbff 0%, #eef3f8 100%);
+    radial-gradient(circle at 0% 0%, rgba(8, 145, 178, 0.05), transparent 36%),
+    #f8fafc;
   color: #0f172a;
   -webkit-font-smoothing: antialiased;
   text-rendering: geometricPrecision;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(var(--clinical-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--clinical-grid) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: linear-gradient(to bottom, black, transparent 75%);
-  opacity: 0.38;
 }
 
 button, input, textarea, select {
@@ -67,25 +53,25 @@ img, svg, video, canvas {
 }
 
 button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
-  outline: 3px solid rgba(26, 115, 232, 0.22);
+  outline: 3px solid rgba(8, 145, 178, 0.35);
   outline-offset: 2px;
 }
 
 ::selection {
-  background: rgba(26, 115, 232, 0.18);
+  background: rgba(8, 145, 178, 0.18);
 }
 
 @layer components {
   .clinical-panel {
-    @apply border border-white/70 bg-white/90 shadow-soft backdrop-blur-xl;
+    @apply border border-slate-200/70 bg-white shadow-soft;
   }
 
   .clinical-input {
-    @apply w-full rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-clinical-400 focus:ring-4 focus:ring-clinical-100;
+    @apply w-full rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-clinical-400 focus:ring-4 focus:ring-clinical-100;
   }
 
   .clinical-kbd {
-    @apply rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-black text-slate-500;
+    @apply rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-500;
   }
 }
 
@@ -181,11 +167,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 
 @layer components {
   .clinical-page-section {
-    @apply rounded-[2rem] border border-white/70 bg-white/86 shadow-soft backdrop-blur-xl;
+    @apply rounded-[2rem] border border-slate-200/70 bg-white shadow-soft;
   }
 
   .clinical-action-bar {
-    @apply sticky bottom-4 z-20 mx-auto flex w-fit max-w-full flex-wrap justify-center gap-2 rounded-[1.5rem] border border-white/70 bg-white/90 px-3 py-2 shadow-panel backdrop-blur-xl;
+    @apply sticky bottom-4 z-20 mx-auto flex w-fit max-w-full flex-wrap justify-center gap-2 rounded-[1.5rem] border border-slate-200/70 bg-white/95 px-3 py-2 shadow-panel backdrop-blur-xl;
   }
 
   .clinical-soft-divider {
@@ -218,7 +204,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(26, 115, 232, 0.55);
+  background: rgba(8, 145, 178, 0.55);
 }
 
 
@@ -604,7 +590,7 @@ summary:focus-visible {
   --app-vh: 1vh;
   --app-visual-height: 100vh;
   --mobile-bottom-nav-space: 6.75rem;
-  accent-color: #1a73e8;
+  accent-color: #0891b2;
 }
 
 @supports (height: 100dvh) {

@@ -24,13 +24,13 @@ export function LabAcceptPage() {
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.4fr]">
         <Card title="Find lab request" subtitle="Search a patient or order if you came directly to this page.">
           <div className="relative mb-4">
-            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
             <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient name or order ID..." />
           </div>
           <div className="space-y-2">
             {labOrders.filter((order) => !query || [order.id, order.patient?.fullName, describeOrderItems(order.items)].join(' ').toLowerCase().includes(query.toLowerCase())).slice(0, 8).map((order) => (
               <button key={order.id} onClick={() => dispatch({ type: 'OPEN_LAB_ACCEPT', orderId: order.id })} className={`w-full rounded-2xl border p-3 text-left ${activeOrder?.id === order.id ? 'border-clinical-300 bg-clinical-50' : 'border-slate-200 bg-white hover:bg-slate-50'}`}>
-                <p className="font-black text-slate-950">{order.patient?.fullName}</p>
+                <p className="font-bold text-slate-900">{order.patient?.fullName}</p>
                 <p className="text-xs text-slate-500">{order.id} · {describeOrderItems(order.items)}</p>
               </button>
             ))}
@@ -40,16 +40,16 @@ export function LabAcceptPage() {
           {!activeOrder ? <p className="text-sm text-slate-500">No lab order selected.</p> : (
             <div className="space-y-5">
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Patient</p><p className="font-black text-slate-950">{activeOrder.patient?.fullName}</p><p className="text-sm text-slate-500">{activeOrder.patient?.id} · {activeOrder.patient?.phone}</p></div>
-                <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Doctor / Hospital</p><p className="font-black text-slate-950">{activeOrder.doctor?.name}</p><p className="text-sm text-slate-500">{activeOrder.hospital?.name}</p></div>
+                <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Patient</p><p className="font-bold text-slate-900">{activeOrder.patient?.fullName}</p><p className="text-sm text-slate-500">{activeOrder.patient?.id} · {activeOrder.patient?.phone}</p></div>
+                <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Doctor / Hospital</p><p className="font-bold text-slate-900">{activeOrder.doctor?.name}</p><p className="text-sm text-slate-500">{activeOrder.hospital?.name}</p></div>
               </div>
-              <div className="rounded-2xl border border-slate-200 p-4"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Clinical notes</p><p className="mt-2 text-sm leading-6 text-slate-700">{activeOrder.clinicalNotes || 'No clinical notes provided.'}</p></div>
+              <div className="rounded-2xl border border-slate-200 p-4"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Clinical notes</p><p className="mt-2 text-sm leading-6 text-slate-700">{activeOrder.clinicalNotes || 'No clinical notes provided.'}</p></div>
               <div className="space-y-2">
-                <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Requested lab tests</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Requested lab tests</p>
                 {activeOrder.items.map((item) => <div key={item.id} className="flex items-center justify-between rounded-2xl bg-slate-50 p-3"><span className="font-bold text-slate-900"><FlaskConical className="mr-2 inline h-4 w-4 text-clinical-600" />{item.name}</span><StatusBadge status={item.id} /></div>)}
               </div>
-              <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Requested</p><p className="font-black text-slate-950">{formatDateTime(activeOrder.createdAt)}</p></div>
-              {acceptedSample ? <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4"><p className="font-black text-emerald-800">Sample accepted: {acceptedSample.id}</p><p className="text-sm text-emerald-700">Accepted by {acceptedSample.acceptedBy || acceptedSample.collectedBy} at {formatDateTime(acceptedSample.acceptedAt || acceptedSample.collectedAt)}</p></div> : <Button onClick={() => dispatch({ type: 'ACCEPT_LAB_SAMPLE', orderId: activeOrder.id, payload: {} })}><CheckCircle2 className="h-4 w-4" /> Send to Diagnostics</Button>}
+              <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Requested</p><p className="font-bold text-slate-900">{formatDateTime(activeOrder.createdAt)}</p></div>
+              {acceptedSample ? <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4"><p className="font-bold text-emerald-800">Sample accepted: {acceptedSample.id}</p><p className="text-sm text-emerald-700">Accepted by {acceptedSample.acceptedBy || acceptedSample.collectedBy} at {formatDateTime(acceptedSample.acceptedAt || acceptedSample.collectedAt)}</p></div> : <Button onClick={() => dispatch({ type: 'ACCEPT_LAB_SAMPLE', orderId: activeOrder.id, payload: {} })}><CheckCircle2 className="h-4 w-4" /> Send to Diagnostics</Button>}
               <Button variant="danger" onClick={() => { const reason = window.prompt('Reason for rejection / recollection?'); if (reason) dispatch({ type: 'REJECT_SAMPLE', sampleId: acceptedSample?.id || '', reason }); }} disabled={!acceptedSample}><XCircle className="h-4 w-4" /> Reject Accepted Sample</Button>
               {rejectedSamples.length > 0 && <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">Rejected history: {rejectedSamples.map((sample) => `${sample.id}: ${sample.rejectionReason}`).join(' · ')}</div>}
             </div>

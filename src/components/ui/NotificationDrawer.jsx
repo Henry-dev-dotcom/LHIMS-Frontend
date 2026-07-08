@@ -75,7 +75,7 @@ export function NotificationDrawer({ open, notifications = [], onClose, onMarkDe
           <div className="mx-auto mb-2 h-1.5 w-12 rounded-full bg-slate-200 md:hidden" aria-hidden="true" />
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <p className="flex items-center gap-2 text-sm font-black text-slate-950"><BellRing className="h-4 w-4 text-clinical-600" /> Delivery & role notifications</p>
+              <p className="flex items-center gap-2 text-sm font-semibold text-slate-950"><BellRing className="h-4 w-4 text-clinical-600" /> Delivery & role notifications</p>
               <p className="mt-1 text-xs leading-5 text-slate-500">In-platform, email and SMS delivery events for this workspace.</p>
             </div>
             <Button variant="ghost" size="sm" className="hidden md:inline-flex" onClick={onClose}>Close</Button>
@@ -95,16 +95,16 @@ export function NotificationDrawer({ open, notifications = [], onClose, onMarkDe
                     {String(note.channel || note.type || '').toLowerCase().includes('sms') ? <MessageSquareText className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="break-words text-sm font-black text-slate-900">{note.title || note.channel || 'Notification'}</p>
+                    <p className="break-words text-sm font-semibold text-slate-900">{note.title || note.channel || 'Notification'}</p>
                     <p className="mt-1 break-words text-xs leading-5 text-slate-500">{note.message || note.body || note.status || 'No details supplied.'}</p>
                   </div>
                 </div>
                 <div className="shrink-0"><StatusBadge status={note.status || (note.read ? 'Delivered' : 'Queued')} /></div>
               </div>
-              <div className="mt-3 flex flex-col gap-2 text-[11px] font-semibold text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mt-3 flex flex-col gap-2 text-[11px] font-semibold text-slate-500 sm:flex-row sm:items-center sm:justify-between">
                 <span>{formatDateTime(note.createdAt || note.timestamp)}</span>
                 {onMarkDelivered && note.status !== 'Delivered' && (
-                  <button onClick={() => onMarkDelivered(note.id)} className="inline-flex min-h-9 items-center justify-center gap-1 rounded-full bg-emerald-50 px-3 py-1.5 font-black text-emerald-700 ring-1 ring-emerald-200 sm:min-h-0">
+                  <button onClick={() => onMarkDelivered(note.id)} className="inline-flex min-h-9 items-center justify-center gap-1 rounded-full bg-emerald-50 px-3 py-1.5 font-semibold text-emerald-700 ring-1 ring-emerald-200 sm:min-h-0">
                     <CheckCheck className="h-3.5 w-3.5" /> mark delivered
                   </button>
                 )}

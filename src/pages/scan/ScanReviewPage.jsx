@@ -46,13 +46,13 @@ export function ScanReviewPage() {
       <div className="grid gap-6 xl:grid-cols-[1fr_1.15fr]">
         <Card title="Pending imaging reports" subtitle="Search reports waiting for radiologist sign-off.">
           <div className="relative mb-4">
-            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
             <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient, order, report text..." />
           </div>
           <DataTable
             columns={[
-              { key: 'patient', label: 'Patient', render: (row) => <div><p className="font-black text-slate-950">{row.patient?.fullName}</p><p className="text-xs text-slate-400">{row.patient?.id}</p></div> },
-              { key: 'orderId', label: 'Order', render: (row) => <span className="font-black text-slate-950">{row.orderId}</span> },
+              { key: 'patient', label: 'Patient', render: (row) => <div><p className="font-bold text-slate-900">{row.patient?.fullName}</p><p className="text-xs text-slate-500">{row.patient?.id}</p></div> },
+              { key: 'orderId', label: 'Order', render: (row) => <span className="font-bold text-slate-900">{row.orderId}</span> },
               { key: 'scan', label: 'Scans', render: (row) => <span className="text-sm font-semibold text-slate-700">{describeOrderItems(row.order?.items)}</span> },
               { key: 'files', label: 'Files', render: (row) => <span className="font-bold">{(row.files || []).length}</span> },
               { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> },
@@ -71,11 +71,11 @@ export function ScanReviewPage() {
                 <Info label="Doctor" value={selected.doctor?.name} />
                 <Info label="Hospital" value={selected.hospital?.name} />
               </div>
-              <div className="space-y-2">{scans.map((scan) => <div key={scan.id} className="rounded-2xl border border-slate-200 p-3"><FileImage className="mr-2 inline h-4 w-4 text-purple-600" /><span className="font-black text-slate-950">{scan.name}</span><span className="ml-2 text-sm text-slate-500">{scan.modality}</span></div>)}</div>
+              <div className="space-y-2">{scans.map((scan) => <div key={scan.id} className="rounded-2xl border border-slate-200 p-3"><FileImage className="mr-2 inline h-4 w-4 text-purple-600" /><span className="font-bold text-slate-900">{scan.name}</span><span className="ml-2 text-sm text-slate-500">{scan.modality}</span></div>)}</div>
               <div className="rounded-2xl bg-slate-50 p-3 whitespace-pre-line text-sm font-semibold text-slate-700">{selected.reportText}</div>
               <div className="rounded-2xl border border-purple-100 bg-purple-50 p-4">
-                <p className="text-xs font-black uppercase tracking-wider text-purple-700">Attachments / DICOM metadata</p>
-                {(selected.files || []).length === 0 ? <p className="mt-2 text-sm font-semibold text-purple-700">No files attached.</p> : <div className="mt-3 grid gap-2 sm:grid-cols-2">{selected.files.map((file) => <div key={file.name} className="rounded-xl bg-white p-3 text-xs font-bold text-slate-700">{file.name}<br /><span className="text-slate-400">{file.isDicom ? 'DICOM object · metadata captured' : file.type || 'Attachment'}</span></div>)}</div>}
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-purple-700">Attachments / DICOM metadata</p>
+                {(selected.files || []).length === 0 ? <p className="mt-2 text-sm font-semibold text-purple-700">No files attached.</p> : <div className="mt-3 grid gap-2 sm:grid-cols-2">{selected.files.map((file) => <div key={file.name} className="rounded-xl bg-white p-3 text-xs font-bold text-slate-700">{file.name}<br /><span className="text-slate-500">{file.isDicom ? 'DICOM object · metadata captured' : file.type || 'Attachment'}</span></div>)}</div>}
                 <p className="mt-2 text-xs font-semibold text-purple-700">DICOM files detected: {dicomFiles.length}</p>
               </div>
               <FormField label="Approver note"><textarea rows="3" className={inputClass} value={approverNote} onChange={(event) => setApproverNote(event.target.value)} placeholder="Radiologist approval note" /></FormField>
@@ -89,8 +89,8 @@ export function ScanReviewPage() {
 }
 
 function Summary({ label, value }) {
-  return <Card className="clinical-stat-card p-4"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">{label}</p><p className="mt-1 text-xl font-black text-slate-950">{value}</p></Card>;
+  return <Card className="clinical-stat-card p-4"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{label}</p><p className="mt-1 text-xl font-bold text-slate-900">{value}</p></Card>;
 }
 function Info({ label, value }) {
-  return <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">{label}</p><p className="mt-1 text-sm font-black text-slate-950">{value || '—'}</p></div>;
+  return <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{label}</p><p className="mt-1 text-sm font-bold text-slate-900">{value || '—'}</p></div>;
 }

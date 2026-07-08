@@ -24,7 +24,7 @@ function TabButton({ active, children, onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`rounded-2xl px-4 py-2 text-sm font-black transition ${active ? 'bg-slate-950 text-white shadow-soft' : 'bg-white text-slate-600 hover:bg-slate-100'}`}
+      className={`rounded-2xl px-4 py-2 text-sm font-bold transition ${active ? 'bg-slate-950 text-white shadow-soft' : 'bg-white text-slate-600 hover:bg-slate-100'}`}
     >
       {children}
     </button>
@@ -88,7 +88,7 @@ export function SecurityReliabilityPage() {
               ].map(([name, status, detail]) => (
                 <div key={name} className="flex items-start justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
                   <div>
-                    <p className="font-black text-slate-950">{name}</p>
+                    <p className="font-bold text-slate-900">{name}</p>
                     <p className="mt-1 text-sm leading-6 text-slate-500">{detail}</p>
                   </div>
                   <StatusBadge status={status} />
@@ -197,7 +197,7 @@ export function SecurityReliabilityPage() {
               <div className="flex items-center gap-3">
                 <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500 text-white"><DatabaseBackup className="h-6 w-6" /></div>
                 <div>
-                  <p className="font-black text-slate-950">Security dataset export</p>
+                  <p className="font-bold text-slate-900">Security dataset export</p>
                   <p className="text-sm text-slate-600">Exports patients, orders, invoices, results, reports, notifications, audit logs and security events.</p>
                 </div>
               </div>
@@ -221,7 +221,7 @@ export function SecurityReliabilityPage() {
                 <div key={name} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 p-4">
                   <div className="flex items-center gap-3">
                     <Icon className="h-5 w-5 text-clinical-600" />
-                    <p className="font-black text-slate-900">{name}</p>
+                    <p className="font-bold text-slate-900">{name}</p>
                   </div>
                   <StatusBadge status={status} />
                 </div>

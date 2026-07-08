@@ -44,7 +44,7 @@ export class ErrorBoundary extends Component {
           <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-red-50 text-red-600">
             <AlertTriangle className="h-7 w-7" />
           </div>
-          <h1 className="mt-4 text-xl font-black tracking-tight text-slate-950 sm:text-2xl">Something interrupted this screen</h1>
+          <h1 className="mt-4 text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">Something interrupted this screen</h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             The app stayed online, but this screen could not finish loading. Reload the app, or reset the saved demo state if the issue came from corrupted local data.
           </p>

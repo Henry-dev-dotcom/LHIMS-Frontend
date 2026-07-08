@@ -74,7 +74,7 @@ function ParameterRangeEditor({ parameters, onChange, disabled }) {
   return (
     <div className="space-y-3">
       <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-900">
-        <p className="font-black">Structured result parameters and reference ranges</p>
+        <p className="font-bold">Structured result parameters and reference ranges</p>
         <p className="mt-1 leading-6">These values appear inside the Lab result-entry modal, the Accepted Samples result page, reports, and patient trends. Low/High and Critical limits power automatic flagging.</p>
       </div>
       <div className="grid gap-3 md:hidden">
@@ -86,8 +86,8 @@ function ParameterRangeEditor({ parameters, onChange, disabled }) {
           <div key={`${parameter.name || 'parameter'}-${index}-mobile`} className="rounded-[1.35rem] border border-slate-200 bg-white p-3 shadow-sm">
             <div className="mb-3 flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">Parameter {index + 1}</p>
-                <p className="mt-1 truncate text-sm font-black text-slate-950">{parameter.name || 'Unnamed parameter'}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Parameter {index + 1}</p>
+                <p className="mt-1 truncate text-sm font-bold text-slate-900">{parameter.name || 'Unnamed parameter'}</p>
               </div>
               <Button type="button" size="sm" variant="danger" onClick={() => removeRow(index)}><Trash2 className="h-4 w-4" /> Remove</Button>
             </div>
@@ -165,7 +165,7 @@ function ConfigReadinessCard({ label, ok, detail }) {
   return (
     <div className="rounded-[1.25rem] border border-slate-200 bg-white p-3 shadow-sm">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-black text-slate-900">{label}</p>
+        <p className="text-xs font-bold text-slate-900">{label}</p>
         <StatusBadge status={ok ? 'Ready' : 'Needs Setup'} />
       </div>
       <p className="mt-1.5 text-[11px] font-semibold leading-5 text-slate-500">{detail}</p>
@@ -263,7 +263,7 @@ export function AdminSettingsPage() {
         <Card compact className="mb-5" title="Test / scan catalog" subtitle="Search, add and edit investigations. Prices remain for reception/billing/admin only; clinical roles do not see them.">
           <div className="mb-4 grid gap-3 lg:grid-cols-[1fr_180px_auto]">
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+              <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
               <input className={`${inputClass} pl-10`} value={catalogQuery} onChange={(event) => setCatalogQuery(event.target.value)} placeholder="Search by ID, name, abbreviation, department or modality" />
             </div>
             <select className={inputClass} value={catalogType} onChange={(event) => setCatalogType(event.target.value)}>
@@ -345,7 +345,7 @@ export function AdminSettingsPage() {
             rows={scanEquipment}
           />
           <div className="mt-4 rounded-2xl bg-slate-50 p-3">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Lab analyzers</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Lab analyzers</p>
             <p className="mt-2 text-sm font-semibold text-slate-700">{labAnalyzers.join(' • ') || 'No analyzers configured yet'}</p>
           </div>
         </Card>

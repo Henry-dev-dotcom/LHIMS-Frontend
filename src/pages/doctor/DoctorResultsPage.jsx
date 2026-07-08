@@ -28,9 +28,9 @@ function DetailedResultModal({ order, data, dispatch, onClose }) {
     >
       <div className="space-y-5">
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Patient</p><p className="mt-2 font-black text-slate-950">{order.patient?.fullName}</p><p className="text-sm text-slate-500">{order.patient?.id}</p></div>
-          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Clinician</p><p className="mt-2 font-black text-slate-950">{order.doctor?.name}</p><p className="text-sm text-slate-500">{order.hospital?.name}</p></div>
-          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Status</p><div className="mt-2"><StatusBadge status={order.status} /></div><p className="mt-2 text-sm text-slate-500">Released {formatDateTime(order.updatedAt)}</p></div>
+          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Patient</p><p className="mt-2 font-bold text-slate-900">{order.patient?.fullName}</p><p className="text-sm text-slate-500">{order.patient?.id}</p></div>
+          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Clinician</p><p className="mt-2 font-bold text-slate-900">{order.doctor?.name}</p><p className="text-sm text-slate-500">{order.hospital?.name}</p></div>
+          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Status</p><div className="mt-2"><StatusBadge status={order.status} /></div><p className="mt-2 text-sm text-slate-500">Released {formatDateTime(order.updatedAt)}</p></div>
         </div>
         {order.results.map((result) => (
           <Card key={result.id} title={`${result.department} · ${result.status}`} subtitle={result.reportText}>
@@ -38,7 +38,7 @@ function DetailedResultModal({ order, data, dispatch, onClose }) {
               <DataTable
                 columns={[
                   { key: 'name', label: 'Parameter' },
-                  { key: 'value', label: 'Value', render: (row) => <span className="font-black text-slate-950">{row.value} {row.unit}</span> },
+                  { key: 'value', label: 'Value', render: (row) => <span className="font-bold text-slate-900">{row.value} {row.unit}</span> },
                   { key: 'referenceRange', label: 'Reference Range' },
                   { key: 'flag', label: 'Flag', render: (row) => <StatusBadge status={row.flag} /> }
                 ]}
@@ -84,12 +84,12 @@ export function DoctorResultsPage() {
       <Card
         title="Completed / Result-Available Orders"
         subtitle="Finalized orders appear here automatically when lab or imaging results are released."
-        actions={<div className="relative w-full min-w-0 sm:w-80"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" /><input className={`${inputClass} pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search result, patient, order..." /></div>}
+        actions={<div className="relative w-full min-w-0 sm:w-80"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" /><input className={`${inputClass} pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search result, patient, order..." /></div>}
       >
         <DataTable
           columns={[
-            { key: 'id', label: 'Order ID', render: (order) => <span className="font-black text-slate-950">{order.id}</span> },
-            { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold">{order.patient?.fullName}</p><p className="text-xs text-slate-400">{order.patient?.id}</p></div> },
+            { key: 'id', label: 'Order ID', render: (order) => <span className="font-bold text-slate-900">{order.id}</span> },
+            { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold">{order.patient?.fullName}</p><p className="text-xs text-slate-500">{order.patient?.id}</p></div> },
             { key: 'items', label: 'Tests / Scans', render: (order) => order.items.map((item) => item.name).join(', ') || '—' },
             { key: 'status', label: 'Status', render: (order) => <StatusBadge status={order.status} /> },
             { key: 'released', label: 'Released', render: (order) => formatDateTime(order.updatedAt) },

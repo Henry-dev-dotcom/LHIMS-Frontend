@@ -80,8 +80,8 @@ function ScanQueueStepper({ currentStep }) {
           const complete = step.number < currentStep;
           return (
             <div key={step.number} className={`flex items-center gap-3 rounded-2xl px-4 py-3 ${active ? 'bg-clinical-50 text-clinical-800' : 'bg-slate-50 text-slate-500'}`}>
-              <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-black ${active || complete ? 'bg-clinical-600 text-white' : 'bg-white text-slate-400'}`}>{step.number}</span>
-              <span className="text-sm font-black">{step.label}</span>
+              <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-bold ${active || complete ? 'bg-clinical-600 text-white' : 'bg-white text-slate-500'}`}>{step.number}</span>
+              <span className="text-sm font-bold">{step.label}</span>
             </div>
           );
         })}
@@ -168,7 +168,7 @@ export function ScanQueuePage() {
 
             <div className="grid gap-3 xl:grid-cols-[1fr_200px_220px]">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
                 <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient name, patient ID, order ID, scan name..." />
               </div>
               <select className={inputClass} value={status} onChange={(event) => setStatus(event.target.value)}>
@@ -190,7 +190,7 @@ export function ScanQueuePage() {
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
-              <div className="text-sm font-semibold text-slate-600"><span className="font-black text-slate-950">{selected.length}</span> selected for imaging acceptance</div>
+              <div className="text-sm font-semibold text-slate-600"><span className="font-bold text-slate-900">{selected.length}</span> selected for imaging acceptance</div>
               <div className="flex flex-wrap gap-2">
                 <Button variant="secondary" onClick={toggleAll}>{allVisibleSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />} {allVisibleSelected ? 'Clear visible' : 'Select visible'}</Button>
                 <Button disabled={!selected.length} onClick={batchAccept}><CheckCircle2 className="h-4 w-4" /> Accept Selected</Button>
@@ -200,10 +200,10 @@ export function ScanQueuePage() {
             <DataTable
               columns={[
                 { key: 'select', label: '', render: (row) => <button type="button" disabled={scanStateForOrder(data, row.id) === 'Accepted'} onClick={() => toggleRow(row.id)} className="text-clinical-700 disabled:text-slate-300">{selected.includes(row.id) ? <CheckSquare className="h-5 w-5" /> : <Square className="h-5 w-5" />}</button> },
-                { key: 'patient', label: 'Patient', render: (row) => <div><p className="font-black text-slate-950">{row.patient?.fullName}</p><p className="text-xs text-slate-400">{row.patient?.id}</p></div> },
-                { key: 'id', label: 'Order ID', render: (row) => <span className="font-black text-slate-950">{row.id}</span> },
+                { key: 'patient', label: 'Patient', render: (row) => <div><p className="font-bold text-slate-900">{row.patient?.fullName}</p><p className="text-xs text-slate-500">{row.patient?.id}</p></div> },
+                { key: 'id', label: 'Order ID', render: (row) => <span className="font-bold text-slate-900">{row.id}</span> },
                 { key: 'scans', label: 'Scans', render: (row) => <div className="max-w-full text-sm font-semibold text-slate-700">{describeScanItems(row.items)}</div> },
-                { key: 'doctor', label: 'Clinician / Hospital', render: (row) => <div><p className="font-semibold">{row.doctor?.name}</p><p className="text-xs text-slate-400">{row.hospital?.name}</p></div> },
+                { key: 'doctor', label: 'Clinician / Hospital', render: (row) => <div><p className="font-semibold">{row.doctor?.name}</p><p className="text-xs text-slate-500">{row.hospital?.name}</p></div> },
                 { key: 'urgency', label: 'Urgency', render: (row) => <StatusBadge status={row.urgency} /> },
                 { key: 'scanStatus', label: 'Scan State', render: (row) => <StatusBadge status={scanStateForOrder(data, row.id)} /> },
                 { key: 'createdAt', label: 'Requested', render: (row) => formatDateTime(row.createdAt) },
@@ -228,37 +228,37 @@ export function ScanQueuePage() {
 
             {!activeOrder ? (
               <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
-                <p className="font-black text-slate-900">No scan request selected.</p>
+                <p className="font-bold text-slate-900">No scan request selected.</p>
                 <p className="mt-2 text-sm text-slate-500">Go back to the queue and select a patient request.</p>
               </div>
             ) : (
               <div className="space-y-5">
                 <div className="grid gap-3 lg:grid-cols-4">
                   <div className="rounded-2xl bg-slate-50 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Patient</p>
-                    <p className="mt-1 font-black text-slate-950">{activeOrder.patient?.fullName}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Patient</p>
+                    <p className="mt-1 font-bold text-slate-900">{activeOrder.patient?.fullName}</p>
                     <p className="text-sm text-slate-500">{activeOrder.patient?.id} · {activeOrder.patient?.phone}</p>
                   </div>
                   <div className="rounded-2xl bg-slate-50 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Order ID</p>
-                    <p className="mt-1 font-black text-slate-950">{activeOrder.id}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Order ID</p>
+                    <p className="mt-1 font-bold text-slate-900">{activeOrder.id}</p>
                     <p className="text-sm text-slate-500">{formatDateTime(activeOrder.createdAt)}</p>
                   </div>
                   <div className="rounded-2xl bg-slate-50 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Clinician</p>
-                    <p className="mt-1 font-black text-slate-950">{activeOrder.doctor?.name}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Clinician</p>
+                    <p className="mt-1 font-bold text-slate-900">{activeOrder.doctor?.name}</p>
                     <p className="text-sm text-slate-500">{activeOrder.hospital?.name}</p>
                   </div>
                   <div className="rounded-2xl bg-slate-50 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Processing</p>
-                    <p className="mt-1 font-black text-slate-950">{activeOrder.status}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Processing</p>
+                    <p className="mt-1 font-bold text-slate-900">{activeOrder.status}</p>
                     <p className="text-sm text-slate-500">{activeOrder.items?.length || 0} requested scan(s)</p>
                   </div>
                 </div>
 
                 <div className="grid gap-4 xl:grid-cols-[1fr_380px]">
                   <div className="rounded-3xl border border-slate-200 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Requested scans</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Requested scans</p>
                     <div className="mt-3 grid gap-2 md:grid-cols-2">
                       {activeOrder.items.map((item) => (
                         <div key={item.id} className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 p-3">
@@ -271,7 +271,7 @@ export function ScanQueuePage() {
                   </div>
 
                   <div className="rounded-3xl border border-slate-200 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Imaging acceptance details</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Imaging acceptance details</p>
                     <div className="mt-3 grid gap-3">
                       <input className={inputClass} value={modality} onChange={(event) => setModality(event.target.value)} placeholder="Modality, e.g. X-ray, CT, Ultrasound" disabled={Boolean(acceptedScan)} />
                       <input className={inputClass} value={room} onChange={(event) => setRoom(event.target.value)} placeholder="Room" disabled={Boolean(acceptedScan)} />
@@ -281,7 +281,7 @@ export function ScanQueuePage() {
 
                     {acceptedScan ? (
                       <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-                        <p className="font-black text-emerald-800">Scan already accepted: {acceptedScan.id}</p>
+                        <p className="font-bold text-emerald-800">Scan already accepted: {acceptedScan.id}</p>
                         <p className="mt-1 text-sm text-emerald-700">Accepted by {acceptedScan.acceptedBy} at {formatDateTime(acceptedScan.acceptedAt || acceptedScan.bookedAt)}</p>
                       </div>
                     ) : (
@@ -292,7 +292,7 @@ export function ScanQueuePage() {
                 </div>
 
                 <div className="rounded-3xl border border-slate-200 bg-white p-4">
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Clinical notes</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Clinical notes</p>
                   <p className="mt-2 text-sm leading-6 text-slate-700">{activeOrder.clinicalNotes || 'No clinical notes provided.'}</p>
                 </div>
               </div>

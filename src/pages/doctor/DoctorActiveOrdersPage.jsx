@@ -26,14 +26,14 @@ function ActiveOrderDetailModal({ order, onClose }) {
     >
       <div className="space-y-5">
         <div className="grid gap-3 md:grid-cols-3">
-          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Patient</p><p className="mt-1 font-black text-slate-950">{order.patient?.fullName}</p><p className="text-sm text-slate-500">{order.patient?.id}</p></div>
-          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Status</p><div className="mt-2"><StatusBadge status={order.status} /></div><p className="mt-2 text-sm text-slate-500">Billing: {order.billingStatus}</p></div>
-          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Expected</p><p className="mt-1 font-black text-slate-950">{formatDateTime(order.expectedCompletionAt)}</p><p className="text-sm text-slate-500">Urgency: {order.urgency}</p></div>
+          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Patient</p><p className="mt-1 font-bold text-slate-900">{order.patient?.fullName}</p><p className="text-sm text-slate-500">{order.patient?.id}</p></div>
+          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Status</p><div className="mt-2"><StatusBadge status={order.status} /></div><p className="mt-2 text-sm text-slate-500">Billing: {order.billingStatus}</p></div>
+          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Expected</p><p className="mt-1 font-bold text-slate-900">{formatDateTime(order.expectedCompletionAt)}</p><p className="text-sm text-slate-500">Urgency: {order.urgency}</p></div>
         </div>
         <WorkflowTimeline status={order.status} timeline={order.timeline || []} />
         <Card title="Tests / Scans" compact>
           <div className="flex flex-wrap gap-2">
-            {order.items.map((item) => <span key={item.id} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-700">{item.id} · {item.name}</span>)}
+            {order.items.map((item) => <span key={item.id} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700">{item.id} · {item.name}</span>)}
           </div>
         </Card>
         <Card title="Clinical Notes" compact>
@@ -84,9 +84,9 @@ export function DoctorActiveOrdersPage() {
         {[
           ['All Active', summary.all], ['Submitted', summary.submitted], ['In Progress', summary.inProgress], ['Pending Review', summary.review], ['Urgent', summary.urgent]
         ].map(([label, value]) => (
-          <div key={label} className="flex min-h-[3rem] items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
-            <p className="text-lg font-black leading-none text-slate-950">{value}</p>
-            <p className="truncate text-[10px] font-black uppercase tracking-[0.12em] text-slate-400">{label}</p>
+          <div key={label} className="flex min-h-[3rem] items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+            <p className="text-lg font-bold leading-none text-slate-900">{value}</p>
+            <p className="truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{label}</p>
           </div>
         ))}
       </div>
@@ -96,7 +96,7 @@ export function DoctorActiveOrdersPage() {
         subtitle="Use filters to follow current work by status, urgency, patient, or test."
         actions={(
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <div className="relative w-full sm:w-64"><Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" /><input className={`${inputClass} h-10 !w-full py-2 pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search order, patient, test..." /></div>
+            <div className="relative w-full sm:w-64"><Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-500" /><input className={`${inputClass} h-10 !w-full py-2 pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search order, patient, test..." /></div>
             <select className={`${inputClass} h-10 !w-full py-2 sm:!w-40`} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="">All statuses</option>{statusOptions.map((status) => <option key={status}>{status}</option>)}</select>
             <select className={`${inputClass} h-10 !w-full py-2 sm:!w-40`} value={urgencyFilter} onChange={(event) => setUrgencyFilter(event.target.value)}><option value="">All urgency</option><option>Routine</option><option>Urgent</option></select>
           </div>
@@ -104,8 +104,8 @@ export function DoctorActiveOrdersPage() {
       >
         <DataTable
           columns={[
-            { key: 'id', label: 'Order ID', render: (order) => <span className="font-black text-slate-950">{order.id}</span> },
-            { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold">{order.patient?.fullName}</p><p className="text-xs text-slate-400">{order.patient?.id}</p></div> },
+            { key: 'id', label: 'Order ID', render: (order) => <span className="font-bold text-slate-900">{order.id}</span> },
+            { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold">{order.patient?.fullName}</p><p className="text-xs text-slate-500">{order.patient?.id}</p></div> },
             { key: 'items', label: 'Tests / Scans', render: orderItemsText },
             { key: 'urgency', label: 'Urgency', render: (order) => <StatusBadge status={order.urgency} /> },
             { key: 'status', label: 'Processing Status', render: (order) => <StatusBadge status={order.status} /> },

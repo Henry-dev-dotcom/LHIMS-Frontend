@@ -21,10 +21,12 @@ export function useApiReadiness() {
       mappedModels: ['Patient','Order','Result','Invoice','Catalog Item','Notification','File Metadata','DICOM Study'],
       blockers: client.mode === 'mock' ? ['Mock mode is active. Switch to live mode when server requests should be used.'] : [],
       liveRequirements: ['API server running on port 5000', 'PostgreSQL running', 'Prisma migrations applied', 'Seed data loaded', 'Valid JWT after login'],
-      hasStoredAccessToken: Boolean(tokens.accessToken),
+      // Auth tokens are httpOnly cookies (not readable from JS); a cached user
+      // profile indicates an established session.
+      hasActiveSession: Boolean(tokens.user),
       services
     };
-  }, [client.mode, config.baseUrl, endpoints.length, tokens.accessToken]);
+  }, [client.mode, config.baseUrl, endpoints.length, tokens.user]);
 
   const updateMode = (mode) => {
     setApiMode(mode);

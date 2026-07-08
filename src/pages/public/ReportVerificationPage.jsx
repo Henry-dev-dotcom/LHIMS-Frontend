@@ -25,7 +25,7 @@ export function ReportVerificationPage() {
   const verificationUrl = getReportVerificationUrl(result || { secureId });
 
   return (
-    <main className="min-h-screen bg-slate-100 px-3 py-4 text-slate-950 sm:px-4 sm:py-8">
+    <main className="min-h-screen bg-slate-100 px-3 py-4 text-slate-900 sm:px-4 sm:py-8">
       <div className="mx-auto max-w-3xl space-y-5">
         <Card title="Report Verification" subtitle="Public read-only integrity check for Diagnosis Center laboratory reports." actions={valid ? <ShieldCheck className="h-6 w-6 text-emerald-600" /> : <AlertTriangle className="h-6 w-6 text-amber-600" />}>
           {result ? (
@@ -33,17 +33,17 @@ export function ReportVerificationPage() {
               <div className="grid gap-4 md:grid-cols-[180px_1fr]">
                 <div className="rounded-2xl border border-slate-200 bg-white p-4 text-center">
                   <img className="mx-auto h-28 w-28 rounded-xl sm:h-36 sm:w-36" src={getQrCodeUrl(verificationUrl)} alt="Verification QR" />
-                  <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-slate-400"><QrCode className="mr-1 inline h-3 w-3" /> Secure QR</p>
+                  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.08em] text-slate-500"><QrCode className="mr-1 inline h-3 w-3" /> Secure QR</p>
                 </div>
                 <div className="space-y-3">
-                  <div><p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Verification Status</p><StatusBadge status={valid ? 'Authentic / Signed' : 'Not fully signed'} /></div>
-                  <div><p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Patient</p><p className="text-lg font-black">{maskName(patient?.fullName)}</p></div>
-                  <div><p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Report</p><p className="font-mono text-sm font-bold">{result.id} · {result.orderId}</p></div>
-                  <div><p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Signed By</p><p className="font-bold">{result.signedBy || result.approvedBy || 'Unsigned'} · {formatDateTime(result.signedAt || result.approvedAt)}</p></div>
+                  <div><p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Verification Status</p><StatusBadge status={valid ? 'Authentic / Signed' : 'Not fully signed'} /></div>
+                  <div><p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Patient</p><p className="text-lg font-bold">{maskName(patient?.fullName)}</p></div>
+                  <div><p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Report</p><p className="font-mono text-sm font-bold">{result.id} · {result.orderId}</p></div>
+                  <div><p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Signed By</p><p className="font-bold">{result.signedBy || result.approvedBy || 'Unsigned'} · {formatDateTime(result.signedAt || result.approvedAt)}</p></div>
                 </div>
               </div>
               <div className="rounded-2xl bg-slate-950 p-4 text-white">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Tamper-evident hash</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">Tamper-evident hash</p>
                 <p className="mt-2 break-all font-mono text-xs font-semibold">{result.reportHash || 'No report hash generated yet.'}</p>
               </div>
               <div className="rounded-2xl bg-clinical-50 p-4 text-sm font-semibold text-clinical-800">

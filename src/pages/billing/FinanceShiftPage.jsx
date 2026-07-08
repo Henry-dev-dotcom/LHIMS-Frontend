@@ -88,9 +88,9 @@ export function FinanceShiftPage() {
               ))}
             </div>
             <div className="grid gap-3 md:grid-cols-3">
-              <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Expected cash</p><p className="font-black text-slate-950">{money(expectedCash)}</p></div>
-              <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Counted</p><p className="font-black text-slate-950">{money(countedCash)}</p></div>
-              <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Variance</p><p className="font-black text-slate-950">{money(variance)}</p></div>
+              <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Expected cash</p><p className="font-bold text-slate-900">{money(expectedCash)}</p></div>
+              <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Counted</p><p className="font-bold text-slate-900">{money(countedCash)}</p></div>
+              <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Variance</p><p className="font-bold text-slate-900">{money(variance)}</p></div>
             </div>
             <FormField label="Closing notes"><textarea className={`${inputClass} min-h-20`} value={closeNotes} onChange={(event) => setCloseNotes(event.target.value)} disabled={!activeShift} /></FormField>
             <Button type="submit" variant="danger" disabled={!activeShift}><Lock className="h-4 w-4" /> Close Shift</Button>

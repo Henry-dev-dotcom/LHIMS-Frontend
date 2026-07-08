@@ -89,7 +89,7 @@ export function IncomingOrdersPage() {
       </div>
       <DataTable
         columns={[
-          { key: 'id', label: 'Order', render: (row) => <button type="button" onClick={() => { setSelectedOrderId(row.id); setSection('confirm'); }} className="font-black text-blue-700 hover:text-blue-900">{row.id}</button> },
+          { key: 'id', label: 'Order', render: (row) => <button type="button" onClick={() => { setSelectedOrderId(row.id); setSection('confirm'); }} className="font-bold text-blue-700 hover:text-blue-900">{row.id}</button> },
           { key: 'patient', label: 'Patient', render: (row) => <div><p className="font-bold text-slate-900">{row.patient?.fullName}</p><p className="text-xs text-slate-500">{row.patient?.phone}</p></div> },
           { key: 'doctor', label: 'Doctor / Hospital', render: (row) => <div><p className="font-bold text-slate-900">{row.doctor?.name}</p><p className="text-xs text-slate-500">{row.hospital?.name}</p></div> },
           { key: 'items', label: 'Tests / Scans', render: (row) => <ItemTags items={row.items} /> },
@@ -116,12 +116,12 @@ export function IncomingOrdersPage() {
 
       <Card title="Focused order preview" subtitle="Select any order from the list to review routing and invoice context." compact>
         {selectedOrder ? <div className="space-y-4">
-          <div><p className="text-xs font-black uppercase tracking-wide text-slate-400">Order</p><p className="text-xl font-black text-slate-950">{selectedOrder.id}</p><p className="text-sm text-slate-500">Created {formatDateTime(selectedOrder.createdAt)}</p></div>
+          <div><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Order</p><p className="text-xl font-bold text-slate-900">{selectedOrder.id}</p><p className="text-sm text-slate-500">Created {formatDateTime(selectedOrder.createdAt)}</p></div>
           <div className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
-            <div><span className="font-black text-slate-700">Patient:</span> {selectedOrder.patient?.fullName} · {selectedOrder.patient?.phone}</div>
-            <div><span className="font-black text-slate-700">Doctor:</span> {selectedOrder.doctor?.name} · {selectedOrder.hospital?.name}</div>
-            <div><span className="font-black text-slate-700">Invoice:</span> {selectedOrder.invoice?.id || 'Not generated'} {selectedOrder.invoice ? `· ${money(selectedOrder.invoice.amount)}` : ''}</div>
-            <div><span className="font-black text-slate-700">Routed:</span> {(selectedOrder.routedDepartments || []).join(', ') || '—'}</div>
+            <div><span className="font-bold text-slate-700">Patient:</span> {selectedOrder.patient?.fullName} · {selectedOrder.patient?.phone}</div>
+            <div><span className="font-bold text-slate-700">Doctor:</span> {selectedOrder.doctor?.name} · {selectedOrder.hospital?.name}</div>
+            <div><span className="font-bold text-slate-700">Invoice:</span> {selectedOrder.invoice?.id || 'Not generated'} {selectedOrder.invoice ? `· ${money(selectedOrder.invoice.amount)}` : ''}</div>
+            <div><span className="font-bold text-slate-700">Routed:</span> {(selectedOrder.routedDepartments || []).join(', ') || '—'}</div>
           </div>
           <WorkflowTimeline status={selectedOrder.status} />
           <ItemTags items={selectedOrder.items} />
@@ -152,7 +152,7 @@ export function IncomingOrdersPage() {
             const count = card.key ? state.data.orders.filter((order) => order.status === card.key).length : state.data.orders.length;
             return (
               <button key={card.label} type="button" onClick={() => goSection(card.key === 'Submitted' ? 'new' : card.key === 'Confirmed' ? 'confirmed' : card.key === 'Cancelled' ? 'cancelled' : 'all')} className="rounded-2xl border border-slate-200 bg-white p-3 text-left transition hover:border-blue-200 hover:bg-blue-50">
-                <div className="flex items-start justify-between gap-3"><p className="text-sm font-black text-slate-950">{card.label}</p><span className="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-black text-white">{count}</span></div>
+                <div className="flex items-start justify-between gap-3"><p className="text-sm font-bold text-slate-900">{card.label}</p><span className="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-bold text-white">{count}</span></div>
                 <p className="mt-1 text-xs leading-5 text-slate-500">{card.description}</p>
               </button>
             );

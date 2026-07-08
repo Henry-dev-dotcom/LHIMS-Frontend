@@ -199,12 +199,12 @@ function PatientProgressChart({ rows, parameterName, compact = false }) {
     <div className={`rounded-3xl border border-clinical-100 bg-gradient-to-br from-clinical-50 to-white ${compact ? 'p-4' : 'p-5'}`}>
       <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
-          <p className="text-xs font-black uppercase tracking-wider text-clinical-700">{parameterName || 'Patient progress line chart'}</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-clinical-700">{parameterName || 'Patient progress line chart'}</p>
           <p className="mt-1 text-sm text-slate-500">Finalized values plotted in visit/release order.</p>
         </div>
         <div className="rounded-2xl bg-white px-4 py-3 text-left shadow-sm md:text-right">
-          <p className="text-xs font-black uppercase tracking-wider text-slate-400">Change</p>
-          <p className={`font-black ${change > 0 ? 'text-amber-700' : change < 0 ? 'text-clinical-700' : 'text-slate-900'}`}>{change > 0 ? '+' : ''}{change.toFixed(2)} {unit}</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Change</p>
+          <p className={`font-semibold ${change > 0 ? 'text-amber-700' : change < 0 ? 'text-clinical-700' : 'text-slate-900'}`}>{change > 0 ? '+' : ''}{change.toFixed(2)} {unit}</p>
         </div>
       </div>
 
@@ -222,13 +222,13 @@ function PatientProgressChart({ rows, parameterName, compact = false }) {
         {Number.isFinite(low) && (
           <g>
             <line x1={left} x2={right} y1={yFor(low)} y2={yFor(low)} className="stroke-emerald-500" strokeDasharray="2 2" strokeWidth="0.8" />
-            <text x={right + 1} y={yFor(low) + 1.2} className="fill-emerald-700 text-[3px] font-black">Low</text>
+            <text x={right + 1} y={yFor(low) + 1.2} className="fill-emerald-700 text-[3px] font-semibold">Low</text>
           </g>
         )}
         {Number.isFinite(high) && (
           <g>
             <line x1={left} x2={right} y1={yFor(high)} y2={yFor(high)} className="stroke-rose-500" strokeDasharray="2 2" strokeWidth="0.8" />
-            <text x={right + 1} y={yFor(high) + 1.2} className="fill-rose-700 text-[3px] font-black">High</text>
+            <text x={right + 1} y={yFor(high) + 1.2} className="fill-rose-700 text-[3px] font-semibold">High</text>
           </g>
         )}
         <polyline fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.4" points={points} className="text-clinical-600" />
@@ -240,7 +240,7 @@ function PatientProgressChart({ rows, parameterName, compact = false }) {
           return (
             <g key={row.id || `${row.orderId}-${index}`}>
               <circle cx={x} cy={y} r="2.5" className={abnormal ? 'fill-rose-600' : 'fill-clinical-700'} />
-              <text x={x} y={y - 4} textAnchor="middle" className="fill-slate-700 text-[3.2px] font-black">{value}</text>
+              <text x={x} y={y - 4} textAnchor="middle" className="fill-slate-700 text-[3.2px] font-semibold">{value}</text>
               <text x={x} y="94" textAnchor="middle" className="fill-slate-500 text-[2.8px] font-bold">{new Date(row.approvedAt || row.createdAt).toLocaleDateString('en-GB', { month: 'short', day: '2-digit' })}</text>
             </g>
           );
@@ -250,9 +250,9 @@ function PatientProgressChart({ rows, parameterName, compact = false }) {
       </svg>
 
       <div className={`mt-4 grid gap-3 ${compact ? 'sm:grid-cols-3' : 'md:grid-cols-3'}`}>
-        <div className="rounded-2xl bg-white p-3"><p className="text-xs font-black uppercase tracking-wider text-slate-400">First value</p><p className="mt-1 font-black text-slate-950">{first.value} {unit}</p><p className="text-xs text-slate-500">{formatDateTime(first.approvedAt || first.createdAt)}</p></div>
-        <div className="rounded-2xl bg-white p-3"><p className="text-xs font-black uppercase tracking-wider text-slate-400">Latest value</p><p className="mt-1 font-black text-slate-950">{latest.value} {unit}</p><p className="text-xs text-slate-500">{formatDateTime(latest.approvedAt || latest.createdAt)}</p></div>
-        <div className="rounded-2xl bg-white p-3"><p className="text-xs font-black uppercase tracking-wider text-slate-400">Reference range</p><p className="mt-1 font-black text-slate-950">{latest.referenceRange || '—'}</p><p className="text-xs text-slate-500">Dashed lines show low/high range when available.</p></div>
+        <div className="rounded-2xl bg-white p-3"><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">First value</p><p className="mt-1 font-semibold text-slate-950">{first.value} {unit}</p><p className="text-xs text-slate-500">{formatDateTime(first.approvedAt || first.createdAt)}</p></div>
+        <div className="rounded-2xl bg-white p-3"><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Latest value</p><p className="mt-1 font-semibold text-slate-950">{latest.value} {unit}</p><p className="text-xs text-slate-500">{formatDateTime(latest.approvedAt || latest.createdAt)}</p></div>
+        <div className="rounded-2xl bg-white p-3"><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Reference range</p><p className="mt-1 font-semibold text-slate-950">{latest.referenceRange || '—'}</p><p className="text-xs text-slate-500">Dashed lines show low/high range when available.</p></div>
       </div>
     </div>
   );
@@ -264,10 +264,10 @@ function ParameterTrendCard({ chart, onView }) {
     <div className="flex min-w-0 flex-col rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
       <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="break-words font-black text-slate-950">{chart.parameter.name}</p>
+          <p className="break-words font-semibold text-slate-950">{chart.parameter.name}</p>
           <p className="text-xs font-semibold text-slate-500">{chart.parameter.unit || 'No unit'} · Ref: {chart.parameter.referenceRange || '—'}</p>
         </div>
-        <div className="rounded-2xl bg-slate-50 px-3 py-2 text-xs font-black uppercase tracking-wider text-slate-500">
+        <div className="rounded-2xl bg-slate-50 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
           {chart.rows.length} result{chart.rows.length === 1 ? '' : 's'}
         </div>
       </div>
@@ -278,7 +278,7 @@ function ParameterTrendCard({ chart, onView }) {
 
       <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
         <div className="text-xs font-semibold text-slate-500">
-          Latest: <span className="font-black text-slate-900">{latest ? `${latest.value} ${latest.unit || ''}` : 'No numeric value'}</span>
+          Latest: <span className="font-semibold text-slate-900">{latest ? `${latest.value} ${latest.unit || ''}` : 'No numeric value'}</span>
         </div>
         <Button variant="secondary" onClick={() => onView(chart)} aria-label={`Open large chart for ${chart.parameter.name}`}>
           <Eye className="h-4 w-4" /> View
@@ -373,7 +373,7 @@ export function PatientTrendsPanel({ data, allowedPatientIds = null, title = 'Pa
         <div className="grid gap-4 xl:grid-cols-[0.8fr_1.4fr]">
           <div className="space-y-3">
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+              <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
               <input
                 className={`${inputClass} pl-9`}
                 value={query}
@@ -393,8 +393,8 @@ export function PatientTrendsPanel({ data, allowedPatientIds = null, title = 'Pa
               <div className="max-h-72 overflow-y-auto rounded-2xl border border-slate-200 bg-white">
                 {matches.map((patient) => (
                   <button key={patient.id} type="button" onClick={() => selectPatient(patient.id)} className="flex w-full items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 text-left last:border-b-0 hover:bg-clinical-50">
-                    <span><span className="block font-black text-slate-950">{patient.fullName}</span><span className="text-xs text-slate-500">{patient.id} · {patient.phone || 'No phone'}</span></span>
-                    <span className="text-xs font-black uppercase tracking-wider text-clinical-700">Select</span>
+                    <span><span className="block font-semibold text-slate-950">{patient.fullName}</span><span className="text-xs text-slate-500">{patient.id} · {patient.phone || 'No phone'}</span></span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-clinical-700">Select</span>
                   </button>
                 ))}
                 {matches.length === 0 && <p className="p-4 text-sm font-semibold text-slate-500">No patients found.</p>}
@@ -403,10 +403,10 @@ export function PatientTrendsPanel({ data, allowedPatientIds = null, title = 'Pa
 
             {selectedPatient && (
               <div className="rounded-2xl border border-clinical-100 bg-clinical-50 p-4">
-                <p className="text-xs font-black uppercase tracking-wider text-clinical-700">Selected patient</p>
-                <p className="mt-1 font-black text-slate-950">{selectedPatient.fullName}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-clinical-700">Selected patient</p>
+                <p className="mt-1 font-semibold text-slate-950">{selectedPatient.fullName}</p>
                 <p className="text-sm text-slate-600">ID: {selectedPatient.id} · Age: {calcAge(selectedPatient.dateOfBirth)} · Gender: {selectedPatient.gender || '—'}</p>
-                <button type="button" onClick={resetPatientSearch} className="mt-3 text-xs font-black uppercase tracking-wider text-slate-500 hover:text-clinical-700">Change patient</button>
+                <button type="button" onClick={resetPatientSearch} className="mt-3 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-clinical-700">Change patient</button>
               </div>
             )}
           </div>
@@ -414,8 +414,8 @@ export function PatientTrendsPanel({ data, allowedPatientIds = null, title = 'Pa
           <div className="space-y-4">
             <div className="flex flex-col gap-3 rounded-2xl bg-slate-50 p-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="text-xs font-black uppercase tracking-wider text-slate-400">Trend navigation</p>
-                <p className="mt-1 font-black text-slate-950">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Trend navigation</p>
+                <p className="mt-1 font-semibold text-slate-950">
                   {!selectedPatient ? 'Search and select a patient' : !selectedTest ? 'Select a repeated lab test' : `${selectedTest.name} · ${chartCount} parameter chart${chartCount === 1 ? '' : 's'}`}
                 </p>
                 {selectedTest && <p className="mt-1 text-sm font-semibold text-slate-500">All parameters for this test are displayed together. Use View below any chart to open it in a large popup.</p>}
@@ -425,11 +425,11 @@ export function PatientTrendsPanel({ data, allowedPatientIds = null, title = 'Pa
 
             {selectedPatient && !selectedTest && (
               <div>
-                <p className="mb-2 text-xs font-black uppercase tracking-wider text-slate-400">Select a completed lab test</p>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Select a completed lab test</p>
                 <div className="grid gap-3 md:grid-cols-2">
                   {completedTests.map((test) => (
                     <button key={test.id} onClick={() => { setSelectedTestId(test.id); setFocusedChart(null); }} className="rounded-2xl border border-slate-200 bg-white p-4 text-left transition hover:border-clinical-300 hover:bg-clinical-50">
-                      <p className="font-black text-slate-950">{test.name}</p>
+                      <p className="font-semibold text-slate-950">{test.name}</p>
                       <p className="text-xs text-slate-500">{test.department} · {test.visitCount} completed visit(s) · {(test.parameters || []).length} parameter(s)</p>
                     </button>
                   ))}
@@ -442,15 +442,15 @@ export function PatientTrendsPanel({ data, allowedPatientIds = null, title = 'Pa
               <div className="rounded-2xl border border-clinical-100 bg-clinical-50 p-4">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                   <div>
-                    <p className="text-xs font-black uppercase tracking-wider text-clinical-700">Viewing all test parameters</p>
-                    <p className="font-black text-slate-950">{selectedTest.name}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-clinical-700">Viewing all test parameters</p>
+                    <p className="font-semibold text-slate-950">{selectedTest.name}</p>
                     <p className="mt-1 text-sm text-slate-600">{trendReadyCount} of {chartCount} parameter chart{chartCount === 1 ? '' : 's'} have enough numeric history for a line trend.</p>
                   </div>
                   <Button variant="secondary" onClick={exportTrendCsv} disabled={!allTrendRows.length}><Download className="h-4 w-4" /> Export CSV</Button>
                 </div>
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-500">From date<input className={`${inputClass} mt-1`} type="date" value={fromDate} onChange={(event) => setFromDate(event.target.value)} /></label>
-                  <label className="text-xs font-black uppercase tracking-wider text-slate-500">To date<input className={`${inputClass} mt-1`} type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} /></label>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">From date<input className={`${inputClass} mt-1`} type="date" value={fromDate} onChange={(event) => setFromDate(event.target.value)} /></label>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">To date<input className={`${inputClass} mt-1`} type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} /></label>
                 </div>
               </div>
             )}
@@ -473,7 +473,7 @@ export function PatientTrendsPanel({ data, allowedPatientIds = null, title = 'Pa
             { key: 'approvedAt', label: 'Date', render: (row) => formatDateTime(row.approvedAt || row.createdAt) },
             { key: 'testName', label: 'Test' },
             { key: 'parameter', label: 'Parameter' },
-            { key: 'value', label: 'Value', render: (row) => <span className="font-black text-slate-950">{row.value} {row.unit}</span> },
+            { key: 'value', label: 'Value', render: (row) => <span className="font-semibold text-slate-950">{row.value} {row.unit}</span> },
             { key: 'referenceRange', label: 'Range' },
             { key: 'flag', label: 'Flag', render: (row) => <StatusBadge status={row.flag} /> }
           ]}
@@ -495,7 +495,7 @@ export function PatientTrendsPanel({ data, allowedPatientIds = null, title = 'Pa
             <DataTable
               columns={[
                 { key: 'approvedAt', label: 'Date', render: (row) => formatDateTime(row.approvedAt || row.createdAt) },
-                { key: 'value', label: 'Value', render: (row) => <span className="font-black text-slate-950">{row.value} {row.unit}</span> },
+                { key: 'value', label: 'Value', render: (row) => <span className="font-semibold text-slate-950">{row.value} {row.unit}</span> },
                 { key: 'referenceRange', label: 'Range' },
                 { key: 'flag', label: 'Flag', render: (row) => <StatusBadge status={row.flag} /> },
                 { key: 'orderId', label: 'Order ID' }

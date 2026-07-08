@@ -12,12 +12,12 @@ export function FilterPanel({ title = 'Filters', children, className, defaultOpe
       )}
       open={defaultOpen}
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-black text-slate-900 marker:hidden [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-slate-900 marker:hidden [&::-webkit-details-marker]:hidden">
         <span className="inline-flex items-center gap-2">
           <SlidersHorizontal className="h-4 w-4 text-clinical-600" />
           {title}
         </span>
-        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 group-open:bg-clinical-50 group-open:text-clinical-700">
+        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500 group-open:bg-clinical-50 group-open:text-clinical-700">
           {defaultOpen ? 'Open' : 'Tap'}
         </span>
       </summary>

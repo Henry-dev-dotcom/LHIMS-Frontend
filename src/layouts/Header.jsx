@@ -7,6 +7,7 @@ import { NotificationDrawer } from '../components/ui/NotificationDrawer';
 import { MobileActionBar } from '../components/ui/MobileActionBar';
 import { PAGE_HEADER_EVENT } from '../components/ui/PageHeader';
 import { useAppStore } from '../store/AppStore';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { PAGE_META } from '../routes/routeRegistry';
 import { ROLES } from '../data/roles';
 import '../styles/getlabs-theme.css';
@@ -116,6 +117,17 @@ export function Header() {
     };
   }, [userMenuOpen]);
 
+  useFocusTrap(userDropdownRef, userMenuOpen);
+  useEffect(() => {
+    if (!userMenuOpen) return undefined;
+    // Move focus into the menu on open so keyboard users land inside it.
+    const timer = window.setTimeout(() => {
+      const first = userDropdownRef.current?.querySelector('button, [href], [tabindex]:not([tabindex="-1"])');
+      first?.focus?.({ preventScroll: true });
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [userMenuOpen]);
+
   useEffect(() => {
     if (!userMenuOpen) return undefined;
 
@@ -158,13 +170,11 @@ export function Header() {
   const unread = roleNotifications.filter((item) => !item.read && item.status !== 'Delivered').length;
 
   return (
-    <header className="relative z-[90] border-b border-white/60 bg-slate-50/88 px-3 py-2 shadow-sm backdrop-blur-2xl sm:px-5 lg:px-8 print:hidden">
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-2xl focus:bg-clinical-700 focus:px-4 focus:py-2 focus:text-sm focus:font-black focus:text-white">Skip to content</a>
-
+    <header className="relative z-[90] border-b border-white/60 bg-white/85 px-3 py-2 shadow-sm backdrop-blur-2xl sm:px-5 lg:px-8 print:hidden">
       <div className="lg:hidden">
-        <div className="rounded-[1.35rem] border border-white/85 bg-white/96 px-3 py-2.5 shadow-card backdrop-blur-xl">
+        <div className="rounded-[1.35rem] border border-slate-200/70 bg-white/96 px-3 py-2.5 shadow-card">
           <div className="flex items-center justify-between gap-2">
-            <div className="inline-flex min-w-0 flex-1 items-center gap-1.5 rounded-full border border-clinical-100 bg-clinical-50/90 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-clinical-800 shadow-sm">
+            <div className="inline-flex min-w-0 flex-1 items-center gap-1.5 rounded-full border border-clinical-100 bg-clinical-50/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-clinical-800">
               <Sparkles className="h-3 w-3 shrink-0" />
               <span className="truncate">{pageHeader?.eyebrow || roleInfo?.label || 'Workspace'}</span>
             </div>
@@ -180,7 +190,7 @@ export function Header() {
                   onClick={() => setNotificationsOpen((value) => !value)}
                 >
                   <Bell className="h-4 w-4" />
-                  {unread > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-danger px-1 text-[10px] font-black text-white ring-2 ring-white">{unread}</span>}
+                  {unread > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-danger px-1 text-[10px] font-semibold text-white ring-2 ring-white">{unread}</span>}
                 </button>
                 <NotificationDrawer
                   open={notificationsOpen}
@@ -217,17 +227,18 @@ export function Header() {
                   title="User menu"
                   type="button"
                   aria-label="Open user menu"
+                  aria-haspopup="dialog"
                   aria-expanded={userMenuOpen}
                   onClick={() => setUserMenuOpen((value) => !value)}
                 >
-                  <span className="grid h-7 w-7 place-items-center rounded-xl bg-clinical-600 text-xs font-black text-white shadow-sm">{userInitial}</span>
+                  <span className="grid h-7 w-7 place-items-center rounded-xl bg-clinical-600 text-xs font-semibold text-white shadow-sm">{userInitial}</span>
                 </button>
               </div>
             </div>
           </div>
 
           <div className="mt-2.5 border-t border-slate-100 pt-2.5">
-            <h1 className="line-clamp-1 text-[1.05rem] font-black leading-tight tracking-tight text-slate-950">{pageHeader?.title || 'Diagnosis Center'}</h1>
+            <h1 className="line-clamp-1 text-[1.05rem] font-semibold leading-tight tracking-tight text-slate-900">{pageHeader?.title || 'Diagnosis Center'}</h1>
             {pageHeader?.description && (
               isValidElement(pageHeader.description) ? (
                 <div className="mt-2">{pageHeader.description}</div>
@@ -235,7 +246,7 @@ export function Header() {
                 <div ref={screenGuideRef} className="relative mt-1.5 inline-block text-xs font-semibold leading-5 text-slate-500">
                   <button
                     type="button"
-                    className="inline-flex min-h-0 cursor-pointer items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-slate-500 shadow-sm transition duration-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-[0.98]"
+                    className="inline-flex min-h-0 cursor-pointer items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-500 shadow-sm transition duration-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-[0.98]"
                     aria-label="Open screen guide"
                     aria-expanded={screenGuideOpen}
                     aria-controls="mobile-screen-guide-panel"
@@ -263,20 +274,20 @@ export function Header() {
       </div>
 
       <div className="hidden overflow-visible lg:block">
-        <div className="relative flex min-h-[5.35rem] max-w-full items-start justify-between gap-4 overflow-visible rounded-[1.35rem] border border-white/85 bg-white/94 px-6 py-2.5 shadow-card backdrop-blur-xl">
+        <div className="relative flex min-h-[4.6rem] max-w-full items-start justify-between gap-4 overflow-visible rounded-[1.35rem] border border-slate-200/70 bg-white/94 px-6 py-2.5 shadow-card">
           <div className="min-w-0 flex-1 pr-2">
             {pageHeader?.eyebrow && (
-              <p className="inline-flex items-center gap-1.5 rounded-full border border-clinical-100 bg-clinical-50/80 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.18em] text-clinical-800 shadow-sm">
+              <p className="inline-flex items-center gap-1.5 rounded-full border border-clinical-100 bg-clinical-50/80 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-clinical-800">
                 <Sparkles className="h-3 w-3" /> {pageHeader.eyebrow}
               </p>
             )}
-            <div className="mt-1.5 min-w-0">
-              <h1 className="truncate text-[1.65rem] font-black tracking-tight text-slate-950">{pageHeader?.title || 'Diagnosis Center'}</h1>
+            <div className="mt-1 min-w-0">
+              <h1 className="truncate text-xl font-semibold tracking-tight text-slate-900">{pageHeader?.title || 'Diagnosis Center'}</h1>
               {pageHeader?.description && (
                 isValidElement(pageHeader.description) ? (
                   <div className="mt-1.5 max-w-5xl">{pageHeader.description}</div>
                 ) : (
-                  <p className="mt-0.5 line-clamp-1 max-w-5xl text-sm leading-5 text-slate-600">{pageHeader.description}</p>
+                  <p className="mt-0.5 line-clamp-1 max-w-5xl text-sm leading-5 text-slate-500">{pageHeader.description}</p>
                 )
               )}
             </div>
@@ -293,7 +304,7 @@ export function Header() {
                 onClick={() => setNotificationsOpen((value) => !value)}
               >
                 <Bell className="h-4 w-4" />
-                {unread > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-danger px-1 text-[10px] font-black text-white ring-2 ring-white">{unread}</span>}
+                {unread > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-danger px-1 text-[10px] font-semibold text-white ring-2 ring-white">{unread}</span>}
               </button>
               <NotificationDrawer
                 open={notificationsOpen}
@@ -315,15 +326,16 @@ export function Header() {
                 title="User menu"
                 type="button"
                 aria-label="Open user menu"
+                aria-haspopup="dialog"
                 aria-expanded={userMenuOpen}
                 onClick={() => setUserMenuOpen((value) => !value)}
               >
-                <span className="grid h-7 w-7 place-items-center rounded-xl bg-clinical-600 text-xs font-black text-white shadow-sm">{userInitial}</span>
+                <span className="grid h-7 w-7 place-items-center rounded-xl bg-clinical-600 text-xs font-semibold text-white shadow-sm">{userInitial}</span>
                 <span className="hidden min-w-0 text-left lg:block">
-                  <span className="block max-w-[8rem] truncate text-xs font-black text-slate-900">{state.auth?.userName || 'User'}</span>
+                  <span className="block max-w-[8rem] truncate text-xs font-semibold text-slate-900">{state.auth?.userName || 'User'}</span>
                   <span className="block max-w-[8rem] truncate text-[10px] font-bold capitalize text-slate-500">{roleInfo?.demoUsername || role || 'workspace'}</span>
                 </span>
-                <ChevronDown className="h-4 w-4 text-slate-400" />
+                <ChevronDown className="h-4 w-4 text-slate-500" />
               </button>
             </div>
           </div>
@@ -344,22 +356,22 @@ export function Header() {
           ref={userDropdownRef}
           className="getlabs-floating-panel fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-[130] max-h-[calc(86dvh-env(safe-area-inset-bottom))] overflow-hidden rounded-[1.5rem] border border-slate-200/80 bg-white shadow-lift ring-1 ring-slate-950/5 md:inset-x-auto md:bottom-auto md:right-[var(--user-menu-right)] md:top-[var(--user-menu-top)] md:w-[calc(100vw-1.5rem)] md:max-w-72 md:rounded-3xl"
           style={{ '--user-menu-top': `${userMenuPosition.top}px`, '--user-menu-right': `${userMenuPosition.right}px` }}
-          role="menu"
+          role="dialog"
           aria-label="User session menu"
         >
           <div className="border-b border-slate-100 bg-slate-50/80 p-4">
             <div className="flex items-center gap-3">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-clinical-600 to-emerald-500 text-lg font-black text-white shadow-sm">{userInitial}</div>
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-clinical-500 text-lg font-semibold text-white shadow-sm">{userInitial}</div>
               <div className="min-w-0">
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Signed in as</p>
-                <p className="truncate text-base font-black text-slate-950">{state.auth?.userName || 'User'}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Signed in as</p>
+                <p className="truncate text-base font-semibold text-slate-950">{state.auth?.userName || 'User'}</p>
                 <p className="text-xs font-semibold capitalize text-slate-500">{roleInfo?.demoUsername || role || 'workspace'}</p>
               </div>
             </div>
           </div>
           <div className="max-h-[calc(86dvh-7rem-env(safe-area-inset-bottom))] space-y-2 overflow-y-auto overscroll-contain p-3">
             <div className="rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-600">
-              <div className="flex items-center gap-2 font-black text-slate-800"><UserRound className="h-3.5 w-3.5" /> {roleInfo?.label || 'Workspace'}</div>
+              <div className="flex items-center gap-2 font-semibold text-slate-800"><UserRound className="h-3.5 w-3.5" /> {roleInfo?.label || 'Workspace'}</div>
               <p className="mt-1 leading-5">Use this menu to view your session details or sign out securely.</p>
             </div>
             <div className="grid grid-cols-2 gap-2 md:hidden">

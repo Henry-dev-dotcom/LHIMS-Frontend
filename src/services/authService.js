@@ -1,4 +1,4 @@
-import { clearStoredTokens, getStoredTokens, setStoredTokens } from '../api/config';
+import { clearStoredTokens, setStoredTokens } from '../api/config';
 
 export const authService = {
   me: async (client) => client.mode === 'mock' ? client.get(client.mock.auth.me, client.auth) : client.request('/auth/me'),
@@ -10,8 +10,8 @@ export const authService = {
   },
   refresh: async (client) => {
     if (client.mode === 'mock') return { success: true };
-    const tokens = getStoredTokens();
-    const data = await client.request('/auth/refresh', { method: 'POST', body: { refreshToken: tokens.refreshToken }, skipAuth: true });
+    // Refresh token is carried by the httpOnly cookie; no body is sent.
+    const data = await client.request('/auth/refresh', { method: 'POST', skipAuth: true });
     setStoredTokens(data);
     return data;
   },

@@ -17,7 +17,7 @@ export function NetworkStatusBanner() {
       <div className="mx-auto flex max-w-[1540px] items-start gap-2.5">
         <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
         <div className="min-w-0">
-          <p className="text-xs font-black uppercase tracking-[0.14em]">{title}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.08em]">{title}</p>
           <p className="mt-0.5 text-xs font-semibold leading-5 text-amber-900/80">{detail}</p>
         </div>
       </div>

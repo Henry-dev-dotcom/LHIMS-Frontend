@@ -98,9 +98,9 @@ function TransitionButtons({ order }) {
   const nextStatuses = getNextStatuses(order.status);
 
   if (!canMoveLifecycle) {
-    return <span className="text-xs font-semibold text-slate-400">View-only for this role</span>;
+    return <span className="text-xs font-semibold text-slate-500">View-only for this role</span>;
   }
-  if (nextStatuses.length === 0) return <span className="text-xs font-semibold text-slate-400">No next transition</span>;
+  if (nextStatuses.length === 0) return <span className="text-xs font-semibold text-slate-500">No next transition</span>;
 
   function transition(nextStatus) {
     let reason = '';
@@ -147,7 +147,7 @@ function Timeline({ timeline = [] }) {
         <div key={`${event.status}-${event.timestamp}-${index}`} className="flex gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
           <div className="mt-1 h-2.5 w-2.5 rounded-full bg-clinical-500" />
           <div>
-            <p className="text-sm font-black text-slate-800">{event.status}</p>
+            <p className="text-sm font-bold text-slate-800">{event.status}</p>
             <p className="text-xs text-slate-500">{event.actor} • {event.role} • {formatDateTime(event.timestamp)}</p>
             {event.reason && <p className="mt-1 text-xs font-semibold text-red-600">Reason: {event.reason}</p>}
           </div>
@@ -169,30 +169,30 @@ function OrderCard({ order, selected, onSelect, canSeeFinance }) {
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-slate-950 px-3 py-1 text-xs font-black text-white">{order.id}</span>
+            <span className="rounded-full bg-slate-950 px-3 py-1 text-xs font-bold text-white">{order.id}</span>
             <StatusBadge status={order.status} />
             <StatusBadge status={order.urgency} />
-            {isReleased && <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-black text-emerald-700">Result ready</span>}
+            {isReleased && <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">Result ready</span>}
           </div>
-          <p className="mt-3 text-base font-black text-slate-950">{order.patient?.fullName || 'Unknown patient'}</p>
+          <p className="mt-3 text-base font-bold text-slate-900">{order.patient?.fullName || 'Unknown patient'}</p>
           <p className="mt-1 text-xs font-semibold text-slate-500">
             {order.doctor?.name || '—'} • {order.hospital?.name || '—'}
           </p>
         </div>
         <div className="flex flex-wrap gap-2 lg:justify-end">
           <StatusBadge status={order.billingStatus} />
-          {canSeeFinance && order.invoice && <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-600">{money(order.invoice.amount)}</span>}
+          {canSeeFinance && order.invoice && <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{money(order.invoice.amount)}</span>}
         </div>
       </div>
 
       <div className="mt-4 grid gap-3 xl:grid-cols-[1.25fr_0.75fr]">
         <div>
-          <p className="mb-2 text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Requested items</p>
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">Requested items</p>
           <OrderItems items={order.items} />
         </div>
         <div className="rounded-2xl bg-slate-50 p-3">
-          <p className="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Expected completion</p>
-          <p className="mt-1 text-sm font-black text-slate-800">{formatDateTime(order.expectedCompletionAt)}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">Expected completion</p>
+          <p className="mt-1 text-sm font-bold text-slate-800">{formatDateTime(order.expectedCompletionAt)}</p>
         </div>
       </div>
 
@@ -211,14 +211,14 @@ function BoardColumn({ column, orders, onSelect, selectedOrderId }) {
     <div className="rounded-[1.45rem] border border-slate-200 bg-slate-50/80 p-3">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-black text-slate-900">{column.title}</p>
+          <p className="text-sm font-bold text-slate-900">{column.title}</p>
           <p className="text-xs font-semibold text-slate-500">{column.description}</p>
         </div>
-        <span className="rounded-full bg-white px-2.5 py-1 text-xs font-black text-slate-700 shadow-sm">{orders.filter((order) => order.status === column.id).length}</span>
+        <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-slate-700 shadow-sm">{orders.filter((order) => order.status === column.id).length}</span>
       </div>
       <div className="space-y-2">
         {columnOrders.length === 0 ? (
-          <p className="rounded-2xl bg-white p-3 text-xs font-semibold text-slate-400">No orders in this section.</p>
+          <p className="rounded-2xl bg-white p-3 text-xs font-semibold text-slate-500">No orders in this section.</p>
         ) : columnOrders.map((order) => (
           <button
             key={order.id}
@@ -227,10 +227,10 @@ function BoardColumn({ column, orders, onSelect, selectedOrderId }) {
             className={`w-full rounded-2xl border bg-white p-3 text-left shadow-sm transition hover:border-clinical-200 ${selectedOrderId === order.id ? 'border-clinical-400 ring-2 ring-clinical-100' : 'border-slate-100'}`}
           >
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-black text-slate-900">{order.id}</span>
+              <span className="text-xs font-bold text-slate-900">{order.id}</span>
               <StatusBadge status={order.urgency} />
             </div>
-            <p className="mt-2 truncate text-sm font-black text-slate-800">{order.patient?.fullName || 'Unknown patient'}</p>
+            <p className="mt-2 truncate text-sm font-bold text-slate-800">{order.patient?.fullName || 'Unknown patient'}</p>
             <p className="mt-1 truncate text-xs font-semibold text-slate-500">{order.items.map((item) => item.name).join(', ')}</p>
           </button>
         ))}
@@ -254,9 +254,9 @@ function SectionTabs({ activeSection, counts, onChange }) {
           >
             <div className="flex items-center justify-between gap-3">
               <span className={`grid h-10 w-10 place-items-center rounded-2xl ${active ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-500'}`}><Icon className="h-5 w-5" /></span>
-              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-black text-slate-700">{counts[section.id] || 0}</span>
+              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">{counts[section.id] || 0}</span>
             </div>
-            <p className="mt-3 text-sm font-black text-slate-950">{section.label}</p>
+            <p className="mt-3 text-sm font-bold text-slate-900">{section.label}</p>
             <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">{section.helper}</p>
           </button>
         );
@@ -285,39 +285,39 @@ function OrderDetailsPanel({ order, canSeeFinance }) {
     >
       <div className="grid gap-3 md:grid-cols-2">
         <div className="rounded-2xl bg-slate-50 p-3">
-          <p className="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Patient</p>
-          <p className="mt-1 text-sm font-black text-slate-900">{order.patient?.fullName || '—'}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">Patient</p>
+          <p className="mt-1 text-sm font-bold text-slate-900">{order.patient?.fullName || '—'}</p>
           <p className="text-xs font-semibold text-slate-500">{order.patient?.phone || 'No phone'} • {order.patient?.gender || '—'}</p>
         </div>
         <div className="rounded-2xl bg-slate-50 p-3">
-          <p className="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Billing</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">Billing</p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <StatusBadge status={order.billingStatus} />
-            {canSeeFinance && order.invoice && <span className="text-sm font-black text-slate-900">{money(order.invoice.amount)}</span>}
+            {canSeeFinance && order.invoice && <span className="text-sm font-bold text-slate-900">{money(order.invoice.amount)}</span>}
           </div>
         </div>
       </div>
 
       <div className="mt-4 rounded-2xl bg-slate-50 p-3">
-        <p className="mb-2 text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">Requested tests / scans</p>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">Requested tests / scans</p>
         <OrderItems items={order.items} />
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <div>
-          <p className="mb-2 text-sm font-black text-slate-900">Lifecycle action</p>
+          <p className="mb-2 text-sm font-bold text-slate-900">Lifecycle action</p>
           <TransitionButtons order={order} />
         </div>
         {canSeeFinance && (
           <div>
-            <p className="mb-2 text-sm font-black text-slate-900">Billing action</p>
+            <p className="mb-2 text-sm font-bold text-slate-900">Billing action</p>
             <BillingActions order={order} />
           </div>
         )}
       </div>
 
       <div className="mt-5">
-        <p className="mb-3 text-sm font-black text-slate-900">Timeline</p>
+        <p className="mb-3 text-sm font-bold text-slate-900">Timeline</p>
         <Timeline timeline={order.timeline || []} />
       </div>
     </Card>
@@ -432,12 +432,12 @@ export function OrderRegistryPage() {
 
           <div className="mt-5 flex flex-col gap-3 rounded-[1.35rem] border border-slate-200 bg-white p-3 md:flex-row md:items-center">
             <div className="flex flex-1 items-center gap-3 rounded-2xl bg-slate-50 px-3 py-2">
-              <Search className="h-4 w-4 text-slate-400" />
+              <Search className="h-4 w-4 text-slate-500" />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search by order ID, patient, doctor, hospital, test name, catalog ID, status..."
-                className="w-full bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-400"
+                className="w-full bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-500"
               />
             </div>
             <div className="text-xs font-bold text-slate-500">

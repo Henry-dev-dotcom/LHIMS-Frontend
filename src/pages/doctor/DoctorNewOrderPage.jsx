@@ -57,7 +57,7 @@ function CatalogSearchModal({ open, onClose, catalog, selectedItems, toggleItem,
       description="Search by test/scan name, catalog ID, department, modality, or common abbreviation. Search results now open directly under the search bar. Prices remain hidden from clinicians."
       footer={(
         <>
-          <div className="mr-auto text-sm font-black text-slate-500">{selectedItems.length} selected</div>
+          <div className="mr-auto text-sm font-bold text-slate-500">{selectedItems.length} selected</div>
           <Button type="button" variant="secondary" onClick={clearItems}>Clear</Button>
           <Button type="button" onClick={onClose}>Done — Save Selected Tests</Button>
         </>
@@ -66,7 +66,7 @@ function CatalogSearchModal({ open, onClose, catalog, selectedItems, toggleItem,
       <div className="space-y-4">
         <div className="grid gap-3 md:grid-cols-[1fr_190px]">
           <div className="relative z-30">
-            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
             <input
               className={`${inputClass} pl-9`}
               value={query}
@@ -80,8 +80,8 @@ function CatalogSearchModal({ open, onClose, catalog, selectedItems, toggleItem,
             {searchActive && query.trim() && (
               <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-50 max-h-80 overflow-y-auto rounded-3xl border border-slate-200 bg-white p-2 shadow-2xl">
                 <div className="mb-2 flex items-center justify-between px-2 py-1">
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Search results</p>
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-black text-slate-500">{dropdownMatches.length} shown</span>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Search results</p>
+                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500">{dropdownMatches.length} shown</span>
                 </div>
 
                 {dropdownMatches.map((item) => {
@@ -95,12 +95,12 @@ function CatalogSearchModal({ open, onClose, catalog, selectedItems, toggleItem,
                     >
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="truncate font-black text-slate-950">{item.name}</p>
+                          <p className="truncate font-bold text-slate-900">{item.name}</p>
                           <StatusBadge status={item.type} />
                         </div>
                         <p className="mt-1 text-xs font-semibold text-slate-500">{item.id} · {item.department === 'Imaging' ? 'Radiology / Scan' : item.department}{item.modality ? ` · ${item.modality}` : ''} · ETA {item.expectedHours}h</p>
                       </div>
-                      <span className={`w-fit rounded-full px-3 py-1 text-xs font-black ${selected ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-600'}`}>{selected ? 'Added' : 'Add'}</span>
+                      <span className={`w-fit rounded-full px-3 py-1 text-xs font-bold ${selected ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-600'}`}>{selected ? 'Added' : 'Add'}</span>
                     </button>
                   );
                 })}
@@ -120,14 +120,14 @@ function CatalogSearchModal({ open, onClose, catalog, selectedItems, toggleItem,
         </div>
 
         <div className="rounded-2xl bg-slate-50 p-3">
-          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Quick common requests</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Quick common requests</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {COMMON_TEST_IDS.map((id) => catalog.find((item) => item.id === id)).filter(Boolean).map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => toggleItem(item.id)}
-                className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-black ring-1 transition ${selectedItems.includes(item.id) ? 'bg-clinical-600 text-white ring-clinical-600' : 'bg-white text-slate-700 ring-slate-200 hover:bg-clinical-50 hover:text-clinical-700'}`}
+                className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold ring-1 transition ${selectedItems.includes(item.id) ? 'bg-clinical-600 text-white ring-clinical-600' : 'bg-white text-slate-700 ring-slate-200 hover:bg-clinical-50 hover:text-clinical-700'}`}
               >
                 <Star className="h-3.5 w-3.5" /> {item.name}
               </button>
@@ -138,10 +138,10 @@ function CatalogSearchModal({ open, onClose, catalog, selectedItems, toggleItem,
         <div className="rounded-2xl border border-slate-200 bg-white p-3">
           <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-black uppercase tracking-wider text-slate-500">Selected tests / scans</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Selected tests / scans</p>
               <p className="text-sm text-slate-500">Use the search bar above. Matching tests drop down immediately under it.</p>
             </div>
-            <span className="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-600">{selectedCatalogItems.length} selected</span>
+            <span className="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{selectedCatalogItems.length} selected</span>
           </div>
 
           {selectedCatalogItems.length > 0 ? (
@@ -151,7 +151,7 @@ function CatalogSearchModal({ open, onClose, catalog, selectedItems, toggleItem,
                   key={item.id}
                   type="button"
                   onClick={() => toggleItem(item.id)}
-                  className="inline-flex items-center gap-2 rounded-full bg-clinical-50 px-3 py-1.5 text-xs font-black text-clinical-700 ring-1 ring-clinical-200 hover:bg-red-50 hover:text-red-600 hover:ring-red-200"
+                  className="inline-flex items-center gap-2 rounded-full bg-clinical-50 px-3 py-1.5 text-xs font-bold text-clinical-700 ring-1 ring-clinical-200 hover:bg-red-50 hover:text-red-600 hover:ring-red-200"
                   title="Remove selected item"
                 >
                   {item.id} · {item.name}
@@ -181,40 +181,40 @@ function ReviewOrderModal({ open, onClose, onConfirm, patient, newPatient, patie
       <div className="space-y-4">
         {duplicateOrders.length > 0 && (
           <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-            <div className="flex gap-2 font-black"><AlertTriangle className="h-5 w-5" /> Possible duplicate same-day order</div>
+            <div className="flex gap-2 font-bold"><AlertTriangle className="h-5 w-5" /> Possible duplicate same-day order</div>
             <p className="mt-1">This patient already has {duplicateOrders.length} order(s) today containing one or more of the selected tests/scans.</p>
           </div>
         )}
         <div className="grid gap-3 md:grid-cols-2">
           <div className="rounded-2xl bg-slate-50 p-3">
-            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Patient</p>
-            <p className="mt-1 font-black text-slate-950">{patientName || '—'}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Patient</p>
+            <p className="mt-1 font-bold text-slate-900">{patientName || '—'}</p>
             <p className="text-sm text-slate-500">{patientMode === 'existing' ? patient?.id : 'New patient record will be created'}</p>
           </div>
           <div className="rounded-2xl bg-slate-50 p-3">
-            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Clinician / Hospital</p>
-            <p className="mt-1 font-black text-slate-950">{doctor?.name}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Clinician / Hospital</p>
+            <p className="mt-1 font-bold text-slate-900">{doctor?.name}</p>
             <p className="text-sm text-slate-500">{hospital?.name}</p>
           </div>
           <div className="rounded-2xl bg-slate-50 p-3">
-            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Urgency</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Urgency</p>
             <div className="mt-1"><StatusBadge status={urgency} /></div>
             <p className="mt-2 text-sm text-slate-500">Expected: {expected ? formatDateTime(expected) : '—'}</p>
           </div>
           <div className="rounded-2xl bg-slate-50 p-3">
-            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Selected items</p>
-            <p className="mt-1 font-black text-slate-950">{items.length} test/scan item(s)</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Selected items</p>
+            <p className="mt-1 font-bold text-slate-900">{items.length} test/scan item(s)</p>
             <p className="text-sm text-slate-500">Prices hidden from clinicians.</p>
           </div>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-4">
-          <p className="mb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Tests / Scans</p>
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Tests / Scans</p>
           <div className="flex flex-wrap gap-2">
-            {items.map((item) => <span key={item.id} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-700">{item.id} · {item.name}</span>)}
+            {items.map((item) => <span key={item.id} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700">{item.id} · {item.name}</span>)}
           </div>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-4">
-          <p className="mb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Clinical notes</p>
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Clinical notes</p>
           <p className="text-sm leading-6 text-slate-600">{clinicalNotes || 'No clinical notes entered.'}</p>
         </div>
       </div>
@@ -247,10 +247,10 @@ function OrderHeaderProgress({ step, canReach, onStepChange }) {
                 aria-current={isCurrent ? 'step' : undefined}
                 className={`flex min-w-0 items-center gap-2 rounded-xl px-2 py-1.5 transition ${reachable ? 'cursor-pointer hover:bg-slate-50' : 'cursor-not-allowed'}`}
               >
-                <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-black ${isCurrent ? 'bg-clinical-600 text-white' : isDone ? 'bg-clinical-100 text-clinical-700' : 'bg-slate-100 text-slate-400'}`}>
+                <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-bold ${isCurrent ? 'bg-clinical-600 text-white' : isDone ? 'bg-clinical-100 text-clinical-700' : 'bg-slate-100 text-slate-500'}`}>
                   {isDone ? <CheckCircle2 className="h-4 w-4" /> : item.id}
                 </span>
-                <span className={`hidden truncate text-xs font-black sm:block ${isCurrent ? 'text-clinical-700' : isDone ? 'text-slate-700' : 'text-slate-400'}`}>{item.label}</span>
+                <span className={`hidden truncate text-xs font-bold sm:block ${isCurrent ? 'text-clinical-700' : isDone ? 'text-slate-700' : 'text-slate-500'}`}>{item.label}</span>
               </button>
               {index < WIZARD_STEPS.length - 1 && <span className={`h-0.5 flex-1 rounded ${step > item.id ? 'bg-clinical-300' : 'bg-slate-200'}`} />}
             </li>
@@ -269,7 +269,7 @@ function PatientModeHeaderSwitch({ patientMode, onChange }) {
         onClick={() => onChange('existing')}
         className={`rounded-xl px-3 py-2 text-left transition ${patientMode === 'existing' ? 'bg-clinical-50 text-clinical-800 ring-1 ring-clinical-200' : 'text-slate-600 hover:bg-slate-50'}`}
       >
-        <span className="block text-xs font-black leading-4">Existing Patient</span>
+        <span className="block text-xs font-bold leading-4">Existing Patient</span>
         <span className="block truncate text-[10px] font-semibold leading-4 text-slate-500">Search record</span>
       </button>
       <button
@@ -277,7 +277,7 @@ function PatientModeHeaderSwitch({ patientMode, onChange }) {
         onClick={() => onChange('new')}
         className={`rounded-xl px-3 py-2 text-left transition ${patientMode === 'new' ? 'bg-clinical-50 text-clinical-800 ring-1 ring-clinical-200' : 'text-slate-600 hover:bg-slate-50'}`}
       >
-        <span className="block text-xs font-black leading-4">New Patient</span>
+        <span className="block text-xs font-bold leading-4">New Patient</span>
         <span className="block truncate text-[10px] font-semibold leading-4 text-slate-500">Create record</span>
       </button>
     </div>
@@ -410,26 +410,26 @@ export function DoctorNewOrderPage() {
             {patientMode === 'existing' ? (
               <div className="space-y-3">
                 <div className="relative">
-                  <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
                   <input className={`${inputClass} pl-9`} value={patientSearch} onChange={(event) => setPatientSearch(event.target.value)} placeholder="Search patient name, ID, phone, email..." />
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
                   <div className="mb-2 flex items-center justify-between gap-3">
-                    <p className="text-xs font-black uppercase tracking-wider text-slate-500">Matching existing patients</p>
-                    <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-black text-slate-500">{patientMatches.length} found</span>
+                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Matching existing patients</p>
+                    <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold text-slate-500">{patientMatches.length} found</span>
                   </div>
                   <div className="max-h-72 overflow-y-auto rounded-2xl border border-slate-200 bg-white">
                     {patientMatches.map((patient) => (
                       <button key={patient.id} type="button" onClick={() => setSelectedPatientId(patient.id)} className={`flex w-full items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 text-left last:border-b-0 transition ${selectedPatientId === patient.id ? 'bg-clinical-50 ring-2 ring-inset ring-clinical-200' : 'hover:bg-slate-50'}`}>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate font-black text-slate-950">{patient.fullName}</p>
+                          <p className="truncate font-bold text-slate-900">{patient.fullName}</p>
                           <p className="truncate text-xs font-semibold text-slate-500">{patient.id} · {patient.gender} · {calculateAge(patient.dateOfBirth)} yrs</p>
                         </div>
-                        <div className="hidden min-w-[190px] text-right text-xs font-semibold text-slate-400 sm:block">
+                        <div className="hidden min-w-[190px] text-right text-xs font-semibold text-slate-500 sm:block">
                           <p className="truncate">{patient.phone || 'No phone'}</p>
                           <p className="truncate">{patient.email || 'No email'}</p>
                         </div>
-                        <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-black ${selectedPatientId === patient.id ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-600'}`}>{selectedPatientId === patient.id ? 'Selected' : 'Select'}</span>
+                        <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${selectedPatientId === patient.id ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-600'}`}>{selectedPatientId === patient.id ? 'Selected' : 'Select'}</span>
                       </button>
                     ))}
                     {patientMatches.length === 0 && <p className="p-4 text-sm font-semibold text-slate-500">No matching patients found.</p>}
@@ -457,7 +457,7 @@ export function DoctorNewOrderPage() {
           <Card title="Tests / Scans" subtitle="Add multiple lab tests and scans for one patient. Clinicians cannot see prices.">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="font-black text-slate-950">Selected investigations</p>
+                <p className="font-bold text-slate-900">Selected investigations</p>
                 <p className="text-sm text-slate-500">{chosenCatalogItems.length} item(s) selected · Expected completion {expected ? formatDateTime(expected) : '—'}</p>
               </div>
               <Button type="button" onClick={() => setCatalogOpen(true)}><Plus className="h-4 w-4" /> Add Test / Scan</Button>
@@ -465,7 +465,7 @@ export function DoctorNewOrderPage() {
 
             {sameDayDuplicates.length > 0 && (
               <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-                <div className="flex gap-2 font-black"><AlertTriangle className="h-5 w-5" /> Same-day duplicate warning</div>
+                <div className="flex gap-2 font-bold"><AlertTriangle className="h-5 w-5" /> Same-day duplicate warning</div>
                 <p className="mt-1">This patient has already been ordered for one or more of these selected investigations today. Review before submitting.</p>
               </div>
             )}
@@ -474,10 +474,10 @@ export function DoctorNewOrderPage() {
               {chosenCatalogItems.map((item) => (
                 <div key={item.id} className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
                   <div>
-                    <div className="flex flex-wrap items-center gap-2"><p className="font-black text-slate-950">{item.name}</p><StatusBadge status={item.type} /></div>
+                    <div className="flex flex-wrap items-center gap-2"><p className="font-bold text-slate-900">{item.name}</p><StatusBadge status={item.type} /></div>
                     <p className="text-sm text-slate-500">{item.id} · {item.department === 'Imaging' ? 'Radiology / Scan' : item.department} · ETA {item.expectedHours}h</p>
                   </div>
-                  <button type="button" onClick={() => removeItem(item.id)} className="self-end rounded-full p-2 text-slate-400 hover:bg-red-50 hover:text-red-600 sm:self-auto"><Trash2 className="h-4 w-4" /></button>
+                  <button type="button" onClick={() => removeItem(item.id)} className="self-end rounded-full p-2 text-slate-500 hover:bg-red-50 hover:text-red-600 sm:self-auto"><Trash2 className="h-4 w-4" /></button>
                 </div>
               ))}
               {chosenCatalogItems.length === 0 && <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-500">No tests or scans selected yet.</div>}
@@ -489,7 +489,7 @@ export function DoctorNewOrderPage() {
           <Card title="Clinical Context" subtitle="Add urgency and notes for the receiving departments.">
             <div className="grid gap-4 md:grid-cols-2">
               <FormField label="Urgency"><select className={inputClass} value={urgency} onChange={(event) => setUrgency(event.target.value)}><option>Routine</option><option>Urgent</option></select></FormField>
-              <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Expected completion</p><p className="mt-1 font-black text-slate-950">{expected ? formatDateTime(expected) : 'Select tests/scans first'}</p></div>
+              <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Expected completion</p><p className="mt-1 font-bold text-slate-900">{expected ? formatDateTime(expected) : 'Select tests/scans first'}</p></div>
               <FormField label="Clinical Notes" className="md:col-span-2"><textarea className={inputClass} rows={4} value={clinicalNotes} onChange={(event) => setClinicalNotes(event.target.value)} placeholder="Clinical indication, patient history, and special instructions..." /></FormField>
             </div>
           </Card>
@@ -499,7 +499,7 @@ export function DoctorNewOrderPage() {
           <div className="space-y-5">
             {attemptedSubmit && validationIssues.length > 0 && (
               <div className="rounded-3xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900">
-                <p className="font-black">Complete the order before review:</p>
+                <p className="font-bold">Complete the order before review:</p>
                 <ul className="mt-2 list-disc pl-5">
                   {validationIssues.map((issue) => <li key={issue}>{issue}</li>)}
                 </ul>
@@ -509,37 +509,37 @@ export function DoctorNewOrderPage() {
             <Card title="Review & Submit" subtitle="Confirm the order details before sending to reception.">
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl bg-slate-50 p-3">
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Patient</p>
-                  <p className="mt-1 font-black text-slate-950">{patientMode === 'existing' ? selectedPatient?.fullName || 'None selected' : newPatient.fullName || 'New patient'}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Patient</p>
+                  <p className="mt-1 font-bold text-slate-900">{patientMode === 'existing' ? selectedPatient?.fullName || 'None selected' : newPatient.fullName || 'New patient'}</p>
                   <p className="text-sm text-slate-500">{patientMode === 'existing' ? (selectedPatient?.id || '—') : 'New patient record will be created'}</p>
                 </div>
                 <div className="rounded-2xl bg-slate-50 p-3">
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Clinician / Hospital</p>
-                  <p className="mt-1 font-black text-slate-950">{doctor?.name}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Clinician / Hospital</p>
+                  <p className="mt-1 font-bold text-slate-900">{doctor?.name}</p>
                   <p className="text-sm text-slate-500">{hospital?.name}</p>
                 </div>
                 <div className="rounded-2xl bg-slate-50 p-3">
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Urgency</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Urgency</p>
                   <div className="mt-1"><StatusBadge status={urgency} /></div>
                   <p className="mt-2 text-sm text-slate-500">Expected: {expected ? formatDateTime(expected) : '—'}</p>
                 </div>
                 <div className="rounded-2xl bg-slate-50 p-3">
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Items</p>
-                  <p className="mt-1 font-black text-slate-950">{chosenCatalogItems.length} test/scan item(s)</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Items</p>
+                  <p className="mt-1 font-bold text-slate-900">{chosenCatalogItems.length} test/scan item(s)</p>
                   <p className="text-sm text-slate-500">Prices hidden from clinicians.</p>
                 </div>
               </div>
 
               {chosenCatalogItems.length > 0 && (
                 <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4">
-                  <p className="mb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Tests / Scans</p>
-                  <div className="flex flex-wrap gap-2">{chosenCatalogItems.map((item) => <span key={item.id} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-700">{item.id} · {item.name}</span>)}</div>
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Tests / Scans</p>
+                  <div className="flex flex-wrap gap-2">{chosenCatalogItems.map((item) => <span key={item.id} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700">{item.id} · {item.name}</span>)}</div>
                 </div>
               )}
 
               {clinicalNotes.trim() && (
                 <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-4">
-                  <p className="mb-2 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Clinical notes</p>
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Clinical notes</p>
                   <p className="text-sm leading-6 text-slate-600">{clinicalNotes}</p>
                 </div>
               )}
@@ -558,7 +558,7 @@ export function DoctorNewOrderPage() {
 
         <div className="flex items-center justify-between gap-3 rounded-3xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
           <Button type="button" variant="secondary" onClick={goBack} disabled={step === 1}><ArrowLeft className="h-4 w-4" /> Back</Button>
-          <p className="hidden text-xs font-black uppercase tracking-[0.14em] text-slate-400 sm:block">{activeStep.label}</p>
+          <p className="hidden text-xs font-semibold uppercase tracking-[0.08em] text-slate-500 sm:block">{activeStep.label}</p>
           {step < WIZARD_STEPS.length ? (
             <Button type="button" onClick={goNext}>Continue to {nextStep?.label || 'Review'} <ArrowRight className="h-4 w-4" /></Button>
           ) : (

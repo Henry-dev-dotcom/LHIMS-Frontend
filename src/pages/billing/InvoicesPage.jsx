@@ -106,8 +106,8 @@ export function InvoicesPage() {
           <Card title="Payment method log" subtitle="Payments are blocked unless the cashier has started a shift. Every payment goes to the active float.">
             <form onSubmit={recordPayment} className="space-y-4">
               <div className="rounded-2xl bg-slate-50 p-3 text-sm">
-                <div className="font-black text-slate-700">Selected invoice balance</div>
-                <div className="mt-1 text-xl font-black text-slate-950">{money(invoiceBalance(selectedInvoice || {}))}</div>
+                <div className="font-bold text-slate-700">Selected invoice balance</div>
+                <div className="mt-1 text-xl font-bold text-slate-900">{money(invoiceBalance(selectedInvoice || {}))}</div>
               </div>
               <FormField label="Payment amount"><input type="number" step="0.01" className={inputClass} value={payment.amount} placeholder={selectedInvoice ? String(invoiceBalance(selectedInvoice)) : '0'} onChange={(e) => setPayment({ ...payment, amount: e.target.value })} /></FormField>
               <FormField label="Payment method"><select className={inputClass} value={payment.method} onChange={(e) => setPayment({ ...payment, method: e.target.value })}><option>Cash</option><option>Mobile Money</option><option>Card</option><option>Transfer</option><option>Insurance</option></select></FormField>
@@ -120,7 +120,7 @@ export function InvoicesPage() {
 
         <Card title="Invoice register" subtitle="Filter by payment category, cashier and date range. Print receipts directly from completed payments.">
           <div className="mb-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            <div className="relative md:col-span-2 xl:col-span-1"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" /><input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search invoice, order, patient, hospital" /></div>
+            <div className="relative md:col-span-2 xl:col-span-1"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" /><input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search invoice, order, patient, hospital" /></div>
             <select className={inputClass} value={status} onChange={(event) => setStatus(event.target.value)}><option value="">All payment categories</option><option>Paid</option><option>Partly Paid</option><option>Yet To Pay</option><option>Insurance Pending</option><option>Refunded</option></select>
             <select className={inputClass} value={cashier} onChange={(event) => setCashier(event.target.value)}><option value="">All cashiers</option>{cashiers.map((name) => <option key={name}>{name}</option>)}</select>
             <input className={inputClass} type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
@@ -143,19 +143,19 @@ export function InvoicesPage() {
       <Modal open={Boolean(receiptInvoice)} onClose={() => setReceiptInvoiceId('')} title="Payment Receipt">
         {receiptInvoice && <div className="space-y-5" id="receipt-print-area">
           <div className="rounded-3xl border border-slate-200 bg-white p-5 text-sm">
-            <div className="text-center"><div className="text-xl font-black text-slate-950">Diagnosis Center</div><div className="text-slate-500">Official Payment Receipt</div></div>
+            <div className="text-center"><div className="text-xl font-bold text-slate-900">Diagnosis Center</div><div className="text-slate-500">Official Payment Receipt</div></div>
             <div className="mt-5 grid gap-3 md:grid-cols-2">
-              <div><span className="font-black text-slate-500">Receipt / Invoice</span><p className="font-bold">{receiptInvoice.id}</p></div>
-              <div><span className="font-black text-slate-500">Order</span><p className="font-bold">{receiptInvoice.orderId}</p></div>
-              <div><span className="font-black text-slate-500">Patient</span><p className="font-bold">{receiptInvoice.patient?.fullName || '—'}</p></div>
-              <div><span className="font-black text-slate-500">Hospital</span><p className="font-bold">{receiptInvoice.hospital?.name || '—'}</p></div>
-              <div><span className="font-black text-slate-500">Total</span><p className="font-bold">{money(invoiceTotal(receiptInvoice))}</p></div>
-              <div><span className="font-black text-slate-500">Paid</span><p className="font-bold">{money(invoicePaid(receiptInvoice))}</p></div>
-              <div><span className="font-black text-slate-500">Balance</span><p className="font-bold">{money(invoiceBalance(receiptInvoice))}</p></div>
-              <div><span className="font-black text-slate-500">Status</span><p className="font-bold">{statusGroup(receiptInvoice.status)}</p></div>
+              <div><span className="font-bold text-slate-500">Receipt / Invoice</span><p className="font-bold">{receiptInvoice.id}</p></div>
+              <div><span className="font-bold text-slate-500">Order</span><p className="font-bold">{receiptInvoice.orderId}</p></div>
+              <div><span className="font-bold text-slate-500">Patient</span><p className="font-bold">{receiptInvoice.patient?.fullName || '—'}</p></div>
+              <div><span className="font-bold text-slate-500">Hospital</span><p className="font-bold">{receiptInvoice.hospital?.name || '—'}</p></div>
+              <div><span className="font-bold text-slate-500">Total</span><p className="font-bold">{money(invoiceTotal(receiptInvoice))}</p></div>
+              <div><span className="font-bold text-slate-500">Paid</span><p className="font-bold">{money(invoicePaid(receiptInvoice))}</p></div>
+              <div><span className="font-bold text-slate-500">Balance</span><p className="font-bold">{money(invoiceBalance(receiptInvoice))}</p></div>
+              <div><span className="font-bold text-slate-500">Status</span><p className="font-bold">{statusGroup(receiptInvoice.status)}</p></div>
             </div>
             <div className="mt-5">
-              <div className="font-black text-slate-700">Transactions</div>
+              <div className="font-bold text-slate-700">Transactions</div>
               <DataTable columns={[{ key: 'createdAt', label: 'Date', render: (row) => formatDateTime(row.createdAt) }, { key: 'method', label: 'Method' }, { key: 'amount', label: 'Amount', render: (row) => money(row.amount) }, { key: 'staff', label: 'Cashier' }, { key: 'reference', label: 'Reference' }]} rows={receiptInvoice.transactions || []} emptyMessage="No payment transactions recorded yet." />
             </div>
           </div>

@@ -100,17 +100,17 @@ function PatientDetail({ patient, data }) {
     <div className="space-y-5">
       <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl bg-slate-50 p-3">
-          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Identity</p>
-          <p className="mt-2 text-lg font-black text-slate-950">{patient.fullName}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Identity</p>
+          <p className="mt-2 text-lg font-bold text-slate-900">{patient.fullName}</p>
           <p className="text-sm text-slate-500">{patient.id} · {patient.gender} · {calculateAge(patient.dateOfBirth)} yrs</p>
         </div>
         <div className="rounded-2xl bg-slate-50 p-3">
-          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Contact</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Contact</p>
           <p className="mt-2 font-bold text-slate-800">{patient.phone || '—'}</p>
           <p className="text-sm text-slate-500">{patient.email || 'No email'}</p>
         </div>
         <div className="rounded-2xl bg-slate-50 p-3">
-          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Referral</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Referral</p>
           <p className="mt-2 font-bold text-slate-800">{hospital?.name || '—'}</p>
           <p className="text-sm text-slate-500">{doctor?.name || '—'}</p>
         </div>
@@ -130,7 +130,7 @@ function PatientDetail({ patient, data }) {
       <Card title="Order History" subtitle="All orders linked to this master Patient ID.">
         <DataTable
           columns={[
-            { key: 'id', label: 'Order ID', render: (order) => <span className="font-black text-slate-950">{order.id}</span> },
+            { key: 'id', label: 'Order ID', render: (order) => <span className="font-bold text-slate-900">{order.id}</span> },
             { key: 'items', label: 'Tests / Scans', render: (order) => order.items.map((item) => item.name).join(', ') || '—' },
             { key: 'status', label: 'Status', render: (order) => <StatusBadge status={order.status} /> },
             { key: 'billingStatus', label: 'Billing', render: (order) => <StatusBadge status={order.billingStatus} /> },
@@ -140,7 +140,7 @@ function PatientDetail({ patient, data }) {
           emptyMessage="No order history is linked to this patient yet."
         />
       </Card>
-      <p className="text-xs font-semibold text-slate-400">Created {formatDateTime(patient.createdAt)} · Last updated {formatDateTime(patient.updatedAt)}</p>
+      <p className="text-xs font-semibold text-slate-500">Created {formatDateTime(patient.createdAt)} · Last updated {formatDateTime(patient.updatedAt)}</p>
     </div>
   );
 }
@@ -205,8 +205,8 @@ export function PatientRecordsPage() {
       <div className="mb-5 grid gap-4 md:grid-cols-4">
         {metrics.map((metric) => (
           <div key={metric.label} className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-            <p className="text-xl font-black text-slate-950">{metric.value}</p>
-            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">{metric.label}</p>
+            <p className="text-xl font-bold text-slate-900">{metric.value}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{metric.label}</p>
           </div>
         ))}
       </div>
@@ -216,22 +216,22 @@ export function PatientRecordsPage() {
         subtitle="Search, verify, update, and open patient profiles with linked order history."
         actions={
           <div className="relative w-full min-w-[260px] sm:w-80">
-            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
             <input className={`${inputClass} pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name, ID, phone, email..." />
           </div>
         }
       >
         <DataTable
           columns={[
-            { key: 'id', label: 'Patient ID', render: (patient) => <span className="font-black text-slate-950">{patient.id}</span> },
-            { key: 'fullName', label: 'Patient', render: (patient) => <div><p className="font-bold text-slate-900">{patient.fullName}</p><p className="text-xs text-slate-400">{patient.gender} · {calculateAge(patient.dateOfBirth)} yrs</p></div> },
-            { key: 'contact', label: 'Contact', render: (patient) => <div><p>{patient.phone || '—'}</p><p className="text-xs text-slate-400">{patient.email || 'No email'}</p></div> },
+            { key: 'id', label: 'Patient ID', render: (patient) => <span className="font-bold text-slate-900">{patient.id}</span> },
+            { key: 'fullName', label: 'Patient', render: (patient) => <div><p className="font-bold text-slate-900">{patient.fullName}</p><p className="text-xs text-slate-500">{patient.gender} · {calculateAge(patient.dateOfBirth)} yrs</p></div> },
+            { key: 'contact', label: 'Contact', render: (patient) => <div><p>{patient.phone || '—'}</p><p className="text-xs text-slate-500">{patient.email || 'No email'}</p></div> },
             { key: 'referral', label: 'Referral', render: (patient) => {
               const hospital = data.hospitals.find((item) => item.id === patient.referringHospitalId);
               const doctor = data.doctors.find((item) => item.id === patient.referringDoctorId);
-              return <div><p className="font-semibold">{hospital?.name || '—'}</p><p className="text-xs text-slate-400">{doctor?.name || '—'}</p></div>;
+              return <div><p className="font-semibold">{hospital?.name || '—'}</p><p className="text-xs text-slate-500">{doctor?.name || '—'}</p></div>;
             }},
-            { key: 'insurance', label: 'Insurance', render: (patient) => patient.insuranceProvider ? <StatusBadge status="Insurance" /> : <span className="text-slate-400">Self-pay / none</span> },
+            { key: 'insurance', label: 'Insurance', render: (patient) => patient.insuranceProvider ? <StatusBadge status="Insurance" /> : <span className="text-slate-500">Self-pay / none</span> },
             { key: 'updatedAt', label: 'Updated', render: (patient) => formatDateTime(patient.updatedAt) },
             { key: 'actions', label: 'Actions', render: (patient) => <div className="flex gap-2"><Button variant="secondary" className="px-3" onClick={() => setViewPatient(patient)}><Eye className="h-4 w-4" /> View</Button><Button variant="subtle" className="px-3" onClick={() => openEdit(patient)}><Edit3 className="h-4 w-4" /> Edit</Button></div> }
           ]}
@@ -259,7 +259,7 @@ export function PatientRecordsPage() {
       >
         {duplicateCandidates.length > 0 && (
           <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-            <div className="flex items-center gap-2 font-black"><ShieldAlert className="h-4 w-4" /> Possible duplicate patient record</div>
+            <div className="flex items-center gap-2 font-bold"><ShieldAlert className="h-4 w-4" /> Possible duplicate patient record</div>
             <p className="mt-1">Review before saving. Matches: {duplicateCandidates.map((patient) => `${patient.fullName} (${patient.id})`).join(', ')}</p>
           </div>
         )}

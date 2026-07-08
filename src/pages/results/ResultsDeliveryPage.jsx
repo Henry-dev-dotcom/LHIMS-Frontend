@@ -167,16 +167,16 @@ export function ResultsDeliveryPage() {
       <Card title="Privacy and release safety" subtitle="Patient-facing SMS and WhatsApp notices must not include clinical values, diagnoses, abnormal flags or patient-identifying clinical detail.">
         <div className="grid gap-4 lg:grid-cols-3">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="font-black text-slate-950">SMS clinical-data safety check</p>
+            <p className="font-bold text-slate-900">SMS clinical-data safety check</p>
             <p className="mt-1 text-sm text-slate-500">Checks release SMS messages for unsafe clinical words or test values.</p>
             <div className="mt-3"><StatusBadge status={privacySafeSms ? 'Privacy Safe' : 'Review Required'} /></div>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="font-black text-slate-950">Default patient notice</p>
+            <p className="font-bold text-slate-900">Default patient notice</p>
             <p className="mt-1 text-sm text-slate-600">Your diagnosis center result is ready. Please contact the center or your referring doctor for secure review.</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="font-black text-slate-950">Doctor notice</p>
+            <p className="font-bold text-slate-900">Doctor notice</p>
             <p className="mt-1 text-sm text-slate-600">A finalized report is ready. Please log in to the doctor portal to review and download it.</p>
           </div>
         </div>
@@ -187,7 +187,7 @@ export function ResultsDeliveryPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`rounded-2xl px-4 py-2 text-sm font-black transition ${activeTab === tab.id ? 'bg-clinical-500 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'}`}
+            className={`rounded-2xl px-4 py-2 text-sm font-bold transition ${activeTab === tab.id ? 'bg-clinical-500 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'}`}
           >
             {tab.label}
           </button>
@@ -202,13 +202,13 @@ export function ResultsDeliveryPage() {
         >
           <DataTable
             columns={[
-              { key: 'id', label: 'Order ID', render: (order) => <span className="font-black text-slate-950">{order.id}</span> },
-              { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold">{order.patient?.fullName}</p><p className="text-xs text-slate-400">{order.patient?.id} · {order.patient?.phone}</p></div> },
-              { key: 'doctor', label: 'Doctor / Hospital', render: (order) => <div><p className="font-bold">{order.doctor?.name}</p><p className="text-xs text-slate-400">{order.hospital?.name}</p></div> },
+              { key: 'id', label: 'Order ID', render: (order) => <span className="font-bold text-slate-900">{order.id}</span> },
+              { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold">{order.patient?.fullName}</p><p className="text-xs text-slate-500">{order.patient?.id} · {order.patient?.phone}</p></div> },
+              { key: 'doctor', label: 'Doctor / Hospital', render: (order) => <div><p className="font-bold">{order.doctor?.name}</p><p className="text-xs text-slate-500">{order.hospital?.name}</p></div> },
               { key: 'items', label: 'Investigations', render: (order) => order.items.map((item) => item.name).join(', ') || '—' },
               { key: 'report', label: 'PDF Report', render: (order) => {
                 const readiness = getDeliveryReadiness(data, order);
-                return readiness.report ? <div><StatusBadge status={readiness.report.status} /><p className="mt-1 text-xs text-slate-400">{readiness.report.id}</p></div> : <StatusBadge status="Missing" />;
+                return readiness.report ? <div><StatusBadge status={readiness.report.status} /><p className="mt-1 text-xs text-slate-500">{readiness.report.id}</p></div> : <StatusBadge status="Missing" />;
               }},
               { key: 'delivery', label: 'Readiness', render: (order) => {
                 const readiness = getDeliveryReadiness(data, order);
@@ -241,7 +241,7 @@ export function ResultsDeliveryPage() {
           </div>
           <DataTable
             columns={[
-              { key: 'id', label: 'ID', render: (event) => <span className="font-black text-slate-950">{event.id}</span> },
+              { key: 'id', label: 'ID', render: (event) => <span className="font-bold text-slate-900">{event.id}</span> },
               { key: 'entityId', label: 'Order' },
               { key: 'title', label: 'Title' },
               { key: 'target', label: 'Target', render: (event) => event.target || 'Doctor dashboard' },

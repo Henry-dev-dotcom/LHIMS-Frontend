@@ -58,9 +58,9 @@ function SectionNav({ activeSection, counts, onChange }) {
             >
               <div className="flex items-center justify-between gap-3">
                 <span className={`grid h-9 w-9 place-items-center rounded-2xl ${active ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-500'}`}><Icon className="h-4 w-4" /></span>
-                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-black text-slate-700">{counts[section.id]}</span>
+                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700">{counts[section.id]}</span>
               </div>
-              <p className="mt-3 text-sm font-black text-slate-950">{section.label}</p>
+              <p className="mt-3 text-sm font-bold text-slate-900">{section.label}</p>
               <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">{section.helper}</p>
             </button>
           );
@@ -73,7 +73,7 @@ function SectionNav({ activeSection, counts, onChange }) {
 function CompactInfoBox({ label, children }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-      <p className="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">{label}</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">{label}</p>
       <div className="mt-2 text-sm font-bold text-slate-800">{children}</div>
     </div>
   );
@@ -128,8 +128,8 @@ export function ApiReadinessPage() {
                 ['Mapper coverage', `${readiness.mappedModels.length} models`, 'Core payload objects are normalized before requests.']
               ].map(([label, value, detail]) => (
                 <div key={label} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <p className="text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">{label}</p>
-                  <p className="mt-2 text-xl font-black text-slate-950">{value}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">{label}</p>
+                  <p className="mt-2 text-xl font-bold text-slate-900">{value}</p>
                   <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">{detail}</p>
                 </div>
               ))}
@@ -159,8 +159,8 @@ export function ApiReadinessPage() {
                 ['VITE_API_TIMEOUT_MS', `${config.timeoutMs}`]
               ].map(([name, value]) => (
                 <div key={name} className="rounded-2xl bg-slate-950 p-4 text-white">
-                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">{name}</p>
-                  <p className="mt-2 break-all text-sm font-black">{value}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">{name}</p>
+                  <p className="mt-2 break-all text-sm font-bold">{value}</p>
                 </div>
               ))}
             </div>
@@ -201,7 +201,7 @@ export function ApiReadinessPage() {
           <DataTable
             dense
             columns={[
-              { key: 'module', label: 'Module', render: (row) => <span className="font-black capitalize text-slate-800">{row.module}</span> },
+              { key: 'module', label: 'Module', render: (row) => <span className="font-bold capitalize text-slate-800">{row.module}</span> },
               { key: 'name', label: 'Action' },
               { key: 'signature', label: 'Endpoint Contract' }
             ]}
@@ -240,7 +240,7 @@ export function ApiReadinessPage() {
                 ['Core APIs', 'Patients, orders, lab, scan, billing, finance, admin and results']
               ].map(([title, body]) => (
                 <div key={title} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                  <div className="mb-2 flex items-center gap-2 text-sm font-black text-slate-900"><CheckCircle2 className="h-4 w-4 text-clinical-600" /> {title}</div>
+                  <div className="mb-2 flex items-center gap-2 text-sm font-bold text-slate-900"><CheckCircle2 className="h-4 w-4 text-clinical-600" /> {title}</div>
                   <p className="text-sm leading-6 text-slate-500">{body}</p>
                 </div>
               ))}

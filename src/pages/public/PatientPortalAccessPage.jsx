@@ -40,7 +40,7 @@ export function PatientPortalAccessPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 px-3 py-4 text-slate-950 sm:px-4 sm:py-8">
+    <main className="min-h-screen bg-slate-100 px-3 py-4 text-slate-900 sm:px-4 sm:py-8">
       <div className="mx-auto max-w-4xl space-y-5">
         <Card title="Secure Patient Result Portal" subtitle="Time-limited OTP-style access for patient report viewing." actions={<LockKeyhole className="h-6 w-6 text-clinical-600" />}>
           {!result && <div className="rounded-2xl bg-amber-50 p-5 text-sm font-semibold text-amber-800">No report found for secure ID <span className="font-mono">{secureId || 'missing'}</span>.</div>}
@@ -56,11 +56,11 @@ export function PatientPortalAccessPage() {
           )}
           {result && verified && (
             <div className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-emerald-50 p-4 text-emerald-800"><div><p className="font-black">Access granted</p><p className="text-sm font-semibold">This secure session is for the current viewing period only.</p></div><StatusBadge status="OTP Verified" /></div>
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-emerald-50 p-4 text-emerald-800"><div><p className="font-bold">Access granted</p><p className="text-sm font-semibold">This secure session is for the current viewing period only.</p></div><StatusBadge status="OTP Verified" /></div>
               <div className="grid gap-3 md:grid-cols-3">
-                <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Patient</p><p className="font-black text-slate-950">{patient?.fullName}</p></div>
-                <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Report</p><p className="font-black text-slate-950">{result.id}</p></div>
-                <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Signed</p><p className="font-black text-slate-950">{formatDateTime(result.signedAt || result.approvedAt)}</p></div>
+                <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Patient</p><p className="font-bold text-slate-900">{patient?.fullName}</p></div>
+                <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Report</p><p className="font-bold text-slate-900">{result.id}</p></div>
+                <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Signed</p><p className="font-bold text-slate-900">{formatDateTime(result.signedAt || result.approvedAt)}</p></div>
               </div>
               <DataTable
                 dense

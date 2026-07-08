@@ -68,13 +68,13 @@ export function ReceptionResultsInboxPage() {
     >
       <DataTable
         columns={[
-          { key: 'id', label: 'Order', render: (order) => <span className="font-black text-slate-950">{order.id}</span> },
-          { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold text-slate-950">{order.patient?.fullName}</p><p className="text-xs text-slate-500">{order.patient?.id} · {order.patient?.phone || 'No phone'}</p></div> },
+          { key: 'id', label: 'Order', render: (order) => <span className="font-bold text-slate-900">{order.id}</span> },
+          { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold text-slate-900">{order.patient?.fullName}</p><p className="text-xs text-slate-500">{order.patient?.id} · {order.patient?.phone || 'No phone'}</p></div> },
           { key: 'doctor', label: 'Doctor / Hospital', render: (order) => <div><p className="font-bold">{order.doctor?.name}</p><p className="text-xs text-slate-500">{order.hospital?.name}</p></div> },
-          { key: 'items', label: 'Investigations', render: (order) => <div className="flex max-w-full flex-wrap gap-1">{(order.items || []).map((item) => <span key={item.id} className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">{item.name}</span>)}</div> },
+          { key: 'items', label: 'Investigations', render: (order) => <div className="flex max-w-[240px] flex-wrap gap-1">{(order.items || []).map((item) => <span key={item.id} className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">{item.name}</span>)}</div> },
           { key: 'report', label: 'Report', render: (order) => getReportForOrder(data, order.id)?.id || 'PDF-ready' },
           { key: 'updatedAt', label: 'Released', render: (order) => formatDateTime(order.updatedAt) },
-          { key: 'actions', label: 'Actions', render: (order) => <div className="flex flex-wrap gap-1.5"><Button className="px-3 py-1.5 text-xs" onClick={() => printReport(order)}><Download className="h-3.5 w-3.5" /> Print Copy</Button><span className="rounded-full bg-clinical-50 px-3 py-1.5 text-xs font-black text-clinical-700 ring-1 ring-clinical-100">Sent to clinician</span></div> }
+          { key: 'actions', label: 'Actions', render: (order) => <div className="flex flex-wrap gap-1.5"><Button className="px-3 py-1.5 text-xs" onClick={() => printReport(order)}><Download className="h-3.5 w-3.5" /> Print Copy</Button><span className="rounded-full bg-clinical-50 px-3 py-1.5 text-xs font-bold text-clinical-700 ring-1 ring-clinical-100">Sent to clinician</span></div> }
         ]}
         rows={tableRows}
         emptyMessage="No released result reports match this filter."

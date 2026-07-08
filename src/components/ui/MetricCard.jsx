@@ -17,27 +17,27 @@ export function MetricCard({ label, value, icon: Icon, tone = 'blue', helper, co
   };
   return (
     <div className={clsx(
-      'metric-card group relative min-w-0 overflow-hidden border border-white/70 bg-card-sheen shadow-soft backdrop-blur-xl transition duration-200 hover:-translate-y-0.5 hover:shadow-panel sm:min-h-[4.5rem]',
-      compact ? 'min-h-[4.6rem] rounded-[1rem] p-2 sm:rounded-2xl sm:p-2.5' : 'min-h-[5rem] rounded-[1.2rem] p-3.5 sm:p-3'
+      'metric-card group relative min-w-0 overflow-hidden border border-slate-200/70 bg-white shadow-soft transition duration-200 hover:-translate-y-0.5 hover:shadow-panel sm:min-h-[4.5rem]',
+      compact ? 'min-h-[4.6rem] rounded-[1rem] p-2.5 sm:rounded-2xl sm:p-3' : 'min-h-[5rem] rounded-[1.2rem] p-3.5'
     )}>
       <div className={clsx('absolute top-0 h-0.5 rounded-b-full bg-gradient-to-r', compact ? 'inset-x-2 sm:inset-x-3' : 'inset-x-3.5', bars[tone] || bars.blue)} />
       <div className={clsx('flex h-full items-start justify-between', compact ? 'gap-1.5 sm:gap-2' : 'gap-2.5')}>
         <div className="min-w-0 flex-1">
           <p
             className={clsx(
-              'metric-card-label break-words font-black uppercase leading-[1.15] text-slate-400',
-              compact ? 'text-[7.2px] tracking-[0.105em] sm:text-[8.5px] sm:tracking-[0.14em]' : 'text-[9px] tracking-[0.15em]'
+              'metric-card-label break-words font-semibold uppercase leading-[1.2] text-slate-500',
+              compact ? 'text-[9px] tracking-[0.08em] sm:text-[11px] sm:tracking-[0.1em]' : 'text-[11px] tracking-[0.1em]'
             )}
             title={label}
           >
             {label}
           </p>
-          <p className={clsx('metric-card-value mt-1 truncate font-black tracking-tight text-slate-950', compact ? 'text-[1.15rem] leading-none sm:text-xl' : 'text-2xl')}>{value}</p>
-          {helper && <p className={clsx('mt-0.5 hidden leading-4 text-slate-500 sm:block', compact ? 'text-[10px]' : 'text-[11px]')}>{helper}</p>}
+          <p className={clsx('metric-card-value mt-1 truncate font-bold tracking-tight text-slate-900', compact ? 'text-[1.2rem] leading-none sm:text-2xl' : 'text-2xl')}>{value}</p>
+          {helper && <p className={clsx('mt-0.5 hidden leading-4 text-slate-500 sm:block', compact ? 'text-[11px]' : 'text-xs')}>{helper}</p>}
         </div>
         {Icon && (
-          <div className={clsx('metric-card-icon grid shrink-0 place-items-center rounded-xl ring-1 transition group-hover:scale-105', compact ? 'h-7 w-7 sm:h-8 sm:w-8' : 'h-9 w-9', tones[tone] || tones.blue)}>
-            <Icon className={clsx(compact ? 'h-3.5 w-3.5 sm:h-4 sm:w-4' : 'h-5 w-5')} />
+          <div className={clsx('metric-card-icon grid shrink-0 place-items-center rounded-xl ring-1 transition group-hover:scale-105', compact ? 'h-8 w-8 sm:h-9 sm:w-9' : 'h-9 w-9', tones[tone] || tones.blue)}>
+            <Icon className={clsx(compact ? 'h-4 w-4 sm:h-5 sm:w-5' : 'h-5 w-5')} />
           </div>
         )}
       </div>

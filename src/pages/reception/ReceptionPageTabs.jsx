@@ -19,10 +19,10 @@ export function ReceptionPageTabs({ label = 'Page sections', sections, active, o
   }, [label]);
 
   return (
-    <section className="rounded-[1.15rem] border border-white/80 bg-white/90 p-2 shadow-soft backdrop-blur-xl sm:rounded-2xl">
+    <section className="rounded-[1.15rem] border border-slate-200/70 bg-white p-2 shadow-soft sm:rounded-2xl">
       <div className="mb-2 flex flex-col gap-2 px-1 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400">{label}</p>
+          <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-500">{label}</p>
           <p className="hidden text-[11px] font-semibold text-slate-500 sm:block">Use these tabs to focus this page.</p>
         </div>
         {actions && <div className="shrink-0">{actions}</div>}
@@ -46,8 +46,8 @@ export function ReceptionPageTabs({ label = 'Page sections', sections, active, o
               {Icon && <span className={clsx('grid h-8 w-8 shrink-0 place-items-center rounded-lg ring-1', toneClasses[section.tone] || toneClasses.blue)}><Icon className="h-4 w-4" /></span>}
               <span className="min-w-0 flex-1">
                 <span className="flex items-center justify-between gap-2">
-                  <span className="truncate text-sm font-black text-slate-950">{section.label}</span>
-                  {section.count !== undefined && <span className="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-black text-white">{section.count}</span>}
+                  <span className="truncate text-sm font-bold text-slate-900">{section.label}</span>
+                  {section.count !== undefined && <span className={clsx('rounded-full px-2 py-0.5 text-[10px] font-bold', isActive ? 'bg-clinical-500 text-white' : 'bg-slate-100 text-slate-600')}>{section.count}</span>}
                 </span>
                 {section.helper && <span className="mt-0.5 hidden truncate text-[11px] font-semibold text-slate-500 sm:block">{section.helper}</span>}
               </span>

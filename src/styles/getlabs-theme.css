@@ -1,196 +1,85 @@
 /*
-  Getlabs-inspired warm interface layer.
-  This file intentionally avoids copying the Getlabs brand assets. It only applies a warm cream background,
-  minimal cards, serif display headings, and dark/outlined button treatments inspired by the uploaded reference.
+  Calm Clinical Teal interface layer.
+  Replaces the former Getlabs-inspired warm theme. The getlabs-* class names are kept as
+  styling hooks used across Header, LoginPage, lab pages and modals, but they now follow
+  the calm clinical teal design language (cyan #0891b2 primary, green #059669 success,
+  near-white surfaces, Inter typography, soft shadows, 150-200ms transitions).
 */
+
 :root {
-  --getlabs-ink: #2f2f2d;
-  --getlabs-ink-soft: #4a4640;
-  --getlabs-muted: #756f67;
-  --getlabs-cream: #f8f1e8;
-  --getlabs-paper: #fffaf3;
-  --getlabs-soft: #efe5d7;
-  --getlabs-border: #e3d8c9;
-  --getlabs-mint: #e6f0e8;
-  --getlabs-shadow: 0 22px 55px rgba(47, 47, 45, 0.10);
+  --calm-teal: #0891b2;
+  --calm-teal-deep: #155e75;
+  --calm-ink: #0f172a;
+  --calm-muted: #64748b;
+  --calm-border: #e2e8f0;
+  --calm-surface: #ffffff;
+  --calm-shadow: 0 8px 22px rgba(8, 145, 178, 0.10);
 }
 
-html,
-body,
-#root {
-  min-height: 100%;
-  background:
-    radial-gradient(circle at 86% 4%, rgba(224, 239, 228, 0.9), transparent 34rem),
-    radial-gradient(circle at 10% 16%, rgba(255, 250, 243, 0.95), transparent 28rem),
-    linear-gradient(180deg, var(--getlabs-paper) 0%, var(--getlabs-cream) 100%) !important;
-  color: var(--getlabs-ink);
-}
-
-body {
-  color: var(--getlabs-ink);
-}
-
-main,
-[class*="bg-slate-50"],
-[class*="bg-slate-100"] {
-  background-color: transparent;
-}
-
+/* Headline hook (formerly serif). Keeps Inter, calm weight and color. */
 .getlabs-serif,
-.getlabs-login h2,
-main h1,
-main h2,
-header h1 {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-weight: 500 !important;
-  color: var(--getlabs-ink) !important;
+.getlabs-login h2 {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-weight: 650;
+  color: var(--calm-ink);
 }
 
-.getlabs-input,
-main input,
-main select,
-main textarea {
-  width: 100%;
-  border: 1px solid var(--getlabs-border) !important;
-  border-radius: 0.2rem !important;
-  background: rgba(255, 250, 243, 0.96) !important;
-  color: var(--getlabs-ink) !important;
-  box-shadow: none !important;
-}
-
+/* Input hook used on the login form. */
 .getlabs-input {
-  padding: 0.85rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 700;
+  width: 100%;
+  border: 1px solid var(--calm-border);
+  border-radius: 0.9rem;
+  background: var(--calm-surface);
+  color: var(--calm-ink);
+  padding: 0.72rem 0.95rem;
+  font-size: 1rem;
+  font-weight: 500;
   outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
-.getlabs-input:focus,
-main input:focus,
-main select:focus,
-main textarea:focus {
-  border-color: var(--getlabs-ink) !important;
-  box-shadow: 0 0 0 4px rgba(47, 47, 45, 0.08) !important;
+.getlabs-input:focus {
+  border-color: var(--calm-teal);
+  box-shadow: 0 0 0 4px rgba(8, 145, 178, 0.14);
 }
 
-header {
-  border-color: rgba(47, 47, 45, 0.12) !important;
-  background:
-    radial-gradient(circle at 100% 0%, rgba(230, 240, 232, 0.9), transparent 32rem),
-    rgba(248, 241, 232, 0.92) !important;
-}
-
-header > div > div,
-header [class*="rounded-"][class*="bg-white"] {
-  border-color: rgba(47, 47, 45, 0.12) !important;
-  background: rgba(255, 250, 243, 0.8) !important;
-  box-shadow: none !important;
-}
-
-header [class*="bg-clinical-50"],
-header [class*="bg-clinical-100"] {
-  border-color: rgba(47, 47, 45, 0.14) !important;
-  background: rgba(255, 250, 243, 0.86) !important;
-  color: var(--getlabs-ink) !important;
-}
-
-header [class*="text-clinical"],
-main [class*="text-clinical"] {
-  color: var(--getlabs-ink) !important;
-}
-
-header [class*="bg-clinical-600"],
-header [class*="from-clinical"],
-main [class*="bg-clinical-600"],
-main [class*="bg-clinical-700"],
-main [class*="from-clinical"] {
-  background: var(--getlabs-ink) !important;
-  color: #fffaf3 !important;
-}
-
-main [class*="border-slate"],
-main [class*="border-white"],
-header [class*="border-slate"],
-header [class*="border-white"] {
-  border-color: var(--getlabs-border) !important;
-}
-
-main [class*="bg-white"],
-main article,
-main section,
-main [class*="shadow-card"],
-main [class*="shadow-panel"],
-main [class*="shadow-sm"] {
-  background-color: rgba(255, 250, 243, 0.96) !important;
-}
-
-main [class*="bg-slate-50"],
-main [class*="bg-slate-100"],
-main [class*="bg-clinical-50"] {
-  background-color: rgba(248, 241, 232, 0.86) !important;
-}
-
-main [class*="rounded-3xl"],
-main [class*="rounded-2xl"],
-main [class*="rounded-["],
-header [class*="rounded-3xl"],
-header [class*="rounded-2xl"],
-header [class*="rounded-["] {
-  border-radius: 0.8rem !important;
-}
-
-main [class*="text-slate-950"],
-main [class*="text-slate-900"],
-header [class*="text-slate-950"],
-header [class*="text-slate-900"] {
-  color: var(--getlabs-ink) !important;
-}
-
-main [class*="text-slate-600"],
-main [class*="text-slate-500"],
-main [class*="text-slate-400"],
-header [class*="text-slate-600"],
-header [class*="text-slate-500"],
-header [class*="text-slate-400"] {
-  color: var(--getlabs-muted) !important;
-}
-
-.getlabs-primary-button,
-main button[class*="bg-clinical"],
-main a[class*="bg-clinical"],
-header button[class*="bg-clinical"] {
-  border: 1px solid var(--getlabs-ink) !important;
-  border-radius: 0.18rem !important;
-  background: var(--getlabs-ink) !important;
-  color: #fffaf3 !important;
-  box-shadow: none !important;
-  letter-spacing: 0.16em !important;
-  text-transform: uppercase;
-}
-
-.getlabs-outline-button,
-main button[class*="bg-white"],
-main button[class*="bg-slate-50"],
-header button[class*="bg-white"],
-header button[class*="bg-slate-50"] {
-  border: 1px solid rgba(47, 47, 45, 0.55) !important;
-  border-radius: 0.18rem !important;
-  background: rgba(255, 250, 243, 0.78) !important;
-  color: var(--getlabs-ink) !important;
-  box-shadow: none !important;
-}
-
+/* Button hooks. */
 .getlabs-outline-button {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 3rem;
-  padding: 0 1.35rem;
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1.25rem;
+  border: 1px solid var(--calm-border);
+  border-radius: 999px;
+  background: var(--calm-surface);
+  color: var(--calm-teal-deep);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
 }
 
+.getlabs-outline-button:hover {
+  border-color: var(--calm-teal);
+  background: #f7fcfd;
+  transform: translateY(-1px);
+}
+
+.getlabs-primary-button {
+  background: var(--calm-teal) !important;
+  border-color: var(--calm-teal) !important;
+  color: #ffffff !important;
+  box-shadow: var(--calm-shadow);
+}
+
+.getlabs-primary-button:hover {
+  background: var(--calm-teal-deep) !important;
+  border-color: var(--calm-teal-deep) !important;
+}
+
+/* Gentle motion shared by interactive controls. */
 main button:not(:disabled),
 header button:not(:disabled),
 .getlabs-login button:not(:disabled) {
@@ -208,605 +97,25 @@ main button:disabled {
   cursor: not-allowed;
 }
 
-.getlabs-page > [class*="grid"]:has([class*="MetricCard"]),
-.getlabs-page > .grid:first-of-type {
-  gap: 0.85rem;
-}
-
-.getlabs-page article,
-.getlabs-page [class*="rounded-3xl"][class*="border"] {
-  border-color: var(--getlabs-border) !important;
-  box-shadow: var(--getlabs-shadow) !important;
-}
-
-.getlabs-page [class*="tracking-[0.14em]"],
-.getlabs-page [class*="tracking-[0.16em]"],
-.getlabs-page [class*="tracking-[0.18em]"],
-.getlabs-page [class*="tracking-[0.2em]"] {
-  letter-spacing: 0.18em !important;
-}
-
-@media (max-width: 768px) {
-  header {
-    padding-inline: 0.75rem !important;
-  }
-
-  main h1,
-  main h2,
-  header h1 {
-    font-size: clamp(1.35rem, 7vw, 2.5rem) !important;
-    line-height: 1.05 !important;
-  }
-
-  .getlabs-login main {
-    border-radius: 1.25rem !important;
-  }
-}
-
-/* Full warm interface pass for lab pages: sidebar, popups, drawers, and floating menus */
-body aside,
-body [data-sidebar],
-body [class*="sidebar"],
-body [class*="Sidebar"] {
-  background:
-    linear-gradient(180deg, rgba(255, 250, 243, 0.98) 0%, rgba(248, 241, 232, 0.98) 100%) !important;
-  border-right: 1px solid var(--getlabs-border) !important;
-  color: var(--getlabs-ink) !important;
-  box-shadow: 18px 0 45px rgba(47, 47, 45, 0.08) !important;
-}
-
-body aside *,
-body [data-sidebar] *,
-body [class*="sidebar"] *,
-body [class*="Sidebar"] * {
-  border-color: rgba(47, 47, 45, 0.12) !important;
-}
-
-body aside [class*="text-white"],
-body aside [class*="text-slate-50"],
-body aside [class*="text-slate-100"],
-body aside [class*="text-slate-200"],
-body aside [class*="text-slate-300"],
-body aside [class*="text-slate-400"],
-body aside [class*="text-slate-500"],
-body [data-sidebar] [class*="text-white"],
-body [data-sidebar] [class*="text-slate-"],
-body [class*="sidebar"] [class*="text-white"],
-body [class*="sidebar"] [class*="text-slate-"],
-body [class*="Sidebar"] [class*="text-white"],
-body [class*="Sidebar"] [class*="text-slate-"] {
-  color: var(--getlabs-ink) !important;
-}
-
-body aside [class*="bg-slate-950"],
-body aside [class*="bg-slate-900"],
-body aside [class*="bg-slate-800"],
-body aside [class*="bg-slate-700"],
-body aside [class*="bg-white"],
-body aside [class*="bg-clinical"],
-body [data-sidebar] [class*="bg-slate-950"],
-body [data-sidebar] [class*="bg-slate-900"],
-body [data-sidebar] [class*="bg-slate-800"],
-body [data-sidebar] [class*="bg-white"],
-body [data-sidebar] [class*="bg-clinical"],
-body [class*="sidebar"] [class*="bg-slate-950"],
-body [class*="sidebar"] [class*="bg-slate-900"],
-body [class*="sidebar"] [class*="bg-slate-800"],
-body [class*="sidebar"] [class*="bg-white"],
-body [class*="sidebar"] [class*="bg-clinical"],
-body [class*="Sidebar"] [class*="bg-slate-950"],
-body [class*="Sidebar"] [class*="bg-slate-900"],
-body [class*="Sidebar"] [class*="bg-slate-800"],
-body [class*="Sidebar"] [class*="bg-white"],
-body [class*="Sidebar"] [class*="bg-clinical"] {
-  background: rgba(255, 250, 243, 0.74) !important;
-}
-
-body aside button,
-body aside a,
-body aside [role="button"],
-body [data-sidebar] button,
-body [data-sidebar] a,
-body [data-sidebar] [role="button"],
-body [class*="sidebar"] button,
-body [class*="sidebar"] a,
-body [class*="sidebar"] [role="button"],
-body [class*="Sidebar"] button,
-body [class*="Sidebar"] a,
-body [class*="Sidebar"] [role="button"] {
-  border-radius: 0.2rem !important;
-  color: var(--getlabs-ink) !important;
-  box-shadow: none !important;
-}
-
-body aside button:hover,
-body aside a:hover,
-body aside [aria-current="page"],
-body aside [class*="active"],
-body [data-sidebar] button:hover,
-body [data-sidebar] a:hover,
-body [data-sidebar] [aria-current="page"],
-body [data-sidebar] [class*="active"],
-body [class*="sidebar"] button:hover,
-body [class*="sidebar"] a:hover,
-body [class*="sidebar"] [aria-current="page"],
-body [class*="Sidebar"] button:hover,
-body [class*="Sidebar"] a:hover,
-body [class*="Sidebar"] [aria-current="page"] {
-  background: var(--getlabs-ink) !important;
-  color: #fffaf3 !important;
-}
-
-body aside button:hover *,
-body aside a:hover *,
-body aside [aria-current="page"] *,
-body [data-sidebar] button:hover *,
-body [data-sidebar] a:hover *,
-body [data-sidebar] [aria-current="page"] *,
-body [class*="sidebar"] button:hover *,
-body [class*="sidebar"] a:hover *,
-body [class*="sidebar"] [aria-current="page"] *,
-body [class*="Sidebar"] button:hover *,
-body [class*="Sidebar"] a:hover *,
-body [class*="Sidebar"] [aria-current="page"] * {
-  color: #fffaf3 !important;
-}
-
-.getlabs-modal-overlay,
-.getlabs-floating-overlay,
-body [class*="backdrop-blur"][class*="bg-slate-950"] {
-  background: rgba(47, 47, 45, 0.44) !important;
-  backdrop-filter: blur(10px) !important;
-}
-
-.getlabs-modal-panel,
+/* Floating panels (header user menu) and modal hooks: soft clinical surfaces. */
 .getlabs-floating-panel,
-body [role="dialog"],
-body [role="menu"] {
-  border: 1px solid var(--getlabs-border) !important;
-  border-radius: 0.65rem !important;
-  background:
-    radial-gradient(circle at 100% 0%, rgba(230, 240, 232, 0.75), transparent 26rem),
-    rgba(255, 250, 243, 0.98) !important;
-  color: var(--getlabs-ink) !important;
-  box-shadow: 0 24px 70px rgba(47, 47, 45, 0.2) !important;
-}
-
-.getlabs-modal-panel header,
-.getlabs-modal-header,
-.getlabs-modal-footer,
-body [role="dialog"] [class*="border-b"],
-body [role="dialog"] [class*="border-t"],
-body [role="menu"] [class*="border-b"],
-body [role="menu"] [class*="border-t"] {
-  border-color: var(--getlabs-border) !important;
-  background: rgba(248, 241, 232, 0.72) !important;
-}
-
-.getlabs-modal-panel [class*="bg-slate-50"],
-.getlabs-modal-panel [class*="bg-white"],
-body [role="dialog"] [class*="bg-slate-50"],
-body [role="dialog"] [class*="bg-white"],
-body [role="menu"] [class*="bg-slate-50"],
-body [role="menu"] [class*="bg-white"] {
-  background: rgba(255, 250, 243, 0.72) !important;
-}
-
-.getlabs-page .rounded-3xl,
-.getlabs-page .rounded-2xl,
-.getlabs-page .rounded-full,
-.getlabs-modal-panel .rounded-3xl,
-.getlabs-modal-panel .rounded-2xl,
-.getlabs-modal-panel .rounded-full {
-  border-radius: 0.55rem !important;
-}
-
-.getlabs-lab-card {
-  border: 1px solid var(--getlabs-border) !important;
-  background: rgba(255, 250, 243, 0.94) !important;
-  box-shadow: 0 12px 34px rgba(47, 47, 45, 0.08) !important;
-}
-
-.getlabs-chip {
-  border: 1px solid rgba(47, 47, 45, 0.2) !important;
-  border-radius: 999px !important;
-  background: rgba(248, 241, 232, 0.86) !important;
-  color: var(--getlabs-ink) !important;
-}
-
-
-/* Keep lab result-entry popups above the fixed header and sidebar controls. */
-.getlabs-modal-overlay {
-  z-index: 9999 !important;
-  isolation: isolate;
-  align-items: center !important;
-  padding-top: max(1.5rem, env(safe-area-inset-top)) !important;
-  padding-bottom: max(1.5rem, env(safe-area-inset-bottom)) !important;
-}
-
 .getlabs-modal-panel {
-  position: relative;
-  z-index: 10000 !important;
+  box-shadow: 0 16px 44px rgba(15, 23, 42, 0.14);
 }
 
-
-/* --------------------------------------------------------------------------
-   Responsive scaling pass: phone + tablet
-   Keeps every workspace readable without horizontal clipping or hidden panels.
-   -------------------------------------------------------------------------- */
-* {
-  box-sizing: border-box;
+.getlabs-floating-overlay,
+.getlabs-modal-overlay {
+  background-color: rgba(15, 23, 42, 0.38);
 }
 
-html,
-body,
-#root {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+.getlabs-modal-header {
+  background: #f8fafc;
 }
 
-body {
-  min-width: 320px;
-}
-
-#root,
-#root > * {
-  min-width: 0;
-}
-
-main,
-section,
-article,
-header,
-aside,
-nav,
-form,
-fieldset,
-[class*="grid"],
-[class*="flex"],
-[class*="space-y"],
-[class*="rounded"],
-[class*="shadow"] {
-  min-width: 0;
-}
-
-img,
-svg,
-video,
-canvas,
-iframe {
-  max-width: 100%;
-}
-
-input,
-select,
-textarea,
-button,
-a {
-  min-width: 0;
-  max-width: 100%;
-}
-
-table {
-  width: 100%;
-  max-width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  overflow-wrap: anywhere;
-  word-break: normal;
-}
-
-/* Generic horizontal safety for legacy tables and older registry screens. */
-main table,
-main [role="table"] {
-  display: block;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-main [class*="overflow-x-auto"] {
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-}
-
-/* Prevent long IDs, investigation names, emails, and hospital names from breaking phone layouts. */
-main p,
-main span,
-main div,
-main label,
-main button,
-main a {
-  overflow-wrap: anywhere;
-}
-
-main .truncate,
-header .truncate {
-  min-width: 0;
-}
-
-/* Tablet optimization */
-@media (max-width: 1024px) {
-  header {
-    position: sticky;
-    top: 0;
-    z-index: 90;
-    padding-inline: clamp(0.65rem, 2vw, 1.25rem) !important;
-  }
-
-  main,
-  .getlabs-page {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  main > .getlabs-page,
-  .getlabs-page,
-  main > div,
-  main > section {
-    min-width: 0;
-  }
-
-  /* Any custom desktop grid becomes a safe single-column tablet stack. */
-  main [class*="grid-cols-["],
-  main [class*="xl:grid-cols-["],
-  main [class*="lg:grid-cols-["],
-  main [class*="md:grid-cols-["],
-  .getlabs-login main,
-  .getlabs-login [class*="xl:grid-cols-["],
-  .getlabs-login [class*="lg:grid-cols-["] {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-
-  /* Two-column summaries are acceptable on tablets, but never allow cramped 4-column rows. */
-  main [class*="xl:grid-cols-4"],
-  main [class*="lg:grid-cols-4"],
-  main [class*="md:grid-cols-4"],
-  main [class*="sm:grid-cols-4"] {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-
-  main [class*="min-w-["],
-  header [class*="min-w-["],
-  main [class*="max-w-["],
-  header [class*="max-w["] {
-    min-width: 0 !important;
-  }
-
-  main [class*="max-w-[240px]"],
-  main [class*="max-w-[300px]"],
-  main [class*="max-w-[320px]"] {
-    max-width: 100% !important;
-  }
-
-  .getlabs-modal-panel,
-  body [role="dialog"] {
-    width: min(100%, calc(100vw - 1.5rem)) !important;
-    max-width: calc(100vw - 1.5rem) !important;
-  }
-}
-
-/* Phone optimization */
-@media (max-width: 767px) {
-  body {
-    font-size: 14px;
-  }
-
-  header {
-    padding: 0.55rem 0.65rem !important;
-  }
-
-  header > div,
-  header > div > div,
-  main,
-  .getlabs-page,
-  .getlabs-login main {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  main h1,
-  main h2,
-  header h1 {
-    font-size: clamp(1.25rem, 7vw, 1.9rem) !important;
-    line-height: 1.08 !important;
-    letter-spacing: -0.035em !important;
-  }
-
-  main h3 {
-    font-size: clamp(1.05rem, 5.2vw, 1.45rem) !important;
-    line-height: 1.15 !important;
-  }
-
-  main p,
-  main label,
-  main span,
-  main button,
-  main input,
-  main select,
-  main textarea,
-  main a {
-    line-height: 1.45;
-  }
-
-  main input,
-  main select,
-  main textarea,
-  .getlabs-input {
-    min-height: 2.85rem;
-    font-size: 0.95rem !important;
-  }
-
-  main textarea {
-    min-height: 6rem;
-  }
-
-  main button,
-  main a[role="button"],
-  .getlabs-primary-button,
-  .getlabs-outline-button,
-  header button {
-    min-height: 2.65rem;
-  }
-
-  main .getlabs-primary-button,
-  main .getlabs-outline-button {
-    width: 100%;
-  }
-
-  main [class*="grid-cols-2"],
-  main [class*="grid-cols-3"],
-  main [class*="grid-cols-4"],
-  main [class*="md:grid-cols"],
-  main [class*="sm:grid-cols"],
-  main [class*="xl:grid-cols"],
-  main [class*="lg:grid-cols"] {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-
-  main [class*="flex-wrap"] {
-    row-gap: 0.55rem;
-  }
-
-  main [class*="justify-between"] {
-    align-items: stretch;
-  }
-
-  main [class*="rounded-[2rem]"],
-  main [class*="rounded-3xl"],
-  .getlabs-modal-panel,
-  .getlabs-login main {
-    border-radius: 0.75rem !important;
-  }
-
-  main [class*="p-7"],
-  main [class*="p-6"],
-  main [class*="p-5"],
-  main [class*="p-4"],
-  .getlabs-modal-panel [class*="p-5"],
-  .getlabs-modal-panel [class*="p-4"] {
-    padding: 0.85rem !important;
-  }
-
-  main [class*="gap-6"],
-  main [class*="gap-5"],
-  main [class*="gap-4"] {
-    gap: 0.85rem !important;
-  }
-
-  main [class*="space-y-6"] > :not([hidden]) ~ :not([hidden]),
-  main [class*="space-y-5"] > :not([hidden]) ~ :not([hidden]),
-  main [class*="space-y-4"] > :not([hidden]) ~ :not([hidden]) {
-    margin-top: 0.85rem !important;
-  }
-
-  /* Make action groups fit phones without hiding buttons off-screen. */
-  main .flex:has(> button),
-  main .flex:has(> a),
-  .getlabs-modal-footer,
-  .getlabs-modal-header {
-    flex-wrap: wrap;
-  }
-
-  .getlabs-modal-header > div,
-  .getlabs-modal-footer > div,
-  main .flex:has(> button) > *,
-  main .flex:has(> a) > * {
-    min-width: 0;
-  }
-
-  .getlabs-modal-footer {
-    align-items: stretch !important;
-  }
-
-  .getlabs-modal-footer > div,
-  .getlabs-modal-footer button {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .getlabs-modal-overlay {
-    align-items: flex-end !important;
-    padding: 0.75rem !important;
-  }
-
-  .getlabs-modal-panel,
-  body [role="dialog"] {
-    max-height: calc(100dvh - 1.5rem) !important;
-    overflow: hidden !important;
-    border-radius: 0.85rem !important;
-  }
-
-  .getlabs-modal-panel > div,
-  body [role="dialog"] > div {
-    min-width: 0;
-  }
-
-  .getlabs-modal-panel [class*="max-h-[calc"],
-  body [role="dialog"] [class*="max-h-[calc"] {
-    max-height: calc(100dvh - 13rem) !important;
-  }
-
-  .getlabs-floating-panel,
-  body [role="menu"] {
-    width: calc(100vw - 1rem) !important;
-    max-width: calc(100vw - 1rem) !important;
-    left: 0.5rem !important;
-    right: 0.5rem !important;
-  }
-
-  .getlabs-login {
-    padding: 0.75rem !important;
-  }
-
-  .getlabs-login main {
-    overflow: visible !important;
-  }
-
-  .getlabs-login section {
-    min-height: auto !important;
-  }
-
-  /* Keep step indicators usable on phone without pushing content off-screen. */
-  main ol,
-  main [class*="overflow-x-auto"] {
-    max-width: 100%;
-  }
-
-  main ol > li,
-  main [class*="overflow-x-auto"] > * {
-    flex-shrink: 0;
-  }
-
-  /* Avoid invisible right-side action columns on queue/result cards. */
-  main article button,
-  main article .getlabs-primary-button,
-  main article .getlabs-outline-button {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* Very small phones */
-@media (max-width: 380px) {
-  body {
-    font-size: 13px;
-  }
-
-  header [class*="tracking-["],
-  main [class*="tracking-["] {
-    letter-spacing: 0.08em !important;
-  }
-
-  main button,
-  main input,
-  main select,
-  main textarea {
-    font-size: 0.9rem !important;
-  }
+/* Page + card hooks kept as no-visual-change anchors for existing markup. */
+.getlabs-page,
+.getlabs-lab-card,
+.getlabs-theme,
+.getlabs-modal-footer {
+  /* Styling comes from utility classes on the elements themselves. */
 }

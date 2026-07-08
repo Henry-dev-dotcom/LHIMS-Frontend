@@ -75,13 +75,14 @@ export function Modal({ open, title, description, onClose, children, footer }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
+        aria-label={title ? undefined : 'Dialog'}
         aria-describedby={description ? descriptionId : undefined}
       >
         <div className="border-b border-slate-100 bg-gradient-to-r from-white to-clinical-50/95 px-4 pb-3 pt-2.5 backdrop-blur sm:px-6 sm:py-5">
           <div className="mx-auto mb-2 h-1.5 w-12 rounded-full bg-slate-200 sm:hidden" aria-hidden="true" />
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
-              <h2 id={titleId} className="break-words text-lg font-black tracking-tight text-slate-950 sm:text-xl">{title}</h2>
+              <h2 id={titleId} className="break-words text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">{title}</h2>
               {description && <p id={descriptionId} className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">{description}</p>}
             </div>
             <Button ref={closeButtonRef} variant="subtle" className="h-10 w-10 shrink-0 p-0" onClick={onClose} aria-label="Close modal">

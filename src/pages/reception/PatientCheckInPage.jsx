@@ -114,7 +114,7 @@ export function PatientCheckInPage() {
             { key: 'identityVerified', label: 'Identity', render: (row) => <StatusBadge status={row.identityVerified ? 'Verified' : 'Not verified'} /> },
             { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> },
             { key: 'checkedInAt', label: 'Checked In', render: (row) => formatDateTime(row.checkedInAt) },
-            { key: 'actions', label: 'Action', render: (row) => !row.orderId ? <Button variant="secondary" onClick={() => dispatch({ type: 'START_WALK_IN_TEST_REQUEST', payload: { patientId: row.patientId, visitId: row.id } })}>Request Tests</Button> : <span className="text-xs font-bold text-slate-400">Linked</span> }
+            { key: 'actions', label: 'Action', render: (row) => !row.orderId ? <Button variant="secondary" onClick={() => dispatch({ type: 'START_WALK_IN_TEST_REQUEST', payload: { patientId: row.patientId, visitId: row.id } })}>Request Tests</Button> : <span className="text-xs font-bold text-slate-500">Linked</span> }
           ]}
           rows={todaysVisits.slice(0, 12)}
           emptyMessage="No checked-in patients yet."
@@ -125,7 +125,7 @@ export function PatientCheckInPage() {
         {selectedPatient && duplicateCandidates.length > 0 ? <div className="space-y-3">
           {duplicateCandidates.map((patient) => (
             <div key={patient.id} className="flex items-center justify-between gap-4 rounded-2xl border border-amber-100 bg-amber-50 p-3">
-              <div><p className="font-black text-slate-950">{patient.fullName}</p><p className="text-sm text-slate-500">{patient.id} · {patient.phone || 'No phone'}</p></div>
+              <div><p className="font-bold text-slate-900">{patient.fullName}</p><p className="text-sm text-slate-500">{patient.id} · {patient.phone || 'No phone'}</p></div>
               <Button variant="secondary" className="px-3 py-1.5 text-xs" onClick={() => dispatch({ type: 'FLAG_DUPLICATE_PATIENT', payload: { patientId: selectedPatient.id, possibleDuplicateId: patient.id } })}>Flag duplicate</Button>
             </div>
           ))}

@@ -43,7 +43,7 @@ const checks = [
     message: 'Service worker registration must notify the UI when a new production build is ready.'
   },
   {
-    pass: sw.includes('diagnosis-center-phase9-v1') && sw.includes("event.data?.type === 'SKIP_WAITING'") && sw.includes("url.pathname.startsWith('/api/')") && sw.includes('canCacheResponse') && sw.includes('response.ok'),
+    pass: sw.includes('diagnosis-center-phase9-') && sw.includes("event.data?.type === 'SKIP_WAITING'") && sw.includes('url.pathname.startsWith(`${BASE_PATH}api/`)') && sw.includes('canCacheResponse') && sw.includes('response.ok'),
     message: 'Service worker must use the Phase 9 cache, support skip-waiting, avoid API caching and only cache safe responses.'
   },
   {

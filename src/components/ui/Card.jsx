@@ -16,8 +16,8 @@ export function Card({ title, subtitle, actions, children, className, compact = 
       {(title || subtitle || actions) && (
         <div className={clsx('mb-3 flex min-w-0 flex-col gap-3 sm:mb-5 sm:flex-row sm:items-start sm:justify-between', compact && 'mb-3')}>
           <div className="min-w-0 flex-1">
-            {title && <h2 className="text-[0.98rem] font-black leading-6 tracking-tight text-slate-950 sm:text-lg">{title}</h2>}
-            {subtitle && <p className="mt-1 max-w-3xl text-[13px] leading-5 text-slate-500 sm:text-sm sm:leading-6">{subtitle}</p>}
+            {title && <h2 className="text-base font-semibold leading-6 tracking-tight text-slate-900 sm:text-lg">{title}</h2>}
+            {subtitle && <p className="mt-1 max-w-3xl text-sm leading-5 text-slate-500 sm:leading-6">{subtitle}</p>}
           </div>
           {actions && (
             <div className="grid w-full min-w-0 shrink-0 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-end [&_.clinical-input]:w-full [&_button]:w-full [&_button]:justify-center sm:[&_button]:w-auto [&_select]:w-full sm:[&_select]:w-auto">

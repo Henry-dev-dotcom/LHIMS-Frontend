@@ -132,10 +132,10 @@ function LabResultWorkflow({ currentStep }) {
           const complete = step.number < currentStep;
           return (
             <div key={step.number} className={`flex items-center gap-3 rounded-2xl px-4 py-3 ${active ? 'bg-clinical-50 text-clinical-800' : complete ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-50 text-slate-500'}`}>
-              <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-black ${active ? 'bg-clinical-600 text-white' : complete ? 'bg-emerald-600 text-white' : 'bg-white text-slate-400'}`}>
+              <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-bold ${active ? 'bg-clinical-600 text-white' : complete ? 'bg-emerald-600 text-white' : 'bg-white text-slate-500'}`}>
                 {complete ? <CheckCircle2 className="h-4 w-4" /> : step.number}
               </span>
-              <span className="text-sm font-black">{step.label}</span>
+              <span className="text-sm font-bold">{step.label}</span>
             </div>
           );
         })}
@@ -158,34 +158,34 @@ function AcceptedPatientCard({ row, onOpen }) {
               <UserRound className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              <p className="truncate text-base font-black text-slate-950">{row.order?.patient?.fullName}</p>
+              <p className="truncate text-base font-bold text-slate-900">{row.order?.patient?.fullName}</p>
               <p className="mt-0.5 text-sm font-semibold text-slate-500">{row.order?.patient?.id} · {row.order?.patient?.phone || 'No phone'}</p>
             </div>
           </div>
-          <p className="mt-3 text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Order ID</p>
-          <p className="mt-0.5 break-words text-sm font-black text-slate-900">{row.order?.id}</p>
+          <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Order ID</p>
+          <p className="mt-0.5 break-words text-sm font-bold text-slate-900">{row.order?.id}</p>
         </div>
 
         <div className="min-w-0 rounded-2xl border border-slate-100 bg-slate-50 p-3">
-          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Time</p>
-          <p className="mt-2 text-sm font-black leading-6 text-slate-900">{formatDateTime(acceptedTime)}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Time</p>
+          <p className="mt-2 text-sm font-bold leading-6 text-slate-900">{formatDateTime(acceptedTime)}</p>
           <p className="mt-1 text-xs font-semibold text-slate-500">Accepted for result entry</p>
         </div>
 
         <div className="min-w-0 rounded-2xl border border-slate-100 bg-slate-50 p-3">
-          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Priority</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Priority</p>
           <div className="mt-3"><StatusBadge status={row.order?.urgency || 'Routine'} /></div>
         </div>
 
         <div className="min-w-0 rounded-2xl border border-slate-100 bg-slate-50 p-3">
-          <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Result</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Result</p>
           <div className="mt-3"><StatusBadge status={resultStatus} /></div>
         </div>
 
         <div className="min-w-0 space-y-3">
           <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3">
-            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Clinician / Hospital</p>
-            <p className="mt-1 truncate font-black text-slate-900">{row.order?.doctor?.name}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Clinician / Hospital</p>
+            <p className="mt-1 truncate font-bold text-slate-900">{row.order?.doctor?.name}</p>
             <p className="truncate text-sm text-slate-500">{row.order?.hospital?.name}</p>
           </div>
           <Button disabled={finalised} onClick={() => onOpen(row)} className="w-full justify-center whitespace-nowrap">
@@ -208,8 +208,8 @@ function TestResultModal({ test, values, files, onChange, onFileSelection, onRem
       <div className="getlabs-modal-panel max-h-[92vh] w-full max-w-3xl overflow-hidden rounded-[2rem] bg-white shadow-2xl" role="dialog" aria-modal="true">
         <div className="getlabs-modal-header flex flex-col gap-4 border-b border-slate-200 p-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-clinical-700">Enter test result</p>
-            <h3 className="mt-1 text-2xl font-black text-slate-950">{test.name}</h3>
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-clinical-700">Enter test result</p>
+            <h3 className="mt-1 text-2xl font-bold text-slate-900">{test.name}</h3>
             <p className="mt-1 text-sm text-slate-500">Fill the result fields for this test only. When saved, this test will be marked as completed.</p>
           </div>
           <button type="button" onClick={onClose} className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-slate-500 hover:bg-slate-50" aria-label="Close result entry popup">
@@ -221,7 +221,7 @@ function TestResultModal({ test, values, files, onChange, onFileSelection, onRem
           <div className="space-y-3">
             {parameters.map((parameter) => (
               <label key={valueKey(test.id, parameter)} className="block rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                <span className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">{parameter.name}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{parameter.name}</span>
                 <input
                   className={`${inputClass} mt-2 bg-white`}
                   value={values[valueKey(test.id, parameter)] || ''}
@@ -238,10 +238,10 @@ function TestResultModal({ test, values, files, onChange, onFileSelection, onRem
           <div className="mt-4 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Add result document</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Add result document</p>
                 <p className="mt-1 text-sm font-semibold text-slate-600">Attach a PDF, Word document, spreadsheet, or image for this specific test.</p>
               </div>
-              <label htmlFor={`test-file-upload-${test.id}`} className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white shadow-sm transition hover:bg-slate-800">
+              <label htmlFor={`test-file-upload-${test.id}`} className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800">
                 <UploadCloud className="h-4 w-4" /> Add Document
               </label>
               <input
@@ -261,11 +261,11 @@ function TestResultModal({ test, values, files, onChange, onFileSelection, onRem
                     <div className="flex min-w-0 items-center gap-2">
                       <FileText className="h-4 w-4 shrink-0 text-clinical-600" />
                       <div className="min-w-0">
-                        <p className="truncate font-black text-slate-800">{file.name || file.fileName}</p>
+                        <p className="truncate font-bold text-slate-800">{file.name || file.fileName}</p>
                         <p className="text-xs font-semibold text-slate-500">{formatFileSize(file.size || file.fileSize)} · Attached to {test.name}</p>
                       </div>
                     </div>
-                    <button type="button" onClick={() => onRemoveFile(file.id)} className="self-start rounded-full border border-slate-200 px-3 py-1 text-xs font-black text-slate-500 hover:border-rose-200 hover:text-rose-600 sm:self-auto" aria-label="Remove attached document">Remove</button>
+                    <button type="button" onClick={() => onRemoveFile(file.id)} className="self-start rounded-full border border-slate-200 px-3 py-1 text-xs font-bold text-slate-500 hover:border-rose-200 hover:text-rose-600 sm:self-auto" aria-label="Remove attached document">Remove</button>
                   </div>
                 ))}
               </div>
@@ -445,7 +445,7 @@ export function AcceptedSamplesPage() {
         <Card>
           <div className="space-y-4">
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+              <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
               <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient name, patient ID, order ID, sample ID, or test..." />
             </div>
             <div className="space-y-3">
@@ -453,7 +453,7 @@ export function AcceptedSamplesPage() {
                 <AcceptedPatientCard key={row.sample.id} row={row} onOpen={openPatientWorkspace} />
               )) : (
                 <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
-                  <p className="font-black text-slate-900">No accepted patients are waiting for result entry.</p>
+                  <p className="font-bold text-slate-900">No accepted patients are waiting for result entry.</p>
                   <p className="mt-2 text-sm text-slate-500">Accepted samples appear here after they are completed in the Lab Queue.</p>
                 </div>
               )}
@@ -467,27 +467,27 @@ export function AcceptedSamplesPage() {
           <div className="space-y-5">
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
               <Button variant="secondary" onClick={backToList}><ArrowLeft className="h-4 w-4" /> Back to Accepted Patients</Button>
-              <p className="text-sm font-black text-slate-700">{completedCount} of {activeItems.length} test(s) completed</p>
+              <p className="text-sm font-bold text-slate-700">{completedCount} of {activeItems.length} test(s) completed</p>
             </div>
 
             {!activeRow ? (
               <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
-                <p className="font-black text-slate-900">No accepted patient selected.</p>
+                <p className="font-bold text-slate-900">No accepted patient selected.</p>
                 <p className="mt-2 text-sm text-slate-500">Go back and choose a patient before entering results.</p>
               </div>
             ) : (
               <div className="space-y-5">
                 <div className="grid gap-3 lg:grid-cols-4">
-                  <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Patient</p><p className="mt-1 font-black text-slate-950">{activeRow.order.patient?.fullName}</p><p className="text-sm text-slate-500">{activeRow.order.patient?.id} · {activeRow.order.patient?.phone}</p></div>
-                  <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Order / Sample</p><p className="mt-1 font-black text-slate-950">{activeRow.order.id}</p><p className="text-sm text-slate-500">{activeRow.sample.id}</p></div>
-                  <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Clinician</p><p className="mt-1 font-black text-slate-950">{activeRow.order.doctor?.name}</p><p className="text-sm text-slate-500">{activeRow.order.hospital?.name}</p></div>
-                  <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Accepted Time</p><p className="mt-1 font-black text-slate-950">{formatDateTime(activeRow.sample.acceptedAt || activeRow.sample.collectedAt)}</p><div className="mt-2"><StatusBadge status={activeRow.order.urgency || 'Routine'} /></div></div>
+                  <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Patient</p><p className="mt-1 font-bold text-slate-900">{activeRow.order.patient?.fullName}</p><p className="text-sm text-slate-500">{activeRow.order.patient?.id} · {activeRow.order.patient?.phone}</p></div>
+                  <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Order / Sample</p><p className="mt-1 font-bold text-slate-900">{activeRow.order.id}</p><p className="text-sm text-slate-500">{activeRow.sample.id}</p></div>
+                  <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Clinician</p><p className="mt-1 font-bold text-slate-900">{activeRow.order.doctor?.name}</p><p className="text-sm text-slate-500">{activeRow.order.hospital?.name}</p></div>
+                  <div className="rounded-2xl bg-slate-50 p-4"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Accepted Time</p><p className="mt-1 font-bold text-slate-900">{formatDateTime(activeRow.sample.acceptedAt || activeRow.sample.collectedAt)}</p><div className="mt-2"><StatusBadge status={activeRow.order.urgency || 'Routine'} /></div></div>
                 </div>
 
                 <div className="getlabs-lab-card rounded-3xl border border-slate-200 bg-white p-4">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <p className="font-black text-slate-950"><ListChecks className="mr-2 inline h-5 w-5 text-clinical-600" />Patient laboratory tests</p>
+                      <p className="font-bold text-slate-900"><ListChecks className="mr-2 inline h-5 w-5 text-clinical-600" />Patient laboratory tests</p>
                       <p className="mt-1 text-sm text-slate-500">Click a test to enter its results. Completed tests are marked automatically.</p>
                     </div>
                     <StatusBadge status={allComplete ? 'All Tests Completed' : 'Result Entry In Progress'} />
@@ -501,7 +501,7 @@ export function AcceptedSamplesPage() {
                         <div key={item.id} className="getlabs-lab-card grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-[1fr_auto] md:items-center">
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <p className="font-black text-slate-950"><FlaskConical className="mr-2 inline h-4 w-4 text-clinical-600" />{item.name}</p>
+                              <p className="font-bold text-slate-900"><FlaskConical className="mr-2 inline h-4 w-4 text-clinical-600" />{item.name}</p>
                               <StatusBadge status={complete ? 'Completed' : 'Not Completed'} />
                             </div>
                             <p className="mt-1 text-sm text-slate-500">{fieldCount} result field{fieldCount === 1 ? '' : 's'} to complete.</p>
@@ -519,23 +519,23 @@ export function AcceptedSamplesPage() {
 
                 <div className="grid gap-4 xl:grid-cols-[1fr_1fr]">
                   <label className="block rounded-3xl border border-slate-200 p-4">
-                    <span className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Equipment / Analyzer</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Equipment / Analyzer</span>
                     <input className={`${inputClass} mt-3`} value={equipment} onChange={(event) => setEquipment(event.target.value)} placeholder="e.g. Sysmex XN-1000" />
                   </label>
                   <label className="block rounded-3xl border border-slate-200 p-4">
-                    <span className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Report summary for clinician</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Report summary for clinician</span>
                     <textarea className={`${inputClass} mt-3 min-h-[92px]`} value={reportText} onChange={(event) => setReportText(event.target.value)} placeholder="Add result interpretation, summary, or lab comments..." />
                   </label>
                 </div>
 
                 <label className="block rounded-3xl border border-slate-200 p-4">
-                  <span className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Internal laboratory notes</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Internal laboratory notes</span>
                   <textarea className={`${inputClass} mt-3 min-h-[90px]`} value={technicianNotes} onChange={(event) => setTechnicianNotes(event.target.value)} placeholder="Internal notes, analyzer remarks, quality-control comments..." />
                 </label>
 
                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-4">
                   <div>
-                    <p className="font-black text-slate-950">{completedCount} of {activeItems.length} test(s) completed</p>
+                    <p className="font-bold text-slate-900">{completedCount} of {activeItems.length} test(s) completed</p>
                     <p className="text-sm text-slate-500">Complete every test before pushing the result to the clinician.</p>
                   </div>
                   <Button disabled={!allComplete} onClick={pushToClinician}><Send className="h-4 w-4" /> Push Results to Clinician</Button>

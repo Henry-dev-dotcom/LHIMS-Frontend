@@ -92,31 +92,31 @@ export function PriceCatalogPage() {
           <div className="space-y-5">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Code</p>
-                <p className="mt-1 font-black text-slate-900">{item.id}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Code</p>
+                <p className="mt-1 font-bold text-slate-900">{item.id}</p>
               </div>
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Type</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Type</p>
                 <div className="mt-1"><StatusBadge status={item.type} /></div>
               </div>
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Price</p>
-                <p className="mt-1 font-black text-slate-900">{money(item.price)}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Price</p>
+                <p className="mt-1 font-bold text-slate-900">{money(item.price)}</p>
               </div>
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Expected hours</p>
-                <p className="mt-1 font-black text-slate-900">{item.expectedHours}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Expected hours</p>
+                <p className="mt-1 font-bold text-slate-900">{item.expectedHours}</p>
               </div>
             </div>
 
             <div className="rounded-3xl border border-slate-200/80 bg-white p-4">
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Selected catalog item</p>
-                  <h3 className="mt-1 text-xl font-black text-slate-950">{item.name}</h3>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Selected catalog item</p>
+                  <h3 className="mt-1 text-xl font-bold text-slate-900">{item.name}</h3>
                   <p className="mt-1 text-sm font-semibold text-slate-500">{item.department} {item.modality ? `• ${item.modality}` : ''}</p>
                 </div>
-                <div className="rounded-2xl border border-clinical-100 bg-clinical-50 px-3 py-2 text-sm font-black text-clinical-800">
+                <div className="rounded-2xl border border-clinical-100 bg-clinical-50 px-3 py-2 text-sm font-bold text-clinical-800">
                   {parameterRows.length} parameter{parameterRows.length === 1 ? '' : 's'}
                 </div>
               </div>
@@ -146,7 +146,7 @@ export function PriceCatalogPage() {
             )}
 
             <div className="rounded-3xl border border-slate-200/80 bg-white p-4">
-              <h4 className="font-black text-slate-950">Parameters / components</h4>
+              <h4 className="font-bold text-slate-900">Parameters / components</h4>
               {parameterRows.length === 0 ? (
                 <p className="mt-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-500">No structured lab parameters are configured for this scan/imaging item.</p>
               ) : (

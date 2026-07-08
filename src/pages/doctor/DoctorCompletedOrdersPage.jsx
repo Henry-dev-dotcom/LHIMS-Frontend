@@ -32,9 +32,9 @@ function DetailedResultModal({ order, data, dispatch, onClose }) {
     >
       <div className="space-y-5">
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Patient</p><p className="mt-2 font-black text-slate-950">{order.patient?.fullName}</p><p className="text-sm text-slate-500">{order.patient?.id}</p></div>
-          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Released</p><p className="mt-2 font-black text-slate-950">{formatDateTime(order.updatedAt)}</p><p className="text-sm text-slate-500">{orderItemsText(order)}</p></div>
-          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Status</p><div className="mt-2"><StatusBadge status={order.status} /></div><p className="mt-2 text-sm text-slate-500">Prices hidden from clinicians.</p></div>
+          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Patient</p><p className="mt-2 font-bold text-slate-900">{order.patient?.fullName}</p><p className="text-sm text-slate-500">{order.patient?.id}</p></div>
+          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Released</p><p className="mt-2 font-bold text-slate-900">{formatDateTime(order.updatedAt)}</p><p className="text-sm text-slate-500">{orderItemsText(order)}</p></div>
+          <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Status</p><div className="mt-2"><StatusBadge status={order.status} /></div><p className="mt-2 text-sm text-slate-500">Prices hidden from clinicians.</p></div>
         </div>
         {order.results.map((result) => (
           <Card key={result.id} title={`${result.department} · ${result.status}`} subtitle={result.reportText}>
@@ -42,7 +42,7 @@ function DetailedResultModal({ order, data, dispatch, onClose }) {
               <DataTable
                 columns={[
                   { key: 'name', label: 'Parameter' },
-                  { key: 'value', label: 'Value', render: (row) => <span className="font-black text-slate-950">{row.value} {row.unit}</span> },
+                  { key: 'value', label: 'Value', render: (row) => <span className="font-bold text-slate-900">{row.value} {row.unit}</span> },
                   { key: 'referenceRange', label: 'Reference Range' },
                   { key: 'flag', label: 'Flag', render: (row) => <StatusBadge status={row.flag} /> }
                 ]}
@@ -96,8 +96,8 @@ export function DoctorCompletedOrdersPage() {
           ['Completed', summary.all], ['Lab Results', summary.lab], ['Scan Reports', summary.scan], ['Abnormal Flags', summary.abnormal]
         ].map(([label, value]) => (
           <div key={label} className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-            <p className="text-xl font-black text-slate-950">{value}</p>
-            <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">{label}</p>
+            <p className="text-xl font-bold text-slate-900">{value}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{label}</p>
           </div>
         ))}
       </div>
@@ -107,15 +107,15 @@ export function DoctorCompletedOrdersPage() {
         subtitle="Filter released orders by lab results, scan reports, or abnormal flags."
         actions={(
           <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-            <div className="relative min-w-0 flex-1 sm:w-80 sm:flex-none"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" /><input className={`${inputClass} pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search completed order, patient, test..." /></div>
+            <div className="relative min-w-0 flex-1 sm:w-80 sm:flex-none"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" /><input className={`${inputClass} pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search completed order, patient, test..." /></div>
             <select className={inputClass} value={resultFilter} onChange={(event) => setResultFilter(event.target.value)}><option value="">All result types</option><option value="Laboratory">Lab results</option><option value="Imaging">Scan reports</option><option value="Abnormal">Abnormal only</option></select>
           </div>
         )}
       >
         <DataTable
           columns={[
-            { key: 'id', label: 'Order ID', render: (order) => <span className="font-black text-slate-950">{order.id}</span> },
-            { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold">{order.patient?.fullName}</p><p className="text-xs text-slate-400">{order.patient?.id}</p></div> },
+            { key: 'id', label: 'Order ID', render: (order) => <span className="font-bold text-slate-900">{order.id}</span> },
+            { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold">{order.patient?.fullName}</p><p className="text-xs text-slate-500">{order.patient?.id}</p></div> },
             { key: 'items', label: 'Tests / Scans', render: orderItemsText },
             { key: 'released', label: 'Released', render: (order) => formatDateTime(order.updatedAt) },
             { key: 'status', label: 'Status', render: (order) => <StatusBadge status={hasAbnormal(order) ? 'Abnormal' : order.status} /> },

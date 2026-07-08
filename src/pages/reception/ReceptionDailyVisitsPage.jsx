@@ -98,9 +98,9 @@ export function ReceptionDailyVisitsPage() {
       {['register', 'exceptions'].includes(section) && <Card title={section === 'exceptions' ? 'Exceptions register' : 'Reception daily visit register'} subtitle="Mark completed visits after patient handoff, sample collection, imaging attendance, or billing resolution." compact>
         <DataTable
           columns={[
-            { key: 'id', label: 'Visit ID', render: (row) => <span className="font-black text-slate-950">{row.id}</span> },
-            { key: 'patient', label: 'Patient', render: (row) => <div><p className="font-bold text-slate-950">{row.patient?.fullName || '—'}</p><p className="text-xs text-slate-500">{row.patient?.id} · {row.patient?.phone || 'No phone'}</p></div> },
-            { key: 'order', label: 'Linked Order', render: (row) => row.orderId ? <div><p className="font-bold">{row.orderId}</p><p className="text-xs text-slate-500">{row.order?.status || '—'}</p></div> : <span className="text-slate-400">Walk-in / no order</span> },
+            { key: 'id', label: 'Visit ID', render: (row) => <span className="font-bold text-slate-900">{row.id}</span> },
+            { key: 'patient', label: 'Patient', render: (row) => <div><p className="font-bold text-slate-900">{row.patient?.fullName || '—'}</p><p className="text-xs text-slate-500">{row.patient?.id} · {row.patient?.phone || 'No phone'}</p></div> },
+            { key: 'order', label: 'Linked Order', render: (row) => row.orderId ? <div><p className="font-bold">{row.orderId}</p><p className="text-xs text-slate-500">{row.order?.status || '—'}</p></div> : <span className="text-slate-500">Walk-in / no order</span> },
             { key: 'identityVerified', label: 'Identity', render: (row) => <StatusBadge status={row.identityVerified ? 'Verified' : 'Not verified'} /> },
             { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> },
             { key: 'checkedInBy', label: 'Checked In By' },

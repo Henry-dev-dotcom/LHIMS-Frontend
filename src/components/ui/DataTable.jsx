@@ -27,7 +27,7 @@ function cellLabel(column, row) {
 function MobileDetail({ column, row, compact = false }) {
   return (
     <div className={clsx('min-w-0 rounded-2xl bg-slate-50 px-3 py-2', compact && 'rounded-xl px-2.5 py-2')}>
-      <dt className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{column.label}</dt>
+      <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{column.label}</dt>
       <dd className="mt-1 min-w-0 break-words text-sm font-semibold leading-5 text-slate-800">{renderCell(column, row) ?? '—'}</dd>
     </div>
   );
@@ -49,7 +49,7 @@ export function DataTable({ columns, rows, emptyMessage = 'No records found.', d
         {rows.length === 0 ? (
           <div className="px-4 py-10 text-center text-slate-500">
             <div className="flex flex-col items-center justify-center gap-2">
-              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-slate-100 text-slate-400"><SearchX className="h-5 w-5" /></span>
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-slate-100 text-slate-500"><SearchX className="h-5 w-5" /></span>
               <span className="font-semibold">{emptyMessage}</span>
             </div>
           </div>
@@ -57,12 +57,12 @@ export function DataTable({ columns, rows, emptyMessage = 'No records found.', d
           <article key={row.id || index} className="bg-white p-3 sm:p-4" aria-label={`${primaryColumn?.label || 'Record'} ${(primaryColumn && cellLabel(primaryColumn, row)) || index + 1}`}>
             <div className="mb-3 flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">{primaryColumn?.label || `Record ${index + 1}`}</p>
-                <div className="mt-1 min-w-0 break-words text-base font-black leading-6 text-slate-950">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{primaryColumn?.label || `Record ${index + 1}`}</p>
+                <div className="mt-1 min-w-0 break-words text-base font-bold leading-6 text-slate-900">
                   {primaryColumn ? renderCell(primaryColumn, row) ?? '—' : `Record ${index + 1}`}
                 </div>
               </div>
-              {row.id && primaryColumn?.key !== 'id' && <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-black text-slate-600">{row.id}</span>}
+              {row.id && primaryColumn?.key !== 'id' && <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{row.id}</span>}
             </div>
 
             {detailColumns.length > 0 && (
@@ -73,7 +73,7 @@ export function DataTable({ columns, rows, emptyMessage = 'No records found.', d
 
             {extraColumns.length > 0 && (
               <details className="group mt-2 rounded-2xl border border-slate-200 bg-white">
-                <summary aria-label="Show more record details" className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 text-xs font-black uppercase tracking-[0.14em] text-slate-500">
+                <summary aria-label="Show more record details" className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
                   More details
                   <ChevronDown className="h-4 w-4 transition group-open:rotate-180" />
                 </summary>
@@ -85,7 +85,7 @@ export function DataTable({ columns, rows, emptyMessage = 'No records found.', d
 
             {actionColumn && (
               <div className="mt-3 min-w-0 rounded-2xl bg-clinical-50/70 px-3 py-2">
-                <p className="text-[10px] font-black uppercase tracking-[0.16em] text-clinical-700">{actionColumn.label}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-clinical-700">{actionColumn.label}</p>
                 <div className="mt-2 grid min-w-0 gap-2 [&_*]:min-w-0 [&_button]:w-full [&_button]:justify-center">
                   {renderCell(actionColumn, row) ?? '—'}
                 </div>
@@ -100,7 +100,7 @@ export function DataTable({ columns, rows, emptyMessage = 'No records found.', d
           <thead className="bg-slate-50/90">
             <tr>
               {columns.map((column) => (
-                <th key={column.key} className="whitespace-nowrap px-4 py-3.5 text-left text-[11px] font-black uppercase tracking-[0.16em] text-slate-500">
+                <th key={column.key} scope="col" className="whitespace-nowrap px-4 py-3.5 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">
                   {column.label}
                 </th>
               ))}
@@ -111,7 +111,7 @@ export function DataTable({ columns, rows, emptyMessage = 'No records found.', d
               <tr>
                 <td className="px-4 py-10 text-center text-slate-500" colSpan={columns.length}>
                   <div className="flex flex-col items-center justify-center gap-2">
-                    <span className="grid h-11 w-11 place-items-center rounded-2xl bg-slate-100 text-slate-400"><SearchX className="h-5 w-5" /></span>
+                    <span className="grid h-11 w-11 place-items-center rounded-2xl bg-slate-100 text-slate-500"><SearchX className="h-5 w-5" /></span>
                     <span className="font-semibold">{emptyMessage}</span>
                   </div>
                 </td>

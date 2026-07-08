@@ -1,10 +1,9 @@
-import { ClipboardList, CreditCard, FlaskConical, ScanLine, UsersRound } from 'lucide-react';
+import { ChevronDown, ClipboardList, CreditCard, FlaskConical, ScanLine, UsersRound } from 'lucide-react';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { MetricCard } from '../../components/ui/MetricCard';
 import { Card } from '../../components/ui/Card';
 import { DataTable } from '../../components/ui/DataTable';
 import { StatusBadge } from '../../components/ui/StatusBadge';
-import { InsightStrip } from '../../components/ui/InsightStrip';
 import { WorkflowTimeline } from '../../components/ui/WorkflowTimeline';
 import { useAppStore } from '../../store/AppStore';
 import { formatDateTime, getById, money } from '../../utils/formatters';
@@ -12,18 +11,12 @@ import { canViewPrices } from '../../utils/priceVisibility';
 
 export function OverviewPage() {
   const { state } = useAppStore();
-  const { patients, orders, catalog, invoices, results, auditLogs, notifications } = state.data;
+  const { patients, orders, catalog, invoices } = state.data;
   const canSeeFinance = canViewPrices(state.auth?.role);
   const labOrders = orders.filter((order) => order.itemIds.some((id) => getById(catalog, id)?.type === 'Lab')).length;
   const scanOrders = orders.filter((order) => order.itemIds.some((id) => getById(catalog, id)?.type === 'Scan')).length;
   const outstanding = invoices.filter((invoice) => invoice.status !== 'Paid').reduce((sum, invoice) => sum + invoice.amount, 0);
   const latestOrder = orders[0];
-  const insightItems = [
-    { label: 'Finalized results', value: results.filter((result) => result.status === 'Final / Released').length, helper: 'Released to doctors' },
-    { label: 'Audit events', value: auditLogs.length, helper: 'Traceability coverage' },
-    { label: 'Delivery events', value: notifications.length, helper: 'In-platform / email / SMS' },
-    { label: 'Open invoices', value: invoices.filter((invoice) => invoice.status !== 'Paid').length, helper: 'Billing follow-up' }
-  ];
 
   return (
     <div>
@@ -39,13 +32,8 @@ export function OverviewPage() {
         <MetricCard label="Scan routed" value={scanOrders} icon={ScanLine} tone="yellow" />
         {canSeeFinance ? <MetricCard label="Outstanding" value={money(outstanding)} icon={CreditCard} tone="red" /> : <MetricCard label="Open invoices" value={invoices.filter((invoice) => invoice.status !== 'Paid').length} icon={CreditCard} tone="red" />}
       </div>
-      <InsightStrip className="mt-3" items={insightItems} />
-      {latestOrder && (
-        <div className="mt-4">
-          <WorkflowTimeline status={latestOrder.status} timeline={latestOrder.timeline} />
-        </div>
-      )}
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
+
+      <div className="mt-4">
         <Card title="Recent order registry" subtitle="Recent orders across routing, billing and results workflows.">
           <DataTable
             columns={[
@@ -58,26 +46,17 @@ export function OverviewPage() {
             rows={orders}
           />
         </Card>
-        <Card title="Platform status" subtitle="Current workspace capabilities and operational checks.">
-          <div className="space-y-3 text-sm">
-            {[
-              'Consistent polished app shell',
-              'Six role-based workspaces',
-              'Refined dashboard metric cards',
-              'Responsive permission-aware navigation',
-              'Accessible protected-route feedback',
-              'Local session persistence',
-              'Mobile tables become readable cards',
-              'Print-ready report and dashboard styling'
-            ].map((item) => (
-              <div key={item} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
-                <span className="font-semibold text-slate-700">{item}</span>
-                <StatusBadge status="Ready" />
-              </div>
-            ))}
-          </div>
-        </Card>
       </div>
+
+      <details className="group mt-4">
+        <summary className="clinical-panel flex cursor-pointer list-none items-center justify-between gap-3 rounded-[1.2rem] px-4 py-3 text-sm font-semibold text-slate-600 transition hover:text-clinical-700 sm:rounded-[1.75rem]">
+          More details — latest order workflow
+          <ChevronDown className="h-4 w-4 shrink-0 transition group-open:rotate-180" />
+        </summary>
+        <div className="mt-3">
+          {latestOrder && <WorkflowTimeline status={latestOrder.status} timeline={latestOrder.timeline} />}
+        </div>
+      </details>
     </div>
   );
 }

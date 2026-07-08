@@ -99,7 +99,7 @@ export function EquipmentBookingPage() {
         <div className="space-y-6">
           <Card title="Equipment list" subtitle="Imaging machines and room status for scheduling.">
             <div className="grid gap-3 md:grid-cols-2">
-              {equipment.map((item) => <div key={item.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><div className="flex items-center justify-between gap-3"><p className="font-black text-slate-900">{item.machine}</p><StatusBadge status={item.status} /></div><p className="mt-1 text-sm font-semibold text-slate-500">{item.modality} · {item.room}</p></div>)}
+              {equipment.map((item) => <div key={item.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><div className="flex items-center justify-between gap-3"><p className="font-bold text-slate-900">{item.machine}</p><StatusBadge status={item.status} /></div><p className="mt-1 text-sm font-semibold text-slate-500">{item.modality} · {item.room}</p></div>)}
             </div>
           </Card>
           <Card title="Today’s imaging board" subtitle="Calendar-like room view grouped by machine and time.">
@@ -108,10 +108,10 @@ export function EquipmentBookingPage() {
                 const machineBookings = bookingRows.filter((booking) => booking.machine === item.machine || booking.room === item.room);
                 return (
                   <div key={item.id} className="rounded-2xl border border-slate-200 bg-white p-4">
-                    <div className="flex items-center justify-between gap-2"><p className="font-black text-slate-950">{item.room}</p><StatusBadge status={item.status} /></div>
+                    <div className="flex items-center justify-between gap-2"><p className="font-bold text-slate-900">{item.room}</p><StatusBadge status={item.status} /></div>
                     <p className="mt-1 text-xs font-bold text-slate-500">{item.machine} · {item.modality}</p>
                     <div className="mt-3 space-y-2">
-                      {machineBookings.length === 0 ? <p className="text-xs font-semibold text-slate-400">No bookings on this machine.</p> : machineBookings.slice(0, 4).map((booking) => <div key={booking.id} className="rounded-xl bg-slate-50 p-2 text-xs"><span className="font-black text-slate-900">{formatDateTime(booking.bookedAt)}</span><br />{booking.order?.patient?.fullName || booking.orderId}</div>)}
+                      {machineBookings.length === 0 ? <p className="text-xs font-semibold text-slate-500">No bookings on this machine.</p> : machineBookings.slice(0, 4).map((booking) => <div key={booking.id} className="rounded-xl bg-slate-50 p-2 text-xs"><span className="font-bold text-slate-900">{formatDateTime(booking.bookedAt)}</span><br />{booking.order?.patient?.fullName || booking.orderId}</div>)}
                     </div>
                   </div>
                 );
@@ -129,5 +129,5 @@ export function EquipmentBookingPage() {
 }
 
 function Info({ label, value }) {
-  return <div><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">{label}</p><p className="mt-1 text-sm font-bold text-slate-900">{value || '—'}</p></div>;
+  return <div><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{label}</p><p className="mt-1 text-sm font-bold text-slate-900">{value || '—'}</p></div>;
 }

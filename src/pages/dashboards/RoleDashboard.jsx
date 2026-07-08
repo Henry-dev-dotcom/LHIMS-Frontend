@@ -1,6 +1,8 @@
 import {
   Bell,
   Building2,
+  CalendarDays,
+  ChevronDown,
   ClipboardCheck,
   ClipboardList,
   CreditCard,
@@ -17,8 +19,7 @@ import { DataTable } from '../../components/ui/DataTable';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { Button } from '../../components/ui/Button';
 import { WorkflowTimeline } from '../../components/ui/WorkflowTimeline';
-import { InsightStrip } from '../../components/ui/InsightStrip';
-import { ROLE_DASHBOARD_REQUIREMENTS, ROLES } from '../../data/roles';
+import { ROLES } from '../../data/roles';
 import { useAppStore } from '../../store/AppStore';
 import { formatDateTime, getById, money } from '../../utils/formatters';
 import { getNavForRole } from '../../utils/permissions';
@@ -56,6 +57,45 @@ const roleHeaders = {
   }
 };
 
+/* Each role gets ONE primary queue plus two or three quick actions.
+   Everything else lives behind the collapsed details section. */
+const roleQueueMeta = {
+  doctor: { title: 'Your active orders', subtitle: 'Latest orders you placed, newest first.' },
+  receptionist: { title: 'Orders waiting on reception', subtitle: 'Submitted and confirmed orders that need check-in or routing.' },
+  lab: { title: 'Lab work queue', subtitle: 'Orders routed to the laboratory.' },
+  scan: { title: 'Imaging work queue', subtitle: 'Orders routed to scan / imaging.' },
+  billing: { title: 'Recent invoices', subtitle: 'Latest invoice activity and payment status.' },
+  admin: { title: 'Recent audit events', subtitle: 'Latest system activity across all roles.' }
+};
+
+const roleQuickActions = {
+  doctor: [
+    ['doctor-new-order', 'New Order', ClipboardList],
+    ['doctor-results', 'Results', ShieldCheck]
+  ],
+  receptionist: [
+    ['incoming-orders', 'Incoming Orders', ClipboardList],
+    ['patient-checkin', 'Check-In', UsersRound],
+    ['reception-walkins', 'Walk-Ins', CalendarDays]
+  ],
+  lab: [
+    ['lab-queue', 'Open Queue', FlaskConical],
+    ['lab-review', 'Review & Sign-off', ShieldCheck]
+  ],
+  scan: [
+    ['scan-queue', 'Open Queue', ScanLine],
+    ['scan-review', 'Review Reports', ShieldCheck]
+  ],
+  billing: [
+    ['invoices', 'Invoices', CreditCard],
+    ['billing-analytics', 'Analytics', ClipboardCheck]
+  ],
+  admin: [
+    ['users', 'User Management', UserRound],
+    ['audit-log', 'Audit Log', ShieldCheck]
+  ]
+};
+
 function itemType(order, catalog, type) {
   return order.itemIds.some((id) => getById(catalog, id)?.type === type);
 }
@@ -66,7 +106,7 @@ function getDoctorOrders(data, auth) {
 }
 
 function getRoleRows(role, data, auth) {
-  const { orders, catalog, invoices, auditLogs, notifications, patients, hospitals, doctors, users } = data;
+  const { orders, catalog, invoices, auditLogs } = data;
   if (role === 'doctor') return getDoctorOrders(data, auth).slice(0, 6);
   if (role === 'receptionist') return orders.filter((order) => ['Submitted', 'Confirmed'].includes(order.status)).slice(0, 6);
   if (role === 'lab') return orders.filter((order) => itemType(order, catalog, 'Lab')).slice(0, 6);
@@ -128,8 +168,6 @@ function getMetrics(role, data, auth) {
 function getTableConfig(role, data) {
   if (role === 'billing') {
     return {
-      title: 'Recent invoices',
-      subtitle: 'Finance-facing invoice status snapshot.',
       columns: [
         { key: 'id', label: 'Invoice' },
         { key: 'orderId', label: 'Order' },
@@ -141,8 +179,6 @@ function getTableConfig(role, data) {
   }
   if (role === 'admin') {
     return {
-      title: 'Recent audit events',
-      subtitle: 'System oversight event feed.',
       columns: [
         { key: 'id', label: 'Audit ID' },
         { key: 'actor', label: 'Actor' },
@@ -153,13 +189,10 @@ function getTableConfig(role, data) {
     };
   }
   return {
-    title: 'Role queue snapshot',
-    subtitle: 'Orders filtered for this role’s dashboard responsibilities.',
     columns: [
       { key: 'id', label: 'Order ID' },
       { key: 'patient', label: 'Patient', render: (row) => getById(data.patients, row.patientId)?.fullName || '—' },
       { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> },
-      { key: 'billingStatus', label: 'Billing', render: (row) => <StatusBadge status={row.billingStatus} /> },
       { key: 'urgency', label: 'Urgency', render: (row) => <StatusBadge status={row.urgency} /> },
       { key: 'expectedCompletionAt', label: 'Expected', render: (row) => formatDateTime(row.expectedCompletionAt) }
     ]
@@ -191,62 +224,60 @@ function getIdentityCard(role, data, auth) {
 export function RoleDashboard({ role }) {
   const { state, dispatch } = useAppStore();
   const config = roleHeaders[role] || roleHeaders.admin;
+  const queueMeta = roleQueueMeta[role] || roleQueueMeta.admin;
   const rows = getRoleRows(role, state.data, state.auth);
   const table = getTableConfig(role, state.data);
   const identity = getIdentityCard(role, state.data, state.auth);
-  const requirements = ROLE_DASHBOARD_REQUIREMENTS[role] || [];
-  const firstOrder = rows.find((row) => row.status);
-  const insightItems = [
-    { label: 'Visible modules', value: getNavForRole(role).length, helper: 'Role-safe navigation' },
-    { label: 'Queue rows', value: rows.length, helper: 'Visible in this workspace' },
-    { label: 'Audit trail', value: state.data.auditLogs.length, helper: 'Tracked system events' },
-    { label: 'Notifications', value: state.data.notifications.length, helper: 'Delivery and alerts' }
-  ];
+  const quickActions = (roleQuickActions[role] || []).filter(([pageId]) => getNavForRole(role).some((item) => item.id === pageId));
+  const firstOrder = rows.find((row) => row.status && row.timeline);
 
   return (
     <div>
       <PageHeader eyebrow={config.eyebrow} title={config.title} description={config.description} />
+
       <div className="dashboard-metric-row grid grid-cols-4 gap-2 md:grid-cols-2 md:gap-3 xl:grid-cols-4">
         {getMetrics(role, state.data, state.auth).map(([label, value, Icon, tone]) => (
           <MetricCard key={label} label={label} value={value} icon={Icon} tone={tone} />
         ))}
       </div>
-      <InsightStrip className="mt-3" items={insightItems} />
-      {firstOrder && (
-        <div className="mt-4">
-          <WorkflowTimeline status={firstOrder.status} timeline={firstOrder.timeline} />
-        </div>
-      )}
-      <div className="mt-6 grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
-        <Card title="Role identity & permissions" subtitle="The session role, accessible modules and active clinical responsibilities are explicit.">
-          <div className="space-y-3">
-            {identity.map(([label, value]) => (
-              <div key={label} className="flex items-center justify-between gap-4 rounded-2xl bg-slate-50 px-4 py-3">
-                <span className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">{label}</span>
-                <span className="text-right text-sm font-bold text-slate-800">{value || '—'}</span>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button variant="secondary" onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'orders' })}>Open Order Registry</Button>
-            <Button variant="subtle" onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'overview' })}>System Overview</Button>
-          </div>
-        </Card>
-        <Card title={table.title} subtitle={table.subtitle}>
+
+      <div className="mt-4">
+        <Card
+          title={queueMeta.title}
+          subtitle={queueMeta.subtitle}
+          actions={quickActions.map(([pageId, label, Icon]) => (
+            <Button key={pageId} variant="secondary" onClick={() => dispatch({ type: 'NAVIGATE', pageId })}>
+              <Icon className="h-4 w-4" /> {label}
+            </Button>
+          ))}
+        >
           <DataTable columns={table.columns} rows={rows} />
         </Card>
       </div>
-      <Card className="mt-6" title="Workspace capabilities for this role" subtitle="Role-specific features available in this workspace.">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {requirements.map((item) => (
-            <div key={item} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-              <StatusBadge status="Mapped" />
-              <p className="mt-3 font-bold text-slate-900">{item}</p>
-              <p className="mt-1 text-xs leading-5 text-slate-500">Route, permissions and workflow are active.</p>
+
+      <details className="group mt-4">
+        <summary className="clinical-panel flex cursor-pointer list-none items-center justify-between gap-3 rounded-[1.2rem] px-4 py-3 text-sm font-semibold text-slate-600 transition hover:text-clinical-700 sm:rounded-[1.75rem]">
+          More details — session, permissions and order workflow
+          <ChevronDown className="h-4 w-4 shrink-0 transition group-open:rotate-180" />
+        </summary>
+        <div className="mt-3 space-y-4">
+          {firstOrder && <WorkflowTimeline status={firstOrder.status} timeline={firstOrder.timeline} />}
+          <Card title="Role identity & permissions" subtitle="The session role, accessible modules and active clinical responsibilities are explicit.">
+            <div className="space-y-2">
+              {identity.map(([label, value]) => (
+                <div key={label} className="flex items-center justify-between gap-4 rounded-2xl bg-slate-50 px-4 py-3">
+                  <span className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">{label}</span>
+                  <span className="text-right text-sm font-semibold text-slate-800">{value || '—'}</span>
+                </div>
+              ))}
             </div>
-          ))}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button variant="secondary" onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'orders' })}>Open Order Registry</Button>
+              <Button variant="subtle" onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'overview' })}>System Overview</Button>
+            </div>
+          </Card>
         </div>
-      </Card>
+      </details>
     </div>
   );
 }

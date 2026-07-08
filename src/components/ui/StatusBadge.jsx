@@ -14,5 +14,5 @@ export function StatusBadge({ status }) {
             ? 'bg-purple-50 text-purple-700 ring-purple-200'
             : 'bg-slate-100 text-slate-700 ring-slate-200';
 
-  return <span className={clsx('inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-black ring-1', className)}>{status || '—'}</span>;
+  return <span className={clsx('inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1', className)}>{status || '—'}</span>;
 }

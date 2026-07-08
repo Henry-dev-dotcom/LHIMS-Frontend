@@ -27,7 +27,7 @@ export function ResponsiveTabs({ tabs, activeTab, onChange, className, ariaLabel
               onClick={() => onChange(tab.id)}
               title={tab.label}
               className={clsx(
-                'min-h-10 max-w-[72vw] shrink-0 rounded-2xl px-3 py-2 text-xs font-black transition active:scale-[0.98] sm:max-w-none sm:px-4 sm:text-sm',
+                'min-h-10 max-w-[72vw] shrink-0 rounded-2xl px-3 py-2 text-xs font-semibold transition active:scale-[0.98] sm:max-w-none sm:px-4 sm:text-sm',
                 active ? 'bg-clinical-600 text-white shadow-sm' : 'text-slate-600 hover:bg-clinical-50 hover:text-clinical-800'
               )}
             >

@@ -43,7 +43,7 @@ export function ServiceWorkerUpdateBanner() {
         <div className="flex min-w-0 items-start gap-2.5">
           <DownloadCloud className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           <div className="min-w-0">
-            <p className="text-xs font-black uppercase tracking-[0.14em]">Update ready</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.08em]">Update ready</p>
             <p className="mt-0.5 text-xs font-semibold leading-5 text-clinical-900/80">A newer mobile build is available. Update now to avoid using an old cached version.</p>
           </div>
         </div>

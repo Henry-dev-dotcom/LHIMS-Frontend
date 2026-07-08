@@ -55,7 +55,7 @@ export function FloatTrackerPage() {
       <div className="grid gap-6 xl:grid-cols-[0.72fr_1.28fr]">
         <Card title="Active float" subtitle="Payments and adjustments can only be recorded after a shift starts.">
           <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
-            <div className="flex items-center justify-between gap-3"><span className="font-black text-slate-700">Current shift</span><StatusBadge status={activeShift ? 'Open' : 'No Shift'} /></div>
+            <div className="flex items-center justify-between gap-3"><span className="font-bold text-slate-700">Current shift</span><StatusBadge status={activeShift ? 'Open' : 'No Shift'} /></div>
             <div className="mt-2 text-slate-600">{activeShift ? `${activeShift.id} · ${activeShift.startedBy} · opened ${formatDateTime(activeShift.startedAt)}` : 'Start a shift before taking payments or making float adjustments.'}</div>
           </div>
           <form onSubmit={saveAdjustment} className="space-y-4">
@@ -76,7 +76,7 @@ export function FloatTrackerPage() {
             <input className={inputClass} type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
             <input className={inputClass} type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} />
           </div>
-          <DataTable columns={[{ key: 'createdAt', label: 'Time', render: (row) => formatDateTime(row.createdAt) }, { key: 'type', label: 'Type', render: (row) => <StatusBadge status={row.type === 'Out' ? 'Debit' : 'Credit'} /> }, { key: 'description', label: 'Patient / Description' }, { key: 'method', label: 'Method' }, { key: 'amount', label: 'Amount', render: (row) => <span className={row.type === 'Out' ? 'font-black text-red-700' : 'font-black text-emerald-700'}>{row.type === 'Out' ? '-' : '+'}{money(row.amount)}</span> }, { key: 'staff', label: 'Cashier' }, { key: 'shiftId', label: 'Shift' }, { key: 'reference', label: 'Reference' }]} rows={rows} emptyMessage="No float transactions match your filters." />
+          <DataTable columns={[{ key: 'createdAt', label: 'Time', render: (row) => formatDateTime(row.createdAt) }, { key: 'type', label: 'Type', render: (row) => <StatusBadge status={row.type === 'Out' ? 'Debit' : 'Credit'} /> }, { key: 'description', label: 'Patient / Description' }, { key: 'method', label: 'Method' }, { key: 'amount', label: 'Amount', render: (row) => <span className={row.type === 'Out' ? 'font-bold text-red-700' : 'font-bold text-emerald-700'}>{row.type === 'Out' ? '-' : '+'}{money(row.amount)}</span> }, { key: 'staff', label: 'Cashier' }, { key: 'shiftId', label: 'Shift' }, { key: 'reference', label: 'Reference' }]} rows={rows} emptyMessage="No float transactions match your filters." />
         </Card>
       </div>
     </div>

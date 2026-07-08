@@ -48,7 +48,7 @@ export function MobileBottomNav() {
   if (!state.auth || state.currentPage === 'login') return null;
 
   const landing = state.auth?.landing || 'overview';
-  const roleLinks = (ROLE_QUICK_LINKS[role] || []).filter((item) => canAccessPage(role, item.id));
+  const roleLinks = (ROLE_QUICK_LINKS[role] || []).filter((item) => item.id !== landing && canAccessPage(role, item.id));
   const links = [
     { id: landing, label: 'Home', icon: Home },
     ...roleLinks.slice(0, 3),
@@ -61,7 +61,7 @@ export function MobileBottomNav() {
       <div className="relative grid grid-cols-5 gap-0 overflow-hidden rounded-[1.15rem]">
         {activeIndex >= 0 && (
           <span
-            className="mobile-bottom-nav-pill pointer-events-none absolute inset-y-0 z-0 rounded-2xl bg-clinical-600 shadow-sm"
+            className="mobile-bottom-nav-pill pointer-events-none absolute inset-y-0 z-0 rounded-2xl bg-clinical-500 shadow-sm"
             aria-hidden="true"
             style={{ width: '20%', transform: `translateX(${activeIndex * 100}%)` }}
           />
@@ -81,7 +81,7 @@ export function MobileBottomNav() {
               aria-current={active ? 'page' : undefined}
               aria-label={item.id === '__menu__' ? 'Open full navigation menu' : `Go to ${item.label}`}
               className={clsx(
-                'relative z-10 flex min-h-[3.25rem] min-w-0 flex-col items-center justify-center rounded-2xl px-1 text-[10px] font-black transition duration-200 active:scale-95',
+                'relative z-10 flex min-h-[3.25rem] min-w-0 flex-col items-center justify-center rounded-2xl px-1 text-[10px] font-semibold transition duration-200 active:scale-95',
                 active ? 'bg-clinical-600/0 text-white shadow-sm' : 'text-slate-500 hover:bg-clinical-50 hover:text-clinical-700'
               )}
             >

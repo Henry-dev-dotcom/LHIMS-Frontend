@@ -211,8 +211,8 @@ export function ReceptionWalkInsPage() {
               ['3', 'Diagnostics + clinician return', 'Requests route directly to Lab/Scan, and final results return directly to the clinician.']
             ].map(([step, title, text]) => (
               <div key={step} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-clinical-600 text-sm font-black text-white">{step}</div>
-                <p className="font-black text-slate-950">{title}</p>
+                <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-clinical-600 text-sm font-bold text-white">{step}</div>
+                <p className="font-bold text-slate-900">{title}</p>
                 <p className="mt-1 text-sm leading-6 text-slate-500">{text}</p>
               </div>
             ))}
@@ -241,13 +241,13 @@ export function ReceptionWalkInsPage() {
 
       {section === 'request' && <form onSubmit={submitWalkInRequest} className="mx-auto w-full max-w-5xl space-y-5">
         <section className="overflow-visible rounded-[2rem] border border-slate-200/80 bg-white/80 p-3 shadow-soft backdrop-blur sm:p-5">
-          <div className="mb-4 flex flex-col gap-3 rounded-[1.5rem] bg-gradient-to-r from-clinical-50 to-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-4 flex flex-col gap-3 rounded-[1.5rem] bg-clinical-25 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-clinical-600">Walk-in request workspace</p>
-              <h2 className="mt-1 text-xl font-black tracking-tight text-slate-950">{activeRequestStep.label}</h2>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-clinical-600">Walk-in request workspace</p>
+              <h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900">{activeRequestStep.label}</h2>
               <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">Only one request window is shown at a time. Continue moves the receptionist through the same Walk-in Request section without stacking all forms on the screen.</p>
             </div>
-            <span className="inline-flex w-fit items-center rounded-full bg-white px-3 py-1.5 text-xs font-black text-slate-600 shadow-sm ring-1 ring-slate-200">Step {requestStep} of {REQUEST_STEPS.length}</span>
+            <span className="inline-flex w-fit items-center rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm ring-1 ring-slate-200">Step {requestStep} of {REQUEST_STEPS.length}</span>
           </div>
 
           <nav aria-label="Walk-in request progress">
@@ -265,10 +265,10 @@ export function ReceptionWalkInsPage() {
                       aria-current={isCurrent ? 'step' : undefined}
                       className={`flex min-w-0 items-center gap-2 rounded-2xl px-2 py-1.5 transition sm:px-3 ${reachable ? 'cursor-pointer hover:bg-slate-50' : 'cursor-not-allowed'}`}
                     >
-                      <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-black ${isCurrent ? 'bg-clinical-600 text-white' : isDone ? 'bg-clinical-100 text-clinical-700' : 'bg-slate-100 text-slate-400'}`}>
+                      <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-bold ${isCurrent ? 'bg-clinical-600 text-white' : isDone ? 'bg-clinical-100 text-clinical-700' : 'bg-slate-100 text-slate-500'}`}>
                         {isDone ? <CheckCircle2 className="h-5 w-5" /> : item.id}
                       </span>
-                      <span className={`hidden truncate text-sm font-black sm:block ${isCurrent ? 'text-clinical-700' : isDone ? 'text-slate-700' : 'text-slate-400'}`}>{item.label}</span>
+                      <span className={`hidden truncate text-sm font-bold sm:block ${isCurrent ? 'text-clinical-700' : isDone ? 'text-slate-700' : 'text-slate-500'}`}>{item.label}</span>
                     </button>
                     {index < REQUEST_STEPS.length - 1 && <span className={`h-0.5 flex-1 rounded ${requestStep > item.id ? 'bg-clinical-300' : 'bg-slate-200'}`} />}
                   </li>
@@ -302,7 +302,7 @@ export function ReceptionWalkInsPage() {
             {requestStep === 2 && <Card title="Select requested lab tests or scans" subtitle="Search results drop directly under the search bar. Selected requests appear as removable chips below." compact>
               <div className="mb-4 grid gap-3 md:grid-cols-[minmax(0,1fr)_200px]">
                 <div className="relative z-30">
-                  <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
                   <input
                     className={`${inputClass} pl-9`}
                     value={catalogQuery}
@@ -315,8 +315,8 @@ export function ReceptionWalkInsPage() {
                   {catalogSearchActive && catalogQuery.trim() && (
                     <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] z-50 max-h-80 overflow-y-auto rounded-3xl border border-slate-200 bg-white p-2 shadow-2xl">
                       <div className="mb-2 flex items-center justify-between px-2 py-1">
-                        <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Search results</p>
-                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-black text-slate-500">{dropdownMatches.length} shown</span>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Search results</p>
+                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500">{dropdownMatches.length} shown</span>
                       </div>
 
                       {dropdownMatches.map((item) => {
@@ -331,13 +331,13 @@ export function ReceptionWalkInsPage() {
                           >
                             <div className="min-w-0">
                               <div className="flex flex-wrap items-center gap-2">
-                                <DepartmentIcon className={`h-4 w-4 ${selected ? 'text-clinical-700' : 'text-slate-400'}`} />
-                                <p className="truncate font-black text-slate-950">{item.name}</p>
+                                <DepartmentIcon className={`h-4 w-4 ${selected ? 'text-clinical-700' : 'text-slate-500'}`} />
+                                <p className="truncate font-bold text-slate-900">{item.name}</p>
                                 <StatusBadge status={item.type} />
                               </div>
                               <p className="mt-1 text-xs font-semibold text-slate-500">{item.id} · {item.department === 'Imaging' ? item.modality || 'Imaging' : 'Laboratory'} · ETA {item.expectedHours}h · {money(item.price)}</p>
                             </div>
-                            <span className={`w-fit rounded-full px-3 py-1 text-xs font-black ${selected ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-600'}`}>{selected ? 'Added' : 'Add'}</span>
+                            <span className={`w-fit rounded-full px-3 py-1 text-xs font-bold ${selected ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-600'}`}>{selected ? 'Added' : 'Add'}</span>
                           </button>
                         );
                       })}
@@ -354,10 +354,10 @@ export function ReceptionWalkInsPage() {
               </div>
 
               <div className="mb-4 rounded-2xl bg-slate-50 p-3">
-                <p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Common walk-in requests</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Common walk-in requests</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {COMMON_WALK_IN_ITEMS.map((id) => getById(state.data.catalog, id)).filter(Boolean).map((item) => (
-                    <button key={item.id} type="button" onClick={() => toggleItem(item.id)} className={`rounded-full px-3 py-1.5 text-xs font-black ring-1 transition ${selectedItems.includes(item.id) ? 'bg-clinical-600 text-white ring-clinical-600' : 'bg-white text-slate-700 ring-slate-200 hover:bg-clinical-50 hover:text-clinical-700'}`}>
+                    <button key={item.id} type="button" onClick={() => toggleItem(item.id)} className={`rounded-full px-3 py-1.5 text-xs font-bold ring-1 transition ${selectedItems.includes(item.id) ? 'bg-clinical-600 text-white ring-clinical-600' : 'bg-white text-slate-700 ring-slate-200 hover:bg-clinical-50 hover:text-clinical-700'}`}>
                       {selectedItems.includes(item.id) ? 'Added · ' : ''}{item.name}
                     </button>
                   ))}
@@ -367,16 +367,16 @@ export function ReceptionWalkInsPage() {
               <div className="rounded-2xl border border-slate-200 bg-white p-3">
                 <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-xs font-black uppercase tracking-wider text-slate-500">Selected tests / scans</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Selected tests / scans</p>
                     <p className="text-sm text-slate-500">Use the search bar above. Matching tests drop down immediately under it.</p>
                   </div>
-                  <span className="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-600">{chosenItems.length} selected</span>
+                  <span className="w-fit rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{chosenItems.length} selected</span>
                 </div>
 
                 {chosenItems.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {chosenItems.map((item) => (
-                      <button key={item.id} type="button" onClick={() => toggleItem(item.id)} className="inline-flex items-center gap-2 rounded-full bg-clinical-50 px-3 py-1.5 text-xs font-black text-clinical-700 ring-1 ring-clinical-200 hover:bg-red-50 hover:text-red-600 hover:ring-red-200" title="Remove selected item">
+                      <button key={item.id} type="button" onClick={() => toggleItem(item.id)} className="inline-flex items-center gap-2 rounded-full bg-clinical-50 px-3 py-1.5 text-xs font-bold text-clinical-700 ring-1 ring-clinical-200 hover:bg-red-50 hover:text-red-600 hover:ring-red-200" title="Remove selected item">
                         {item.id} · {item.name} · {money(item.price)}
                         <X className="h-3.5 w-3.5" />
                       </button>
@@ -391,16 +391,16 @@ export function ReceptionWalkInsPage() {
                 <div className="space-y-4">
                   {!selectedPatient && <div className="rounded-2xl border border-amber-100 bg-amber-50 p-3 text-sm font-bold text-amber-800">Select or register a walk-in patient first.</div>}
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="rounded-2xl bg-slate-50 p-3"><p className="text-lg font-black text-slate-950">{chosenItems.length}</p><p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Items</p></div>
-                    <div className="rounded-2xl bg-slate-50 p-3"><p className="text-lg font-black text-slate-950">{labCount}</p><p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Lab</p></div>
-                    <div className="rounded-2xl bg-slate-50 p-3"><p className="text-lg font-black text-slate-950">{scanCount}</p><p className="text-[10px] font-black uppercase tracking-wider text-slate-400">Scan</p></div>
+                    <div className="rounded-2xl bg-slate-50 p-3"><p className="text-lg font-bold text-slate-900">{chosenItems.length}</p><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Items</p></div>
+                    <div className="rounded-2xl bg-slate-50 p-3"><p className="text-lg font-bold text-slate-900">{labCount}</p><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Lab</p></div>
+                    <div className="rounded-2xl bg-slate-50 p-3"><p className="text-lg font-bold text-slate-900">{scanCount}</p><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Scan</p></div>
                   </div>
                   <div className="grid gap-3 md:grid-cols-2">
-                    <div className="rounded-2xl border border-slate-200 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Patient</p><p className="mt-1 font-black text-slate-950">{selectedPatient?.fullName || '—'}</p><p className="text-sm text-slate-500">{selectedPatient?.id || 'No walk-in selected'}</p></div>
-                    <div className="rounded-2xl border border-slate-200 p-3"><p className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-400">Estimated invoice total</p><p className="mt-1 text-2xl font-black text-slate-950">{money(totalAmount)}</p></div>
+                    <div className="rounded-2xl border border-slate-200 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Patient</p><p className="mt-1 font-bold text-slate-900">{selectedPatient?.fullName || '—'}</p><p className="text-sm text-slate-500">{selectedPatient?.id || 'No walk-in selected'}</p></div>
+                    <div className="rounded-2xl border border-slate-200 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Estimated invoice total</p><p className="mt-1 text-2xl font-bold text-slate-900">{money(totalAmount)}</p></div>
                   </div>
                   <div className="space-y-2">
-                    {chosenItems.map((item) => <div key={item.id} className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 p-3"><div><p className="text-sm font-black text-slate-950">{item.name}</p><p className="text-xs text-slate-500">{item.department} · {money(item.price)}</p></div><button type="button" onClick={() => toggleItem(item.id)} className="rounded-full bg-white px-3 py-1 text-xs font-black text-rose-600 ring-1 ring-rose-100">Remove</button></div>)}
+                    {chosenItems.map((item) => <div key={item.id} className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 p-3"><div><p className="text-sm font-bold text-slate-900">{item.name}</p><p className="text-xs text-slate-500">{item.department} · {money(item.price)}</p></div><button type="button" onClick={() => toggleItem(item.id)} className="rounded-full bg-white px-3 py-1 text-xs font-bold text-rose-600 ring-1 ring-rose-100">Remove</button></div>)}
                     {chosenItems.length === 0 && <p className="rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-500">No tests selected yet.</p>}
                   </div>
                   <FormField label="Clinical / reception notes"><textarea className={inputClass} rows="4" value={clinicalNotes} onChange={(event) => setClinicalNotes(event.target.value)} /></FormField>
@@ -411,7 +411,7 @@ export function ReceptionWalkInsPage() {
 
             <div className="flex items-center justify-between gap-3 rounded-3xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
               <Button type="button" variant="secondary" onClick={goRequestBack} disabled={requestStep === 1}><ArrowLeft className="h-4 w-4" /> Back</Button>
-              <p className="hidden text-xs font-black uppercase tracking-[0.14em] text-slate-400 sm:block">{activeRequestStep.label}</p>
+              <p className="hidden text-xs font-semibold uppercase tracking-[0.08em] text-slate-500 sm:block">{activeRequestStep.label}</p>
               {requestStep < REQUEST_STEPS.length ? (
                 <Button type="button" onClick={goRequestNext}>Continue to {nextRequestStep?.label || 'Review'} <ArrowRight className="h-4 w-4" /></Button>
               ) : (
@@ -426,9 +426,9 @@ export function ReceptionWalkInsPage() {
         <Card title="Registered walk-ins" subtitle="Walk-ins are separated from normal check-in so reception can continue directly to test requests." compact actions={<input className={inputClass} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search walk-in patient or visit ID" />}>
           <DataTable
             columns={[
-              { key: 'id', label: 'Visit ID', render: (row) => <span className="font-black text-slate-950">{row.id}</span> },
-              { key: 'patient', label: 'Patient', render: (row) => <div><p className="font-bold text-slate-950">{row.patient?.fullName || '—'}</p><p className="text-xs text-slate-500">{row.patient?.id} · {row.patient?.phone || 'No phone'}</p></div> },
-              { key: 'orderId', label: 'Request', render: (row) => row.orderId ? <div><span className="font-black text-slate-950">{row.orderId}</span>{row.orderIds?.length > 1 && <p className="text-xs font-bold text-slate-500">+{row.orderIds.length - 1} more request(s)</p>}</div> : <span className="text-sm font-bold text-slate-400">Not requested</span> },
+              { key: 'id', label: 'Visit ID', render: (row) => <span className="font-bold text-slate-900">{row.id}</span> },
+              { key: 'patient', label: 'Patient', render: (row) => <div><p className="font-bold text-slate-900">{row.patient?.fullName || '—'}</p><p className="text-xs text-slate-500">{row.patient?.id} · {row.patient?.phone || 'No phone'}</p></div> },
+              { key: 'orderId', label: 'Request', render: (row) => row.orderId ? <div><span className="font-bold text-slate-900">{row.orderId}</span>{row.orderIds?.length > 1 && <p className="text-xs font-bold text-slate-500">+{row.orderIds.length - 1} more request(s)</p>}</div> : <span className="text-sm font-bold text-slate-500">Not requested</span> },
               { key: 'identityVerified', label: 'Identity', render: (row) => <StatusBadge status={row.identityVerified ? 'Verified' : 'Not verified'} /> },
               { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> },
               { key: 'checkedInAt', label: 'Registered', render: (row) => formatDateTime(row.checkedInAt) },
@@ -442,8 +442,8 @@ export function ReceptionWalkInsPage() {
         <Card title="Walk-in test requests" subtitle="Direct requests created by reception from the walk-in section and routed to diagnostics." compact>
           <DataTable
             columns={[
-              { key: 'id', label: 'Order', render: (row) => <span className="font-black text-slate-950">{row.id}</span> },
-              { key: 'patient', label: 'Patient', render: (row) => <div><p className="font-bold text-slate-950">{row.patient?.fullName || '—'}</p><p className="text-xs text-slate-500">{row.patient?.id}</p></div> },
+              { key: 'id', label: 'Order', render: (row) => <span className="font-bold text-slate-900">{row.id}</span> },
+              { key: 'patient', label: 'Patient', render: (row) => <div><p className="font-bold text-slate-900">{row.patient?.fullName || '—'}</p><p className="text-xs text-slate-500">{row.patient?.id}</p></div> },
               { key: 'items', label: 'Requested Items', render: (row) => <div className="max-w-full text-sm font-semibold text-slate-700">{describeOrderItems(row.items)}</div> },
               { key: 'status', label: 'Order Status', render: (row) => <StatusBadge status={row.status} /> },
               { key: 'billing', label: 'Billing', render: (row) => <StatusBadge status={row.invoice?.status || row.billingStatus || 'Pending'} /> },
