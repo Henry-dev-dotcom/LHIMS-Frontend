@@ -59,7 +59,7 @@ async function collectMetrics(page) {
       }
       if (offenders.length >= 8) break;
     }
-    const errorBoundaryVisible = /Something went wrong|Reset demo data and retry/i.test(document.body?.innerText || '');
+    const errorBoundaryVisible = /Something went wrong|Reset saved state/i.test(document.body?.innerText || '');
     const loginVisible = /Sign in|Quick role login/i.test(document.body?.innerText || '');
     return {
       title: document.title,

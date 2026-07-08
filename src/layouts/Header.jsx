@@ -1,7 +1,7 @@
 import { isValidElement, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
-import { Bell, ChevronDown, Home, LogOut, Menu, RotateCcw, Sparkles, UserRound } from 'lucide-react';
+import { Bell, ChevronDown, Home, LogOut, Menu, Sparkles, UserRound } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { NotificationDrawer } from '../components/ui/NotificationDrawer';
 import { MobileActionBar } from '../components/ui/MobileActionBar';
@@ -211,16 +211,6 @@ export function Header() {
                 <Home className="h-4 w-4" />
               </button>
 
-              <button
-                className="grid h-9 w-9 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-600 shadow-sm transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-95"
-                type="button"
-                title="Reset demo data"
-                aria-label="Reset demo data"
-                onClick={() => dispatch({ type: 'RESET_DEMO_DATA' })}
-              >
-                <RotateCcw className="h-4 w-4" />
-              </button>
-
               <div ref={userMenuRef} className="relative">
                 <button
                   className="grid h-9 w-9 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-700 shadow-sm transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-800 active:scale-95"
@@ -317,9 +307,6 @@ export function Header() {
             <Button variant="secondary" onClick={() => dispatch({ type: 'GO_HOME' })}>
               <Home className="h-4 w-4" /> <span>Home</span>
             </Button>
-            <Button variant="secondary" onClick={() => dispatch({ type: 'RESET_DEMO_DATA' })}>
-              <RotateCcw className="h-4 w-4" /> <span>Reset</span>
-            </Button>
             <div ref={userMenuRef} className="relative">
               <button
                 className="flex h-11 items-center gap-2 rounded-2xl border border-slate-200/80 bg-white/95 px-3 text-slate-700 shadow-sm transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-800"
@@ -333,7 +320,7 @@ export function Header() {
                 <span className="grid h-7 w-7 place-items-center rounded-xl bg-clinical-600 text-xs font-semibold text-white shadow-sm">{userInitial}</span>
                 <span className="hidden min-w-0 text-left lg:block">
                   <span className="block max-w-[8rem] truncate text-xs font-semibold text-slate-900">{state.auth?.userName || 'User'}</span>
-                  <span className="block max-w-[8rem] truncate text-[10px] font-bold capitalize text-slate-500">{roleInfo?.demoUsername || role || 'workspace'}</span>
+                  <span className="block max-w-[8rem] truncate text-[10px] font-bold capitalize text-slate-500">{state.auth?.username || role || 'workspace'}</span>
                 </span>
                 <ChevronDown className="h-4 w-4 text-slate-500" />
               </button>
@@ -365,7 +352,7 @@ export function Header() {
               <div className="min-w-0">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Signed in as</p>
                 <p className="truncate text-base font-semibold text-slate-950">{state.auth?.userName || 'User'}</p>
-                <p className="text-xs font-semibold capitalize text-slate-500">{roleInfo?.demoUsername || role || 'workspace'}</p>
+                <p className="text-xs font-semibold capitalize text-slate-500">{state.auth?.username || role || 'workspace'}</p>
               </div>
             </div>
           </div>
@@ -374,12 +361,9 @@ export function Header() {
               <div className="flex items-center gap-2 font-semibold text-slate-800"><UserRound className="h-3.5 w-3.5" /> {roleInfo?.label || 'Workspace'}</div>
               <p className="mt-1 leading-5">Use this menu to view your session details or sign out securely.</p>
             </div>
-            <div className="grid grid-cols-2 gap-2 md:hidden">
+            <div className="grid gap-2 md:hidden">
               <Button variant="secondary" size="sm" onClick={() => { setUserMenuOpen(false); dispatch({ type: 'GO_HOME' }); }}>
                 <Home className="h-4 w-4" /> Home
-              </Button>
-              <Button variant="secondary" size="sm" onClick={() => { setUserMenuOpen(false); dispatch({ type: 'RESET_DEMO_DATA' }); }}>
-                <RotateCcw className="h-4 w-4" /> Reset
               </Button>
             </div>
             <Button

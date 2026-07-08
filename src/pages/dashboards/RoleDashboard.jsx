@@ -213,7 +213,7 @@ function getIdentityCard(role, data, auth) {
   }
   const roleInfo = ROLES.find((item) => item.id === role);
   return [
-    ['Signed in as', auth?.userName || roleInfo?.demoUser],
+    ['Signed in as', auth?.userName || '—'],
     ['Role', roleInfo?.label],
     ['Landing page', roleInfo?.landing],
     ['Allowed pages', getNavForRole(role).length],

@@ -29,9 +29,6 @@ export const ROLES = [
     id: 'doctor',
     label: 'Clinician',
     subtitle: 'External hospital-side clinician',
-    demoUser: 'Dr. Abena Mensah',
-    demoUsername: 'doctor',
-    demoPassword: 'doctor123',
     landing: 'doctor-dashboard',
     linkedDoctorId: 'DOC-001',
     hospitalId: 'HOSP-001',
@@ -41,9 +38,6 @@ export const ROLES = [
     id: 'receptionist',
     label: 'Receptionist',
     subtitle: 'Front-desk and check-in operations',
-    demoUser: 'Grace Osei',
-    demoUsername: 'reception',
-    demoPassword: 'reception123',
     landing: 'reception-dashboard',
     accessSummary: 'Confirms incoming clinician orders, handles patient check-in, appointments and daily visits.'
   },
@@ -51,9 +45,6 @@ export const ROLES = [
     id: 'lab',
     label: 'Lab Staff',
     subtitle: 'Laboratory test processing',
-    demoUser: 'Kwame Adu',
-    demoUsername: 'lab',
-    demoPassword: 'lab123',
     landing: 'lab-queue',
     accessSummary: 'Manages lab queue acceptance, accepted sample result entry, and sent result storage.'
   },
@@ -61,9 +52,6 @@ export const ROLES = [
     id: 'scan',
     label: 'Scan / Imaging Staff',
     subtitle: 'Imaging orders and reports',
-    demoUser: 'Ama Boateng',
-    demoUsername: 'scan',
-    demoPassword: 'scan123',
     landing: 'scan-dashboard',
     accessSummary: 'Processes imaging orders, equipment booking, report drafting and radiologist sign-off.'
   },
@@ -71,9 +59,6 @@ export const ROLES = [
     id: 'billing',
     label: 'Billing / Finance Staff',
     subtitle: 'Invoices, payments, reports',
-    demoUser: 'Kofi Danquah',
-    demoUsername: 'billing',
-    demoPassword: 'billing123',
     landing: 'billing-dashboard',
     accessSummary: 'Manages invoices, price catalog, payment status, outstanding balances and revenue reports.'
   },
@@ -81,9 +66,6 @@ export const ROLES = [
     id: 'admin',
     label: 'Admin',
     subtitle: 'System oversight and configuration',
-    demoUser: 'System Admin',
-    demoUsername: 'admin',
-    demoPassword: 'admin123',
     landing: 'admin-dashboard',
     accessSummary: 'Full system oversight across users, hospitals, catalog, audit logs, notifications and reports.'
   }

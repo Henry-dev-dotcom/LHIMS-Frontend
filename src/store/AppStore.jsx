@@ -1,23 +1,15 @@
-import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import { seedData } from '../data/seedData';
 import { ROLES } from '../data/roles';
 import { createOrder, transitionOrder, updateBillingStatus, idWithPrefix, addAudit, nowIso, createResultDeliveryBundle, retryDeliveryNotification, markReportDownloaded } from '../workflow/workflowEngine';
 import { buildParameterEntries, computeResultFlag } from '../utils/labFlags';
+import { apiClient, hasCommand, runCommand } from './commands';
+import { authService } from '../services/authService';
+import { getStoredSession } from '../api/config';
+import { normalizeAuthUser } from '../api/normalizers';
 
-const STORAGE_KEY = 'diagnosis-center-change-pack-v1-state';
-
-function buildAuthFromRole(role) {
-  return {
-    role: role.id,
-    userName: role.demoUser,
-    userId: `AUTH-${role.id.toUpperCase()}`,
-    landing: role.landing,
-    linkedDoctorId: role.linkedDoctorId || '',
-    hospitalId: role.hospitalId || '',
-    username: role.demoUsername,
-    loginAt: new Date().toISOString()
-  };
-}
+// Legacy demo-store persistence key; cleared on boot so stale seed data never leaks in.
+const LEGACY_STORAGE_KEY = 'diagnosis-center-change-pack-v1-state';
 
 const initialState = {
   auth: null,
@@ -37,13 +29,15 @@ const initialState = {
 
 function getInitialState() {
   try {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return { ...initialState, ...parsed, ui: { ...initialState.ui, ...(parsed.ui || {}), toast: null } };
+    window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+    // Render the shell immediately from the cached (non-sensitive) profile;
+    // the session is revalidated against /auth/me on mount.
+    const cached = normalizeAuthUser(getStoredSession().user);
+    if (cached) {
+      return { ...initialState, auth: cached, currentPage: cached.landing };
     }
   } catch {
-    // Fall back to seeded state.
+    // Fall through to the logged-out state.
   }
   return initialState;
 }
@@ -469,31 +463,14 @@ function normalizeFacilityPayload(payload = {}, existing = {}) {
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'LOGIN_AS': {
-      const role = ROLES.find((item) => item.id === action.roleId) || ROLES[0];
-      const auth = buildAuthFromRole(role);
+    case 'SET_AUTH': {
       return {
         ...state,
-        auth,
-        currentPage: role.landing,
-        ui: { ...state.ui, toast: toast('success', `Logged in as ${role.label}`) }
+        auth: action.auth,
+        currentPage: action.navigate || (action.auth ? state.currentPage : 'login'),
+        ui: { ...state.ui, sidebarOpen: false }
       };
     }
-    case 'LOGIN_WITH_CREDENTIALS': {
-      const username = String(action.username || '').trim().toLowerCase();
-      const password = String(action.password || '').trim();
-      const role = ROLES.find((item) => item.demoUsername === username && item.demoPassword === password);
-      if (!role) return { ...state, ui: { ...state.ui, toast: toast('error', 'Invalid username or password.') } };
-      const auth = buildAuthFromRole(role);
-      return {
-        ...state,
-        auth,
-        currentPage: role.landing,
-        ui: { ...state.ui, toast: toast('success', `Welcome, ${role.demoUser}`) }
-      };
-    }
-    case 'LOGOUT':
-      return { ...state, auth: null, currentPage: 'login', ui: { ...state.ui, toast: toast('success', 'Signed out') } };
     case 'NAVIGATE':
       return { ...state, currentPage: action.pageId, ui: { ...state.ui, sidebarOpen: false } };
     case 'GO_HOME':
@@ -506,8 +483,6 @@ function reducer(state, action) {
       return { ...state, ui: { ...state.ui, toast: action.toast } };
     case 'CLEAR_TOAST':
       return { ...state, ui: { ...state.ui, toast: null } };
-    case 'RESET_DEMO_DATA':
-      return { ...initialState, ui: { sidebarOpen: false, toast: toast('success', 'Workspace data reset. Please choose a role to continue.') } };
     case 'TRANSITION_ORDER': {
       const result = transitionOrder(state.data, { ...action.payload, ...actorFromAuth(state.auth) });
       if (result.error) return { ...state, ui: { ...state.ui, toast: toast('error', result.error) } };
@@ -2355,13 +2330,39 @@ function reducer(state, action) {
 const AppStoreContext = createContext(null);
 
 export function AppStoreProvider({ children }) {
-  const [state, dispatch] = useReducer(reducer, undefined, getInitialState);
+  const [state, rawDispatch] = useReducer(reducer, undefined, getInitialState);
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
+  // Write actions route to the backend through the async command layer while
+  // UI/local actions hit the sync reducer directly. Pages dispatch the same
+  // action shapes either way.
+  const dispatch = useCallback((action) => {
+    if (hasCommand(action.type)) {
+      runCommand(action, dispatch, () => stateRef.current);
+      return;
+    }
+    rawDispatch(action);
+  }, []);
+
+  // Revalidate the cookie session once on mount. A cached profile renders the
+  // shell instantly; a dead session drops the user back to the login page.
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [state]);
+    let cancelled = false;
+    authService.me(apiClient)
+      .then((user) => {
+        if (cancelled) return;
+        const auth = normalizeAuthUser(user?.user || user);
+        if (auth) rawDispatch({ type: 'SET_AUTH', auth });
+        else rawDispatch({ type: 'SET_AUTH', auth: null, navigate: 'login' });
+      })
+      .catch(() => {
+        if (!cancelled) rawDispatch({ type: 'SET_AUTH', auth: null, navigate: 'login' });
+      });
+    return () => { cancelled = true; };
+  }, []);
 
-  const value = useMemo(() => ({ state, dispatch }), [state]);
+  const value = useMemo(() => ({ state, dispatch }), [state, dispatch]);
   return <AppStoreContext.Provider value={value}>{children}</AppStoreContext.Provider>;
 }
 

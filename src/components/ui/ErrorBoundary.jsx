@@ -2,7 +2,9 @@ import { Component } from 'react';
 import { AlertTriangle, RotateCcw } from 'lucide-react';
 import { Button } from './Button';
 
-const STORAGE_KEY = 'diagnosis-center-change-pack-v1-state';
+// Legacy demo-store key plus the cached session profile; clearing both gives
+// a clean recovery when corrupted local data breaks a screen.
+const LOCAL_KEYS = ['diagnosis-center-change-pack-v1-state', 'diagnosis-center-live-api-tokens'];
 
 export class ErrorBoundary extends Component {
   constructor(props) {
@@ -28,7 +30,7 @@ export class ErrorBoundary extends Component {
 
   handleReset = () => {
     try {
-      window.localStorage.removeItem(STORAGE_KEY);
+      LOCAL_KEYS.forEach((key) => window.localStorage.removeItem(key));
     } catch {
       // Reload anyway if storage is unavailable.
     }
@@ -46,7 +48,7 @@ export class ErrorBoundary extends Component {
           </div>
           <h1 className="mt-4 text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">Something interrupted this screen</h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            The app stayed online, but this screen could not finish loading. Reload the app, or reset the saved demo state if the issue came from corrupted local data.
+            The app stayed online, but this screen could not finish loading. Reload the app, or clear the saved local state if the issue came from corrupted local data.
           </p>
           {this.state.errorMessage && (
             <p className="mt-3 rounded-2xl bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-500">{this.state.errorMessage}</p>
@@ -56,7 +58,7 @@ export class ErrorBoundary extends Component {
               <RotateCcw className="h-4 w-4" /> Reload app
             </Button>
             <Button variant="secondary" onClick={this.handleReset} className="w-full">
-              Reset demo state
+              Reset saved state
             </Button>
           </div>
         </section>

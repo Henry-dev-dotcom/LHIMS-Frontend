@@ -21,7 +21,7 @@ const checks = [
     message: 'Frontend package and lockfile versions must be bumped for Phase 7.'
   },
   {
-    pass: app.includes('<ErrorBoundary>') && errorBoundary.includes('componentDidCatch') && errorBoundary.includes('Reset demo state') && errorBoundary.includes('role="alert"'),
+    pass: app.includes('<ErrorBoundary>') && errorBoundary.includes('componentDidCatch') && errorBoundary.includes('Reset saved state') && errorBoundary.includes('role="alert"'),
     message: 'Phase 7 must include an app-level error boundary with mobile-friendly recovery actions.'
   },
   {
