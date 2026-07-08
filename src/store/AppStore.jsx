@@ -7,14 +7,49 @@ import { apiClient, hasCommand, runCommand } from './commands';
 import { authService } from '../services/authService';
 import { getStoredSession } from '../api/config';
 import { normalizeAuthUser } from '../api/normalizers';
+import { hydrateWorkspace } from './hydrate';
 
 // Legacy demo-store persistence key; cleared on boot so stale seed data never leaks in.
 const LEGACY_STORAGE_KEY = 'diagnosis-center-change-pack-v1-state';
 
+/* All collections start empty and are hydrated from the backend after login.
+   The key set mirrors what pages read from state.data. */
+const emptyData = {
+  hospitals: [],
+  doctors: [],
+  users: [],
+  departments: [],
+  patients: [],
+  catalog: [],
+  orders: [],
+  results: [],
+  resultReports: [],
+  invoices: [],
+  labAnalyzers: seedData.labAnalyzers || [],
+  scanEquipment: [],
+  sampleLogs: [],
+  scanBookings: [],
+  scanRejections: [],
+  appointments: [],
+  dailyVisits: [],
+  duplicateFlags: [],
+  adjustments: [],
+  floatAdjustments: [],
+  expenses: [],
+  financeShifts: [],
+  auditLogs: [],
+  notifications: [],
+  securityEvents: [],
+  backupExports: [],
+  deliveryLogs: [],
+  equipment: [],
+  notificationSettings: seedData.notificationSettings || { email: true, sms: true, inApp: true }
+};
+
 const initialState = {
   auth: null,
   currentPage: 'login',
-  data: seedData,
+  data: emptyData,
   ui: {
     sidebarOpen: false,
     toast: null,
@@ -467,9 +502,14 @@ function reducer(state, action) {
       return {
         ...state,
         auth: action.auth,
+        // Dropping the session also drops the hydrated workspace data.
+        data: action.auth ? state.data : emptyData,
         currentPage: action.navigate || (action.auth ? state.currentPage : 'login'),
         ui: { ...state.ui, sidebarOpen: false }
       };
+    }
+    case 'SET_COLLECTIONS': {
+      return { ...state, data: { ...state.data, ...action.collections } };
     }
     case 'NAVIGATE':
       return { ...state, currentPage: action.pageId, ui: { ...state.ui, sidebarOpen: false } };
@@ -2361,6 +2401,13 @@ export function AppStoreProvider({ children }) {
       });
     return () => { cancelled = true; };
   }, []);
+
+  // Hydrate the workspace whenever an authenticated user (re)appears.
+  const authUserId = state.auth?.userId || '';
+  useEffect(() => {
+    if (!authUserId) return;
+    hydrateWorkspace(apiClient, stateRef.current.auth, rawDispatch);
+  }, [authUserId]);
 
   const value = useMemo(() => ({ state, dispatch }), [state, dispatch]);
   return <AppStoreContext.Provider value={value}>{children}</AppStoreContext.Provider>;
