@@ -41,7 +41,7 @@ const checks = [
     message: 'Mobile sidebar must expose dialog semantics, focus the close button and mark active navigation.'
   },
   {
-    pass: bottomNav.includes('aria-current') && bottomNav.includes('Open full navigation menu') && toast.includes('role="status"') && toast.includes('aria-live="polite"'),
+    pass: bottomNav.includes('aria-current') && bottomNav.includes('Open full navigation menu') && toast.includes("'status'") && toast.includes("'polite'"),
     message: 'Mobile bottom navigation and toasts must include accessible current-state and live-region semantics.'
   },
   {

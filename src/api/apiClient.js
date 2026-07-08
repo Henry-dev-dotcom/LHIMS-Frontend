@@ -33,12 +33,13 @@ export function buildQuery(params = {}) {
 }
 
 function normalizeHeaders({ body, headers, token, skipAuth }) {
-  const storedTokens = getStoredTokens();
-  const accessToken = token || storedTokens.accessToken;
   const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
   return {
     ...(!isFormData ? { 'Content-Type': 'application/json' } : {}),
-    ...(!skipAuth && accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    // Browser sessions authenticate via the httpOnly cookie (sent automatically
+    // with credentials: 'include'). An explicit `token` is only honored for
+    // non-browser API callers that pass one directly.
+    ...(!skipAuth && token ? { Authorization: `Bearer ${token}` } : {}),
     ...headers
   };
 }
@@ -53,12 +54,45 @@ async function parseResponse(response) {
   }
 }
 
-export async function request(path, { method = 'GET', body, token, headers = {}, signal, skipAuth = false, unwrap = true } = {}) {
+// A single in-flight refresh is shared across concurrent 401s so a burst of
+// requests triggers only one token renewal instead of a stampede.
+let refreshPromise = null;
+
+async function refreshAccessToken() {
+  // The refresh token lives in an httpOnly cookie sent automatically with the
+  // request, so no token is read or passed from JavaScript.
+  if (!refreshPromise) {
+    refreshPromise = executeRequest('/auth/refresh', {
+      method: 'POST',
+      skipAuth: true
+    })
+      .then((data) => {
+        setStoredTokens(data);
+        return data;
+      })
+      .catch(() => {
+        clearStoredTokens();
+        return null;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
+async function executeRequest(path, { method = 'GET', body, token, headers = {}, signal, skipAuth = false, unwrap = true } = {}) {
   const config = getApiConfig();
   const url = `${config.baseUrl}${path.startsWith('/') ? path : `/${path}`}`;
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), config.timeoutMs);
-  const linkedSignal = signal || controller.signal;
+  // Forward an external abort onto the internal controller so both the caller's
+  // signal and the timeout can cancel the same fetch.
+  const onExternalAbort = () => controller.abort();
+  if (signal) {
+    if (signal.aborted) controller.abort();
+    else signal.addEventListener('abort', onExternalAbort, { once: true });
+  }
   const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
 
   try {
@@ -66,11 +100,12 @@ export async function request(path, { method = 'GET', body, token, headers = {},
       method,
       headers: normalizeHeaders({ body, headers, token, skipAuth }),
       body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
-      signal: linkedSignal
+      // Send the httpOnly auth cookies on same-site and CORS requests.
+      credentials: 'include',
+      signal: controller.signal
     });
     const payload = await parseResponse(response);
     if (!response.ok) {
-      if (response.status === 401) clearStoredTokens();
       throw new ApiError(payload?.message || `Request failed: ${response.status}`, {
         status: response.status,
         details: payload,
@@ -80,6 +115,23 @@ export async function request(path, { method = 'GET', body, token, headers = {},
     return unwrap ? unwrapApiEnvelope(payload) : payload;
   } finally {
     window.clearTimeout(timeout);
+    if (signal) signal.removeEventListener('abort', onExternalAbort);
+  }
+}
+
+export async function request(path, options = {}) {
+  const { skipAuth = false, token, _retried = false } = options;
+  try {
+    return await executeRequest(path, options);
+  } catch (error) {
+    // On an expired access token, attempt a one-time silent refresh and retry.
+    // Skipped for unauthenticated calls and calls with an explicit token.
+    if (error instanceof ApiError && error.status === 401 && !skipAuth && !token && !_retried) {
+      const refreshed = await refreshAccessToken();
+      if (refreshed) return request(path, { ...options, _retried: true });
+      clearStoredTokens();
+    }
+    throw error;
   }
 }
 
@@ -90,9 +142,9 @@ export async function loginRequest(credentials) {
 }
 
 export async function logoutRequest() {
-  const storedTokens = getStoredTokens();
   try {
-    return await request('/auth/logout', { method: 'POST', body: { refreshToken: storedTokens.refreshToken } });
+    // The refresh cookie identifies the session server-side; no body needed.
+    return await request('/auth/logout', { method: 'POST' });
   } finally {
     clearStoredTokens();
   }

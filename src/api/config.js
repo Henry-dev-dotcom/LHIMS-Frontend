@@ -35,7 +35,12 @@ export function getApiConfig() {
   };
 }
 
-export function getStoredTokens() {
+// Access/refresh tokens are held by the backend in httpOnly cookies and are
+// never readable by JavaScript, so they cannot be exfiltrated via XSS. Only the
+// non-sensitive user profile is cached here to render the shell on reload; the
+// session itself is always re-validated against the server (which trusts the
+// cookie, not this cache).
+export function getStoredSession() {
   if (typeof window === 'undefined') return {};
   try {
     return JSON.parse(window.localStorage.getItem(API_TOKEN_STORAGE_KEY) || '{}');
@@ -44,18 +49,21 @@ export function getStoredTokens() {
   }
 }
 
-export function setStoredTokens(tokens = {}) {
+export function setStoredSession(payload = {}) {
   if (typeof window === 'undefined') return;
-  const nextTokens = {
-    accessToken: tokens.accessToken || tokens.token || '',
-    refreshToken: tokens.refreshToken || '',
-    user: tokens.user || null,
+  const session = {
+    user: payload.user || null,
     savedAt: new Date().toISOString()
   };
-  window.localStorage.setItem(API_TOKEN_STORAGE_KEY, JSON.stringify(nextTokens));
+  window.localStorage.setItem(API_TOKEN_STORAGE_KEY, JSON.stringify(session));
 }
 
-export function clearStoredTokens() {
+export function clearStoredSession() {
   if (typeof window === 'undefined') return;
   window.localStorage.removeItem(API_TOKEN_STORAGE_KEY);
 }
+
+// Backwards-compatible aliases for existing call sites.
+export const getStoredTokens = getStoredSession;
+export const setStoredTokens = setStoredSession;
+export const clearStoredTokens = clearStoredSession;

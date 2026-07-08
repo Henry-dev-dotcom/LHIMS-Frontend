@@ -27,7 +27,7 @@ const requiredMarkers = [
   ['.env.example', 'VITE_API_BASE_URL=http://localhost:5000/api'],
   ['src/api/config.js', 'VITE_API_MODE'],
   ['src/api/config.js', 'API_TOKEN_STORAGE_KEY'],
-  ['src/api/apiClient.js', 'Authorization: `Bearer ${accessToken}`'],
+  ['src/api/apiClient.js', "credentials: 'include'"],
   ['src/api/apiClient.js', 'unwrapApiEnvelope'],
   ['src/api/apiClient.js', 'loginRequest'],
   ['src/api/endpointMap.js', 'GET /access/route-contracts'],
@@ -40,7 +40,7 @@ const requiredMarkers = [
   ['src/api/endpointMap.js', 'GET /reports/dashboard'],
   ['src/api/endpointMap.js', 'GET /files/dicom/studies'],
   ['src/services/index.js', 'receptionService'],
-  ['src/hooks/useApiReadiness.js', 'hasStoredAccessToken'],
+  ['src/hooks/useApiReadiness.js', 'hasActiveSession'],
   ['src/pages/system/ApiReadinessPage.jsx', 'API Integration Console']
 ];
 
