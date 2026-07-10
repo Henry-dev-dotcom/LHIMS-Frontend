@@ -387,21 +387,9 @@ export function OrderRegistryPage() {
     .reduce((sum, invoice) => sum + Number(invoice.amount || 0), 0);
 
   function createQuickOrder() {
-    const doctor = role === 'doctor' && state.auth?.linkedDoctorId
-      ? data.doctors.find((item) => item.id === state.auth.linkedDoctorId) || data.doctors[0]
-      : data.doctors[0];
-    const patient = data.patients[0];
-    dispatch({
-      type: 'CREATE_DEMO_ORDER',
-      payload: {
-        patientId: patient.id,
-        doctorId: doctor.id,
-        hospitalId: doctor.hospitalId,
-        itemIds: ['t1', 't17'],
-        urgency: 'Urgent',
-        clinicalNotes: 'Combined lab and imaging request.'
-      }
-    });
+    // Orders are created through the clinician order form (or reception
+    // walk-ins); the registry is a tracking surface, so route to that flow.
+    dispatch({ type: 'NAVIGATE', pageId: 'doctor-new-order' });
   }
 
   const title = role === 'doctor' ? 'My Order Registry' : 'Order Registry';

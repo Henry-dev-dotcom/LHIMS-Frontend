@@ -35,38 +35,50 @@ import {
 const LIST_PARAMS = { limit: 100 };
 
 /*
-  Loads the role-scoped workspace collections from the backend and dispatches
-  them into state.data. Collections load in parallel and tolerate individual
-  failures — a failed collection stays empty and surfaces one toast, while the
-  rest of the workspace remains usable. Orders load first because most other
-  entities cross-reference them by cuid and are re-keyed to order codes.
+  Loads workspace collections from the backend and dispatches them into
+  state.data. Collections load in parallel and tolerate individual failures —
+  a failed collection stays empty (or keeps its previous contents on partial
+  refresh) and surfaces one toast, while the rest of the workspace remains
+  usable. Orders load first because most other entities cross-reference them
+  by cuid and are re-keyed to human order codes.
+
+  `only` limits the load to a subset of collection names so command handlers
+  can refresh just what a write touched.
 */
-export async function hydrateWorkspace(client, auth, dispatch) {
+export async function loadCollections(client, auth, dispatch, only = null) {
   const role = auth?.role;
   if (!role) return;
+  const wants = (name) => !only || only.includes(name);
 
   const failures = [];
   const collections = {};
 
   async function load(name, loader, normalizer) {
+    if (!wants(name)) return;
     try {
       const payload = await loader();
       const items = listItems(payload);
       collections[name] = normalizer ? items.map(normalizer).filter(Boolean) : items;
     } catch (error) {
       if (error?.status !== 403) failures.push(name);
-      collections[name] = [];
+      if (!only) collections[name] = [];
     }
   }
 
-  // Orders first: everything else resolves cuid order ids to order codes.
-  await load('orders', () => orderService.list(client, LIST_PARAMS), null);
-  const rawOrders = collections.orders || [];
-  const orderCodeById = Object.fromEntries(rawOrders.map((order) => [order.id, order.orderCode || order.id]));
-  collections.orders = rawOrders.map(normalizeOrder).filter(Boolean);
+  // Orders load whenever needed for cross-referencing (invoices, results,
+  // visits and notifications all point at orders).
+  const needsOrders = wants('orders') || ['invoices', 'results', 'resultReports', 'deliveryLogs', 'notifications', 'appointments', 'dailyVisits', 'scanBookings'].some(wants);
+  let orderCodeById = {};
+  if (needsOrders) {
+    await load('orders', () => orderService.list(client, LIST_PARAMS), null);
+    const rawOrders = collections.orders || [];
+    orderCodeById = Object.fromEntries(rawOrders.map((order) => [order.id, order.orderCode || order.id]));
+    if (wants('orders')) collections.orders = rawOrders.map(normalizeOrder).filter(Boolean);
+    else delete collections.orders;
+  }
 
   const loaders = [
-    load('catalog', () => adminService.catalog(client, LIST_PARAMS), normalizeCatalogItem),
+    load('catalog', () => orderService.catalog(client, LIST_PARAMS), normalizeCatalogItem),
     load('patients', () => patientService.list(client, LIST_PARAMS), normalizePatient),
     load('invoices', () => billingService.invoices(client, LIST_PARAMS), (item) => normalizeInvoice(item, orderCodeById)),
     load('results', () => labService.acceptedSamples(client, LIST_PARAMS), (item) => normalizeLabResultFromSample(item, orderCodeById)),
@@ -99,7 +111,7 @@ export async function hydrateWorkspace(client, auth, dispatch) {
   await Promise.all(loaders);
 
   // Join billing status onto orders once invoices are known.
-  if (collections.invoices?.length) {
+  if (collections.orders && collections.invoices?.length) {
     const invoiceByOrder = Object.fromEntries(collections.invoices.map((invoice) => [invoice.orderId, invoice]));
     collections.orders = collections.orders.map((order) => (
       invoiceByOrder[order.id] ? { ...order, billingStatus: invoiceByOrder[order.id].status } : order
@@ -108,6 +120,10 @@ export async function hydrateWorkspace(client, auth, dispatch) {
 
   dispatch({ type: 'SET_COLLECTIONS', collections });
   if (failures.length) {
-    dispatch({ type: 'SHOW_TOAST', toast: { type: 'error', message: `Some data failed to load (${failures.join(', ')}). Pull to refresh or try again.` } });
+    dispatch({ type: 'SHOW_TOAST', toast: { type: 'error', message: `Some data failed to load (${failures.join(', ')}). Try again or refresh.` } });
   }
+}
+
+export function hydrateWorkspace(client, auth, dispatch) {
+  return loadCollections(client, auth, dispatch, null);
 }
