@@ -1,5 +1,4 @@
 import { API_MODES, clearStoredTokens, getApiConfig, getStoredTokens, setStoredTokens } from './config';
-import { createMockBackend } from './mockBackend';
 
 export class ApiError extends Error {
   constructor(message, { status = 500, details = null, requestId = '' } = {}) {
@@ -150,22 +149,8 @@ export async function logoutRequest() {
   }
 }
 
-export function createApiClient({ mode, data, auth } = {}) {
+export function createApiClient({ auth } = {}) {
   const config = getApiConfig();
-  const activeMode = mode || config.mode;
-  if (activeMode === API_MODES.MOCK) {
-    const mock = createMockBackend(data);
-    return {
-      mode: API_MODES.MOCK,
-      config,
-      mock,
-      auth,
-      get: async (resolver, ...args) => {
-        await new Promise((resolve) => window.setTimeout(resolve, config.demoDelayMs));
-        return typeof resolver === 'function' ? resolver(...args) : resolver;
-      }
-    };
-  }
   return {
     mode: API_MODES.LIVE,
     config,

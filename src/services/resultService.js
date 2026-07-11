@@ -1,13 +1,13 @@
 import { buildQuery } from '../api/apiClient';
 
 export const resultService = {
-  list: async (client, params = {}) => client.mode === 'mock' ? client.get(client.mock.results.list) : client.request(`/results${buildQuery(params)}`),
-  detail: async (client, resultId) => client.mode === 'mock' ? { pendingBackend: true, resultId } : client.request(`/results/${resultId}`),
-  release: async (client, resultId, payload = {}) => client.mode === 'mock' ? { pendingBackend: true, resultId, payload } : client.request(`/results/${resultId}/release`, { method: 'POST', body: payload }),
-  report: async (client, resultId) => client.mode === 'mock' ? { pendingBackend: true, resultId, format: 'pdf-ready' } : client.request(`/results/${resultId}/report`),
-  email: async (client, resultId, payload) => client.mode === 'mock' ? { pendingBackend: true, resultId, payload } : client.request(`/results/${resultId}/email`, { method: 'POST', body: payload }),
-  sms: async (client, resultId, payload) => client.mode === 'mock' ? { pendingBackend: true, resultId, payload } : client.request(`/results/${resultId}/sms`, { method: 'POST', body: payload }),
-  whatsapp: async (client, resultId, payload) => client.mode === 'mock' ? { pendingBackend: true, resultId, payload } : client.request(`/results/${resultId}/whatsapp`, { method: 'POST', body: payload }),
-  deliveryLogs: async (client, params = {}) => client.mode === 'mock' ? client.get(client.mock.results.deliveryLogs) : client.request(`/results/delivery-logs${buildQuery(params)}`),
-  retryDelivery: async (client, logId, payload = {}) => client.mode === 'mock' ? { pendingBackend: true, logId, payload } : client.request(`/results/delivery/logs/${logId}/retry`, { method: 'POST', body: payload })
+  list: async (client, params = {}) => client.request(`/results${buildQuery(params)}`),
+  detail: async (client, resultId) => client.request(`/results/${resultId}`),
+  release: async (client, resultId, payload = {}) => client.request(`/results/${resultId}/release`, { method: 'POST', body: payload }),
+  report: async (client, resultId) => client.request(`/results/${resultId}/report`),
+  email: async (client, resultId, payload) => client.request(`/results/${resultId}/email`, { method: 'POST', body: payload }),
+  sms: async (client, resultId, payload) => client.request(`/results/${resultId}/sms`, { method: 'POST', body: payload }),
+  whatsapp: async (client, resultId, payload) => client.request(`/results/${resultId}/whatsapp`, { method: 'POST', body: payload }),
+  deliveryLogs: async (client, params = {}) => client.request(`/results/delivery-logs${buildQuery(params)}`),
+  retryDelivery: async (client, logId, payload = {}) => client.request(`/results/delivery/logs/${logId}/retry`, { method: 'POST', body: payload })
 };

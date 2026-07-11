@@ -6,7 +6,6 @@ import { Button } from '../../components/ui/Button';
 import { MetricCard } from '../../components/ui/MetricCard';
 import { DataTable } from '../../components/ui/DataTable';
 import { StatusBadge } from '../../components/ui/StatusBadge';
-import { API_MODES } from '../../api/config';
 import { useApiReadiness } from '../../hooks/useApiReadiness';
 
 const readinessSections = [
@@ -80,7 +79,7 @@ function CompactInfoBox({ label, children }) {
 }
 
 export function ApiReadinessPage() {
-  const { config, endpoints, readiness, updateMode } = useApiReadiness();
+  const { config, endpoints, readiness } = useApiReadiness();
   const [activeSection, setActiveSection] = useState('overview');
 
   const endpointRows = endpoints.map((endpoint, index) => ({ id: `${endpoint.module}-${endpoint.name}-${index}`, ...endpoint }));
@@ -99,13 +98,7 @@ export function ApiReadinessPage() {
       <PageHeader
         eyebrow="System Integration"
         title="API Integration Console"
-        description="Review API mode, service files, endpoint contracts, token storage, and mapped data models from one organized console."
-        actions={
-          <>
-            <Button variant={readiness.apiMode === API_MODES.MOCK ? 'primary' : 'secondary'} onClick={() => updateMode(API_MODES.MOCK)}>Mock API Mode</Button>
-            <Button variant={readiness.apiMode === API_MODES.LIVE ? 'primary' : 'secondary'} onClick={() => updateMode(API_MODES.LIVE)}>Live API Mode</Button>
-          </>
-        }
+        description="Review the live API connection, service files, endpoint contracts, token storage, and mapped data models from one organized console."
       />
 
       <SectionNav activeSection={activeSection} counts={sectionCounts} onChange={setActiveSection} />
@@ -113,7 +106,7 @@ export function ApiReadinessPage() {
       {activeSection === 'overview' && (
         <div className="space-y-6">
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            <MetricCard compact label="API Mode" value={readiness.apiMode.toUpperCase()} icon={PlugZap} tone={readiness.apiMode === API_MODES.MOCK ? 'yellow' : 'green'} helper="Mock mode uses local data; live mode calls the API." />
+            <MetricCard compact label="API Mode" value={readiness.apiMode.toUpperCase()} icon={PlugZap} tone="green" helper="All requests go to the configured backend." />
             <MetricCard compact label="Service Files" value={readiness.serviceCount} icon={Layers} tone="blue" helper="Auth, patient, doctor, lab, scan, billing, admin and more." />
             <MetricCard compact label="Endpoint Contracts" value={readiness.endpointCount} icon={ServerCog} tone="purple" helper="Mapped API routes." />
             <MetricCard compact label="Mapped Models" value={readiness.mappedModels.length} icon={Database} tone="green" helper="Core objects normalized for API payloads." />
@@ -122,7 +115,7 @@ export function ApiReadinessPage() {
           <Card compact title="Integration summary" subtitle="Review the API mode, service boundary, route coverage and mapped payload objects in focused sections.">
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               {[
-                ['Mode control', readiness.apiMode.toUpperCase(), 'Switch between local and live API data sources.'],
+                ['Mode', readiness.apiMode.toUpperCase(), 'All workspace data comes from the live backend.'],
                 ['Service boundary', `${readiness.serviceCount} files`, 'Pages call organized service modules.'],
                 ['Route coverage', `${readiness.endpointCount} endpoints`, 'Endpoint contracts are organized by module.'],
                 ['Mapper coverage', `${readiness.mappedModels.length} models`, 'Core payload objects are normalized before requests.']
@@ -144,10 +137,10 @@ export function ApiReadinessPage() {
             <div className="grid gap-4 md:grid-cols-3">
               <CompactInfoBox label="Base URL"><p className="break-all">{config.baseUrl}</p></CompactInfoBox>
               <CompactInfoBox label="Timeout"><p>{config.timeoutMs}ms</p></CompactInfoBox>
-              <CompactInfoBox label="Status"><StatusBadge status={readiness.apiMode === API_MODES.MOCK ? 'Local mode selected' : 'Live mode selected'} /></CompactInfoBox>
+              <CompactInfoBox label="Status"><StatusBadge status="Live mode active" /></CompactInfoBox>
             </div>
             <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
-              <strong>Important:</strong> Use mock mode for local data and live mode for server requests. Confirm <code className="rounded bg-white/70 px-1 py-0.5">VITE_API_BASE_URL</code> before switching to Live API Mode.
+              <strong>Important:</strong> The workspace always talks to the backend at <code className="rounded bg-white/70 px-1 py-0.5">VITE_API_BASE_URL</code>. Update the deployment environment to point at a different server.
             </div>
           </Card>
 

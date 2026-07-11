@@ -36,8 +36,8 @@ const checks = [
   ['src/data/roles.js', "id: 'lab-results'"],
   ['src/routes/AppRouter.jsx', 'LabResultsPage'],
   ['src/routes/routeRegistry.js', "'lab-results'"],
-  ['src/store/AppStore.jsx', 'UPDATE_LAB_RESULT_ARCHIVE'],
-  ['src/store/AppStore.jsx', 'Laboratory result corrected']
+  ['src/store/commands.js', 'UPDATE_LAB_RESULT_ARCHIVE'],
+  ['src/store/commands.js', 'Laboratory result corrected']
 ];
 
 for (const [file, needle] of checks) {

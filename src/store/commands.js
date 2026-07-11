@@ -5,6 +5,8 @@ import { orderService } from '../services/orderService';
 import { patientService } from '../services/patientService';
 import { receptionService } from '../services/receptionService';
 import { billingService } from '../services/billingService';
+import { financeService } from '../services/financeService';
+import { adminService } from '../services/adminService';
 import { labService } from '../services/labService';
 import { scanService } from '../services/scanService';
 import { resultService } from '../services/resultService';
@@ -98,6 +100,17 @@ function findReportForOrder(getState, orderId) {
 
 function scanItemForOrder(order) {
   return (order?.orderItems || []).find((item) => item.type === 'Scan') || null;
+}
+
+/* UI payment-method labels -> Prisma PaymentMethod enum. */
+function toApiPaymentMethod(method) {
+  const value = String(method || '').toLowerCase();
+  if (value.includes('cash')) return 'CASH';
+  if (value.includes('momo') || value.includes('mobile')) return 'MOBILE_MONEY';
+  if (value.includes('card')) return 'CARD';
+  if (value.includes('transfer') || value.includes('bank') || value.includes('cheque')) return 'BANK_TRANSFER';
+  if (value.includes('insurance')) return 'INSURANCE';
+  return 'OTHER';
 }
 
 const commands = {
@@ -472,6 +485,297 @@ const commands = {
       await resultService.report(apiClient, report.apiId).catch(() => {});
       await refresh(dispatch, getState, ['resultReports']);
     }
+  },
+
+  /* --------------------------------------------------- billing & finance */
+
+  UPDATE_INVOICE: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    const apiId = requireApiId(getState().data.invoices, payload.invoiceId, 'Invoice');
+    await billingService.updateInvoice(apiClient, apiId, {
+      status: payload.status ? toApiEnum(payload.status) : undefined,
+      discountAmount: payload.discount !== undefined && payload.discount !== '' ? Number(payload.discount) : undefined,
+      insuranceClaimNumber: payload.insuranceReference || undefined
+    });
+    await refresh(dispatch, getState, ['invoices', 'orders']);
+    dispatch(toastAction('success', `Invoice ${payload.invoiceId} updated`));
+  },
+
+  RECORD_PAYMENT: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    const apiId = requireApiId(getState().data.invoices, payload.invoiceId, 'Invoice');
+    await billingService.recordPayment(apiClient, apiId, {
+      amount: Number(payload.amount),
+      method: toApiPaymentMethod(payload.method),
+      reference: payload.reference || undefined
+    });
+    await refresh(dispatch, getState, ['invoices', 'orders', 'financeShifts']);
+    dispatch(toastAction('success', `Payment recorded on ${payload.invoiceId}`));
+  },
+
+  REFUND_OR_ADJUST_INVOICE: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    const apiId = requireApiId(getState().data.invoices, payload.invoiceId, 'Invoice');
+    await billingService.refund(apiClient, apiId, {
+      amount: Number(payload.amount),
+      reason: payload.reason,
+      supervisorApprovalId: payload.supervisorCode || payload.supervisorApprovalId || 'SUPERVISOR'
+    });
+    await refresh(dispatch, getState, ['invoices', 'orders', 'financeShifts']);
+    dispatch(toastAction('success', `Refund/adjustment recorded on ${payload.invoiceId}`));
+  },
+
+  START_FINANCE_SHIFT: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    await financeService.startShift(apiClient, {
+      openingFloat: Number(payload.openingFloat || 0),
+      notes: payload.notes || undefined
+    });
+    await refresh(dispatch, getState, ['financeShifts']);
+    dispatch(toastAction('success', 'Cashier shift started'));
+  },
+
+  CLOSE_FINANCE_SHIFT: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    const apiId = requireApiId(getState().data.financeShifts, action.shiftId, 'Shift');
+    await financeService.closeShift(apiClient, apiId, {
+      closingCash: Number(payload.actualCash || 0),
+      notes: payload.notes || undefined
+    });
+    await refresh(dispatch, getState, ['financeShifts']);
+    dispatch(toastAction('success', `Shift ${action.shiftId} closed`));
+  },
+
+  CREATE_FLOAT_ADJUSTMENT: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    await financeService.adjustFloat(apiClient, {
+      type: /out/i.test(payload.type) ? 'MONEY_OUT' : /in/i.test(payload.type) ? 'MONEY_IN' : 'ADJUSTMENT',
+      amount: Number(payload.amount),
+      reason: payload.description || payload.reason || 'Float adjustment'
+    });
+    await refresh(dispatch, getState, ['financeShifts']);
+    dispatch(toastAction('success', 'Float adjustment recorded'));
+  },
+
+  CREATE_EXPENSE: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    await financeService.createExpense(apiClient, {
+      vendorName: payload.vendor || 'Unspecified vendor',
+      category: payload.category || 'General',
+      description: payload.description,
+      amount: Number(payload.amount),
+      notes: payload.notes || undefined
+    });
+    await refresh(dispatch, getState, ['expenses']);
+    dispatch(toastAction('success', 'Expense recorded'));
+  },
+
+  RECORD_EXPENSE_PAYMENT: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    const apiId = requireApiId(getState().data.expenses, payload.expenseId, 'Expense');
+    await financeService.payExpense(apiClient, apiId, {
+      amount: Number(payload.amount),
+      method: toApiPaymentMethod(payload.method)
+    });
+    await refresh(dispatch, getState, ['expenses', 'financeShifts']);
+    dispatch(toastAction('success', `Payment recorded on ${payload.expenseId}`));
+  },
+
+  WRITE_OFF_EXPENSE: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    const apiId = requireApiId(getState().data.expenses, payload.expenseId, 'Expense');
+    await financeService.writeOffExpense(apiClient, apiId, {
+      reason: payload.reason,
+      supervisorApprovalId: payload.supervisorCode || 'SUPERVISOR'
+    });
+    await refresh(dispatch, getState, ['expenses']);
+    dispatch(toastAction('success', `Expense ${payload.expenseId} written off`));
+  },
+
+  UPDATE_CATALOG_PRICE: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    const apiId = requireApiId(getState().data.catalog, payload.itemId, 'Catalog item');
+    await adminService.updateCatalogItem(apiClient, apiId, {
+      price: Number(payload.price),
+      expectedCompletionHours: payload.expectedHours ? Number(payload.expectedHours) : undefined
+    });
+    await refresh(dispatch, getState, ['catalog']);
+    dispatch(toastAction('success', `Price updated for ${payload.itemId}`));
+  },
+
+  /* ---------------------------------------------------------------- admin */
+
+  ADMIN_CREATE_USER: async (action, dispatch, getState) => {
+    const form = action.payload || {};
+    await adminService.createUser(apiClient, {
+      name: form.name,
+      username: form.username,
+      email: form.email || undefined,
+      role: toApiEnum(form.role) === 'LAB' ? 'LAB_STAFF' : toApiEnum(form.role) === 'SCAN' ? 'SCAN_STAFF' : toApiEnum(form.role) === 'BILLING' ? 'BILLING_STAFF' : toApiEnum(form.role),
+      password: form.password || form.tempPassword || 'ChangeMe123!'
+    });
+    await refresh(dispatch, getState, ['users']);
+    dispatch(toastAction('success', `User ${form.username} created`));
+  },
+
+  ADMIN_UPDATE_USER: async (action, dispatch, getState) => {
+    const form = action.payload || {};
+    const userId = action.userId || form.id;
+    await adminService.updateUser(apiClient, userId, {
+      name: form.name || undefined,
+      email: form.email || undefined,
+      status: form.status ? toApiEnum(form.status) : undefined
+    });
+    await refresh(dispatch, getState, ['users']);
+    dispatch(toastAction('success', 'User updated'));
+  },
+
+  /* The Hospitals page manages partner facilities; the backend model for
+     both is the Hospital resource. */
+  ADMIN_CREATE_FACILITY: async (action, dispatch, getState) => {
+    await commands.ADMIN_CREATE_HOSPITAL(action, dispatch, getState);
+  },
+
+  ADMIN_UPDATE_FACILITY: async (action, dispatch, getState) => {
+    await commands.ADMIN_UPDATE_HOSPITAL({ ...action, hospitalId: action.facilityId || action.hospitalId }, dispatch, getState);
+  },
+
+  ADMIN_CREATE_HOSPITAL: async (action, dispatch, getState) => {
+    const form = action.payload || {};
+    await adminService.createHospital(apiClient, {
+      name: form.name,
+      code: form.code || form.name?.slice(0, 12).replace(/\s+/g, '-') || 'HOSP',
+      phone: form.phone || undefined,
+      email: form.email || undefined,
+      address: form.address || undefined,
+      billingContact: form.billingContact || undefined,
+      accountStatus: form.accountStatus || 'Active'
+    });
+    await refresh(dispatch, getState, ['hospitals']);
+    dispatch(toastAction('success', `${form.name} added as a partner facility`));
+  },
+
+  ADMIN_UPDATE_HOSPITAL: async (action, dispatch, getState) => {
+    const form = action.payload || {};
+    const hospitalId = action.hospitalId || form.id;
+    await adminService.updateHospital(apiClient, hospitalId, {
+      name: form.name || undefined,
+      phone: form.phone || undefined,
+      email: form.email || undefined,
+      address: form.address || undefined,
+      billingContact: form.billingContact || undefined,
+      accountStatus: form.accountStatus || undefined
+    });
+    await refresh(dispatch, getState, ['hospitals']);
+    dispatch(toastAction('success', 'Facility updated'));
+  },
+
+  ADMIN_CREATE_CATALOG_ITEM: async (action, dispatch, getState) => {
+    const form = action.payload || {};
+    const isLab = /lab/i.test(form.type || '');
+    await adminService.createCatalogItem(apiClient, {
+      catalogCode: form.id || form.catalogCode || `${isLab ? 'LAB' : 'SCN'}-${Date.now().toString(36).toUpperCase()}`,
+      name: form.name,
+      type: isLab ? 'LAB' : 'SCAN',
+      price: Number(form.price || 0),
+      expectedCompletionHours: Number(form.expectedHours || 24),
+      sampleType: isLab ? (form.sampleType || 'Blood') : undefined,
+      modality: !isLab ? (form.modality || 'General') : undefined,
+      aliases: form.searchText ? String(form.searchText).split(/\s+/).filter(Boolean).slice(0, 10) : []
+    });
+    await refresh(dispatch, getState, ['catalog']);
+    dispatch(toastAction('success', `${form.name} added to the catalog`));
+  },
+
+  ADMIN_UPDATE_CATALOG_ITEM: async (action, dispatch, getState) => {
+    const form = action.payload || {};
+    const apiId = requireApiId(getState().data.catalog, action.itemId || form.id, 'Catalog item');
+    await adminService.updateCatalogItem(apiClient, apiId, {
+      name: form.name || undefined,
+      price: form.price !== undefined && form.price !== '' ? Number(form.price) : undefined,
+      expectedCompletionHours: form.expectedHours ? Number(form.expectedHours) : undefined,
+      sampleType: form.sampleType || undefined,
+      modality: form.modality || undefined,
+      isActive: form.isActive
+    });
+    await refresh(dispatch, getState, ['catalog']);
+    dispatch(toastAction('success', 'Catalog item updated'));
+  },
+
+  ADMIN_CREATE_DEPARTMENT: async (action, dispatch, getState) => {
+    const form = action.payload || {};
+    await adminService.departments.create(apiClient, {
+      name: form.name,
+      code: form.code || form.name?.slice(0, 6).toUpperCase(),
+      type: toApiEnum(form.type || 'Laboratory'),
+      leadName: form.leadName || form.lead || undefined
+    });
+    await refresh(dispatch, getState, ['departments']);
+    dispatch(toastAction('success', `${form.name} department created`));
+  },
+
+  ADMIN_UPDATE_DEPARTMENT: async (action, dispatch, getState) => {
+    const form = action.payload || {};
+    const departmentId = action.departmentId || form.id;
+    await adminService.departments.update(apiClient, departmentId, {
+      name: form.name || undefined,
+      leadName: form.leadName || form.lead || undefined,
+      isActive: form.isActive
+    });
+    await refresh(dispatch, getState, ['departments']);
+    dispatch(toastAction('success', 'Department updated'));
+  },
+
+  ADMIN_CREATE_EQUIPMENT: async (action, dispatch, getState) => {
+    const form = action.payload || {};
+    await adminService.equipment.create(apiClient, {
+      name: form.name,
+      departmentId: form.departmentId || undefined,
+      room: form.room || undefined,
+      modality: form.modality || undefined,
+      serialNumber: form.serialNumber || undefined,
+      status: form.status ? toApiEnum(form.status) : undefined,
+      serviceDueDate: form.serviceDue || undefined,
+      notes: form.notes || undefined
+    });
+    await refresh(dispatch, getState, ['equipment']);
+    dispatch(toastAction('success', `${form.name} added to equipment`));
+  },
+
+  ADMIN_UPDATE_EQUIPMENT: async (action, dispatch, getState) => {
+    const form = action.payload || {};
+    const equipmentId = action.equipmentId || form.id;
+    await adminService.equipment.update(apiClient, equipmentId, {
+      name: form.name || undefined,
+      room: form.room || undefined,
+      status: form.status ? toApiEnum(form.status) : undefined,
+      serviceDueDate: form.serviceDue || undefined,
+      notes: form.notes || undefined
+    });
+    await refresh(dispatch, getState, ['equipment']);
+    dispatch(toastAction('success', 'Equipment updated'));
+  },
+
+  UPDATE_DOCTOR_PROFILE: async (action, dispatch, getState) => {
+    await doctorService.updateProfile(apiClient, action.payload || {});
+    await refresh(dispatch, getState, ['doctors']);
+    dispatch(toastAction('success', 'Profile updated'));
+  },
+
+  UPDATE_NOTIFICATION_PREFS: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    await doctorService.updateProfile(apiClient, {
+      notificationEmail: payload.email !== undefined ? Boolean(payload.email) : undefined,
+      notificationSms: payload.sms !== undefined ? Boolean(payload.sms) : undefined
+    });
+    await refresh(dispatch, getState, ['doctors']);
+    dispatch(toastAction('success', 'Notification preferences saved'));
+  },
+
+  ADMIN_UPDATE_NOTIFICATION_SETTINGS: async (action, dispatch, getState) => {
+    await notificationService.updateSettings(apiClient, action.payload || {});
+    dispatch({ type: 'SET_COLLECTIONS', collections: { notificationSettings: { ...getState().data.notificationSettings, ...(action.payload || {}) } } });
+    dispatch(toastAction('success', 'Notification settings saved'));
   }
 };
 

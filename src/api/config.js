@@ -1,38 +1,23 @@
-export const API_MODE_STORAGE_KEY = 'diagnosis-center-api-mode';
 export const API_TOKEN_STORAGE_KEY = import.meta.env.VITE_API_TOKEN_STORAGE_KEY || 'diagnosis-center-live-api-tokens';
 
+/* The demo/mock mode was removed with the demo store; every environment now
+   talks to a real backend at VITE_API_BASE_URL. */
 export const API_MODES = {
-  MOCK: 'mock',
   LIVE: 'live'
 };
 
-function normalizeApiMode(mode) {
-  return Object.values(API_MODES).includes(mode) ? mode : API_MODES.MOCK;
-}
-
 export const DEFAULT_API_CONFIG = {
-  mode: normalizeApiMode(import.meta.env.VITE_API_MODE || API_MODES.MOCK),
+  mode: API_MODES.LIVE,
   baseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
-  timeoutMs: Number(import.meta.env.VITE_API_TIMEOUT_MS || 15000),
-  demoDelayMs: Number(import.meta.env.VITE_MOCK_API_DELAY_MS || 120)
+  timeoutMs: Number(import.meta.env.VITE_API_TIMEOUT_MS || 15000)
 };
 
 export function getApiMode() {
-  if (typeof window === 'undefined') return DEFAULT_API_CONFIG.mode;
-  return normalizeApiMode(window.localStorage.getItem(API_MODE_STORAGE_KEY) || DEFAULT_API_CONFIG.mode);
-}
-
-export function setApiMode(mode) {
-  if (typeof window === 'undefined') return;
-  const normalized = normalizeApiMode(mode);
-  window.localStorage.setItem(API_MODE_STORAGE_KEY, normalized);
+  return API_MODES.LIVE;
 }
 
 export function getApiConfig() {
-  return {
-    ...DEFAULT_API_CONFIG,
-    mode: getApiMode()
-  };
+  return { ...DEFAULT_API_CONFIG };
 }
 
 // Access/refresh tokens are held by the backend in httpOnly cookies and are
