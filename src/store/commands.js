@@ -5,7 +5,11 @@ import { orderService } from '../services/orderService';
 import { patientService } from '../services/patientService';
 import { receptionService } from '../services/receptionService';
 import { billingService } from '../services/billingService';
-import { normalizeAuthUser, toApiEnum } from '../api/normalizers';
+import { labService } from '../services/labService';
+import { scanService } from '../services/scanService';
+import { resultService } from '../services/resultService';
+import { notificationService } from '../services/notificationService';
+import { listItems, normalizeAuthUser, toApiEnum } from '../api/normalizers';
 import { loadCollections } from './hydrate';
 
 /*
@@ -58,6 +62,42 @@ function toApiPatientPayload(form = {}) {
 
 function refresh(dispatch, getState, names) {
   return loadCollections(apiClient, getState().auth, dispatch, names);
+}
+
+/* Result parameter payloads: backend requires non-empty string values and
+   Prisma ResultFlag enums. */
+function toApiParameters(parameters = []) {
+  return parameters
+    .filter((parameter) => String(parameter.value ?? '').trim() !== '')
+    .map((parameter) => ({
+      name: parameter.name,
+      value: String(parameter.value),
+      unit: parameter.unit || undefined,
+      flag: toApiEnum(parameter.flag || 'Pending'),
+      referenceRange: parameter.referenceRange || undefined,
+      notes: parameter.notes || undefined
+    }));
+}
+
+/* Accepted samples are fetched fresh at command time: hydrated results only
+   cover samples that already have a result, but sample-level actions need the
+   sample id before any result exists. */
+async function findLabSampleForOrder(orderApiId) {
+  const payload = await labService.acceptedSamples(apiClient, { limit: 100 });
+  return listItems(payload).find((sample) => sample.orderItem?.orderId === orderApiId) || null;
+}
+
+async function findLabSampleByCode(sampleCode) {
+  const payload = await labService.acceptedSamples(apiClient, { limit: 100 });
+  return listItems(payload).find((sample) => sample.sampleCode === sampleCode || sample.id === sampleCode) || null;
+}
+
+function findReportForOrder(getState, orderId) {
+  return (getState().data.resultReports || []).find((report) => report.orderId === orderId) || null;
+}
+
+function scanItemForOrder(order) {
+  return (order?.orderItems || []).find((item) => item.type === 'Scan') || null;
 }
 
 const commands = {
@@ -206,6 +246,232 @@ const commands = {
     await receptionService.updateAppointment(apiClient, apiId, { status: toApiEnum(status), notes: reason || undefined });
     await refresh(dispatch, getState, ['appointments']);
     dispatch(toastAction('success', `Appointment ${appointmentId} ${String(status).toLowerCase()}`));
+  },
+
+  /* ---------------------------------------------------------------- lab */
+
+  ACCEPT_LAB_SAMPLE: async (action, dispatch, getState) => {
+    const orderApiId = requireApiId(getState().data.orders, action.orderId, 'Order');
+    await labService.acceptSample(apiClient, orderApiId, {
+      sampleType: action.payload?.sampleType || undefined,
+      barcode: action.payload?.barcode || undefined,
+      notes: action.payload?.notes || undefined
+    });
+    await refresh(dispatch, getState, ['orders', 'results']);
+    dispatch(toastAction('success', `Sample accepted for ${action.orderId}`));
+  },
+
+  BATCH_ACCEPT_LAB_SAMPLES: async (action, dispatch, getState) => {
+    const orderIds = action.orderIds || action.payload?.orderIds || [];
+    for (const orderId of orderIds) {
+      const orderApiId = requireApiId(getState().data.orders, orderId, 'Order');
+      await labService.acceptSample(apiClient, orderApiId, {});
+    }
+    await refresh(dispatch, getState, ['orders', 'results']);
+    dispatch(toastAction('success', `${orderIds.length} sample(s) accepted`));
+  },
+
+  REJECT_SAMPLE: async (action, dispatch, getState) => {
+    const sample = await findLabSampleByCode(action.sampleId);
+    if (!sample) throw new Error(`Sample ${action.sampleId} was not found among accepted samples.`);
+    await labService.rejectSample(apiClient, sample.id, {
+      reason: action.reason || 'Rejected at the bench',
+      requestRecollection: Boolean(action.requestRecollection)
+    });
+    await refresh(dispatch, getState, ['orders', 'results']);
+    dispatch(toastAction('success', `Sample ${action.sampleId} rejected`));
+  },
+
+  /* The demo's single "push to clinician" walks the backend's full chain:
+     save the entered result, submit it for review, sign it off (report is
+     generated server-side), then release it to the clinician. */
+  PUSH_LAB_RESULT_TO_CLINICIAN: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    const orderApiId = requireApiId(getState().data.orders, payload.orderId, 'Order');
+    const sample = await findLabSampleForOrder(orderApiId);
+    if (!sample) throw new Error(`No accepted sample found for ${payload.orderId}. Accept the sample first.`);
+
+    const parameters = toApiParameters(payload.parameters);
+    if (!parameters.length) throw new Error('Enter at least one result value before pushing to the clinician.');
+
+    const saved = await labService.saveResult(apiClient, {
+      sampleId: sample.id,
+      overallComment: payload.reportText || undefined,
+      parameters
+    });
+    const resultApiId = saved?.result?.id || saved?.id || sample.results?.[0]?.id;
+    if (!resultApiId) throw new Error('The laboratory result id was not returned by the server.');
+
+    await labService.submitReview(apiClient, { resultId: resultApiId, notes: payload.technicianNotes || undefined });
+    await labService.signOff(apiClient, resultApiId, { decision: 'SIGNED_OFF' });
+
+    // Release is a separate permission; if this role cannot release, the
+    // signed-off report stays queued for reception/admin.
+    let released = false;
+    try {
+      await refresh(dispatch, getState, ['resultReports']);
+      const report = findReportForOrder(getState, payload.orderId);
+      if (report) {
+        await resultService.release(apiClient, report.apiId, { notifyDoctor: true, notifyReception: true });
+        released = true;
+      }
+    } catch {
+      released = false;
+    }
+
+    await refresh(dispatch, getState, ['orders', 'results', 'resultReports', 'notifications', 'deliveryLogs']);
+    dispatch(toastAction('success', released
+      ? `Result for ${payload.orderId} signed off and released to the clinician`
+      : `Result for ${payload.orderId} signed off — awaiting release`));
+  },
+
+  APPROVE_DEPARTMENT_RESULT: async (action, dispatch, getState) => {
+    const { orderId, department, approverNote } = action.payload || {};
+    const result = (getState().data.results || []).find((item) => item.orderId === orderId && item.department === department && item.status === 'Pending Review');
+    if (!result) throw new Error(`No pending ${department} result found for ${orderId}.`);
+    const service = department === 'Imaging' ? scanService : labService;
+    await service.signOff(apiClient, result.apiId, { decision: 'SIGNED_OFF', reviewerComment: approverNote || undefined });
+    await refresh(dispatch, getState, ['orders', 'results', 'resultReports', 'notifications']);
+    dispatch(toastAction('success', `${department} result for ${orderId} signed off`));
+  },
+
+  UPDATE_LAB_RESULT_ARCHIVE: async (action, dispatch, getState) => {
+    const result = (getState().data.results || []).find((item) => item.id === action.resultId);
+    if (!result) throw new Error(`Result ${action.resultId} was not found.`);
+    await labService.saveResult(apiClient, {
+      resultId: result.apiId,
+      overallComment: action.payload?.reportText || undefined,
+      parameters: toApiParameters(action.payload?.parameters)
+    });
+    await refresh(dispatch, getState, ['results', 'resultReports']);
+    dispatch(toastAction('success', 'Laboratory result corrected and versioned'));
+  },
+
+  SIGN_LAB_RESULT_WITH_SIGNATURE: async (action, dispatch, getState) => {
+    const result = (getState().data.results || []).find((item) => item.id === action.resultId);
+    if (!result) throw new Error(`Result ${action.resultId} was not found.`);
+    if (result.status !== 'Pending Review') {
+      await labService.submitReview(apiClient, { resultId: result.apiId, notes: 'Re-sign after correction' }).catch(() => {});
+    }
+    await labService.signOff(apiClient, result.apiId, {
+      decision: 'SIGNED_OFF',
+      reviewerComment: [action.payload?.signedBy ? `Signed by ${action.payload.signedBy}` : '', action.payload?.note || ''].filter(Boolean).join(' — ') || undefined
+    });
+    await refresh(dispatch, getState, ['results', 'resultReports', 'notifications']);
+    dispatch(toastAction('success', 'Result signed off'));
+  },
+
+  /* ---------------------------------------------------------------- scan */
+
+  ACCEPT_SCAN_ORDER: async (action, dispatch, getState) => {
+    const orderApiId = requireApiId(getState().data.orders, action.orderId, 'Order');
+    await scanService.acceptScan(apiClient, orderApiId, { notes: action.payload?.technicianNotes || undefined });
+    await refresh(dispatch, getState, ['orders']);
+    dispatch(toastAction('success', `Scan accepted for ${action.orderId}`));
+  },
+
+  REJECT_SCAN_ORDER: async (action, dispatch, getState) => {
+    const { orderId, reason, actionNeeded } = action.payload || {};
+    // A retake targets an existing imaging result; the backend has no
+    // pre-result rejection for scans.
+    const result = (getState().data.results || []).find((item) => item.orderId === orderId && item.department === 'Imaging');
+    if (!result) throw new Error(`No imaging result exists for ${orderId} yet — save the report first, then request a retake.`);
+    await scanService.retake(apiClient, {
+      resultId: result.apiId,
+      reason: reason || 'Retake required',
+      notes: actionNeeded || undefined
+    });
+    await refresh(dispatch, getState, ['orders', 'results']);
+    dispatch(toastAction('success', `Retake recorded for ${orderId}`));
+  },
+
+  ADD_SCAN_BOOKING: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    const order = (getState().data.orders || []).find((item) => item.id === payload.orderId);
+    if (!order) throw new Error(`Order ${payload.orderId} was not found.`);
+    const item = scanItemForOrder(order);
+    const equipment = (getState().data.equipment || []).find((eq) => (
+      eq.id === payload.equipmentId || eq.name === payload.machine || (payload.room && eq.room === payload.room && eq.modality === payload.modality)
+    ));
+    if (!equipment) throw new Error('Select a known equipment/room for the booking.');
+    await scanService.createBooking(apiClient, {
+      patientId: order.patientId,
+      orderItemId: item?.id || undefined,
+      equipmentId: equipment.id,
+      scheduledAt: payload.bookedAt || new Date().toISOString(),
+      notes: payload.technicianNotes || undefined
+    });
+    await refresh(dispatch, getState, ['scanBookings']);
+    dispatch(toastAction('success', `Equipment booked for ${payload.orderId}`));
+  },
+
+  SAVE_SCAN_REPORT: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    const order = (getState().data.orders || []).find((item) => item.id === payload.orderId);
+    const item = scanItemForOrder(order);
+    if (!item) throw new Error(`No scan item found on ${payload.orderId}.`);
+    const saved = await scanService.saveReport(apiClient, {
+      orderItemId: item.id,
+      findings: payload.findings,
+      impression: payload.impression,
+      recommendation: payload.internalNotes || undefined
+    });
+    const resultApiId = saved?.result?.id || saved?.id;
+    if (resultApiId) {
+      await scanService.submitReview(apiClient, { resultId: resultApiId }).catch(() => {});
+    }
+    await refresh(dispatch, getState, ['orders', 'results']);
+    dispatch(toastAction('success', `Imaging report for ${payload.orderId} submitted for review`));
+  },
+
+  /* ----------------------------------------------------- results delivery */
+
+  PREPARE_RESULT_DELIVERY: async (action, dispatch, getState) => {
+    const report = findReportForOrder(getState, action.orderId);
+    if (!report) throw new Error(`No generated report found for ${action.orderId} yet.`);
+    await resultService.release(apiClient, report.apiId, { notifyDoctor: true, notifyReception: true });
+    await refresh(dispatch, getState, ['orders', 'resultReports', 'notifications', 'deliveryLogs']);
+    dispatch(toastAction('success', `Result for ${action.orderId} released and delivery notices queued`));
+  },
+
+  SEND_RESULT_TO_PATIENT: async (action, dispatch, getState) => {
+    const { orderId, channel } = action.payload || {};
+    const report = findReportForOrder(getState, orderId);
+    if (!report) throw new Error(`No generated report found for ${orderId} yet.`);
+    const order = (getState().data.orders || []).find((item) => item.id === orderId);
+    const patient = (getState().data.patients || []).find((item) => item.id === order?.patientId);
+    const wantsEmail = /email/i.test(channel || '');
+    const wantsWhatsapp = /whatsapp/i.test(channel || '');
+    const recipient = wantsEmail ? patient?.email : patient?.phone;
+    if (!recipient) throw new Error(`The patient has no ${wantsEmail ? 'email address' : 'phone number'} on record.`);
+    const sender = wantsEmail ? resultService.email : wantsWhatsapp ? resultService.whatsapp : resultService.sms;
+    await sender(apiClient, report.apiId, { recipient });
+    await refresh(dispatch, getState, ['notifications', 'deliveryLogs']);
+    dispatch(toastAction('success', `Privacy-safe ${wantsEmail ? 'email' : wantsWhatsapp ? 'WhatsApp' : 'SMS'} notice sent`));
+  },
+
+  RETRY_DELIVERY_NOTIFICATION: async (action, dispatch, getState) => {
+    await resultService.retryDelivery(apiClient, action.notificationId, {});
+    await refresh(dispatch, getState, ['notifications', 'deliveryLogs']);
+    dispatch(toastAction('success', 'Delivery retried'));
+  },
+
+  MARK_NOTIFICATION_DELIVERED: async (action, dispatch, getState) => {
+    await notificationService.markRead(apiClient, action.notificationId);
+    await refresh(dispatch, getState, ['notifications']);
+  },
+
+  MARK_DOCTOR_NOTIFICATION_READ: async (action, dispatch, getState) => {
+    await notificationService.markRead(apiClient, action.notificationId);
+    await refresh(dispatch, getState, ['notifications']);
+  },
+
+  MARK_REPORT_DOWNLOADED: async (action, dispatch, getState) => {
+    const report = (getState().data.resultReports || []).find((item) => item.id === action.reportId || item.orderId === action.orderId);
+    if (report) {
+      await resultService.report(apiClient, report.apiId).catch(() => {});
+      await refresh(dispatch, getState, ['resultReports']);
+    }
   }
 };
 

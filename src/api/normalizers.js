@@ -504,6 +504,33 @@ export function normalizeReport(report, orderCodeById = {}) {
   };
 }
 
+/* Scan results carry narrative findings/impression rather than parameters. */
+export function normalizeScanResult(result, orderCodeById = {}) {
+  if (!result) return null;
+  const orderApiId = result.orderItem?.orderId || result.orderId;
+  return {
+    id: result.resultCode || result.id,
+    apiId: result.id,
+    orderId: orderCodeById[orderApiId] || result.orderItem?.order?.orderCode || orderApiId || '',
+    patientId: result.patient?.patientCode || result.patientId || '',
+    department: 'Imaging',
+    status: LAB_RESULT_STATUS_FROM_API[result.status] || enumLabel(result.status),
+    reportText: [result.findings, result.impression].filter(Boolean).join('\n\n'),
+    findings: result.findings || '',
+    impression: result.impression || '',
+    recommendation: result.recommendation || '',
+    parameters: [],
+    abnormal: Boolean(result.abnormal),
+    enteredBy: result.enteredBy?.name || '',
+    submittedAt: result.submittedAt || '',
+    signedBy: result.signedOffBy?.name || '',
+    signedAt: result.signedOffAt || '',
+    approvedAt: result.signedOffAt || '',
+    approvedBy: result.signedOffBy?.name || '',
+    updatedAt: result.updatedAt || ''
+  };
+}
+
 export function normalizeScanBooking(booking, orderCodeById = {}) {
   if (!booking) return null;
   return {

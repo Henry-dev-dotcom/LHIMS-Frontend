@@ -22,6 +22,7 @@ import {
   normalizeInvoice,
   normalizeLabResultFromSample,
   normalizeNotification,
+  normalizeScanResult,
   normalizeOrder,
   normalizePatient,
   normalizeReport,
@@ -81,7 +82,22 @@ export async function loadCollections(client, auth, dispatch, only = null) {
     load('catalog', () => orderService.catalog(client, LIST_PARAMS), normalizeCatalogItem),
     load('patients', () => patientService.list(client, LIST_PARAMS), normalizePatient),
     load('invoices', () => billingService.invoices(client, LIST_PARAMS), (item) => normalizeInvoice(item, orderCodeById)),
-    load('results', () => labService.acceptedSamples(client, LIST_PARAMS), (item) => normalizeLabResultFromSample(item, orderCodeById)),
+    // Lab results ride on accepted samples; scan results come from the review
+    // queue. Both merge into the single results collection pages read.
+    (async () => {
+      if (!wants('results')) return;
+      const [labPayload, scanPayload] = await Promise.all([
+        labService.acceptedSamples(client, LIST_PARAMS).catch(() => null),
+        scanService.reviewQueue(client, LIST_PARAMS).catch(() => null)
+      ]);
+      if (labPayload === null && scanPayload === null) {
+        if (!only) collections.results = [];
+        return;
+      }
+      const labResults = listItems(labPayload).map((item) => normalizeLabResultFromSample(item, orderCodeById)).filter(Boolean);
+      const scanResults = listItems(scanPayload).map((item) => normalizeScanResult(item, orderCodeById)).filter(Boolean);
+      collections.results = [...labResults, ...scanResults];
+    })(),
     load('resultReports', () => resultService.list(client, LIST_PARAMS), (item) => normalizeReport(item, orderCodeById)),
     load('deliveryLogs', () => resultService.deliveryLogs(client, LIST_PARAMS), (item) => normalizeDeliveryLog(item, orderCodeById)),
     load('notifications', () => notificationService.list(client, LIST_PARAMS), (item) => normalizeNotification(item, orderCodeById)),
