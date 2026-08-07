@@ -94,6 +94,17 @@ async function findLabSampleByCode(sampleCode) {
   return listItems(payload).find((sample) => sample.sampleCode === sampleCode || sample.id === sampleCode) || null;
 }
 
+/* A recollection can be requested on an already-rejected sample, which no
+   longer appears in the accepted list, so search both accepted and rejected. */
+async function findLabSampleAnywhere(sampleCode) {
+  const [accepted, rejected] = await Promise.all([
+    labService.acceptedSamples(apiClient, { limit: 100 }).catch(() => null),
+    labService.rejectedRetest(apiClient, { limit: 100 }).catch(() => null)
+  ]);
+  return [...listItems(accepted), ...listItems(rejected)]
+    .find((sample) => sample.sampleCode === sampleCode || sample.id === sampleCode) || null;
+}
+
 function findReportForOrder(getState, orderId) {
   return (getState().data.resultReports || []).find((report) => report.orderId === orderId) || null;
 }
@@ -270,8 +281,23 @@ const commands = {
       barcode: action.payload?.barcode || undefined,
       notes: action.payload?.notes || undefined
     });
-    await refresh(dispatch, getState, ['orders', 'results']);
+    await refresh(dispatch, getState, ['orders', 'results', 'sampleLogs']);
     dispatch(toastAction('success', `Sample accepted for ${action.orderId}`));
+  },
+
+  /* The Sample Log "log new sample" form accepts every eligible lab item on the
+     chosen order (the backend uses the authenticated user as collector). */
+  ADD_SAMPLE_LOG: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    if (!payload.orderId) throw new Error('Select a lab order before logging a sample.');
+    const orderApiId = requireApiId(getState().data.orders, payload.orderId, 'Order');
+    await labService.acceptSample(apiClient, orderApiId, {
+      sampleType: payload.sampleType || undefined,
+      collectedAt: payload.collectedAt || undefined,
+      notes: payload.notes || undefined
+    });
+    await refresh(dispatch, getState, ['orders', 'results', 'sampleLogs']);
+    dispatch(toastAction('success', `Sample logged for ${payload.orderId}`));
   },
 
   BATCH_ACCEPT_LAB_SAMPLES: async (action, dispatch, getState) => {
@@ -280,7 +306,7 @@ const commands = {
       const orderApiId = requireApiId(getState().data.orders, orderId, 'Order');
       await labService.acceptSample(apiClient, orderApiId, {});
     }
-    await refresh(dispatch, getState, ['orders', 'results']);
+    await refresh(dispatch, getState, ['orders', 'results', 'sampleLogs']);
     dispatch(toastAction('success', `${orderIds.length} sample(s) accepted`));
   },
 
@@ -291,8 +317,19 @@ const commands = {
       reason: action.reason || 'Rejected at the bench',
       requestRecollection: Boolean(action.requestRecollection)
     });
-    await refresh(dispatch, getState, ['orders', 'results']);
+    await refresh(dispatch, getState, ['orders', 'results', 'sampleLogs']);
     dispatch(toastAction('success', `Sample ${action.sampleId} rejected`));
+  },
+
+  REQUEST_SAMPLE_RECOLLECTION: async (action, dispatch, getState) => {
+    const sample = await findLabSampleAnywhere(action.sampleId);
+    if (!sample) throw new Error(`Sample ${action.sampleId} was not found.`);
+    await labService.rejectSample(apiClient, sample.id, {
+      reason: action.reason || 'Recollection requested',
+      requestRecollection: true
+    });
+    await refresh(dispatch, getState, ['orders', 'results', 'sampleLogs']);
+    dispatch(toastAction('success', `Recollection requested for ${action.sampleId}`));
   },
 
   /* The demo's single "push to clinician" walks the backend's full chain:
@@ -332,7 +369,7 @@ const commands = {
       released = false;
     }
 
-    await refresh(dispatch, getState, ['orders', 'results', 'resultReports', 'notifications', 'deliveryLogs']);
+    await refresh(dispatch, getState, ['orders', 'results', 'sampleLogs', 'resultReports', 'notifications', 'deliveryLogs']);
     dispatch(toastAction('success', released
       ? `Result for ${payload.orderId} signed off and released to the clinician`
       : `Result for ${payload.orderId} signed off — awaiting release`));

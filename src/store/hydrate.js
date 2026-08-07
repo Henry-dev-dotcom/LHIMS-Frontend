@@ -26,6 +26,7 @@ import {
   normalizeOrder,
   normalizePatient,
   normalizeReport,
+  normalizeSampleLogs,
   normalizeScanBooking,
   normalizeShift,
   normalizeUser,
@@ -68,7 +69,7 @@ export async function loadCollections(client, auth, dispatch, only = null) {
 
   // Orders load whenever needed for cross-referencing (invoices, results,
   // visits and notifications all point at orders).
-  const needsOrders = wants('orders') || ['invoices', 'results', 'resultReports', 'deliveryLogs', 'notifications', 'appointments', 'dailyVisits', 'scanBookings'].some(wants);
+  const needsOrders = wants('orders') || ['invoices', 'results', 'sampleLogs', 'resultReports', 'deliveryLogs', 'notifications', 'appointments', 'dailyVisits', 'scanBookings'].some(wants);
   let orderCodeById = {};
   if (needsOrders) {
     await load('orders', () => orderService.list(client, LIST_PARAMS), null);
@@ -84,19 +85,37 @@ export async function loadCollections(client, auth, dispatch, only = null) {
     load('invoices', () => billingService.invoices(client, LIST_PARAMS), (item) => normalizeInvoice(item, orderCodeById)),
     // Lab results ride on accepted samples; scan results come from the review
     // queue. Both merge into the single results collection pages read.
+    // Accepted lab samples feed both the results collection (samples that have
+    // a result) and the sampleLogs collection (every accepted sample, grouped
+    // by order for the queue / result-entry pages), so fetch them once.
     (async () => {
-      if (!wants('results')) return;
-      const [labPayload, scanPayload] = await Promise.all([
+      if (!wants('results') && !wants('sampleLogs')) return;
+      const [labPayload, scanPayload, rejectedPayload] = await Promise.all([
         labService.acceptedSamples(client, LIST_PARAMS).catch(() => null),
-        scanService.reviewQueue(client, LIST_PARAMS).catch(() => null)
+        wants('results') ? scanService.reviewQueue(client, LIST_PARAMS).catch(() => null) : null,
+        // Rejected / recollection samples live on a separate endpoint; they feed
+        // the rejected-samples tracker (they are excluded from accepted-samples).
+        wants('sampleLogs') ? labService.rejectedRetest(client, LIST_PARAMS).catch(() => null) : null
       ]);
-      if (labPayload === null && scanPayload === null) {
-        if (!only) collections.results = [];
-        return;
+      if (wants('sampleLogs')) {
+        if (labPayload === null && rejectedPayload === null) {
+          if (!only) collections.sampleLogs = [];
+        } else {
+          const acceptedLogs = normalizeSampleLogs(listItems(labPayload), orderCodeById);
+          const rejectedLogs = normalizeSampleLogs(listItems(rejectedPayload), orderCodeById, { groupByOrder: false })
+            .filter((sample) => sample.status === 'Rejected' || sample.status === 'Recollection Requested');
+          collections.sampleLogs = [...acceptedLogs, ...rejectedLogs];
+        }
       }
-      const labResults = listItems(labPayload).map((item) => normalizeLabResultFromSample(item, orderCodeById)).filter(Boolean);
-      const scanResults = listItems(scanPayload).map((item) => normalizeScanResult(item, orderCodeById)).filter(Boolean);
-      collections.results = [...labResults, ...scanResults];
+      if (wants('results')) {
+        if (labPayload === null && scanPayload === null) {
+          if (!only) collections.results = [];
+        } else {
+          const labResults = listItems(labPayload).map((item) => normalizeLabResultFromSample(item, orderCodeById)).filter(Boolean);
+          const scanResults = listItems(scanPayload).map((item) => normalizeScanResult(item, orderCodeById)).filter(Boolean);
+          collections.results = [...labResults, ...scanResults];
+        }
+      }
     })(),
     load('resultReports', () => resultService.list(client, LIST_PARAMS), (item) => normalizeReport(item, orderCodeById)),
     load('deliveryLogs', () => resultService.deliveryLogs(client, LIST_PARAMS), (item) => normalizeDeliveryLog(item, orderCodeById)),

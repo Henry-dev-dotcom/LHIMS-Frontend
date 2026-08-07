@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { ArrowLeft, CheckCircle2, CheckSquare, FlaskConical, Search, Square } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, CheckCircle2, CheckSquare, FileText, FlaskConical, Loader2, Search, Square } from 'lucide-react';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -111,6 +111,11 @@ export function LabQueuePage() {
   const [activeOrderId, setActiveOrderId] = useState(state.ui.activeLabAcceptOrderId || '');
   const [selectedTestIds, setSelectedTestIds] = useState([]);
   const [flowError, setFlowError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [accepted, setAccepted] = useState(false);
+  // Toast present when an accept starts, so the completion effect can spot the
+  // fresh success/error toast the async command dispatches when it settles.
+  const submitToastRef = useRef(null);
 
   const labOrders = useMemo(() => getLabOrders(data), [data]);
   const baseRows = useMemo(() => labOrders
@@ -133,6 +138,8 @@ export function LabQueuePage() {
     setActiveOrderId(order.id);
     setSelectedTestIds(sample?.labItemIds?.length ? sample.labItemIds : labItems.map((item) => item.id));
     setFlowError('');
+    setSubmitting(false);
+    setAccepted(false);
     setWorkspace('tests');
   };
 
@@ -141,6 +148,8 @@ export function LabQueuePage() {
     setActiveOrderId('');
     setSelectedTestIds([]);
     setFlowError('');
+    setSubmitting(false);
+    setAccepted(false);
   };
 
   const toggleTest = (testId) => {
@@ -184,12 +193,33 @@ export function LabQueuePage() {
       dispatch({ type: 'OPEN_ACCEPTED_SAMPLE', orderId: activeOrder.id });
       return;
     }
+    if (submitting) return;
+    submitToastRef.current = state.ui.toast;
+    setSubmitting(true);
     dispatch({
       type: 'ACCEPT_LAB_SAMPLE',
       orderId: activeOrder.id,
       payload: { labItemIds: selectedTestIds }
     });
   };
+
+  // Accepting a sample runs asynchronously against the backend. It resolves
+  // when the sample appears in the refreshed accepted list (or a success toast
+  // fires); an error toast lets the user retry. On success we surface a clear
+  // confirmation with a direct hand-off into result entry.
+  const acceptToast = state.ui.toast;
+  useEffect(() => {
+    if (!submitting) return;
+    const freshToast = acceptToast && acceptToast !== submitToastRef.current;
+    if (freshToast && acceptToast.type === 'error') {
+      setSubmitting(false);
+      return;
+    }
+    if (acceptedSample || (freshToast && acceptToast.type === 'success')) {
+      setSubmitting(false);
+      setAccepted(true);
+    }
+  }, [submitting, acceptToast, acceptedSample]);
 
   return (
     <div className="getlabs-page space-y-6">
@@ -336,7 +366,7 @@ export function LabQueuePage() {
         <Card title="Accept sample" subtitle="Confirm the added laboratory tests, then click Accept & Done to move the patient to Accepted Samples.">
           <div className="space-y-5">
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
-              <Button variant="secondary" onClick={() => setWorkspace('tests')}><ArrowLeft className="h-4 w-4" /> Back to Add Tests</Button>
+              <Button variant="secondary" onClick={() => { setAccepted(false); setSubmitting(false); setWorkspace('tests'); }}><ArrowLeft className="h-4 w-4" /> Back to Add Tests</Button>
               {activeOrder && <div className="flex flex-wrap items-center gap-2"><StatusBadge status={activeOrder.urgency} /><StatusBadge status={sampleStateForOrder(data, activeOrder.id)} /></div>}
             </div>
 
@@ -362,23 +392,43 @@ export function LabQueuePage() {
                   </div>
 
                   <div className="rounded-3xl border border-slate-200 bg-white p-4">
-                    {acceptedSample ? (
-                      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-                        <p className="font-bold text-emerald-800">Sample already accepted: {acceptedSample.id}</p>
-                        <p className="mt-1 text-sm text-emerald-700">Accepted by {acceptedSample.acceptedBy || acceptedSample.collectedBy} at {formatDateTime(acceptedSample.acceptedAt || acceptedSample.collectedAt)}</p>
+                    {accepted ? (
+                      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-center">
+                        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-emerald-100 text-emerald-600">
+                          <CheckCircle2 className="h-7 w-7" />
+                        </span>
+                        <p className="mt-3 text-lg font-bold text-slate-900">Sample accepted</p>
+                        <p className="mt-1 text-sm text-emerald-700">{activeOrder.patient?.fullName} is now in Accepted Samples, ready for laboratory result entry.</p>
+                        <div className="mt-4 flex flex-col gap-2">
+                          <Button className="w-full justify-center" onClick={() => dispatch({ type: 'OPEN_ACCEPTED_SAMPLE', orderId: activeOrder.id })}>
+                            <FileText className="h-4 w-4" /> Enter Results Now
+                          </Button>
+                          <Button variant="secondary" className="w-full justify-center" onClick={goBackToQueue}>Back to Queue</Button>
+                        </div>
                       </div>
                     ) : (
-                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                        <p className="font-bold text-slate-900">Ready to accept</p>
-                        <p className="mt-1 text-sm text-slate-500">This will move the patient to Accepted Samples for laboratory result entry.</p>
-                      </div>
+                      <>
+                        {acceptedSample ? (
+                          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                            <p className="font-bold text-emerald-800">Sample already accepted: {acceptedSample.id}</p>
+                            <p className="mt-1 text-sm text-emerald-700">Accepted by {acceptedSample.acceptedBy || acceptedSample.collectedBy} at {formatDateTime(acceptedSample.acceptedAt || acceptedSample.collectedAt)}</p>
+                          </div>
+                        ) : (
+                          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                            <p className="font-bold text-slate-900">Ready to accept</p>
+                            <p className="mt-1 text-sm text-slate-500">This will move the patient to Accepted Samples for laboratory result entry.</p>
+                          </div>
+                        )}
+
+                        {flowError && <p className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{flowError}</p>}
+
+                        <Button onClick={acceptAndFinish} disabled={submitting} className="mt-4 w-full justify-center">
+                          {submitting
+                            ? <><Loader2 className="h-4 w-4 animate-spin" /> Accepting…</>
+                            : <><CheckCircle2 className="h-4 w-4" /> {acceptedSample ? 'Open Accepted Sample' : 'Accept & Done'}</>}
+                        </Button>
+                      </>
                     )}
-
-                    {flowError && <p className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{flowError}</p>}
-
-                    <Button onClick={acceptAndFinish} className="mt-4 w-full justify-center">
-                      <CheckCircle2 className="h-4 w-4" /> {acceptedSample ? 'Open Accepted Sample' : 'Accept & Done'}
-                    </Button>
                   </div>
                 </div>
               </>

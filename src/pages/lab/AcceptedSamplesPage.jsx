@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -6,6 +6,7 @@ import {
   FileText,
   FlaskConical,
   ListChecks,
+  Loader2,
   Search,
   Send,
   UploadCloud,
@@ -299,6 +300,11 @@ export function AcceptedSamplesPage() {
   const [technicianNotes, setTechnicianNotes] = useState('');
   const [reportText, setReportText] = useState('');
   const [files, setFiles] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [sentSummary, setSentSummary] = useState(null);
+  // Snapshot of the toast present when a push starts, so we can tell when the
+  // async command has finished (a brand-new toast object replaces it).
+  const submitToastRef = useRef(null);
 
   const rows = useMemo(() => (data.sampleLogs || [])
     .filter((sample) => sample.status === 'Accepted')
@@ -337,6 +343,8 @@ export function AcceptedSamplesPage() {
     setReportText(row.result?.reportText || '');
     setFiles(row.result?.files || []);
     setActiveTestId('');
+    setSubmitting(false);
+    setSentSummary(null);
     setWorkspace('patient');
   };
 
@@ -344,6 +352,8 @@ export function AcceptedSamplesPage() {
     setWorkspace('list');
     setActiveOrderId('');
     setActiveTestId('');
+    setSubmitting(false);
+    setSentSummary(null);
   };
 
   const openTestPopup = (test) => {
@@ -406,7 +416,11 @@ export function AcceptedSamplesPage() {
   })));
 
   const pushToClinician = () => {
-    if (!activeRow || !allComplete) return;
+    if (!activeRow || !allComplete || submitting || sentSummary) return;
+    // Remember the current toast so the completion effect can detect the fresh
+    // success/error toast the async command dispatches when it finishes.
+    submitToastRef.current = state.ui.toast;
+    setSubmitting(true);
     dispatch({
       type: 'PUSH_LAB_RESULT_TO_CLINICIAN',
       payload: {
@@ -420,7 +434,32 @@ export function AcceptedSamplesPage() {
     });
   };
 
-  const currentStep = activeTest ? 3 : (allComplete ? 4 : 2);
+  // The push command runs asynchronously against the backend. On success the
+  // result flips to 'Final / Released' and a success toast appears; on failure
+  // an error toast appears. Resolve the in-flight state from those signals so
+  // the technician gets an unambiguous "sent" confirmation and Done action.
+  const resultStatus = activeRow?.result?.status;
+  const toast = state.ui.toast;
+  useEffect(() => {
+    if (!submitting) return;
+    const freshToast = toast && toast !== submitToastRef.current;
+    if (freshToast && toast.type === 'error') {
+      // Let the technician correct the problem and try again.
+      setSubmitting(false);
+      return;
+    }
+    if (resultStatus === 'Final / Released' || (freshToast && toast.type === 'success')) {
+      setSubmitting(false);
+      setSentSummary({
+        patientName: activeRow?.order?.patient?.fullName || 'the patient',
+        orderId: activeRow?.order?.id || activeOrderId,
+        clinician: activeRow?.order?.doctor?.name || '',
+        testCount: activeItems.length
+      });
+    }
+  }, [submitting, toast, resultStatus, activeRow, activeItems.length, activeOrderId]);
+
+  const currentStep = sentSummary ? 4 : (activeTest ? 3 : (allComplete ? 4 : 2));
 
   return (
     <div className="getlabs-page space-y-6">
@@ -467,10 +506,24 @@ export function AcceptedSamplesPage() {
           <div className="space-y-5">
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
               <Button variant="secondary" onClick={backToList}><ArrowLeft className="h-4 w-4" /> Back to Accepted Patients</Button>
-              <p className="text-sm font-bold text-slate-700">{completedCount} of {activeItems.length} test(s) completed</p>
+              {!sentSummary && <p className="text-sm font-bold text-slate-700">{completedCount} of {activeItems.length} test(s) completed</p>}
             </div>
 
-            {!activeRow ? (
+            {sentSummary ? (
+              <div className="rounded-3xl border border-emerald-200 bg-emerald-50/60 p-8 text-center">
+                <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-100 text-emerald-600">
+                  <CheckCircle2 className="h-9 w-9" />
+                </span>
+                <p className="mt-4 text-xl font-bold text-slate-900">Results sent to clinician</p>
+                <p className="mt-2 text-sm font-semibold text-slate-600">
+                  {sentSummary.testCount} test result{sentSummary.testCount === 1 ? '' : 's'} for <span className="font-bold text-slate-900">{sentSummary.patientName}</span> ({sentSummary.orderId}) {sentSummary.testCount === 1 ? 'has' : 'have'} been sent to {sentSummary.clinician ? <span className="font-bold text-slate-900">{sentSummary.clinician}</span> : 'the clinician'}.
+                </p>
+                <p className="mt-1 text-xs font-semibold text-slate-500">The signed report is now stored under Laboratory · Results and is available to reception for delivery.</p>
+                <div className="mt-6 flex flex-col items-center justify-center gap-2 sm:flex-row">
+                  <Button className="justify-center" onClick={backToList}><CheckCircle2 className="h-4 w-4" /> Done</Button>
+                </div>
+              </div>
+            ) : !activeRow ? (
               <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
                 <p className="font-bold text-slate-900">No accepted patient selected.</p>
                 <p className="mt-2 text-sm text-slate-500">Go back and choose a patient before entering results.</p>
@@ -536,9 +589,15 @@ export function AcceptedSamplesPage() {
                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-4">
                   <div>
                     <p className="font-bold text-slate-900">{completedCount} of {activeItems.length} test(s) completed</p>
-                    <p className="text-sm text-slate-500">Complete every test before pushing the result to the clinician.</p>
+                    <p className="text-sm text-slate-500">
+                      {submitting ? 'Sending the results to the clinician…' : 'Complete every test before pushing the result to the clinician.'}
+                    </p>
                   </div>
-                  <Button disabled={!allComplete} onClick={pushToClinician}><Send className="h-4 w-4" /> Push Results to Clinician</Button>
+                  <Button disabled={!allComplete || submitting} onClick={pushToClinician}>
+                    {submitting
+                      ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending…</>
+                      : <><Send className="h-4 w-4" /> Push Results to Clinician</>}
+                  </Button>
                 </div>
               </div>
             )}

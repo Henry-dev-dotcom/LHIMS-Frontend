@@ -289,6 +289,67 @@ export function normalizeLabResultFromSample(sample, orderCodeById = {}) {
   }, orderCodeById);
 }
 
+/* The backend keeps one LabSample per order item (one per test) and only the
+   accepted-samples endpoint's statuses reach the lab result-entry workspace. */
+const LAB_SAMPLE_STATUS_FROM_API = {
+  NOT_ACCEPTED: 'Not Accepted',
+  ACCEPTED: 'Accepted',
+  DRAFT: 'Accepted',
+  PENDING_REVIEW: 'Accepted',
+  SIGNED_OFF: 'Accepted',
+  REJECTED: 'Rejected',
+  RECOLLECTION_REQUESTED: 'Recollection Requested'
+};
+
+function mapSampleLog(sample, orderCodeById) {
+  const orderApiId = sample.orderItem?.orderId || sample.orderItem?.order?.id || '';
+  const orderCode = orderCodeById[orderApiId] || sample.orderItem?.order?.orderCode || orderApiId || '';
+  const catalogCode = sample.orderItem?.catalogItem?.catalogCode || sample.orderItem?.catalogItemId || '';
+  const rejection = (sample.rejections || [])[0];
+  return {
+    id: sample.sampleCode || sample.id,
+    apiId: sample.id,
+    orderId: orderCode,
+    patientId: sample.patient?.patientCode || sample.patientId || '',
+    status: LAB_SAMPLE_STATUS_FROM_API[sample.status] || enumLabel(sample.status),
+    sampleType: sample.sampleType || 'Blood',
+    barcode: sample.barcodeValue || '',
+    labItemIds: catalogCode ? [catalogCode] : [],
+    collectedAt: sample.collectedAt || '',
+    collectedBy: sample.acceptedBy?.name || '',
+    acceptedAt: sample.acceptedAt || '',
+    acceptedBy: sample.acceptedBy?.name || '',
+    rejectionReason: rejection?.reason || '',
+    recollectionReason: (sample.rejections || []).find((entry) => entry.action === 'RECOLLECTION_REQUESTED')?.reason || ''
+  };
+}
+
+/* The backend keeps one LabSample per order item (one per test). The accepted
+   lab workflow (queue, result-entry) works per order/patient, so accepted
+   samples are grouped by order into one entry carrying every accepted test's
+   catalog code (labItemIds). The rejected/recollection tracker instead needs
+   one row per sample (each has its own reason), so it passes groupByOrder=false. */
+export function normalizeSampleLogs(rawSamples = [], orderCodeById = {}, { groupByOrder = true } = {}) {
+  const logs = rawSamples
+    .filter(Boolean)
+    .map((sample) => mapSampleLog(sample, orderCodeById))
+    .filter((log) => log.orderId);
+  if (!groupByOrder) return logs;
+
+  const groups = new Map();
+  logs.forEach((log) => {
+    const existing = groups.get(log.orderId);
+    if (!existing) {
+      groups.set(log.orderId, log);
+      return;
+    }
+    log.labItemIds.forEach((code) => { if (!existing.labItemIds.includes(code)) existing.labItemIds.push(code); });
+    if (log.acceptedAt && (!existing.acceptedAt || log.acceptedAt > existing.acceptedAt)) existing.acceptedAt = log.acceptedAt;
+    if (log.collectedAt && (!existing.collectedAt || log.collectedAt < existing.collectedAt)) existing.collectedAt = log.collectedAt;
+  });
+  return Array.from(groups.values());
+}
+
 export function normalizeVisit(visit, orderCodeById = {}) {
   if (!visit) return null;
   return {
