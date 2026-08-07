@@ -107,8 +107,8 @@ export function DoctorCompletedOrdersPage() {
         subtitle="Filter released orders by lab results, scan reports, or abnormal flags."
         actions={(
           <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-            <div className="relative min-w-0 flex-1 sm:w-80 sm:flex-none"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" /><input className={`${inputClass} pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search completed order, patient, test..." /></div>
-            <select className={inputClass} value={resultFilter} onChange={(event) => setResultFilter(event.target.value)}><option value="">All result types</option><option value="Laboratory">Lab results</option><option value="Imaging">Scan reports</option><option value="Abnormal">Abnormal only</option></select>
+            <div className="relative min-w-0 flex-1 sm:w-80 sm:flex-none"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" /><input className={`${inputClass} pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search completed order, patient, test..." aria-label="Search completed order, patient, test" /></div>
+            <select className={inputClass} value={resultFilter} onChange={(event) => setResultFilter(event.target.value)} aria-label="Filter by result type"><option value="">All result types</option><option value="Laboratory">Lab results</option><option value="Imaging">Scan reports</option><option value="Abnormal">Abnormal only</option></select>
           </div>
         )}
       >

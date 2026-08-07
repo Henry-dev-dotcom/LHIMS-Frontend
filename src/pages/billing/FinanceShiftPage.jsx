@@ -107,9 +107,9 @@ export function FinanceShiftPage() {
       </div>
       <Card title="Shift history" subtitle="Closed shifts are read-only and can be filtered by cashier/date for audits.">
         <div className="mb-4 grid gap-3 md:grid-cols-4">
-          <select className={inputClass} value={cashier} onChange={(event) => setCashier(event.target.value)}><option value="">All cashiers</option>{cashiers.map((name) => <option key={name}>{name}</option>)}</select>
-          <input className={inputClass} type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
-          <input className={inputClass} type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} />
+          <select className={inputClass} value={cashier} onChange={(event) => setCashier(event.target.value)} aria-label="Filter by cashier"><option value="">All cashiers</option>{cashiers.map((name) => <option key={name}>{name}</option>)}</select>
+          <input className={inputClass} type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} aria-label="Filter by start date" />
+          <input className={inputClass} type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} aria-label="Filter by end date" />
           <Button variant="secondary" onClick={() => { setCashier(''); setStartDate(''); setEndDate(''); }}>Clear filters</Button>
         </div>
         <DataTable columns={[{ key: 'id', label: 'Shift' }, { key: 'shiftType', label: 'Type', render: (row) => row.shiftType || '—' }, { key: 'startedBy', label: 'Cashier' }, { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> }, { key: 'openingFloat', label: 'Opening', render: (row) => money(row.openingFloat) }, { key: 'expectedCash', label: 'Expected Cash', render: (row) => money(row.expectedCash) }, { key: 'actualCash', label: 'Actual Cash', render: (row) => row.status === 'Closed' ? money(row.actualCash) : '—' }, { key: 'variance', label: 'Variance', render: (row) => row.status === 'Closed' ? money(row.variance) : '—' }, { key: 'txnCount', label: 'Transactions' }, { key: 'startedAt', label: 'Started', render: (row) => formatDateTime(row.startedAt) }, { key: 'closedAt', label: 'Closed', render: (row) => row.closedAt ? formatDateTime(row.closedAt) : '—' }]} rows={shiftRows} emptyMessage="No finance shifts match your filters." />

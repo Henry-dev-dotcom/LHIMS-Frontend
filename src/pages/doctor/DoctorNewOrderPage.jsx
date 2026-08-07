@@ -74,6 +74,7 @@ function CatalogSearchModal({ open, onClose, catalog, selectedItems, toggleItem,
               onFocus={() => setSearchActive(true)}
               onBlur={() => window.setTimeout(() => setSearchActive(false), 120)}
               placeholder="Search FBC, t1, LFT, ultrasound, scan..."
+              aria-label="Search FBC, t1, LFT, ultrasound, scan"
               autoFocus
             />
 
@@ -112,7 +113,7 @@ function CatalogSearchModal({ open, onClose, catalog, selectedItems, toggleItem,
             )}
           </div>
 
-          <select className={inputClass} value={department} onChange={(event) => setDepartment(event.target.value)}>
+          <select className={inputClass} value={department} onChange={(event) => setDepartment(event.target.value)} aria-label="Filter by department">
             <option value="">Both departments</option>
             <option value="Laboratory">Laboratory</option>
             <option value="Imaging">Scan / Radiology</option>
@@ -411,7 +412,7 @@ export function DoctorNewOrderPage() {
               <div className="space-y-3">
                 <div className="relative">
                   <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
-                  <input className={`${inputClass} pl-9`} value={patientSearch} onChange={(event) => setPatientSearch(event.target.value)} placeholder="Search patient name, ID, phone, email..." />
+                  <input className={`${inputClass} pl-9`} value={patientSearch} onChange={(event) => setPatientSearch(event.target.value)} placeholder="Search patient name, ID, phone, email..." aria-label="Search patient name, ID, phone, email" />
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
                   <div className="mb-2 flex items-center justify-between gap-3">

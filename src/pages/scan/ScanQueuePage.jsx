@@ -169,9 +169,9 @@ export function ScanQueuePage() {
             <div className="grid gap-3 xl:grid-cols-[1fr_200px_220px]">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
-                <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient name, patient ID, order ID, scan name..." />
+                <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient name, patient ID, order ID, scan name..." aria-label="Search scan queue" />
               </div>
-              <select className={inputClass} value={status} onChange={(event) => setStatus(event.target.value)}>
+              <select className={inputClass} value={status} onChange={(event) => setStatus(event.target.value)} aria-label="Filter by order status">
                 <option value="">All order statuses</option>
                 <option>Submitted</option>
                 <option>Confirmed</option>
@@ -179,7 +179,7 @@ export function ScanQueuePage() {
                 <option>Pending Review</option>
                 <option>Final / Released</option>
               </select>
-              <select className={inputClass} value={scanFilter} onChange={(event) => setScanFilter(event.target.value)}>
+              <select className={inputClass} value={scanFilter} onChange={(event) => setScanFilter(event.target.value)} aria-label="Filter by scan state">
                 <option value="">All scan states</option>
                 <option>Awaiting Acceptance</option>
                 <option>Accepted</option>
@@ -273,10 +273,10 @@ export function ScanQueuePage() {
                   <div className="rounded-3xl border border-slate-200 p-4">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Imaging acceptance details</p>
                     <div className="mt-3 grid gap-3">
-                      <input className={inputClass} value={modality} onChange={(event) => setModality(event.target.value)} placeholder="Modality, e.g. X-ray, CT, Ultrasound" disabled={Boolean(acceptedScan)} />
-                      <input className={inputClass} value={room} onChange={(event) => setRoom(event.target.value)} placeholder="Room" disabled={Boolean(acceptedScan)} />
-                      <input className={inputClass} value={machine} onChange={(event) => setMachine(event.target.value)} placeholder="Machine" disabled={Boolean(acceptedScan)} />
-                      <textarea className={`${inputClass} min-h-[96px]`} value={technicianNotes} onChange={(event) => setTechnicianNotes(event.target.value)} placeholder="Technician notes or preparation instructions" disabled={Boolean(acceptedScan)} />
+                      <input className={inputClass} value={modality} onChange={(event) => setModality(event.target.value)} placeholder="Modality, e.g. X-ray, CT, Ultrasound" aria-label="Modality" disabled={Boolean(acceptedScan)} />
+                      <input className={inputClass} value={room} onChange={(event) => setRoom(event.target.value)} placeholder="Room" aria-label="Room" disabled={Boolean(acceptedScan)} />
+                      <input className={inputClass} value={machine} onChange={(event) => setMachine(event.target.value)} placeholder="Machine" aria-label="Machine" disabled={Boolean(acceptedScan)} />
+                      <textarea className={`${inputClass} min-h-[96px]`} value={technicianNotes} onChange={(event) => setTechnicianNotes(event.target.value)} placeholder="Technician notes or preparation instructions" aria-label="Technician notes" disabled={Boolean(acceptedScan)} />
                     </div>
 
                     {acceptedScan ? (

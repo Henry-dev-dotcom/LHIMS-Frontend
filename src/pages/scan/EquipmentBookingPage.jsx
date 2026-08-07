@@ -119,7 +119,7 @@ export function EquipmentBookingPage() {
             </div>
           </Card>
           <Card title="Booking records" subtitle="Search bookings by patient, order, room, modality or machine.">
-            <input className={`${inputClass} mb-4`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search bookings" />
+            <input className={`${inputClass} mb-4`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search bookings" aria-label="Search bookings" />
             <DataTable columns={bookingColumns} rows={bookingRows} emptyMessage="No imaging bookings recorded." />
           </Card>
         </div>

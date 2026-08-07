@@ -67,7 +67,7 @@ export function SampleLogPage() {
         </Card>
 
         <Card title="All sample records" subtitle="Search samples by sample ID, order, patient, type or collector.">
-          <input className={`${inputClass} mb-4`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search sample records" />
+          <input aria-label="Search sample records" className={`${inputClass} mb-4`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search sample records" />
           <DataTable columns={columns} rows={rows} emptyMessage="No sample records yet." />
         </Card>
       </div>

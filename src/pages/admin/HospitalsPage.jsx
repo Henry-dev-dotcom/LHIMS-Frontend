@@ -459,7 +459,7 @@ export function HospitalsPage() {
           <Card title="Facility List" subtitle="Search and select a facility to customize." compact>
             <div className="relative">
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-              <input className={`${inputClass} pl-11`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search facility, code, region, contact..." />
+              <input aria-label="Search facilities" className={`${inputClass} pl-11`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search facility, code, region, contact..." />
             </div>
             <div className="mt-4 space-y-3">
               {filteredFacilities.map((facility) => (
@@ -557,6 +557,7 @@ export function HospitalsPage() {
                       {(selectedFacility.departments || []).map((department) => (
                         <span key={department} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">{department}</span>
                       ))}
+                      {!(selectedFacility.departments || []).length && <span className="text-sm font-semibold text-slate-500">No departments configured yet.</span>}
                     </div>
                     <div className="mt-4 grid gap-2 sm:grid-cols-2">
                       <div className="rounded-2xl bg-slate-50 p-3">

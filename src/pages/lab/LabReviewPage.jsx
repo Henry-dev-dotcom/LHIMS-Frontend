@@ -137,8 +137,8 @@ export function LabReviewPage() {
       <div className="grid gap-4 md:grid-cols-3"><Card title="Drafts" subtitle={String(drafts)} /><Card title="Pending Review" subtitle={String(pending)} /><Card title="Released" subtitle={String(released)} /></div>
       <Card title="Review queue" subtitle="Senior reviewer/pathologist sign-off queue for lab results.">
         <div className="mb-4 grid gap-3 md:grid-cols-[1fr_220px]">
-          <div className="relative"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" /><input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient, order, doctor, test or parameter..." /></div>
-          <select className={inputClass} value={status} onChange={(event) => setStatus(event.target.value)}><option value="">All lab result states</option><option>Draft</option><option>In Progress</option><option>Pending Review</option><option>Final / Released</option></select>
+          <div className="relative"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" /><input aria-label="Search patient, order, doctor, test or parameter" className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient, order, doctor, test or parameter..." /></div>
+          <select aria-label="Filter by lab result state" className={inputClass} value={status} onChange={(event) => setStatus(event.target.value)}><option value="">All lab result states</option><option>Draft</option><option>In Progress</option><option>Pending Review</option><option>Final / Released</option></select>
         </div>
         <DataTable
           columns={[

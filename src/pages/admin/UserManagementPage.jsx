@@ -79,7 +79,7 @@ export function UserManagementPage() {
         <div className="mb-4 grid gap-3 md:grid-cols-[1fr_240px]">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
-            <input className={`${inputClass} pl-10`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search user name, ID, role, email or phone" />
+            <input aria-label="Search users" className={`${inputClass} pl-10`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search user name, ID, role, email or phone" />
           </div>
           <select className={inputClass} value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}>
             <option value="">All roles</option>

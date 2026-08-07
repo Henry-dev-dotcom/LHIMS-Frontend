@@ -264,7 +264,7 @@ export function AdminSettingsPage() {
           <div className="mb-4 grid gap-3 lg:grid-cols-[1fr_180px_auto]">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
-              <input className={`${inputClass} pl-10`} value={catalogQuery} onChange={(event) => setCatalogQuery(event.target.value)} placeholder="Search by ID, name, abbreviation, department or modality" />
+              <input aria-label="Search catalog" className={`${inputClass} pl-10`} value={catalogQuery} onChange={(event) => setCatalogQuery(event.target.value)} placeholder="Search by ID, name, abbreviation, department or modality" />
             </div>
             <select className={inputClass} value={catalogType} onChange={(event) => setCatalogType(event.target.value)}>
               <option value="">All types</option>

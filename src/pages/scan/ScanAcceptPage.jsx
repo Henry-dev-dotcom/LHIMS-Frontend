@@ -39,7 +39,7 @@ export function ScanAcceptPage() {
         <Card title="Find scan request" subtitle="Search by patient, order ID or scan name.">
           <div className="relative mb-4">
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
-            <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient name or order ID..." />
+            <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient name or order ID..." aria-label="Search patient name or order ID" />
           </div>
           <div className="space-y-2">
             {scanOrders.filter((order) => !query || [order.id, order.patient?.fullName, describeOrderItems(order.items)].join(' ').toLowerCase().includes(query.toLowerCase())).slice(0, 10).map((order) => (
@@ -60,7 +60,7 @@ export function ScanAcceptPage() {
               <div className="rounded-2xl border border-slate-200 p-4"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Clinical notes</p><p className="mt-2 text-sm leading-6 text-slate-700">{activeOrder.clinicalNotes || 'No clinical notes provided.'}</p></div>
               <div className="space-y-2">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Requested scans</p>
-                {scanItems.map((item) => <div key={item.id} className="flex items-center justify-between rounded-2xl bg-slate-50 p-3"><span className="font-bold text-slate-900"><ScanLine className="mr-2 inline h-4 w-4 text-purple-600" />{item.name}</span><StatusBadge status={item.modality || 'Imaging'} /></div>)}
+                {scanItems.length === 0 ? <p className="rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-500">No scan items found for this order.</p> : scanItems.map((item) => <div key={item.id} className="flex items-center justify-between rounded-2xl bg-slate-50 p-3"><span className="font-bold text-slate-900"><ScanLine className="mr-2 inline h-4 w-4 text-purple-600" />{item.name}</span><StatusBadge status={item.modality || 'Imaging'} /></div>)}
               </div>
               <div className="grid gap-3 md:grid-cols-2">
                 <FormField label="Room"><input className={inputClass} value={acceptance.room} onChange={(event) => setAcceptance((prev) => ({ ...prev, room: event.target.value }))} /></FormField>
@@ -73,8 +73,8 @@ export function ScanAcceptPage() {
               <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.08em] text-amber-700">Reject / Retake request</p>
                 <div className="mt-3 grid gap-3 md:grid-cols-[180px_1fr_auto]">
-                  <select className={inputClass} value={rejectAction} onChange={(event) => setRejectAction(event.target.value)}><option>Retake Requested</option><option>Rejected</option></select>
-                  <input className={inputClass} value={rejectReason} onChange={(event) => setRejectReason(event.target.value)} placeholder="Reason, e.g. wrong protocol, patient movement, preparation incomplete..." />
+                  <select className={inputClass} value={rejectAction} onChange={(event) => setRejectAction(event.target.value)} aria-label="Reject or retake action"><option>Retake Requested</option><option>Rejected</option></select>
+                  <input className={inputClass} value={rejectReason} onChange={(event) => setRejectReason(event.target.value)} placeholder="Reason, e.g. wrong protocol, patient movement, preparation incomplete..." aria-label="Rejection or retake reason" />
                   <Button variant="secondary" onClick={() => dispatch({ type: 'REJECT_SCAN_ORDER', payload: { orderId: activeOrder.id, reason: rejectReason, actionNeeded: rejectAction } })}><AlertTriangle className="h-4 w-4" /> Save</Button>
                 </div>
               </div>

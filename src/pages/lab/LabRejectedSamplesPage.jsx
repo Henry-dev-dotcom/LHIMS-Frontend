@@ -32,7 +32,7 @@ export function LabRejectedSamplesPage() {
     <div className="space-y-6">
       <PageHeader eyebrow="Laboratory · Retest / Recollection" title="Rejected & Retest Samples" description="Track rejected samples, recollection requests and retest reasons from the lab workflow." />
       <Card title="Rejected / recollection tracker" subtitle="Use this page to follow samples that need recollection or retesting.">
-        <div className="relative mb-4"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" /><input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search sample, patient, order or reason..." /></div>
+        <div className="relative mb-4"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" /><input aria-label="Search sample, patient, order or reason" className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search sample, patient, order or reason..." /></div>
         <DataTable
           columns={[
             { key: 'id', label: 'Sample ID', render: (row) => <span className="font-bold text-slate-900">{row.id}</span> },

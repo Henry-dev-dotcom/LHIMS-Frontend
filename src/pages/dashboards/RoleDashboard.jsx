@@ -261,7 +261,14 @@ export function RoleDashboard({ role }) {
           <ChevronDown className="h-4 w-4 shrink-0 transition group-open:rotate-180" />
         </summary>
         <div className="mt-3 space-y-4">
-          {firstOrder && <WorkflowTimeline status={firstOrder.status} timeline={firstOrder.timeline} />}
+          {firstOrder ? (
+            <WorkflowTimeline status={firstOrder.status} timeline={firstOrder.timeline} />
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-2 rounded-[1.2rem] bg-slate-50 px-4 py-10 text-center sm:rounded-[1.75rem]">
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-slate-100 text-slate-500"><ClipboardList className="h-5 w-5" /></span>
+              <span className="text-sm font-semibold text-slate-500">No workflow activity yet.</span>
+            </div>
+          )}
           <Card title="Role identity & permissions" subtitle="The session role, accessible modules and active clinical responsibilities are explicit.">
             <div className="space-y-2">
               {identity.map(([label, value]) => (

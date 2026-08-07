@@ -70,11 +70,11 @@ export function FloatTrackerPage() {
         </Card>
         <Card title="Float transaction log" subtitle="Filter by cashier, payment method and date range to audit at micro level.">
           <div className="mb-4 grid gap-3 md:grid-cols-3 xl:grid-cols-5">
-            <input className={inputClass} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search float log" />
-            <select className={inputClass} value={method} onChange={(event) => setMethod(event.target.value)}><option value="">All methods</option><option>Cash</option><option>Mobile Money</option><option>Card</option><option>Transfer</option><option>Insurance</option></select>
-            <select className={inputClass} value={cashier} onChange={(event) => setCashier(event.target.value)}><option value="">All cashiers</option>{cashiers.map((name) => <option key={name}>{name}</option>)}</select>
-            <input className={inputClass} type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
-            <input className={inputClass} type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} />
+            <input className={inputClass} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search float log" aria-label="Search float log" />
+            <select className={inputClass} value={method} onChange={(event) => setMethod(event.target.value)} aria-label="Filter by method"><option value="">All methods</option><option>Cash</option><option>Mobile Money</option><option>Card</option><option>Transfer</option><option>Insurance</option></select>
+            <select className={inputClass} value={cashier} onChange={(event) => setCashier(event.target.value)} aria-label="Filter by cashier"><option value="">All cashiers</option>{cashiers.map((name) => <option key={name}>{name}</option>)}</select>
+            <input className={inputClass} type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} aria-label="Filter by start date" />
+            <input className={inputClass} type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} aria-label="Filter by end date" />
           </div>
           <DataTable columns={[{ key: 'createdAt', label: 'Time', render: (row) => formatDateTime(row.createdAt) }, { key: 'type', label: 'Type', render: (row) => <StatusBadge status={row.type === 'Out' ? 'Debit' : 'Credit'} /> }, { key: 'description', label: 'Patient / Description' }, { key: 'method', label: 'Method' }, { key: 'amount', label: 'Amount', render: (row) => <span className={row.type === 'Out' ? 'font-bold text-red-700' : 'font-bold text-emerald-700'}>{row.type === 'Out' ? '-' : '+'}{money(row.amount)}</span> }, { key: 'staff', label: 'Cashier' }, { key: 'shiftId', label: 'Shift' }, { key: 'reference', label: 'Reference' }]} rows={rows} emptyMessage="No float transactions match your filters." />
         </Card>

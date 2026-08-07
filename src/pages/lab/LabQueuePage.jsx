@@ -246,9 +246,9 @@ export function LabQueuePage() {
             <div className="grid gap-3 xl:grid-cols-[1fr_200px_220px]">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
-                <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient name, patient ID, order ID, test name..." />
+                <input aria-label="Search patient name, patient ID, order ID, test name" className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient name, patient ID, order ID, test name..." />
               </div>
-              <select className={inputClass} value={status} onChange={(event) => setStatus(event.target.value)}>
+              <select aria-label="Filter by order status" className={inputClass} value={status} onChange={(event) => setStatus(event.target.value)}>
                 <option value="">All order statuses</option>
                 <option>Submitted</option>
                 <option>Confirmed</option>
@@ -256,7 +256,7 @@ export function LabQueuePage() {
                 <option>Pending Review</option>
                 <option>Final / Released</option>
               </select>
-              <select className={inputClass} value={sampleFilter} onChange={(event) => setSampleFilter(event.target.value)}>
+              <select aria-label="Filter by sample state" className={inputClass} value={sampleFilter} onChange={(event) => setSampleFilter(event.target.value)}>
                 <option value="">All sample states</option>
                 <option>Not Accepted</option>
                 <option>Accepted</option>
@@ -325,6 +325,12 @@ export function LabQueuePage() {
                   </div>
 
                   <div className="mt-4 grid gap-3 md:grid-cols-2">
+                    {activeLabItems.length === 0 && (
+                      <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center md:col-span-2">
+                        <p className="font-bold text-slate-900">No laboratory tests found for this request.</p>
+                        <p className="mt-1 text-sm text-slate-500">Go back and choose a different patient request.</p>
+                      </div>
+                    )}
                     {activeLabItems.map((item) => {
                       const checked = selectedTestIds.includes(item.id);
                       return (

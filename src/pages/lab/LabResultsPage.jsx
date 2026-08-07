@@ -94,11 +94,11 @@ function CompareChangesModal({ amendment, onClose }) {
                 <p className="truncate text-sm font-bold text-slate-900">{name}</p>
               </div>
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Before</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Before</p>
                 <p className="text-sm font-semibold text-slate-700">{before ? `${before.value} ${before.unit || ''}` : '—'} {before?.flag && <StatusBadge status={before.flag} />}</p>
               </div>
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">After</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">After</p>
                 <p className={`text-sm font-semibold ${changed ? 'text-amber-800' : 'text-slate-700'}`}>{after ? `${after.value} ${after.unit || ''}` : '—'} {after?.flag && <StatusBadge status={after.flag} />}</p>
               </div>
             </div>
@@ -336,7 +336,7 @@ export function LabResultsPage() {
           <div className="space-y-4">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
-              <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient, order ID, clinician, hospital, or test..." />
+              <input aria-label="Search patient, order ID, clinician, hospital, or test" className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient, order ID, clinician, hospital, or test..." />
             </div>
             <div className="space-y-3">
               {filteredRows.length ? filteredRows.map((row) => (
@@ -420,6 +420,9 @@ export function LabResultsPage() {
                 <div className="rounded-3xl border border-slate-200 p-4">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Result parameters</p>
                   <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    {(activeRow.result.parameters || []).length === 0 && (
+                      <p className="text-sm text-slate-500 md:col-span-2 xl:col-span-3">No result parameters stored for this report.</p>
+                    )}
                     {(activeRow.result.parameters || []).map((parameter, index) => (
                       <div key={`${parameter.testId}-${parameter.name}-${index}`} className="rounded-2xl bg-slate-50 p-3">
                         <p className="text-xs font-bold text-slate-500">{parameter.testName}</p>

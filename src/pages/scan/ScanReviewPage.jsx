@@ -47,7 +47,7 @@ export function ScanReviewPage() {
         <Card title="Pending imaging reports" subtitle="Search reports waiting for radiologist sign-off.">
           <div className="relative mb-4">
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
-            <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient, order, report text..." />
+            <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient, order, report text..." aria-label="Search pending imaging reports" />
           </div>
           <DataTable
             columns={[
@@ -71,7 +71,7 @@ export function ScanReviewPage() {
                 <Info label="Doctor" value={selected.doctor?.name} />
                 <Info label="Hospital" value={selected.hospital?.name} />
               </div>
-              <div className="space-y-2">{scans.map((scan) => <div key={scan.id} className="rounded-2xl border border-slate-200 p-3"><FileImage className="mr-2 inline h-4 w-4 text-purple-600" /><span className="font-bold text-slate-900">{scan.name}</span><span className="ml-2 text-sm text-slate-500">{scan.modality}</span></div>)}</div>
+              <div className="space-y-2">{scans.length === 0 ? <p className="rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-500">No scan items found for this order.</p> : scans.map((scan) => <div key={scan.id} className="rounded-2xl border border-slate-200 p-3"><FileImage className="mr-2 inline h-4 w-4 text-purple-600" /><span className="font-bold text-slate-900">{scan.name}</span><span className="ml-2 text-sm text-slate-500">{scan.modality}</span></div>)}</div>
               <div className="rounded-2xl bg-slate-50 p-3 whitespace-pre-line text-sm font-semibold text-slate-700">{selected.reportText}</div>
               <div className="rounded-2xl border border-purple-100 bg-purple-50 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.08em] text-purple-700">Attachments / DICOM metadata</p>

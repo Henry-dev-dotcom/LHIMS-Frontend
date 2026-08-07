@@ -217,7 +217,7 @@ export function PatientRecordsPage() {
         actions={
           <div className="relative w-full min-w-[260px] sm:w-80">
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
-            <input className={`${inputClass} pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name, ID, phone, email..." />
+            <input className={`${inputClass} pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name, ID, phone, email..." aria-label="Search patients by name, ID, phone, or email" />
           </div>
         }
       >

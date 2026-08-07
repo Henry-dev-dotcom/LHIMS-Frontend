@@ -270,7 +270,7 @@ function OrderDetailsPanel({ order, canSeeFinance }) {
     return (
       <Card title="Order detail" subtitle="Select an order from any section to view focused details, timeline, billing and delivery information.">
         <div className="grid place-items-center rounded-[1.5rem] bg-slate-50 p-10 text-center text-slate-500">
-          <UserRound className="mb-3 h-8 w-8 text-slate-300" />
+          <UserRound className="mb-3 h-8 w-8 text-slate-400" />
           <p className="text-sm font-bold">No order selected yet.</p>
         </div>
       </Card>
@@ -425,6 +425,7 @@ export function OrderRegistryPage() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search by order ID, patient, doctor, hospital, test name, catalog ID, status..."
+                aria-label="Search orders by ID, patient, doctor, hospital, test name, catalog ID, or status"
                 className="w-full bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-500"
               />
             </div>

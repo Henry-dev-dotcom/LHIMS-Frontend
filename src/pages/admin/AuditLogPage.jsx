@@ -52,7 +52,7 @@ export function AuditLogPage() {
         <div className="mb-4 grid gap-3 md:grid-cols-[1fr_260px]">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
-            <input className={`${inputClass} pl-10`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search actor, action, module, entity or detail" />
+            <input aria-label="Search audit log" className={`${inputClass} pl-10`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search actor, action, module, entity or detail" />
           </div>
           <select className={inputClass} value={moduleFilter} onChange={(event) => setModuleFilter(event.target.value)}>
             <option value="">All modules</option>

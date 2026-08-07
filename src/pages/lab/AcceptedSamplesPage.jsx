@@ -485,7 +485,7 @@ export function AcceptedSamplesPage() {
           <div className="space-y-4">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
-              <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient name, patient ID, order ID, sample ID, or test..." />
+              <input aria-label="Search patient name, patient ID, order ID, sample ID, or test" className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient name, patient ID, order ID, sample ID, or test..." />
             </div>
             <div className="space-y-3">
               {filteredRows.length ? filteredRows.map((row) => (

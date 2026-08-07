@@ -51,11 +51,11 @@ export function AccountLedgerPage() {
       </div>
       <Card title="Ledger entries" subtitle="Money coming in from billing and money going out through expenses or float adjustments are centralised here.">
         <div className="mb-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
-          <input className={inputClass} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search ledger" />
-          <select className={inputClass} value={period} onChange={(event) => setPeriod(event.target.value)}><option value="all">All time</option><option value="today">Today</option><option value="week">This week</option><option value="month">This month</option></select>
-          <select className={inputClass} value={cashier} onChange={(event) => setCashier(event.target.value)}><option value="">All staff</option>{cashiers.map((name) => <option key={name}>{name}</option>)}</select>
-          <input className={inputClass} type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
-          <input className={inputClass} type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} />
+          <input className={inputClass} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search ledger" aria-label="Search ledger" />
+          <select className={inputClass} value={period} onChange={(event) => setPeriod(event.target.value)} aria-label="Filter by period"><option value="all">All time</option><option value="today">Today</option><option value="week">This week</option><option value="month">This month</option></select>
+          <select className={inputClass} value={cashier} onChange={(event) => setCashier(event.target.value)} aria-label="Filter by cashier"><option value="">All staff</option>{cashiers.map((name) => <option key={name}>{name}</option>)}</select>
+          <input className={inputClass} type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} aria-label="Filter by start date" />
+          <input className={inputClass} type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} aria-label="Filter by end date" />
           <Button variant="secondary" onClick={() => { setPeriod('all'); setQuery(''); setCashier(''); setStartDate(''); setEndDate(''); }}>Clear filters</Button>
         </div>
         <DataTable columns={[{ key: 'createdAt', label: 'Date', render: (row) => formatDateTime(row.createdAt) }, { key: 'type', label: 'Type' }, { key: 'category', label: 'Category' }, { key: 'description', label: 'Description' }, { key: 'reference', label: 'Reference' }, { key: 'method', label: 'Method' }, { key: 'staff', label: 'Staff' }, { key: 'credit', label: 'Credit', render: (row) => row.credit ? <span className="font-bold text-emerald-700">{money(row.credit)}</span> : '—' }, { key: 'debit', label: 'Debit', render: (row) => row.debit ? <span className="font-bold text-red-700">{money(row.debit)}</span> : '—' }, { key: 'balance', label: 'Balance', render: (row) => money(row.balance) }]} rows={rows} emptyMessage="No ledger entries match your filters." />

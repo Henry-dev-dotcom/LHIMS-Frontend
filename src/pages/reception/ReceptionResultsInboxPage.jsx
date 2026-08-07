@@ -64,7 +64,7 @@ export function ReceptionResultsInboxPage() {
       title={section === 'abnormal' ? 'Abnormal released results' : 'Released results reference'}
       subtitle="Results are already delivered to the clinician. Reception can print a patient-safe copy when needed."
       compact
-      actions={<div className="grid gap-3 md:grid-cols-[minmax(220px,1fr)_180px]"><input className={inputClass} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient, order, doctor, test..." /><select className={inputClass} value={filter} onChange={(event) => setFilter(event.target.value)}><option value="">All results</option><option value="Laboratory">Laboratory</option><option value="Imaging">Imaging</option><option value="Abnormal">Abnormal only</option></select></div>}
+      actions={<div className="grid gap-3 md:grid-cols-[minmax(220px,1fr)_180px]"><input className={inputClass} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient, order, doctor, test..." aria-label="Search released results" /><select className={inputClass} value={filter} onChange={(event) => setFilter(event.target.value)} aria-label="Filter results by department"><option value="">All results</option><option value="Laboratory">Laboratory</option><option value="Imaging">Imaging</option><option value="Abnormal">Abnormal only</option></select></div>}
     >
       <DataTable
         columns={[

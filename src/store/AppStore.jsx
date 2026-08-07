@@ -48,6 +48,7 @@ const initialState = {
   auth: null,
   currentPage: 'login',
   data: emptyData,
+  hydrating: false,
   ui: {
     sidebarOpen: false,
     toast: null,
@@ -67,7 +68,9 @@ function getInitialState() {
     // the session is revalidated against /auth/me on mount.
     const cached = normalizeAuthUser(getStoredSession().user);
     if (cached) {
-      return { ...initialState, auth: cached, currentPage: cached.landing };
+      // Data hydrates asynchronously right after mount; start in the
+      // hydrating state so pages don't flash an empty/"no records" view.
+      return { ...initialState, auth: cached, currentPage: cached.landing, hydrating: true };
     }
   } catch {
     // Fall through to the logged-out state.
@@ -246,6 +249,9 @@ function reducer(state, action) {
         currentPage: action.navigate || (action.auth ? state.currentPage : 'login'),
         ui: { ...state.ui, sidebarOpen: false }
       };
+    }
+    case 'SET_HYDRATING': {
+      return { ...state, hydrating: action.hydrating };
     }
     case 'SET_COLLECTIONS': {
       return { ...state, data: { ...state.data, ...action.collections } };
@@ -626,11 +632,19 @@ export function AppStoreProvider({ children }) {
     return () => { cancelled = true; };
   }, []);
 
-  // Hydrate the workspace whenever an authenticated user (re)appears.
+  // Hydrate the workspace whenever an authenticated user (re)appears. The
+  // hydrating flag gates the shell's first paint so pages don't flash an
+  // empty/"no records" state while the initial fetch is in flight.
   const authUserId = state.auth?.userId || '';
   useEffect(() => {
     if (!authUserId) return;
-    hydrateWorkspace(apiClient, stateRef.current.auth, rawDispatch);
+    let cancelled = false;
+    rawDispatch({ type: 'SET_HYDRATING', hydrating: true });
+    hydrateWorkspace(apiClient, stateRef.current.auth, rawDispatch)
+      .finally(() => {
+        if (!cancelled) rawDispatch({ type: 'SET_HYDRATING', hydrating: false });
+      });
+    return () => { cancelled = true; };
   }, [authUserId]);
 
   const value = useMemo(() => ({ state, dispatch }), [state, dispatch]);

@@ -90,11 +90,11 @@ export function BillingAnalyticsPage() {
       <PageHeader eyebrow="Finance" title="Billing Analytics" description="Period-end dashboard for visits, collections, outstanding balances, paid invoices, write-offs, cashier performance and ageing." />
       <Card title="Analytics filters" subtitle="Use period, custom dates, cashier and hospital filters for weekly/monthly/micro-level reviews.">
         <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
-          <select className={inputClass} value={range} onChange={(event) => setRange(event.target.value)}><option value="week">Last 7 days</option><option value="month">This month</option><option value="quarter">This quarter</option><option value="all">All time</option></select>
-          <input className={inputClass} type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
-          <input className={inputClass} type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} />
-          <select className={inputClass} value={cashier} onChange={(event) => setCashier(event.target.value)}><option value="">All cashiers</option>{cashiers.map((name) => <option key={name}>{name}</option>)}</select>
-          <select className={inputClass} value={hospitalId} onChange={(event) => setHospitalId(event.target.value)}><option value="">All hospitals</option>{(data.hospitals || []).map((hospital) => <option key={hospital.id} value={hospital.id}>{hospital.name}</option>)}</select>
+          <select className={inputClass} value={range} onChange={(event) => setRange(event.target.value)} aria-label="Filter by date range"><option value="week">Last 7 days</option><option value="month">This month</option><option value="quarter">This quarter</option><option value="all">All time</option></select>
+          <input className={inputClass} type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} aria-label="Filter by start date" />
+          <input className={inputClass} type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} aria-label="Filter by end date" />
+          <select className={inputClass} value={cashier} onChange={(event) => setCashier(event.target.value)} aria-label="Filter by cashier"><option value="">All cashiers</option>{cashiers.map((name) => <option key={name}>{name}</option>)}</select>
+          <select className={inputClass} value={hospitalId} onChange={(event) => setHospitalId(event.target.value)} aria-label="Filter by hospital"><option value="">All hospitals</option>{(data.hospitals || []).map((hospital) => <option key={hospital.id} value={hospital.id}>{hospital.name}</option>)}</select>
           <Button variant="secondary" onClick={() => { setRange('all'); setStartDate(''); setEndDate(''); setCashier(''); setHospitalId(''); }}>Clear</Button>
         </div>
       </Card>

@@ -82,7 +82,7 @@ export function LoginPage() {
                 </Button>
               </form>
 
-              <p className="mt-4 text-xs leading-5 text-slate-400">
+              <p className="mt-4 text-xs leading-5 text-slate-500">
                 Sessions are secured with httpOnly cookies. Contact your system administrator if you need an account or a password reset.
               </p>
             </div>

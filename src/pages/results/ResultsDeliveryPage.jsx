@@ -198,7 +198,7 @@ export function ResultsDeliveryPage() {
         <Card
           title="Released reports"
           subtitle="Every Final / Released order should have a PDF-ready report record and delivery events for doctor-facing channels."
-          actions={<input className={`${inputClass} min-w-[260px]`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search order, patient, doctor, hospital..." />}
+          actions={<input className={`${inputClass} min-w-[260px]`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search order, patient, doctor, hospital..." aria-label="Search released reports" />}
         >
           <DataTable
             columns={[

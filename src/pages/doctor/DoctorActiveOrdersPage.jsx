@@ -96,9 +96,9 @@ export function DoctorActiveOrdersPage() {
         subtitle="Use filters to follow current work by status, urgency, patient, or test."
         actions={(
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <div className="relative w-full sm:w-64"><Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-500" /><input className={`${inputClass} h-10 !w-full py-2 pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search order, patient, test..." /></div>
-            <select className={`${inputClass} h-10 !w-full py-2 sm:!w-40`} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="">All statuses</option>{statusOptions.map((status) => <option key={status}>{status}</option>)}</select>
-            <select className={`${inputClass} h-10 !w-full py-2 sm:!w-40`} value={urgencyFilter} onChange={(event) => setUrgencyFilter(event.target.value)}><option value="">All urgency</option><option>Routine</option><option>Urgent</option></select>
+            <div className="relative w-full sm:w-64"><Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-500" /><input className={`${inputClass} h-10 !w-full py-2 pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search order, patient, test..." aria-label="Search order, patient, test" /></div>
+            <select className={`${inputClass} h-10 !w-full py-2 sm:!w-40`} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} aria-label="Filter by status"><option value="">All statuses</option>{statusOptions.map((status) => <option key={status}>{status}</option>)}</select>
+            <select className={`${inputClass} h-10 !w-full py-2 sm:!w-40`} value={urgencyFilter} onChange={(event) => setUrgencyFilter(event.target.value)} aria-label="Filter by urgency"><option value="">All urgency</option><option>Routine</option><option>Urgent</option></select>
           </div>
         )}
       >

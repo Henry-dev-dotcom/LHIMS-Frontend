@@ -310,6 +310,7 @@ export function ReceptionWalkInsPage() {
                     onFocus={() => setCatalogSearchActive(true)}
                     onBlur={() => window.setTimeout(() => setCatalogSearchActive(false), 120)}
                     placeholder="Search FBC, glucose, ultrasound, X-ray..."
+                    aria-label="Search test and scan catalog"
                   />
 
                   {catalogSearchActive && catalogQuery.trim() && (
@@ -346,7 +347,7 @@ export function ReceptionWalkInsPage() {
                     </div>
                   )}
                 </div>
-                <select className={inputClass} value={department} onChange={(event) => setDepartment(event.target.value)}>
+                <select className={inputClass} value={department} onChange={(event) => setDepartment(event.target.value)} aria-label="Filter catalog by department">
                   <option value="">Lab and Scan</option>
                   <option value="Laboratory">Laboratory only</option>
                   <option value="Imaging">Scan / Imaging only</option>
@@ -423,7 +424,7 @@ export function ReceptionWalkInsPage() {
       </form>}
 
       {section === 'walkins' && <div className="space-y-5">
-        <Card title="Registered walk-ins" subtitle="Walk-ins are separated from normal check-in so reception can continue directly to test requests." compact actions={<input className={inputClass} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search walk-in patient or visit ID" />}>
+        <Card title="Registered walk-ins" subtitle="Walk-ins are separated from normal check-in so reception can continue directly to test requests." compact actions={<input className={inputClass} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search walk-in patient or visit ID" aria-label="Search registered walk-ins" />}>
           <DataTable
             columns={[
               { key: 'id', label: 'Visit ID', render: (row) => <span className="font-bold text-slate-900">{row.id}</span> },

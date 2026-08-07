@@ -82,8 +82,8 @@ export function IncomingOrdersPage() {
   const ordersTable = (
     <Card title={section === 'all' ? 'All reception-visible orders' : `${activeStatus || 'All'} orders`} subtitle="Click any order ID to open it in the confirmation panel.">
       <div className="mb-4 grid gap-3 md:grid-cols-[minmax(220px,1fr)_180px]">
-        <input className={inputClass} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search order, patient, phone, doctor, test" />
-        <select className={inputClass} value={activeStatus} onChange={(event) => { setStatus(event.target.value); setSection('custom'); }}>
+        <input className={inputClass} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search order, patient, phone, doctor, test" aria-label="Search incoming orders" />
+        <select className={inputClass} value={activeStatus} onChange={(event) => { setStatus(event.target.value); setSection('custom'); }} aria-label="Filter by order status">
           <option value="">All statuses</option><option>Submitted</option><option>Confirmed</option><option>Cancelled</option><option>In Progress</option><option>Pending Review</option><option>Final / Released</option>
         </select>
       </div>

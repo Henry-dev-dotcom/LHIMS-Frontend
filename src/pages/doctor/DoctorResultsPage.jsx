@@ -84,7 +84,7 @@ export function DoctorResultsPage() {
       <Card
         title="Completed / Result-Available Orders"
         subtitle="Finalized orders appear here automatically when lab or imaging results are released."
-        actions={<div className="relative w-full min-w-0 sm:w-80"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" /><input className={`${inputClass} pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search result, patient, order..." /></div>}
+        actions={<div className="relative w-full min-w-0 sm:w-80"><Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" /><input className={`${inputClass} pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search result, patient, order..." aria-label="Search result, patient, order" /></div>}
       >
         <DataTable
           columns={[

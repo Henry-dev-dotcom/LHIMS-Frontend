@@ -52,7 +52,7 @@ export function Sidebar() {
       </div>
 
       <div className="border-b border-slate-100 px-5 py-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Active workspace</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Active workspace</p>
         <p className="mt-0.5 truncate text-sm font-bold text-clinical-700">{roleInfo?.label}</p>
       </div>
 
@@ -60,7 +60,7 @@ export function Sidebar() {
         {Object.entries(groups).length === 0 && <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-500">No matching menu items.</div>}
         {Object.entries(groups).map(([section, items]) => (
           <div key={section} className="mb-5">
-            <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">{section}</p>
+            <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">{section}</p>
             <div className="space-y-0.5">
               {items.map((item) => {
                 const Icon = item.icon;

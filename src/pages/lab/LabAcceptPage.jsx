@@ -25,15 +25,26 @@ export function LabAcceptPage() {
         <Card title="Find lab request" subtitle="Search a patient or order if you came directly to this page.">
           <div className="relative mb-4">
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
-            <input className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient name or order ID..." />
+            <input aria-label="Search patient name or order ID" className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient name or order ID..." />
           </div>
           <div className="space-y-2">
-            {labOrders.filter((order) => !query || [order.id, order.patient?.fullName, describeOrderItems(order.items)].join(' ').toLowerCase().includes(query.toLowerCase())).slice(0, 8).map((order) => (
-              <button key={order.id} onClick={() => dispatch({ type: 'OPEN_LAB_ACCEPT', orderId: order.id })} className={`w-full rounded-2xl border p-3 text-left ${activeOrder?.id === order.id ? 'border-clinical-300 bg-clinical-50' : 'border-slate-200 bg-white hover:bg-slate-50'}`}>
-                <p className="font-bold text-slate-900">{order.patient?.fullName}</p>
-                <p className="text-xs text-slate-500">{order.id} · {describeOrderItems(order.items)}</p>
-              </button>
-            ))}
+            {(() => {
+              const matches = labOrders.filter((order) => !query || [order.id, order.patient?.fullName, describeOrderItems(order.items)].join(' ').toLowerCase().includes(query.toLowerCase())).slice(0, 8);
+              if (!matches.length) {
+                return (
+                  <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center">
+                    <p className="font-bold text-slate-900">No matching lab requests.</p>
+                    <p className="mt-1 text-sm text-slate-500">Adjust the search term and try again.</p>
+                  </div>
+                );
+              }
+              return matches.map((order) => (
+                <button key={order.id} onClick={() => dispatch({ type: 'OPEN_LAB_ACCEPT', orderId: order.id })} className={`w-full rounded-2xl border p-3 text-left ${activeOrder?.id === order.id ? 'border-clinical-300 bg-clinical-50' : 'border-slate-200 bg-white hover:bg-slate-50'}`}>
+                  <p className="font-bold text-slate-900">{order.patient?.fullName}</p>
+                  <p className="text-xs text-slate-500">{order.id} · {describeOrderItems(order.items)}</p>
+                </button>
+              ));
+            })()}
           </div>
         </Card>
         <Card title="Diagnostic routing panel" subtitle="Accept the received specimen and send it straight to diagnostics, or reject it with a reason for recollection.">
@@ -46,7 +57,7 @@ export function LabAcceptPage() {
               <div className="rounded-2xl border border-slate-200 p-4"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Clinical notes</p><p className="mt-2 text-sm leading-6 text-slate-700">{activeOrder.clinicalNotes || 'No clinical notes provided.'}</p></div>
               <div className="space-y-2">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Requested lab tests</p>
-                {activeOrder.items.map((item) => <div key={item.id} className="flex items-center justify-between rounded-2xl bg-slate-50 p-3"><span className="font-bold text-slate-900"><FlaskConical className="mr-2 inline h-4 w-4 text-clinical-600" />{item.name}</span><StatusBadge status={item.id} /></div>)}
+                {activeOrder.items.map((item) => <div key={item.id} className="flex items-center justify-between rounded-2xl bg-slate-50 p-3"><span className="font-bold text-slate-900"><FlaskConical className="mr-2 inline h-4 w-4 text-clinical-600" />{item.name}</span><StatusBadge status={item.type} /></div>)}
               </div>
               <div className="rounded-2xl bg-slate-50 p-3"><p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Requested</p><p className="font-bold text-slate-900">{formatDateTime(activeOrder.createdAt)}</p></div>
               {acceptedSample ? <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4"><p className="font-bold text-emerald-800">Sample accepted: {acceptedSample.id}</p><p className="text-sm text-emerald-700">Accepted by {acceptedSample.acceptedBy || acceptedSample.collectedBy} at {formatDateTime(acceptedSample.acceptedAt || acceptedSample.collectedAt)}</p></div> : <Button onClick={() => dispatch({ type: 'ACCEPT_LAB_SAMPLE', orderId: activeOrder.id, payload: {} })}><CheckCircle2 className="h-4 w-4" /> Send to Diagnostics</Button>}
