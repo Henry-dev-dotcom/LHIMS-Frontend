@@ -148,6 +148,8 @@ export function OpdQueuePage({ mode = 'OPD', clinic }) {
 function defaultFee(services, clinic) {
   const code = CLINICS[clinic]?.feeCode;
   const own = code && services.find((s) => (s.catalogCode || '').toUpperCase() === code);
+  // Clinics whose care is free unless they have their own fee item (antenatal, postnatal).
+  if (!own && CLINICS[clinic]?.feeRequired) return '';
   return (own || services.find((s) => (s.catalogCode || '').toUpperCase() === 'CONSULT-OPD') || services.find((s) => /consult/i.test(s.catalogCode || s.name)))?.id || '';
 }
 

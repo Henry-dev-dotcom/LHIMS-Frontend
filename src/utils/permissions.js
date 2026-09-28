@@ -11,6 +11,7 @@ const SECTION_MODULES = {
   Emergency: 'emergency',
   Wards: 'inpatient',
   Theatre: 'theatre',
+  Maternity: 'maternity',
   Pharmacy: 'pharmacy',
   Clinician: 'clinician_portal',
   Reception: 'reception',

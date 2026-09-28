@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ClipboardPlus, History } from 'lucide-react';
+import { AlertTriangle, ClipboardPlus, History } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { FormField, inputClass } from '../../components/ui/FormField';
@@ -57,7 +57,7 @@ export function ClinicalFormsCard({ encounter, auth, open, busy, act }) {
         busy={busy}
         onClose={() => setEditing(null)}
         onSave={async (data) => {
-          const ok = await act(() => encounterService.addForm(apiClient, encounter.id, { type: editing.type, data, amendsId: editing.amends?.id }), `${FORMS[editing.type].label} recorded.`);
+          const ok = await act(() => encounterService.addForm(apiClient, encounter.id, { type: editing.type, data, amendsId: editing.amends?.id, pregnancyId: editing.amends?.pregnancyId || undefined }), `${FORMS[editing.type].label} recorded.`);
           if (ok) setEditing(null);
         }}
       />
@@ -96,8 +96,41 @@ function Line({ label, value }) {
   return <p className="text-sm text-slate-800"><span className="font-semibold">{label}:</span> {value}</p>;
 }
 
-function FormSummary({ type, data }) {
+export function FormSummary({ type, data }) {
   if (!data) return null;
+  const alerts = data.derived?.alerts;
+  const alertList = alerts?.length ? (
+    <ul className="mt-2 space-y-1">{alerts.map((a) => <li key={a} className="flex items-start gap-1.5 rounded-xl bg-red-50 px-2.5 py-1 text-xs font-bold text-red-800"><AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />{a}</li>)}</ul>
+  ) : null;
+  if (type === 'ANC_VISIT') {
+    const g = data.derived?.gestation;
+    return (
+      <div className="mt-2 space-y-1">
+        <Line label="Gestation" value={g ? `${g.weeks} weeks ${g.days} days (by ${g.basis === 'SCAN' ? 'scan' : 'LMP'})` : null} />
+        <Line label="Measurements" value={[data.weightKg && `${data.weightKg} kg`, data.bpSystolic && `BP ${data.bpSystolic}/${data.bpDiastolic}`, data.fundalHeightCm && `SFH ${data.fundalHeightCm} cm`, data.fetalHeartRate && `FHR ${data.fetalHeartRate}`, data.presentation && data.presentation.toLowerCase().replace(/_/g, ' '), data.haemoglobin && `Hb ${data.haemoglobin}`].filter(Boolean).join(' · ')} />
+        <Line label="Urine" value={[data.urineProtein && `protein ${data.urineProtein.toLowerCase()}`, data.urineGlucose && `glucose ${data.urineGlucose.toLowerCase()}`].filter(Boolean).join(', ')} />
+        <Line label="Given" value={[data.iptpSpDose && `IPTp-SP ${data.iptpSpDose}`, data.tdDose && `Td ${data.tdDose}`, data.llinGiven && 'bed net', data.ironFolateGiven && 'iron/folate'].filter(Boolean).join(', ')} />
+        <Line label="Complaints" value={data.complaints} />
+        <Line label="Plan" value={[data.plan, data.nextVisit && `next visit ${data.nextVisit}`].filter(Boolean).join(' · ')} />
+        {alertList}
+      </div>
+    );
+  }
+  if (type === 'POSTNATAL_CHECK') {
+    const m = data.mother || {};
+    const b = data.baby;
+    const day = data.derived?.dayPostpartum;
+    return (
+      <div className="mt-2 space-y-1">
+        <Line label="Day after birth" value={day ?? null} />
+        <Line label="Mother" value={[m.bpSystolic && `BP ${m.bpSystolic}/${m.bpDiastolic}`, m.temperatureC && `${m.temperatureC} °C`, m.pulseBpm && `P ${m.pulseBpm}`, m.uterus && `uterus ${m.uterus.toLowerCase().replace(/_/g, ' ')}`, m.lochia && `lochia ${m.lochia.toLowerCase()}`, m.breastfeeding && m.breastfeeding.toLowerCase().replace(/_/g, ' ')].filter(Boolean).join(' · ')} />
+        <Line label="Baby" value={b ? [b.weightG && `${b.weightG} g`, b.temperatureC && `${b.temperatureC} °C`, b.feeding && `feeding ${b.feeding.toLowerCase()}`, b.cord && `cord ${b.cord.toLowerCase()}`, b.jaundice && `jaundice ${b.jaundice.toLowerCase()}`].filter(Boolean).join(' · ') : null} />
+        <Line label="Family planning" value={data.familyPlanningCounselled ? `counselled${data.familyPlanningMethod ? `: ${data.familyPlanningMethod}` : ''}` : null} />
+        <Line label="Plan" value={data.plan} />
+        {alertList}
+      </div>
+    );
+  }
   if (type === 'DENTAL_CHART') {
     return (
       <div className="mt-2 space-y-1">
@@ -185,7 +218,9 @@ const blankFor = (type) => ({
   EYE_EXAM: { right: {}, left: {}, iopMethod: '', glassesPrescribed: false, impression: '', plan: '' },
   PHYSIO_ASSESSMENT: { presentingComplaint: '', affectedArea: '', painScore: '', rangeOfMotion: '', muscleStrength: '', functionalLimitations: '', specialTests: '', goals: '', plannedSessions: '', plan: '' },
   PHYSIO_SESSION: { sessionNumber: '', treatments: '', painBefore: '', painAfter: '', response: '', homeExercises: '', nextSession: '' },
-  NUTRITION_ASSESSMENT: { weightKg: '', heightCm: '', muacCm: '', oedema: 'NONE', dietHistory: '', nutritionDiagnosis: '', plan: '', followUpWeeks: '' }
+  NUTRITION_ASSESSMENT: { weightKg: '', heightCm: '', muacCm: '', oedema: 'NONE', dietHistory: '', nutritionDiagnosis: '', plan: '', followUpWeeks: '' },
+  ANC_VISIT: { weightKg: '', bpSystolic: '', bpDiastolic: '', fundalHeightCm: '', presentation: '', fetalHeartRate: '', fetalMovements: '', oedema: '', urineProtein: '', urineGlucose: '', haemoglobin: '', iptpSpDose: '', tdDose: '', llinGiven: false, ironFolateGiven: false, dangerSigns: [], complaints: '', plan: '', nextVisit: '' },
+  POSTNATAL_CHECK: { mother: {}, baby: {}, hasBaby: true, familyPlanningCounselled: false, familyPlanningMethod: '', plan: '' }
 }[type]);
 
 /** Loads an earlier form back into editor state, for corrections. */
@@ -202,6 +237,8 @@ function fromData(type, data) {
     };
   }
   if (type === 'PHYSIO_SESSION') return { ...blank, ...stringify(data), treatments: (data.treatments || []).join('\n') };
+  if (type === 'POSTNATAL_CHECK') return { ...blank, ...data, mother: stringify(data.mother || {}), baby: stringify(data.baby || {}), hasBaby: Boolean(data.baby) };
+  if (type === 'ANC_VISIT') { const { derived: _d, ...rest } = data; void _d; return { ...blank, ...stringify(rest), dangerSigns: rest.dangerSigns || [] }; }
   if (type === 'EYE_EXAM') return { ...blank, ...data, right: stringify(data.right || {}), left: stringify(data.left || {}) };
   const { derived, ...rest } = data;
   void derived;
@@ -235,6 +272,22 @@ function toPayload(type, f) {
     const side = (s) => clean({ unaided: str(s.unaided), pinhole: str(s.pinhole), corrected: str(s.corrected), iopMmHg: num(s.iopMmHg), sphere: num(s.sphere), cylinder: num(s.cylinder), axis: num(s.axis), add: num(s.add), anteriorSegment: str(s.anteriorSegment), fundus: str(s.fundus) });
     return clean({ right: side(f.right), left: side(f.left), iopMethod: f.iopMethod || undefined, glassesPrescribed: f.glassesPrescribed, impression: str(f.impression), plan: str(f.plan) });
   }
+  if (type === 'ANC_VISIT') {
+    const n = ['weightKg', 'bpSystolic', 'bpDiastolic', 'fundalHeightCm', 'fetalHeartRate', 'haemoglobin', 'iptpSpDose', 'tdDose'];
+    const e = ['presentation', 'fetalMovements', 'oedema', 'urineProtein', 'urineGlucose'];
+    return clean({ ...Object.fromEntries(n.map((k) => [k, num(f[k])])), ...Object.fromEntries(e.map((k) => [k, f[k] || undefined])), llinGiven: f.llinGiven, ironFolateGiven: f.ironFolateGiven, dangerSigns: f.dangerSigns, complaints: str(f.complaints), plan: str(f.plan), nextVisit: f.nextVisit || undefined });
+  }
+  if (type === 'POSTNATAL_CHECK') {
+    const m = f.mother;
+    const b = f.baby;
+    return clean({
+      mother: clean({ bpSystolic: num(m.bpSystolic), bpDiastolic: num(m.bpDiastolic), temperatureC: num(m.temperatureC), pulseBpm: num(m.pulseBpm), uterus: m.uterus || undefined, lochia: m.lochia || undefined, perineum: m.perineum || undefined, breastfeeding: m.breastfeeding || undefined, mood: m.mood || undefined }),
+      baby: f.hasBaby ? clean({ weightG: num(b.weightG), temperatureC: num(b.temperatureC), feeding: b.feeding || undefined, cord: b.cord || undefined, jaundice: b.jaundice || undefined }) : undefined,
+      familyPlanningCounselled: f.familyPlanningCounselled,
+      familyPlanningMethod: str(f.familyPlanningMethod),
+      plan: str(f.plan)
+    });
+  }
   if (type === 'PHYSIO_SESSION') {
     return clean({ sessionNumber: num(f.sessionNumber), treatments: f.treatments.split('\n').map((l) => l.trim()).filter(Boolean), painBefore: num(f.painBefore), painAfter: num(f.painAfter), response: str(f.response), homeExercises: str(f.homeExercises), nextSession: str(f.nextSession) });
   }
@@ -242,7 +295,7 @@ function toPayload(type, f) {
   return clean(Object.fromEntries(Object.entries(f).map(([k, v]) => [k, numeric.includes(k) ? num(v) : typeof v === 'string' ? (k === 'oedema' ? v : str(v)) : v])));
 }
 
-function FormModal({ editing, ...props }) {
+export function FormModal({ editing, ...props }) {
   if (!editing) return null;
   // Keyed so each form (and each correction) starts from its own state, never the previous editor's.
   return <FormEditorModal key={`${editing.type}:${editing.amends?.id || 'new'}`} editing={editing} {...props} />;
@@ -250,9 +303,9 @@ function FormModal({ editing, ...props }) {
 
 function FormEditorModal({ editing, busy, onClose, onSave }) {
   const [form, setForm] = useState(() => fromData(editing.type, editing.amends?.data));
-  const Editor = { DENTAL_CHART: DentalChartEditor, EYE_EXAM: EyeExamEditor, PHYSIO_ASSESSMENT: PhysioAssessmentEditor, PHYSIO_SESSION: PhysioSessionEditor, NUTRITION_ASSESSMENT: NutritionEditor }[editing.type];
+  const Editor = { DENTAL_CHART: DentalChartEditor, EYE_EXAM: EyeExamEditor, PHYSIO_ASSESSMENT: PhysioAssessmentEditor, PHYSIO_SESSION: PhysioSessionEditor, NUTRITION_ASSESSMENT: NutritionEditor, ANC_VISIT: AncVisitEditor, POSTNATAL_CHECK: PostnatalEditor }[editing.type];
   return (
-    <Modal open title={`${editing.amends ? 'Correct' : 'Record'} ${FORMS[editing.type].label.toLowerCase()}`} description={editing.amends ? 'The original stays on the record; this correction is added after it.' : undefined} onClose={onClose}
+    <Modal open title={`${editing.amends ? 'Correct' : 'Record'} ${FORMS[editing.type].label.toLowerCase()}`} description={editing.amends ? 'The original stays on the record; this correction is added after it.' : editing.description} onClose={onClose}
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button disabled={busy} onClick={() => onSave(toPayload(editing.type, form))}>{busy ? 'Saving…' : 'Save'}</Button></>}>
       <Editor form={form} setForm={setForm} />
     </Modal>
@@ -421,6 +474,91 @@ function NutritionEditor({ form, setForm }) {
       <FormField label="Diet plan" required className="sm:col-span-2"><textarea rows={3} className={inputClass} {...field('plan')} maxLength={2000} /></FormField>
       <FormField label="Review in (weeks)"><input type="number" min="1" max="52" className={inputClass} {...field('followUpWeeks')} /></FormField>
       <p className="self-end pb-3 text-xs text-slate-500">BMI and the MUAC category are worked out when you save.</p>
+    </div>
+  );
+}
+
+const opts = (pairs) => pairs.map(([v, label]) => <option key={v} value={v}>{label}</option>);
+const DANGER_SIGNS = [
+  ['VAGINAL_BLEEDING', 'Vaginal bleeding'], ['SEVERE_HEADACHE', 'Severe headache'], ['BLURRED_VISION', 'Blurred vision'], ['CONVULSIONS', 'Convulsions'],
+  ['SEVERE_ABDOMINAL_PAIN', 'Severe abdominal pain'], ['FEVER', 'Fever'], ['REDUCED_FETAL_MOVEMENT', 'Reduced fetal movement'], ['LEAKING_LIQUOR', 'Leaking liquor'],
+  ['SWELLING_FACE_HANDS', 'Swelling of face or hands'], ['DIFFICULTY_BREATHING', 'Difficulty breathing']
+];
+
+function AncVisitEditor({ form, setForm }) {
+  const field = useField(form, setForm);
+  const toggleSign = (sign) => setForm((c) => ({ ...c, dangerSigns: c.dangerSigns.includes(sign) ? c.dangerSigns.filter((s) => s !== sign) : [...c.dangerSigns, sign] }));
+  const urine = [['', '—'], ['NEGATIVE', 'Negative'], ['TRACE', 'Trace'], ['1+', '+'], ['2+', '++'], ['3+', '+++'], ['4+', '++++']];
+  return (
+    <div className="space-y-4">
+      <fieldset>
+        <legend className="mb-2 text-sm font-bold text-slate-900">Danger signs</legend>
+        <div className="grid gap-1.5 sm:grid-cols-2">
+          {DANGER_SIGNS.map(([sign, label]) => (
+            <label key={sign} className="flex items-center gap-2 text-sm text-slate-800"><input type="checkbox" className="h-4 w-4" checked={form.dangerSigns.includes(sign)} onChange={() => toggleSign(sign)} /> {label}</label>
+          ))}
+        </div>
+      </fieldset>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <FormField label="Weight (kg)"><input type="number" step="0.1" className={inputClass} {...field('weightKg')} /></FormField>
+        <FormField label="BP systolic"><input type="number" className={inputClass} {...field('bpSystolic')} /></FormField>
+        <FormField label="BP diastolic"><input type="number" className={inputClass} {...field('bpDiastolic')} /></FormField>
+        <FormField label="Fundal height (cm)"><input type="number" step="0.5" className={inputClass} {...field('fundalHeightCm')} /></FormField>
+        <FormField label="Fetal heart rate (/min)"><input type="number" className={inputClass} {...field('fetalHeartRate')} /></FormField>
+        <FormField label="Fetal movements"><select className={inputClass} {...field('fetalMovements')}>{opts([['', '—'], ['PRESENT', 'Present'], ['REDUCED', 'Reduced'], ['ABSENT', 'Absent']])}</select></FormField>
+        <FormField label="Presentation"><select className={inputClass} {...field('presentation')}>{opts([['', '—'], ['CEPHALIC', 'Cephalic'], ['BREECH', 'Breech'], ['TRANSVERSE', 'Transverse'], ['OBLIQUE', 'Oblique'], ['NOT_DETERMINED', 'Not determined']])}</select></FormField>
+        <FormField label="Oedema"><select className={inputClass} {...field('oedema')}>{opts([['', '—'], ['NONE', 'None'], ['FEET', 'Feet'], ['LEGS', 'Legs'], ['GENERALISED', 'Generalised']])}</select></FormField>
+        <FormField label="Haemoglobin (g/dL)"><input type="number" step="0.1" className={inputClass} {...field('haemoglobin')} /></FormField>
+        <FormField label="Urine protein"><select className={inputClass} {...field('urineProtein')}>{opts(urine)}</select></FormField>
+        <FormField label="Urine glucose"><select className={inputClass} {...field('urineGlucose')}>{opts(urine)}</select></FormField>
+        <FormField label="Next visit"><input type="date" className={inputClass} {...field('nextVisit')} /></FormField>
+        <FormField label="IPTp-SP dose given"><select className={inputClass} {...field('iptpSpDose')}>{opts([['', 'None today'], ...[1, 2, 3, 4, 5].map((n) => [String(n), `Dose ${n}`])])}</select></FormField>
+        <FormField label="Td dose given"><select className={inputClass} {...field('tdDose')}>{opts([['', 'None today'], ...[1, 2, 3, 4, 5].map((n) => [String(n), `Td${n}`])])}</select></FormField>
+        <div className="flex flex-col justify-end gap-1.5 pb-2 text-sm">
+          <label className="flex items-center gap-2"><input type="checkbox" className="h-4 w-4" checked={form.llinGiven} onChange={(e) => setForm((c) => ({ ...c, llinGiven: e.target.checked }))} /> Bed net (LLIN) given</label>
+          <label className="flex items-center gap-2"><input type="checkbox" className="h-4 w-4" checked={form.ironFolateGiven} onChange={(e) => setForm((c) => ({ ...c, ironFolateGiven: e.target.checked }))} /> Iron / folate given</label>
+        </div>
+      </div>
+      <FormField label="Complaints"><input className={inputClass} {...field('complaints')} maxLength={1000} /></FormField>
+      <FormField label="Plan"><textarea rows={2} className={inputClass} {...field('plan')} maxLength={2000} /></FormField>
+      <p className="text-xs text-slate-500">Gestational age and warnings are worked out when you save.</p>
+    </div>
+  );
+}
+
+function PostnatalEditor({ form, setForm }) {
+  const part = (who, key) => ({ value: form[who][key] ?? '', onChange: (e) => setForm((c) => ({ ...c, [who]: { ...c[who], [key]: e.target.value } })) });
+  const field = useField(form, setForm);
+  return (
+    <div className="space-y-4">
+      <fieldset className="grid gap-3 sm:grid-cols-3">
+        <legend className="mb-2 text-sm font-bold text-slate-900">Mother</legend>
+        <FormField label="BP systolic"><input type="number" className={inputClass} {...part('mother', 'bpSystolic')} /></FormField>
+        <FormField label="BP diastolic"><input type="number" className={inputClass} {...part('mother', 'bpDiastolic')} /></FormField>
+        <FormField label="Temperature (°C)"><input type="number" step="0.1" className={inputClass} {...part('mother', 'temperatureC')} /></FormField>
+        <FormField label="Pulse (/min)"><input type="number" className={inputClass} {...part('mother', 'pulseBpm')} /></FormField>
+        <FormField label="Uterus"><select className={inputClass} {...part('mother', 'uterus')}>{opts([['', '—'], ['WELL_CONTRACTED', 'Well contracted'], ['INVOLUTED', 'Involuted'], ['BOGGY', 'Boggy'], ['TENDER', 'Tender']])}</select></FormField>
+        <FormField label="Lochia"><select className={inputClass} {...part('mother', 'lochia')}>{opts([['', '—'], ['NORMAL', 'Normal'], ['HEAVY', 'Heavy'], ['OFFENSIVE', 'Offensive'], ['NONE', 'None']])}</select></FormField>
+        <FormField label="Perineum / wound"><select className={inputClass} {...part('mother', 'perineum')}>{opts([['', '—'], ['HEALING', 'Healing'], ['INFECTED', 'Infected'], ['BREAKDOWN', 'Breakdown'], ['NOT_APPLICABLE', 'Not applicable']])}</select></FormField>
+        <FormField label="Breastfeeding"><select className={inputClass} {...part('mother', 'breastfeeding')}>{opts([['', '—'], ['EXCLUSIVE', 'Exclusive'], ['MIXED', 'Mixed'], ['NOT_BREASTFEEDING', 'Not breastfeeding']])}</select></FormField>
+        <FormField label="Mood"><select className={inputClass} {...part('mother', 'mood')}>{opts([['', '—'], ['WELL', 'Well'], ['LOW', 'Low'], ['CONCERN', 'Concern']])}</select></FormField>
+      </fieldset>
+      <label className="flex items-center gap-2 text-sm font-semibold text-slate-800"><input type="checkbox" className="h-4 w-4" checked={form.hasBaby} onChange={(e) => setForm((c) => ({ ...c, hasBaby: e.target.checked }))} /> Baby seen at this check</label>
+      {form.hasBaby && (
+        <fieldset className="grid gap-3 sm:grid-cols-3">
+          <legend className="mb-2 text-sm font-bold text-slate-900">Baby</legend>
+          <FormField label="Weight (g)"><input type="number" className={inputClass} {...part('baby', 'weightG')} /></FormField>
+          <FormField label="Temperature (°C)"><input type="number" step="0.1" className={inputClass} {...part('baby', 'temperatureC')} /></FormField>
+          <FormField label="Feeding"><select className={inputClass} {...part('baby', 'feeding')}>{opts([['', '—'], ['GOOD', 'Good'], ['POOR', 'Poor']])}</select></FormField>
+          <FormField label="Cord"><select className={inputClass} {...part('baby', 'cord')}>{opts([['', '—'], ['CLEAN', 'Clean'], ['SEPARATED', 'Separated'], ['INFECTED', 'Infected']])}</select></FormField>
+          <FormField label="Jaundice"><select className={inputClass} {...part('baby', 'jaundice')}>{opts([['', '—'], ['NONE', 'None'], ['MILD', 'Mild'], ['SEVERE', 'Severe']])}</select></FormField>
+        </fieldset>
+      )}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="flex items-center gap-2 self-end pb-3 text-sm font-semibold text-slate-800"><input type="checkbox" className="h-4 w-4" checked={form.familyPlanningCounselled} onChange={(e) => setForm((c) => ({ ...c, familyPlanningCounselled: e.target.checked }))} /> Family planning counselled</label>
+        <FormField label="Method chosen"><input className={inputClass} {...field('familyPlanningMethod')} maxLength={120} /></FormField>
+      </div>
+      <FormField label="Plan"><textarea rows={2} className={inputClass} {...field('plan')} maxLength={2000} /></FormField>
     </div>
   );
 }

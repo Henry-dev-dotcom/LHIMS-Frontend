@@ -1,4 +1,19 @@
 export const PAGE_META = {
+  'clinic-antenatal': {
+    title: 'Antenatal Clinic', section: 'Maternity',
+    description: 'Antenatal visits: book the pregnancy, record each visit with gestation and warning signs, and record the delivery.',
+    requirements: ['Clinic queue', 'Pregnancy booking', 'Antenatal visit', 'Delivery']
+  },
+  'clinic-postnatal': {
+    title: 'Postnatal Clinic', section: 'Maternity',
+    description: 'Postnatal checks for mother and baby, with warning signs and family planning.',
+    requirements: ['Clinic queue', 'Postnatal check']
+  },
+  'maternity-register': {
+    title: 'Maternity Register', section: 'Maternity',
+    description: 'Every booked pregnancy with gestation today, due date, risks, antenatal record, delivery and babies.',
+    requirements: ['Pregnancy register', 'Antenatal record', 'Delivery record', 'Postnatal care']
+  },
   'clinic-dental': {
     title: 'Dental Clinic', section: 'Clinics',
     description: 'Dental visits with a tooth-by-tooth chart (FDI numbering) and treatment record.',

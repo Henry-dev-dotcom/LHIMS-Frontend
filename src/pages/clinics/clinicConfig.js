@@ -5,7 +5,10 @@ export const CLINICS = {
   DENTAL: { label: 'Dental clinic', module: 'dental', page: 'clinic-dental', feeCode: 'CONSULT-DENTAL', forms: ['DENTAL_CHART'] },
   EYE: { label: 'Eye clinic', module: 'eye', page: 'clinic-eye', feeCode: 'CONSULT-EYE', forms: ['EYE_EXAM'] },
   PHYSIOTHERAPY: { label: 'Physiotherapy', module: 'physiotherapy', page: 'clinic-physiotherapy', feeCode: 'CONSULT-PHYSIOTHERAPY', forms: ['PHYSIO_ASSESSMENT', 'PHYSIO_SESSION'] },
-  DIETETICS: { label: 'Dietetics', module: 'dietetics', page: 'clinic-dietetics', feeCode: 'CONSULT-DIETETICS', forms: ['NUTRITION_ASSESSMENT'] }
+  DIETETICS: { label: 'Dietetics', module: 'dietetics', page: 'clinic-dietetics', feeCode: 'CONSULT-DIETETICS', forms: ['NUTRITION_ASSESSMENT'] },
+  // Antenatal and postnatal care is usually free (NHIS); no fee unless the catalog has CONSULT-ANTENATAL / CONSULT-POSTNATAL.
+  ANTENATAL: { label: 'Antenatal clinic', module: 'maternity', page: 'clinic-antenatal', feeCode: 'CONSULT-ANTENATAL', feeRequired: true, forms: [] },
+  POSTNATAL: { label: 'Postnatal clinic', module: 'maternity', page: 'clinic-postnatal', feeCode: 'CONSULT-POSTNATAL', feeRequired: true, forms: [] }
 };
 
 /** `clinicianOnly` forms need the consult permission; the others nurses may record too. */
@@ -14,14 +17,17 @@ export const FORMS = {
   EYE_EXAM: { label: 'Eye examination', module: 'eye', clinicianOnly: true },
   PHYSIO_ASSESSMENT: { label: 'Physiotherapy assessment', module: 'physiotherapy', clinicianOnly: true },
   PHYSIO_SESSION: { label: 'Physiotherapy session', module: 'physiotherapy', clinicianOnly: true },
-  NUTRITION_ASSESSMENT: { label: 'Nutrition assessment', module: 'dietetics', clinicianOnly: false }
+  NUTRITION_ASSESSMENT: { label: 'Nutrition assessment', module: 'dietetics', clinicianOnly: false },
+  // Recorded from the pregnancy card, never offered as a free-standing form.
+  ANC_VISIT: { label: 'Antenatal visit', module: 'maternity', clinicianOnly: false, pregnancy: true },
+  POSTNATAL_CHECK: { label: 'Postnatal check', module: 'maternity', clinicianOnly: false, pregnancy: true }
 };
 
 export const clinicsFor = (modules) => Object.entries(CLINICS).filter(([, c]) => !Array.isArray(modules) || modules.includes(c.module));
 
 /** The forms offered on a visit: its clinic's forms first, then any other enabled form. */
 export function formsFor(clinic, modules) {
-  const enabled = Object.keys(FORMS).filter((type) => !Array.isArray(modules) || modules.includes(FORMS[type].module));
+  const enabled = Object.keys(FORMS).filter((type) => !FORMS[type].pregnancy && (!Array.isArray(modules) || modules.includes(FORMS[type].module)));
   const own = CLINICS[clinic]?.forms || [];
   return [...own.filter((t) => enabled.includes(t)), ...enabled.filter((t) => !own.includes(t))];
 }
