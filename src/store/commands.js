@@ -126,7 +126,10 @@ function toApiPaymentMethod(method) {
 
 const commands = {
   LOGIN_WITH_CREDENTIALS: async (action, dispatch) => {
+    const facilityCode = String(action.facilityCode || '').trim().toUpperCase();
     const data = await authService.login(apiClient, {
+      // Omitted for the platform operator, who belongs to no facility.
+      ...(facilityCode ? { facilityCode } : {}),
       username: String(action.username || '').trim(),
       password: String(action.password || '')
     });

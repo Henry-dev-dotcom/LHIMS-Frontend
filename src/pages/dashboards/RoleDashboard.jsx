@@ -19,7 +19,7 @@ import { DataTable } from '../../components/ui/DataTable';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { Button } from '../../components/ui/Button';
 import { WorkflowTimeline } from '../../components/ui/WorkflowTimeline';
-import { ROLES } from '../../data/roles';
+import { ALL_ROLES } from '../../data/roles';
 import { useAppStore } from '../../store/AppStore';
 import { formatDateTime, getById, money } from '../../utils/formatters';
 import { getNavForRole } from '../../utils/permissions';
@@ -211,7 +211,7 @@ function getIdentityCard(role, data, auth) {
       ['Email/SMS', `${doctor?.notificationPreferences?.email ? 'Email on' : 'Email off'} / ${doctor?.notificationPreferences?.sms ? 'SMS on' : 'SMS off'}`]
     ];
   }
-  const roleInfo = ROLES.find((item) => item.id === role);
+  const roleInfo = ALL_ROLES.find((item) => item.id === role);
   return [
     ['Signed in as', auth?.userName || '—'],
     ['Role', roleInfo?.label],

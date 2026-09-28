@@ -1,7 +1,8 @@
-import { NAV_ITEMS, ROLES } from '../data/roles';
+import { ALL_ROLES, NAV_ITEMS, ROLES } from '../data/roles';
 
 export function canAccessPage(role, pageId) {
-  if (pageId === 'overview') return true;
+  // Overview is a facility workspace page; the platform operator has none.
+  if (pageId === 'overview') return role !== 'platform';
   const page = NAV_ITEMS.find((item) => item.id === pageId);
   if (!page) return false;
   return page.roles.includes(role);
@@ -25,7 +26,7 @@ export function groupNavItems(items) {
 }
 
 export function getRole(roleId) {
-  return ROLES.find((role) => role.id === roleId) || ROLES[0];
+  return ALL_ROLES.find((role) => role.id === roleId) || ROLES[0];
 }
 
 export function getRoleLabel(roleId) {

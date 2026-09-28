@@ -1,4 +1,4 @@
-import { ROLES } from '../data/roles';
+import { ALL_ROLES } from '../data/roles';
 
 /*
   Backend <-> frontend translation layer.
@@ -14,6 +14,7 @@ import { ROLES } from '../data/roles';
 /* ---------------------------------------------------------------- roles */
 
 export const ROLE_FROM_API = {
+  PLATFORM_ADMIN: 'platform',
   ADMIN: 'admin',
   DOCTOR: 'doctor',
   RECEPTIONIST: 'receptionist',
@@ -31,13 +32,15 @@ export function normalizeRole(apiRole) {
 export function normalizeAuthUser(apiUser) {
   if (!apiUser) return null;
   const role = normalizeRole(apiUser.role);
-  const roleInfo = ROLES.find((item) => item.id === role);
+  const roleInfo = ALL_ROLES.find((item) => item.id === role);
   return {
     role,
     userName: apiUser.name || apiUser.username || 'User',
     userId: apiUser.id,
     username: apiUser.username || '',
     email: apiUser.email || '',
+    // The facility (tenant) this account belongs to; null for the platform operator.
+    facility: apiUser.facility ? { id: apiUser.facility.id, code: apiUser.facility.code, name: apiUser.facility.name } : null,
     landing: roleInfo?.landing || 'overview',
     linkedDoctorId: apiUser.doctorProfileId || apiUser.doctorProfile?.id || '',
     hospitalId: apiUser.hospitalId || apiUser.doctorProfile?.hospitalId || '',

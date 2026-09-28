@@ -204,6 +204,12 @@ export const PAGE_META = {
     requirements: ['TAT reports', 'Order volume by hospital/doctor/department', 'Revenue and outstanding balances', 'Abnormal result rates', 'Staff productivity', 'CSV/JSON export']
   },
 
+  'platform-facilities': {
+    title: 'Facilities', section: 'Platform',
+    description: 'Platform operator console for creating, suspending and reactivating subscribing facilities.',
+    requirements: ['Facility list', 'Create facility with first administrator', 'Suspend / reactivate']
+  },
+
   'api-readiness': {
     title: 'API Readiness', section: 'System',
     description: 'API integration boundary with service files, endpoint contracts, API mode and model mappers.',

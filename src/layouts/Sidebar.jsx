@@ -3,13 +3,14 @@ import clsx from 'clsx';
 import { Activity, ChevronRight, X } from 'lucide-react';
 import { useAppStore } from '../store/AppStore';
 import { getNavForRole, groupNavItems } from '../utils/permissions';
-import { ROLES } from '../data/roles';
+import { ALL_ROLES } from '../data/roles';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 
 export function Sidebar() {
   const { state, dispatch } = useAppStore();
   const role = state.auth?.role || 'admin';
-  const roleInfo = ROLES.find((item) => item.id === role);
+  const roleInfo = ALL_ROLES.find((item) => item.id === role);
+  const facility = state.auth?.facility;
   const closeButtonRef = useRef(null);
   const drawerRef = useRef(null);
   useFocusTrap(drawerRef, state.ui.sidebarOpen);
@@ -45,8 +46,8 @@ export function Sidebar() {
             <Activity className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <div className="truncate text-base font-bold tracking-tight text-slate-900">Diagnosis Center</div>
-            <div className="truncate text-xs font-medium text-slate-500">Orders · Billing · Results</div>
+            <div className="truncate text-base font-bold tracking-tight text-slate-900">{facility?.name || (role === 'platform' ? 'LHIMS Platform' : 'Diagnosis Center')}</div>
+            <div className="truncate text-xs font-medium text-slate-500">{facility ? `Facility code ${facility.code}` : 'Orders · Billing · Results'}</div>
           </div>
         </div>
       </div>

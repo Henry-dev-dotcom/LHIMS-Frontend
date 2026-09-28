@@ -71,6 +71,18 @@ export const ROLES = [
   }
 ];
 
+// The SaaS operator. Not a facility staff role, so it is kept out of ROLES (which
+// feeds staff role pickers and the access matrix); use ALL_ROLES for lookups.
+export const PLATFORM_ROLE = {
+  id: 'platform',
+  label: 'Platform Operator',
+  subtitle: 'Runs the LHIMS service',
+  landing: 'platform-facilities',
+  accessSummary: 'Creates and manages subscribing facilities. Has no access to any facility\'s patient or business data.'
+};
+
+export const ALL_ROLES = [PLATFORM_ROLE, ...ROLES];
+
 export const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard, roles: ['doctor','receptionist','lab','scan','billing','admin'], section: 'Overview' },
 
@@ -120,7 +132,7 @@ export const NAV_ITEMS = [
 
   { id: 'admin-dashboard', label: 'Admin', icon: ShieldCheck, roles: ['admin'], section: 'Admin' },
   { id: 'users', label: 'User Management', icon: UserCog, roles: ['admin'], section: 'Admin' },
-  { id: 'hospitals', label: 'Facilities / Partners', icon: Building2, roles: ['admin'], section: 'Admin' },
+  { id: 'hospitals', label: 'Partner Hospitals', icon: Building2, roles: ['admin'], section: 'Admin' },
   { id: 'audit-log', label: 'Audit Log', icon: History, roles: ['admin'], section: 'Admin' },
   { id: 'security', label: 'Security & Reliability', icon: ShieldCheck, roles: ['admin'], section: 'Admin' },
   { id: 'notification-settings', label: 'Notification Settings', icon: Bell, roles: ['admin'], section: 'Admin' },
@@ -128,7 +140,9 @@ export const NAV_ITEMS = [
 
   { id: 'reports', label: 'Reports', icon: FileBarChart2, roles: ['billing','admin','scan'], section: 'Reporting' },
   { id: 'settings', label: 'Settings', icon: Settings, roles: ['admin'], section: 'System' },
-  { id: 'api-readiness', label: 'API Readiness', icon: ServerCog, roles: ['admin'], section: 'System' }
+  { id: 'api-readiness', label: 'API Readiness', icon: ServerCog, roles: ['admin'], section: 'System' },
+
+  { id: 'platform-facilities', label: 'Facilities', icon: Building2, roles: ['platform'], section: 'Platform' }
 ];
 
 export const ROLE_DASHBOARD_REQUIREMENTS = {

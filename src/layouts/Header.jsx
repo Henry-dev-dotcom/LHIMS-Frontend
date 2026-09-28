@@ -9,7 +9,7 @@ import { PAGE_HEADER_EVENT } from '../components/ui/PageHeader';
 import { useAppStore } from '../store/AppStore';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { PAGE_META } from '../routes/routeRegistry';
-import { ROLES } from '../data/roles';
+import { ALL_ROLES } from '../data/roles';
 import '../styles/getlabs-theme.css';
 
 const dashboardMeta = {
@@ -46,7 +46,7 @@ const dashboardMeta = {
 };
 
 function fallbackPageHeader(pageId, role) {
-  const roleInfo = ROLES.find((item) => item.id === role);
+  const roleInfo = ALL_ROLES.find((item) => item.id === role);
   const meta = dashboardMeta[pageId] || PAGE_META[pageId];
   return {
     eyebrow: meta?.section || meta?.eyebrow || roleInfo?.label || 'Workspace',
@@ -68,7 +68,7 @@ export function Header() {
   const [userMenuPosition, setUserMenuPosition] = useState({ top: 0, right: 16 });
   const [screenGuideOpen, setScreenGuideOpen] = useState(false);
   const role = state.auth?.role;
-  const roleInfo = ROLES.find((item) => item.id === role);
+  const roleInfo = ALL_ROLES.find((item) => item.id === role);
   const userInitial = (state.auth?.userName || roleInfo?.label || 'U').charAt(0);
 
   useEffect(() => {
@@ -353,6 +353,7 @@ export function Header() {
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Signed in as</p>
                 <p className="truncate text-base font-semibold text-slate-950">{state.auth?.userName || 'User'}</p>
                 <p className="text-xs font-semibold capitalize text-slate-500">{state.auth?.username || role || 'workspace'}</p>
+                {state.auth?.facility && <p className="truncate text-xs text-slate-500">{state.auth.facility.name}</p>}
               </div>
             </div>
           </div>

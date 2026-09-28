@@ -1,12 +1,32 @@
 import { useState } from 'react';
-import { Activity, CheckCircle2, KeyRound, Loader2, ShieldCheck, UserRound } from 'lucide-react';
+import { Activity, Building2, CheckCircle2, KeyRound, Loader2, ShieldCheck, UserRound } from 'lucide-react';
 import { useAppStore } from '../../store/AppStore';
 import { Button } from '../../components/ui/Button';
 import { ToastHost } from '../../components/ui/ToastHost';
 import '../../styles/getlabs-theme.css';
 
+// Staff sign in to the same facility every day, so remember its code per device.
+const FACILITY_CODE_KEY = 'lhims.lastFacilityCode';
+
+function readRememberedFacilityCode() {
+  try {
+    return window.localStorage.getItem(FACILITY_CODE_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
+function rememberFacilityCode(code) {
+  try {
+    if (code) window.localStorage.setItem(FACILITY_CODE_KEY, code);
+  } catch {
+    // Storage can be unavailable (private mode); the code is simply not remembered.
+  }
+}
+
 export function LoginPage() {
   const { dispatch } = useAppStore();
+  const [facilityCode, setFacilityCode] = useState(readRememberedFacilityCode);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -15,7 +35,9 @@ export function LoginPage() {
     event.preventDefault();
     if (submitting || !username.trim() || !password) return;
     setSubmitting(true);
-    dispatch({ type: 'LOGIN_WITH_CREDENTIALS', username, password });
+    const code = facilityCode.trim().toUpperCase();
+    rememberFacilityCode(code);
+    dispatch({ type: 'LOGIN_WITH_CREDENTIALS', facilityCode: code, username, password });
     // The command layer navigates away on success; re-enable the form shortly
     // so a failed attempt can be retried.
     window.setTimeout(() => setSubmitting(false), 1500);
@@ -69,9 +91,26 @@ export function LoginPage() {
               <p className="mt-3 text-sm leading-6 text-slate-500">Sign in with the staff account issued by your administrator.</p>
 
               <form onSubmit={submitCredentials} className="mt-6 space-y-4 rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+                <label className="block" htmlFor="login-facility">
+                  <span className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-600"><Building2 className="h-3.5 w-3.5" aria-hidden="true" /> Facility code</span>
+                  <input
+                    id="login-facility"
+                    name="facilityCode"
+                    autoComplete="organization"
+                    autoCapitalize="characters"
+                    spellCheck={false}
+                    autoFocus={!facilityCode}
+                    placeholder="e.g. KBTH"
+                    aria-describedby="login-facility-hint"
+                    value={facilityCode}
+                    onChange={(event) => setFacilityCode(event.target.value.toUpperCase())}
+                    className="getlabs-input uppercase tracking-[0.08em]"
+                  />
+                  <span id="login-facility-hint" className="mt-1.5 block text-xs text-slate-500">The code your hospital or clinic was given.</span>
+                </label>
                 <label className="block" htmlFor="login-username">
                   <span className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-600"><UserRound className="h-3.5 w-3.5" aria-hidden="true" /> Username</span>
-                  <input id="login-username" name="username" autoComplete="username" autoFocus value={username} onChange={(event) => setUsername(event.target.value)} className="getlabs-input" />
+                  <input id="login-username" name="username" autoComplete="username" autoFocus={Boolean(facilityCode)} value={username} onChange={(event) => setUsername(event.target.value)} className="getlabs-input" />
                 </label>
                 <label className="block" htmlFor="login-password">
                   <span className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-600"><KeyRound className="h-3.5 w-3.5" aria-hidden="true" /> Password</span>

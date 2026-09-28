@@ -55,6 +55,7 @@ const ExpensesPage = lazyPage(() => import('../pages/billing/ExpensesPage'), 'Ex
 const AccountLedgerPage = lazyPage(() => import('../pages/billing/AccountLedgerPage'), 'AccountLedgerPage');
 const BillingAnalyticsPage = lazyPage(() => import('../pages/billing/BillingAnalyticsPage'), 'BillingAnalyticsPage');
 const ApiReadinessPage = lazyPage(() => import('../pages/system/ApiReadinessPage'), 'ApiReadinessPage');
+const PlatformFacilitiesPage = lazyPage(() => import('../pages/platform/PlatformFacilitiesPage'), 'PlatformFacilitiesPage');
 
 const roleDashboardMap = {
   'doctor-dashboard': 'doctor',
@@ -122,6 +123,7 @@ function resolvePage(pageId, role) {
   if (pageId === 'billing-analytics') return <BillingAnalyticsPage />;
   if (pageId === 'price-catalog') return <PriceCatalogPage />;
   if (pageId === 'api-readiness') return <ApiReadinessPage />;
+  if (pageId === 'platform-facilities') return <PlatformFacilitiesPage />;
   if (roleDashboardMap[pageId]) return <RoleDashboard role={roleDashboardMap[pageId]} />;
 
   const meta = PAGE_META[pageId] || {

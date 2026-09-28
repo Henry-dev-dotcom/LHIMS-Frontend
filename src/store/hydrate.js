@@ -49,7 +49,8 @@ const LIST_PARAMS = { limit: 100 };
 */
 export async function loadCollections(client, auth, dispatch, only = null) {
   const role = auth?.role;
-  if (!role) return;
+  // The platform operator has no facility workspace to load.
+  if (!role || role === 'platform') return;
   const wants = (name) => !only || only.includes(name);
 
   const failures = [];
