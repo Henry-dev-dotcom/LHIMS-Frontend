@@ -1,4 +1,24 @@
 export const PAGE_META = {
+  'clinic-dental': {
+    title: 'Dental Clinic', section: 'Clinics',
+    description: 'Dental visits with a tooth-by-tooth chart (FDI numbering) and treatment record.',
+    requirements: ['Clinic queue', 'Dental chart', 'Earlier charts']
+  },
+  'clinic-eye': {
+    title: 'Eye Clinic', section: 'Clinics',
+    description: 'Eye clinic visits: visual acuity, eye pressure, examination findings and refraction.',
+    requirements: ['Clinic queue', 'Eye examination']
+  },
+  'clinic-physiotherapy': {
+    title: 'Physiotherapy', section: 'Clinics',
+    description: 'Physiotherapy assessments with goals, and treatment sessions.',
+    requirements: ['Clinic queue', 'Assessment', 'Session record']
+  },
+  'clinic-dietetics': {
+    title: 'Dietetics', section: 'Clinics',
+    description: 'Nutrition assessments with BMI and MUAC, diet plans and follow-up.',
+    requirements: ['Clinic queue', 'Nutrition assessment']
+  },
   'theatre-list': {
     title: 'Theatre List', section: 'Theatre',
     description: 'The day\'s operations by theatre, the WHO surgical safety checklist and the operation note.',

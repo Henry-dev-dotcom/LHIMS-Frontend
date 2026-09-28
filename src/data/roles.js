@@ -28,7 +28,11 @@ import {
   Pill,
   Package,
   BedDouble,
-  Scissors
+  Scissors,
+  Smile,
+  Eye,
+  Activity,
+  Apple
 } from 'lucide-react';
 
 export const ROLES = [
@@ -111,6 +115,10 @@ export const NAV_ITEMS = [
   { id: 'emergency-board', label: 'Emergency Board', icon: Siren, roles: ['nurse','doctor','receptionist','admin'], section: 'Emergency' },
   { id: 'ward-board', label: 'Ward Board', icon: BedDouble, roles: ['nurse','doctor','admin'], section: 'Wards' },
   { id: 'theatre-list', label: 'Theatre List', icon: Scissors, roles: ['nurse','doctor','admin'], section: 'Theatre' },
+  { id: 'clinic-dental', label: 'Dental Clinic', icon: Smile, roles: ['nurse','doctor','receptionist','admin'], section: 'Clinics' },
+  { id: 'clinic-eye', label: 'Eye Clinic', icon: Eye, roles: ['nurse','doctor','receptionist','admin'], section: 'Clinics' },
+  { id: 'clinic-physiotherapy', label: 'Physiotherapy', icon: Activity, roles: ['nurse','doctor','receptionist','admin'], section: 'Clinics' },
+  { id: 'clinic-dietetics', label: 'Dietetics', icon: Apple, roles: ['nurse','doctor','receptionist','admin'], section: 'Clinics' },
   { id: 'pharmacy-dispensing', label: 'Dispensing', icon: Pill, roles: ['pharmacist','admin'], section: 'Pharmacy' },
   { id: 'pharmacy-stock', label: 'Drugs & Stock', icon: Package, roles: ['pharmacist','admin'], section: 'Pharmacy' },
 

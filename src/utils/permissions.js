@@ -26,7 +26,12 @@ const PAGE_MODULE_OVERRIDES = {
   'float-tracker': 'finance',
   expenses: 'finance',
   'account-ledger': 'finance',
-  'price-catalog': null
+  'price-catalog': null,
+  // Specialty clinics: one module each.
+  'clinic-dental': 'dental',
+  'clinic-eye': 'eye',
+  'clinic-physiotherapy': 'physiotherapy',
+  'clinic-dietetics': 'dietetics'
 };
 
 export function moduleForPage(pageId) {

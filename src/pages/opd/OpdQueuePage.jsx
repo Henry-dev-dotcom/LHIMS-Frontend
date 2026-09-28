@@ -12,6 +12,7 @@ import { encounterService } from '../../services/encounterService';
 import { isProcedureItem } from '../../services/theatreService';
 import { listItems } from '../../api/normalizers';
 import { EncounterWorkspace } from './EncounterWorkspace';
+import { CLINICS, clinicsFor } from '../clinics/clinicConfig';
 import { P, QUEUE_TABS, STATUS, TRIAGE, ageLabel, can, patientName, todayIso, waitingSince } from './opdUtils';
 
 function TriageBadge({ level }) {
@@ -24,8 +25,14 @@ export function EmergencyBoardPage() {
   return <OpdQueuePage mode="EMERGENCY" />;
 }
 
-export function OpdQueuePage({ mode = 'OPD' }) {
+/** A specialty clinic's own queue: outpatient visits held in that clinic. */
+export function ClinicQueuePage({ clinic }) {
+  return <OpdQueuePage key={clinic} clinic={clinic} />;
+}
+
+export function OpdQueuePage({ mode = 'OPD', clinic }) {
   const emergency = mode === 'EMERGENCY';
+  const clinicInfo = clinic ? CLINICS[clinic] : null;
   const { state, dispatch } = useAppStore();
   const auth = state.auth;
   // In the ED everyone starts at triage, where new arrivals land.
@@ -41,13 +48,13 @@ export function OpdQueuePage({ mode = 'OPD' }) {
     setLoading(true);
     try {
       const params = tab === 'COMPLETED' ? { status: 'COMPLETED', date: todayIso() } : { status: tab };
-      setRows(listItems(await encounterService.list(apiClient, { ...params, type: mode })));
+      setRows(listItems(await encounterService.list(apiClient, { ...params, type: mode, clinic })));
     } catch (error) {
       toast('error', error?.message || 'Visits could not be loaded.');
     } finally {
       setLoading(false);
     }
-  }, [tab, toast, mode]);
+  }, [tab, toast, mode, clinic]);
 
   useEffect(() => {
     if (!openId) load();
@@ -65,9 +72,9 @@ export function OpdQueuePage({ mode = 'OPD' }) {
   return (
     <div className="space-y-4">
       <PageHeader
-        eyebrow={emergency ? 'Emergency' : 'Outpatient'}
-        title={emergency ? 'Emergency board' : 'OPD visits'}
-        description={emergency ? 'Emergency arrivals by triage colour: red first, then longest waiting.' : 'Patients waiting for triage, waiting for the doctor, and in consultation.'}
+        eyebrow={emergency ? 'Emergency' : clinicInfo ? 'Clinics' : 'Outpatient'}
+        title={emergency ? 'Emergency board' : clinicInfo ? clinicInfo.label : 'OPD visits'}
+        description={emergency ? 'Emergency arrivals by triage colour: red first, then longest waiting.' : clinicInfo ? `Patients booked into the ${clinicInfo.label.toLowerCase()}, by stage.` : 'Patients waiting for triage, waiting for the doctor, and in consultation, in every clinic.'}
       />
 
       <Card
@@ -96,6 +103,7 @@ export function OpdQueuePage({ mode = 'OPD' }) {
         </div>
         <DataTable
           caption="Visits"
+          rowBadge={(row) => row.encounterCode}
           emptyMessage={loading ? 'Loading visits…' : 'No patients at this stage.'}
           rows={rows}
           columns={[
@@ -106,7 +114,12 @@ export function OpdQueuePage({ mode = 'OPD' }) {
               </span>
             ) },
             { key: 'triageLevel', label: 'Triage', render: (row) => <TriageBadge level={row.triageLevel} /> },
-            { key: 'chiefComplaint', label: 'Complaint', render: (row) => row.chiefComplaint || '—' },
+            { key: 'chiefComplaint', label: 'Complaint', render: (row) => (
+              <span>
+                {row.chiefComplaint || '—'}
+                {!clinic && row.clinic && row.clinic !== 'GENERAL' && <span className="ml-2 rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-bold text-violet-800">{CLINICS[row.clinic]?.label || row.clinic}</span>}
+              </span>
+            ) },
             { key: 'status', label: 'Stage', render: (row) => STATUS[row.status] || row.status },
             { key: 'startedAt', label: tab === 'COMPLETED' ? 'Arrived' : 'Waiting', render: (row) => (tab === 'COMPLETED' ? new Date(row.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : waitingSince(row.startedAt)) },
             { key: 'attending', label: 'Clinician', render: (row) => row.attending?.name || '—' },
@@ -117,6 +130,7 @@ export function OpdQueuePage({ mode = 'OPD' }) {
 
       <NewVisitModal
         mode={mode}
+        clinic={clinic}
         open={newOpen}
         onClose={() => setNewOpen(false)}
         onStarted={(encounter) => {
@@ -130,8 +144,18 @@ export function OpdQueuePage({ mode = 'OPD' }) {
   );
 }
 
-function NewVisitModal({ mode = 'OPD', open, onClose, onStarted }) {
+/** The clinic's own fee if the catalog has one (CONSULT-DENTAL, ...), else the general consultation. */
+function defaultFee(services, clinic) {
+  const code = CLINICS[clinic]?.feeCode;
+  const own = code && services.find((s) => (s.catalogCode || '').toUpperCase() === code);
+  return (own || services.find((s) => (s.catalogCode || '').toUpperCase() === 'CONSULT-OPD') || services.find((s) => /consult/i.test(s.catalogCode || s.name)))?.id || '';
+}
+
+function NewVisitModal({ mode = 'OPD', clinic: fixedClinic, open, onClose, onStarted }) {
   const emergency = mode === 'EMERGENCY';
+  const { state } = useAppStore();
+  const clinicOptions = clinicsFor(state.auth?.modules);
+  const [clinic, setClinic] = useState(fixedClinic || 'GENERAL');
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
   const [patient, setPatient] = useState(null);
@@ -152,15 +176,21 @@ function NewVisitModal({ mode = 'OPD', open, onClose, onStarted }) {
     setQuick({ firstName: '', lastName: '', gender: 'UNKNOWN', estimatedAgeYears: '', triageLevel: '' });
     setComplaint('');
     setError('');
+    setClinic(fixedClinic || 'GENERAL');
     encounterService.catalog(apiClient)
       .then((data) => {
         const services = listItems(data).filter((item) => item.type === 'SERVICE' && item.isActive !== false && !isProcedureItem(item));
         setFees(services);
         // Emergency care is not held up for payment; the fee can be added later.
-        setFeeItemId(emergency ? '' : services.find((s) => /consult/i.test(s.catalogCode || s.name))?.id || '');
+        setFeeItemId(emergency ? '' : defaultFee(services, fixedClinic || 'GENERAL'));
       })
       .catch(() => setFees([]));
-  }, [open, emergency]);
+  }, [open, emergency, fixedClinic]);
+
+  function chooseClinic(value) {
+    setClinic(value);
+    setFeeItemId(defaultFee(fees, value));
+  }
 
   async function find(event) {
     event.preventDefault();
@@ -189,6 +219,7 @@ function NewVisitModal({ mode = 'OPD', open, onClose, onStarted }) {
         : await encounterService.start(apiClient, {
             patientId: patient.id,
             type: mode,
+            clinic: emergency ? undefined : clinic,
             chiefComplaint: complaint.trim() || undefined,
             feeItemId: feeItemId || undefined
           });
@@ -278,6 +309,13 @@ function NewVisitModal({ mode = 'OPD', open, onClose, onStarted }) {
         )}
 
         <div className="grid gap-4 sm:grid-cols-2">
+          {!emergency && !fixedClinic && clinicOptions.length > 1 && (
+            <FormField label="Clinic" className="sm:col-span-2">
+              <select className={inputClass} value={clinic} onChange={(e) => chooseClinic(e.target.value)}>
+                {clinicOptions.map(([key, c]) => <option key={key} value={key}>{c.label}</option>)}
+              </select>
+            </FormField>
+          )}
           <FormField label={emergency ? 'Reason for attending' : 'Main complaint'} required={unidentified} className="sm:col-span-2">
             <input className={inputClass} maxLength={500} value={complaint} onChange={(e) => setComplaint(e.target.value)} placeholder={emergency ? 'e.g. Road traffic accident, head injury' : 'e.g. Fever and headache for 3 days'} />
           </FormField>

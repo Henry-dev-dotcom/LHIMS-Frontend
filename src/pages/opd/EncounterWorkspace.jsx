@@ -14,6 +14,8 @@ import { isAllergyConflict } from '../../services/pharmacyService';
 import { inpatientService } from '../../services/inpatientService';
 import { BedPicker } from '../inpatient/BedPicker';
 import { BookSurgeryModal } from '../theatre/BookSurgeryModal';
+import { ClinicalFormsCard } from '../clinics/ClinicalFormsCard';
+import { CLINICS } from '../clinics/clinicConfig';
 import { P, STATUS, TRIAGE, ageLabel, can, patientName } from './opdUtils';
 
 const ACTIVE = ['WAITING_TRIAGE', 'WAITING_DOCTOR', 'IN_CONSULTATION'];
@@ -113,7 +115,7 @@ export function EncounterWorkspace({ encounterId }) {
       <Card>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">{encounter.encounterCode} · {encounter.type === 'EMERGENCY' ? 'Emergency' : inpatient ? 'Inpatient stay' : 'Outpatient'}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">{encounter.encounterCode} · {encounter.type === 'EMERGENCY' ? 'Emergency' : inpatient ? 'Inpatient stay' : encounter.clinic && encounter.clinic !== 'GENERAL' ? CLINICS[encounter.clinic]?.label || encounter.clinic : 'Outpatient'}</p>
             <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">{patientName(patient)}</h2>
             <p className="mt-1 text-sm text-slate-600">
               {[patient.patientCode, ageLabel(patient.dateOfBirth), patient.gender, patient.insuranceProvider && `${patient.insuranceProvider}${patient.policyNumber ? ` ${patient.policyNumber}` : ''}`].filter(Boolean).join(' · ')}
@@ -177,6 +179,7 @@ export function EncounterWorkspace({ encounterId }) {
         <VitalsCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} latest={latestVitals} />
         <AllergiesCard encounter={encounter} auth={auth} busy={busy} act={act} />
         <NotesCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
+        <ClinicalFormsCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
         <DiagnosesCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
         <OrdersCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
         <PrescriptionsCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />

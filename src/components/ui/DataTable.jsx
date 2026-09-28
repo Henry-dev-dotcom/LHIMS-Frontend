@@ -33,7 +33,11 @@ function MobileDetail({ column, row, compact = false }) {
   );
 }
 
-export function DataTable({ columns, rows, emptyMessage = 'No records found.', dense = false, caption }) {
+// Database ids (cuid) mean nothing to staff; older records used readable ids (ORD-2026-0001) that are worth showing.
+const MACHINE_ID = /^c[a-z0-9]{20,}$/;
+
+export function DataTable({ columns, rows, emptyMessage = 'No records found.', dense = false, caption, rowBadge }) {
+  const badgeFor = (row) => (rowBadge ? rowBadge(row) : row.id && !MACHINE_ID.test(row.id) ? row.id : null);
   const mobileColumns = columns.filter((column) => !column.mobileHidden);
   const actionColumn = mobileColumns.find(isActionColumn);
   const primaryColumn = mobileColumns.find((column) => column.mobilePrimary) || mobileColumns.find((column) => !isActionColumn(column)) || mobileColumns[0];
@@ -62,7 +66,7 @@ export function DataTable({ columns, rows, emptyMessage = 'No records found.', d
                   {primaryColumn ? renderCell(primaryColumn, row) ?? '—' : `Record ${index + 1}`}
                 </div>
               </div>
-              {row.id && primaryColumn?.key !== 'id' && <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{row.id}</span>}
+              {badgeFor(row) && primaryColumn?.key !== 'id' && <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{badgeFor(row)}</span>}
             </div>
 
             {detailColumns.length > 0 && (
