@@ -1,4 +1,14 @@
 export const PAGE_META = {
+  'clinic-child-welfare': {
+    title: 'Child Welfare Clinic', section: 'Child Health',
+    description: 'Child welfare visits: growth monitoring and immunisations against the EPI schedule.',
+    requirements: ['Clinic queue', 'Growth monitoring', 'Immunisation schedule']
+  },
+  'immunisation-due': {
+    title: 'Immunisation Due List', section: 'Child Health',
+    description: 'Children under five with vaccines due or overdue, for defaulter tracing.',
+    requirements: ['Due list', 'Defaulter tracing']
+  },
   'clinic-antenatal': {
     title: 'Antenatal Clinic', section: 'Maternity',
     description: 'Antenatal visits: book the pregnancy, record each visit with gestation and warning signs, and record the delivery.',

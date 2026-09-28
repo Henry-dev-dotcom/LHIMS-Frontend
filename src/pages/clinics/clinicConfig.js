@@ -8,7 +8,8 @@ export const CLINICS = {
   DIETETICS: { label: 'Dietetics', module: 'dietetics', page: 'clinic-dietetics', feeCode: 'CONSULT-DIETETICS', forms: ['NUTRITION_ASSESSMENT'] },
   // Antenatal and postnatal care is usually free (NHIS); no fee unless the catalog has CONSULT-ANTENATAL / CONSULT-POSTNATAL.
   ANTENATAL: { label: 'Antenatal clinic', module: 'maternity', page: 'clinic-antenatal', feeCode: 'CONSULT-ANTENATAL', feeRequired: true, forms: [] },
-  POSTNATAL: { label: 'Postnatal clinic', module: 'maternity', page: 'clinic-postnatal', feeCode: 'CONSULT-POSTNATAL', feeRequired: true, forms: [] }
+  POSTNATAL: { label: 'Postnatal clinic', module: 'maternity', page: 'clinic-postnatal', feeCode: 'CONSULT-POSTNATAL', feeRequired: true, forms: [] },
+  CHILD_WELFARE: { label: 'Child welfare clinic', module: 'child_health', page: 'clinic-child-welfare', feeCode: 'CONSULT-CHILD-WELFARE', feeRequired: true, forms: ['GROWTH'] }
 };
 
 /** `clinicianOnly` forms need the consult permission; the others nurses may record too. */
@@ -20,7 +21,8 @@ export const FORMS = {
   NUTRITION_ASSESSMENT: { label: 'Nutrition assessment', module: 'dietetics', clinicianOnly: false },
   // Recorded from the pregnancy card, never offered as a free-standing form.
   ANC_VISIT: { label: 'Antenatal visit', module: 'maternity', clinicianOnly: false, pregnancy: true },
-  POSTNATAL_CHECK: { label: 'Postnatal check', module: 'maternity', clinicianOnly: false, pregnancy: true }
+  POSTNATAL_CHECK: { label: 'Postnatal check', module: 'maternity', clinicianOnly: false, pregnancy: true },
+  GROWTH: { label: 'Growth monitoring', module: 'child_health', clinicianOnly: false }
 };
 
 export const clinicsFor = (modules) => Object.entries(CLINICS).filter(([, c]) => !Array.isArray(modules) || modules.includes(c.module));

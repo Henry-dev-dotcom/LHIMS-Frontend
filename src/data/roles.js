@@ -35,7 +35,9 @@ import {
   Apple,
   Baby,
   HeartHandshake,
-  BookHeart
+  BookHeart,
+  Syringe,
+  ListChecks
 } from 'lucide-react';
 
 export const ROLES = [
@@ -121,6 +123,8 @@ export const NAV_ITEMS = [
   { id: 'clinic-antenatal', label: 'Antenatal Clinic', icon: HeartHandshake, roles: ['nurse','doctor','receptionist','admin'], section: 'Maternity' },
   { id: 'clinic-postnatal', label: 'Postnatal Clinic', icon: Baby, roles: ['nurse','doctor','receptionist','admin'], section: 'Maternity' },
   { id: 'maternity-register', label: 'Maternity Register', icon: BookHeart, roles: ['nurse','doctor','admin'], section: 'Maternity' },
+  { id: 'clinic-child-welfare', label: 'Child Welfare Clinic', icon: Syringe, roles: ['nurse','doctor','receptionist','admin'], section: 'Child Health' },
+  { id: 'immunisation-due', label: 'Immunisation Due List', icon: ListChecks, roles: ['nurse','doctor','admin'], section: 'Child Health' },
   { id: 'clinic-dental', label: 'Dental Clinic', icon: Smile, roles: ['nurse','doctor','receptionist','admin'], section: 'Clinics' },
   { id: 'clinic-eye', label: 'Eye Clinic', icon: Eye, roles: ['nurse','doctor','receptionist','admin'], section: 'Clinics' },
   { id: 'clinic-physiotherapy', label: 'Physiotherapy', icon: Activity, roles: ['nurse','doctor','receptionist','admin'], section: 'Clinics' },

@@ -16,6 +16,7 @@ import { BedPicker } from '../inpatient/BedPicker';
 import { BookSurgeryModal } from '../theatre/BookSurgeryModal';
 import { ClinicalFormsCard } from '../clinics/ClinicalFormsCard';
 import { PregnancyCard } from '../maternity/PregnancyCard';
+import { ImmunizationCard } from '../childHealth/ImmunizationCard';
 import { CLINICS } from '../clinics/clinicConfig';
 import { P, STATUS, TRIAGE, ageLabel, can, patientName } from './opdUtils';
 
@@ -181,6 +182,7 @@ export function EncounterWorkspace({ encounterId }) {
         <AllergiesCard encounter={encounter} auth={auth} busy={busy} act={act} />
         <NotesCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
         <PregnancyCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
+        <ImmunizationCard encounter={encounter} auth={auth} open={open} />
         <ClinicalFormsCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
         <DiagnosesCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
         <OrdersCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />

@@ -102,6 +102,23 @@ export function FormSummary({ type, data }) {
   const alertList = alerts?.length ? (
     <ul className="mt-2 space-y-1">{alerts.map((a) => <li key={a} className="flex items-start gap-1.5 rounded-xl bg-red-50 px-2.5 py-1 text-xs font-bold text-red-800"><AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />{a}</li>)}</ul>
   ) : null;
+  if (type === 'GROWTH') {
+    const d = data.derived || {};
+    const w = d.weightChange;
+    return (
+      <div className="mt-2 space-y-1">
+        <Line label="Age" value={d.ageMonths != null ? `${d.ageMonths} month${d.ageMonths === 1 ? '' : 's'}` : null} />
+        <Line label="Measurements" value={[`${data.weightKg} kg`, data.lengthCm && `${data.measuredLying ? 'length' : 'height'} ${data.lengthCm} cm`, data.headCircumferenceCm && `HC ${data.headCircumferenceCm} cm`, data.muacCm && `MUAC ${data.muacCm} cm`, data.oedema && data.oedema !== 'NONE' && `oedema ${data.oedema.toLowerCase()}`].filter(Boolean).join(' · ')} />
+        {d.muacCategory && <p className={`text-sm font-semibold ${/severe|moderate/i.test(d.muacCategory) ? 'text-red-700' : 'text-slate-800'}`}>MUAC: {d.muacCategory}</p>}
+        <Line label="Since last visit" value={w ? `${w.grams > 0 ? '+' : ''}${w.grams} g in ${w.days} days` : null} />
+        <Line label="Feeding" value={data.feeding?.toLowerCase().replace(/_/g, ' ')} />
+        <Line label="Milestones" value={data.milestones} />
+        <Line label="Given" value={[data.vitaminAGiven && 'vitamin A', data.dewormingGiven && 'deworming'].filter(Boolean).join(', ')} />
+        <Line label="Counselling" value={data.counselling} />
+        {alertList}
+      </div>
+    );
+  }
   if (type === 'ANC_VISIT') {
     const g = data.derived?.gestation;
     return (
@@ -220,7 +237,8 @@ const blankFor = (type) => ({
   PHYSIO_SESSION: { sessionNumber: '', treatments: '', painBefore: '', painAfter: '', response: '', homeExercises: '', nextSession: '' },
   NUTRITION_ASSESSMENT: { weightKg: '', heightCm: '', muacCm: '', oedema: 'NONE', dietHistory: '', nutritionDiagnosis: '', plan: '', followUpWeeks: '' },
   ANC_VISIT: { weightKg: '', bpSystolic: '', bpDiastolic: '', fundalHeightCm: '', presentation: '', fetalHeartRate: '', fetalMovements: '', oedema: '', urineProtein: '', urineGlucose: '', haemoglobin: '', iptpSpDose: '', tdDose: '', llinGiven: false, ironFolateGiven: false, dangerSigns: [], complaints: '', plan: '', nextVisit: '' },
-  POSTNATAL_CHECK: { mother: {}, baby: {}, hasBaby: true, familyPlanningCounselled: false, familyPlanningMethod: '', plan: '' }
+  POSTNATAL_CHECK: { mother: {}, baby: {}, hasBaby: true, familyPlanningCounselled: false, familyPlanningMethod: '', plan: '' },
+  GROWTH: { weightKg: '', lengthCm: '', measuredLying: true, headCircumferenceCm: '', muacCm: '', oedema: 'NONE', feeding: '', milestones: '', counselling: '', vitaminAGiven: false, dewormingGiven: false }
 }[type]);
 
 /** Loads an earlier form back into editor state, for corrections. */
@@ -291,8 +309,8 @@ function toPayload(type, f) {
   if (type === 'PHYSIO_SESSION') {
     return clean({ sessionNumber: num(f.sessionNumber), treatments: f.treatments.split('\n').map((l) => l.trim()).filter(Boolean), painBefore: num(f.painBefore), painAfter: num(f.painAfter), response: str(f.response), homeExercises: str(f.homeExercises), nextSession: str(f.nextSession) });
   }
-  const numeric = ['painScore', 'plannedSessions', 'weightKg', 'heightCm', 'muacCm', 'followUpWeeks'];
-  return clean(Object.fromEntries(Object.entries(f).map(([k, v]) => [k, numeric.includes(k) ? num(v) : typeof v === 'string' ? (k === 'oedema' ? v : str(v)) : v])));
+  const numeric = ['painScore', 'plannedSessions', 'weightKg', 'heightCm', 'muacCm', 'followUpWeeks', 'lengthCm', 'headCircumferenceCm'];
+  return clean(Object.fromEntries(Object.entries(f).map(([k, v]) => [k, numeric.includes(k) ? num(v) : typeof v === 'string' ? (k === 'oedema' ? v : k === 'feeding' ? v || undefined : str(v)) : v])));
 }
 
 export function FormModal({ editing, ...props }) {
@@ -303,7 +321,7 @@ export function FormModal({ editing, ...props }) {
 
 function FormEditorModal({ editing, busy, onClose, onSave }) {
   const [form, setForm] = useState(() => fromData(editing.type, editing.amends?.data));
-  const Editor = { DENTAL_CHART: DentalChartEditor, EYE_EXAM: EyeExamEditor, PHYSIO_ASSESSMENT: PhysioAssessmentEditor, PHYSIO_SESSION: PhysioSessionEditor, NUTRITION_ASSESSMENT: NutritionEditor, ANC_VISIT: AncVisitEditor, POSTNATAL_CHECK: PostnatalEditor }[editing.type];
+  const Editor = { DENTAL_CHART: DentalChartEditor, EYE_EXAM: EyeExamEditor, PHYSIO_ASSESSMENT: PhysioAssessmentEditor, PHYSIO_SESSION: PhysioSessionEditor, NUTRITION_ASSESSMENT: NutritionEditor, ANC_VISIT: AncVisitEditor, POSTNATAL_CHECK: PostnatalEditor, GROWTH: GrowthEditor }[editing.type];
   return (
     <Modal open title={`${editing.amends ? 'Correct' : 'Record'} ${FORMS[editing.type].label.toLowerCase()}`} description={editing.amends ? 'The original stays on the record; this correction is added after it.' : editing.description} onClose={onClose}
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button disabled={busy} onClick={() => onSave(toPayload(editing.type, form))}>{busy ? 'Saving…' : 'Save'}</Button></>}>
@@ -559,6 +577,31 @@ function PostnatalEditor({ form, setForm }) {
         <FormField label="Method chosen"><input className={inputClass} {...field('familyPlanningMethod')} maxLength={120} /></FormField>
       </div>
       <FormField label="Plan"><textarea rows={2} className={inputClass} {...field('plan')} maxLength={2000} /></FormField>
+    </div>
+  );
+}
+
+function GrowthEditor({ form, setForm }) {
+  const field = useField(form, setForm);
+  const tick = (key, label) => <label className="flex items-center gap-2 text-sm text-slate-800"><input type="checkbox" className="h-4 w-4" checked={form[key]} onChange={(e) => setForm((c) => ({ ...c, [key]: e.target.checked }))} /> {label}</label>;
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <FormField label="Weight (kg)" required><input type="number" step="0.01" min="0.3" className={inputClass} {...field('weightKg')} /></FormField>
+        <FormField label="Length / height (cm)"><input type="number" step="0.1" className={inputClass} {...field('lengthCm')} /></FormField>
+        <FormField label="Head circumference (cm)"><input type="number" step="0.1" className={inputClass} {...field('headCircumferenceCm')} /></FormField>
+        <FormField label="MUAC (cm)" help="From 6 months."><input type="number" step="0.1" className={inputClass} {...field('muacCm')} /></FormField>
+        <FormField label="Bilateral pitting oedema"><select className={inputClass} {...field('oedema')}>{opts([['NONE', 'None'], ['MILD', 'Mild (+)'], ['MODERATE', 'Moderate (++)'], ['SEVERE', 'Severe (+++)']])}</select></FormField>
+        <FormField label="Feeding"><select className={inputClass} {...field('feeding')}>{opts([['', '—'], ['EXCLUSIVE_BREASTFEEDING', 'Exclusive breastfeeding'], ['MIXED', 'Mixed feeding'], ['COMPLEMENTARY', 'Complementary foods'], ['FAMILY_FOOD', 'Family food']])}</select></FormField>
+      </div>
+      <div className="flex flex-wrap gap-4">
+        {tick('measuredLying', 'Measured lying down (under 2 years)')}
+        {tick('vitaminAGiven', 'Vitamin A given')}
+        {tick('dewormingGiven', 'Deworming given')}
+      </div>
+      <FormField label="Milestones"><input className={inputClass} {...field('milestones')} maxLength={1000} /></FormField>
+      <FormField label="Counselling given"><input className={inputClass} {...field('counselling')} maxLength={1000} /></FormField>
+      <p className="text-xs text-slate-500">Age, the MUAC category and weight change since the last visit are worked out when you save.</p>
     </div>
   );
 }
