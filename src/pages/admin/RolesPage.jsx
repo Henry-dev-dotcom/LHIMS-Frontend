@@ -13,7 +13,7 @@ import { ROLE_FROM_API, listItems } from '../../api/normalizers';
 import { ROLES } from '../../data/roles';
 
 // Custom roles build on a standard staff workspace (never Admin).
-const BASE_ROLES = ['DOCTOR', 'RECEPTIONIST', 'LAB_STAFF', 'SCAN_STAFF', 'BILLING_STAFF'];
+const BASE_ROLES = ['DOCTOR', 'NURSE', 'RECEPTIONIST', 'LAB_STAFF', 'SCAN_STAFF', 'BILLING_STAFF'];
 
 const GROUP_LABELS = {
   system: 'System',
@@ -32,7 +32,8 @@ const GROUP_LABELS = {
   notifications: 'Notifications',
   files: 'Files',
   catalog: 'Catalog',
-  pricing: 'Pricing'
+  pricing: 'Pricing',
+  encounters: 'Outpatient visits'
 };
 
 const EMPTY_FORM = { id: '', name: '', description: '', baseRole: 'LAB_STAFF', permissions: [] };

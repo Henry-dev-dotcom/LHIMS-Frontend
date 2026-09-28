@@ -1,4 +1,9 @@
 export const PAGE_META = {
+  'opd-queue': {
+    title: 'OPD Visits', section: 'Outpatient',
+    description: 'Outpatient visit queue and encounter workspace: triage, vitals, notes, diagnoses, investigations, prescriptions and charges.',
+    requirements: ['Visit queue by stage', 'Triage and vitals', 'SOAP notes', 'ICD-10 diagnoses', 'Investigations', 'Prescriptions', 'Visit charges']
+  },
   'doctor-new-order': {
     title: 'New Order', section: 'Doctor Portal',
     description: 'Doctor order form for existing or new patients, tests/scans, clinical notes and urgency.',

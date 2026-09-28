@@ -56,6 +56,7 @@ const AccountLedgerPage = lazyPage(() => import('../pages/billing/AccountLedgerP
 const BillingAnalyticsPage = lazyPage(() => import('../pages/billing/BillingAnalyticsPage'), 'BillingAnalyticsPage');
 const ApiReadinessPage = lazyPage(() => import('../pages/system/ApiReadinessPage'), 'ApiReadinessPage');
 const RolesPage = lazyPage(() => import('../pages/admin/RolesPage'), 'RolesPage');
+const OpdQueuePage = lazyPage(() => import('../pages/opd/OpdQueuePage'), 'OpdQueuePage');
 const PlatformFacilitiesPage = lazyPage(() => import('../pages/platform/PlatformFacilitiesPage'), 'PlatformFacilitiesPage');
 
 const roleDashboardMap = {
@@ -126,6 +127,7 @@ function resolvePage(pageId, role, modules) {
   if (pageId === 'api-readiness') return <ApiReadinessPage />;
   if (pageId === 'platform-facilities') return <PlatformFacilitiesPage />;
   if (pageId === 'roles') return <RolesPage />;
+  if (pageId === 'opd-queue') return <OpdQueuePage />;
   if (roleDashboardMap[pageId]) return <RoleDashboard role={roleDashboardMap[pageId]} />;
 
   const meta = PAGE_META[pageId] || {

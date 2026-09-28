@@ -7,6 +7,7 @@ import { ALL_ROLES, NAV_ITEMS, ROLES } from '../data/roles';
   list (auth.modules); when it is not provided, no module filtering applies.
 */
 const SECTION_MODULES = {
+  Outpatient: 'opd',
   Clinician: 'clinician_portal',
   Reception: 'reception',
   Laboratory: 'laboratory',

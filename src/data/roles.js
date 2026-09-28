@@ -22,7 +22,8 @@ import {
   ServerCog,
   Clock,
   CheckCircle2,
-  KeyRound
+  KeyRound,
+  Stethoscope
 } from 'lucide-react';
 
 export const ROLES = [
@@ -41,6 +42,13 @@ export const ROLES = [
     subtitle: 'Front-desk and check-in operations',
     landing: 'reception-dashboard',
     accessSummary: 'Confirms incoming clinician orders, handles patient check-in, appointments and daily visits.'
+  },
+  {
+    id: 'nurse',
+    label: 'Nurse',
+    subtitle: 'Triage, vitals and patient care',
+    landing: 'opd-queue',
+    accessSummary: 'Triages outpatients, records vital signs and allergies, and hands patients to the doctor queue.'
   },
   {
     id: 'lab',
@@ -86,6 +94,8 @@ export const ALL_ROLES = [PLATFORM_ROLE, ...ROLES];
 
 export const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard, roles: ['doctor','receptionist','lab','scan','billing','admin'], section: 'Overview' },
+
+  { id: 'opd-queue', label: 'OPD Visits', icon: Stethoscope, roles: ['nurse','doctor','receptionist','admin'], section: 'Outpatient' },
 
   { id: 'doctor-dashboard', label: 'Clinician Dashboard', icon: UserRound, roles: ['doctor','admin'], section: 'Clinician' },
   { id: 'doctor-new-order', label: 'New Order', icon: ClipboardList, roles: ['doctor','admin'], section: 'Clinician' },
