@@ -1,4 +1,9 @@
 export const PAGE_META = {
+  'theatre-list': {
+    title: 'Theatre List', section: 'Theatre',
+    description: 'The day\'s operations by theatre, the WHO surgical safety checklist and the operation note.',
+    requirements: ['Operating list', 'Sign in', 'Time out', 'Sign out', 'Operation note', 'Theatre setup']
+  },
   'ward-board': {
     title: 'Ward Board', section: 'Wards',
     description: 'Wards and beds at a glance; admissions, bed moves, the medication chart and discharge.',

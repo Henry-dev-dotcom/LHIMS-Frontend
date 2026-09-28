@@ -9,6 +9,7 @@ import { Modal } from '../../components/ui/Modal';
 import { useAppStore } from '../../store/AppStore';
 import { apiClient } from '../../store/commands';
 import { encounterService } from '../../services/encounterService';
+import { isProcedureItem } from '../../services/theatreService';
 import { listItems } from '../../api/normalizers';
 import { EncounterWorkspace } from './EncounterWorkspace';
 import { P, QUEUE_TABS, STATUS, TRIAGE, ageLabel, can, patientName, todayIso, waitingSince } from './opdUtils';
@@ -153,7 +154,7 @@ function NewVisitModal({ mode = 'OPD', open, onClose, onStarted }) {
     setError('');
     encounterService.catalog(apiClient)
       .then((data) => {
-        const services = listItems(data).filter((item) => item.type === 'SERVICE' && item.isActive !== false);
+        const services = listItems(data).filter((item) => item.type === 'SERVICE' && item.isActive !== false && !isProcedureItem(item));
         setFees(services);
         // Emergency care is not held up for payment; the fee can be added later.
         setFeeItemId(emergency ? '' : services.find((s) => /consult/i.test(s.catalogCode || s.name))?.id || '');

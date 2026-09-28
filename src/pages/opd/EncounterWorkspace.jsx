@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, BedDouble, CheckCircle2, ClipboardList, FlaskConical, HeartPulse, Pill, Plus, Stethoscope, Trash2, XCircle } from 'lucide-react';
+import { AlertTriangle, BedDouble, Scissors, CheckCircle2, ClipboardList, FlaskConical, HeartPulse, Pill, Plus, Stethoscope, Trash2, XCircle } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { FormField, inputClass } from '../../components/ui/FormField';
@@ -13,6 +13,7 @@ import { formatDateTime } from '../../utils/formatters';
 import { isAllergyConflict } from '../../services/pharmacyService';
 import { inpatientService } from '../../services/inpatientService';
 import { BedPicker } from '../inpatient/BedPicker';
+import { BookSurgeryModal } from '../theatre/BookSurgeryModal';
 import { P, STATUS, TRIAGE, ageLabel, can, patientName } from './opdUtils';
 
 const ACTIVE = ['WAITING_TRIAGE', 'WAITING_DOCTOR', 'IN_CONSULTATION'];
@@ -60,6 +61,7 @@ export function EncounterWorkspace({ encounterId }) {
   const [busy, setBusy] = useState(false);
   const [completeOpen, setCompleteOpen] = useState(false);
   const [admitOpen, setAdmitOpen] = useState(false);
+  const [surgeryOpen, setSurgeryOpen] = useState(false);
 
   const toast = useCallback((type, message) => dispatch({ type: 'SHOW_TOAST', toast: { type, message } }), [dispatch]);
 
@@ -101,6 +103,7 @@ export function EncounterWorkspace({ encounterId }) {
   // Inpatient stays are opened by admission and closed by discharge, on the ward screens.
   const inpatient = encounter.type === 'INPATIENT';
   const canAdmit = inConsult && !inpatient && can(auth, 'inpatient:admit') && (auth?.modules || []).includes('inpatient');
+  const canBookSurgery = open && can(auth, 'theatre:schedule') && (auth?.modules || []).includes('theatre');
   const patient = encounter.patient;
   const latestVitals = encounter.vitalSigns?.[0];
 
@@ -139,6 +142,9 @@ export function EncounterWorkspace({ encounterId }) {
                   <Stethoscope className="h-4 w-4" /> Start consultation
                 </Button>
               )}
+              {canBookSurgery && (
+                <Button variant="secondary" disabled={busy} onClick={() => setSurgeryOpen(true)}><Scissors className="h-4 w-4" /> Book operation</Button>
+              )}
               {canAdmit && (
                 <Button variant="secondary" disabled={busy} onClick={() => setAdmitOpen(true)}><BedDouble className="h-4 w-4" /> Admit to ward</Button>
               )}
@@ -176,6 +182,16 @@ export function EncounterWorkspace({ encounterId }) {
         <PrescriptionsCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
         <ChargesCard encounter={encounter} />
       </div>
+
+      <BookSurgeryModal
+        open={surgeryOpen}
+        encounter={encounter}
+        onClose={() => setSurgeryOpen(false)}
+        onBooked={(surgery) => {
+          setSurgeryOpen(false);
+          toast('success', `${surgery.procedureName} booked in ${surgery.theatre.name}, ${formatDateTime(surgery.scheduledStart)} (${surgery.surgeryCode}). See the Theatre List.`);
+        }}
+      />
 
       <AdmitFromVisitModal
         open={admitOpen}

@@ -35,7 +35,8 @@ const GROUP_LABELS = {
   pricing: 'Pricing',
   encounters: 'Outpatient visits',
   pharmacy: 'Pharmacy',
-  inpatient: 'Wards & admissions'
+  inpatient: 'Wards & admissions',
+  theatre: 'Theatre'
 };
 
 const EMPTY_FORM = { id: '', name: '', description: '', baseRole: 'LAB_STAFF', permissions: [] };

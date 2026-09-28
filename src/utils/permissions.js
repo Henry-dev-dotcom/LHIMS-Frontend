@@ -10,6 +10,7 @@ const SECTION_MODULES = {
   Outpatient: 'opd',
   Emergency: 'emergency',
   Wards: 'inpatient',
+  Theatre: 'theatre',
   Pharmacy: 'pharmacy',
   Clinician: 'clinician_portal',
   Reception: 'reception',
