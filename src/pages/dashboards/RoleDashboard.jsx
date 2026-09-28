@@ -216,7 +216,7 @@ function getIdentityCard(role, data, auth) {
     ['Signed in as', auth?.userName || '—'],
     ['Role', roleInfo?.label],
     ['Landing page', roleInfo?.landing],
-    ['Allowed pages', getNavForRole(role).length],
+    ['Allowed pages', getNavForRole(role, auth?.modules).length],
     ['Session started', formatDateTime(auth?.loginAt)]
   ];
 }
@@ -228,7 +228,7 @@ export function RoleDashboard({ role }) {
   const rows = getRoleRows(role, state.data, state.auth);
   const table = getTableConfig(role, state.data);
   const identity = getIdentityCard(role, state.data, state.auth);
-  const quickActions = (roleQuickActions[role] || []).filter(([pageId]) => getNavForRole(role).some((item) => item.id === pageId));
+  const quickActions = (roleQuickActions[role] || []).filter(([pageId]) => getNavForRole(role, state.auth?.modules).some((item) => item.id === pageId));
   const firstOrder = rows.find((row) => row.status && row.timeline);
 
   return (

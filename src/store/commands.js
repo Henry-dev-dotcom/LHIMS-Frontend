@@ -11,8 +11,21 @@ import { labService } from '../services/labService';
 import { scanService } from '../services/scanService';
 import { resultService } from '../services/resultService';
 import { notificationService } from '../services/notificationService';
-import { listItems, normalizeAuthUser, toApiEnum } from '../api/normalizers';
+import { ROLE_TO_API, listItems, normalizeAuthUser, toApiEnum } from '../api/normalizers';
 import { loadCollections } from './hydrate';
+
+/**
+ * The user form's role picker holds either a base role id ('receptionist') or
+ * 'custom:<roleId>' for a facility-defined role. The backend derives the base
+ * role from a custom role; choosing a base role on update clears any custom one.
+ */
+export function roleChoiceToApi(choice, { clearCustom = false } = {}) {
+  const value = String(choice || '');
+  if (value.startsWith('custom:')) return { customRoleId: value.slice('custom:'.length) };
+  const role = ROLE_TO_API[value];
+  if (!role) throw new Error('Choose a role for this user.');
+  return clearCustom ? { role, customRoleId: null } : { role };
+}
 
 /*
   Async command router. Write actions keep their historical dispatch names
@@ -647,12 +660,14 @@ const commands = {
 
   ADMIN_CREATE_USER: async (action, dispatch, getState) => {
     const form = action.payload || {};
+    // An administrator always sets the first password; there is no shared default.
+    if (!form.password || form.password.length < 8) throw new Error('Set a temporary password of at least 8 characters.');
     await adminService.createUser(apiClient, {
       name: form.name,
       username: form.username,
       email: form.email || undefined,
-      role: toApiEnum(form.role) === 'LAB' ? 'LAB_STAFF' : toApiEnum(form.role) === 'SCAN' ? 'SCAN_STAFF' : toApiEnum(form.role) === 'BILLING' ? 'BILLING_STAFF' : toApiEnum(form.role),
-      password: form.password || form.tempPassword || 'ChangeMe123!'
+      ...roleChoiceToApi(form.roleChoice || form.role),
+      password: form.password
     });
     await refresh(dispatch, getState, ['users']);
     dispatch(toastAction('success', `User ${form.username} created`));
@@ -664,7 +679,9 @@ const commands = {
     await adminService.updateUser(apiClient, userId, {
       name: form.name || undefined,
       email: form.email || undefined,
-      status: form.status ? toApiEnum(form.status) : undefined
+      status: form.status ? toApiEnum(form.status) : undefined,
+      // Only the edit form sets roleChoice; other updates (e.g. deactivate) leave roles alone.
+      ...(form.roleChoice ? roleChoiceToApi(form.roleChoice, { clearCustom: true }) : {})
     });
     await refresh(dispatch, getState, ['users']);
     dispatch(toastAction('success', 'User updated'));

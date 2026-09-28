@@ -48,7 +48,7 @@ export function MobileBottomNav() {
   if (!state.auth || state.currentPage === 'login') return null;
 
   const landing = state.auth?.landing || 'overview';
-  const roleLinks = (ROLE_QUICK_LINKS[role] || []).filter((item) => item.id !== landing && canAccessPage(role, item.id));
+  const roleLinks = (ROLE_QUICK_LINKS[role] || []).filter((item) => item.id !== landing && canAccessPage(role, item.id, state.auth?.modules));
   const links = [
     { id: landing, label: 'Home', icon: Home },
     ...roleLinks.slice(0, 3),

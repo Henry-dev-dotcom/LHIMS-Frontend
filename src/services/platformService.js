@@ -3,5 +3,8 @@ export const platformService = {
   facilities: async (client) => client.request('/platform/facilities'),
   createFacility: async (client, payload) => client.request('/platform/facilities', { method: 'POST', body: payload }),
   updateFacility: async (client, facilityId, payload) =>
-    client.request(`/platform/facilities/${facilityId}`, { method: 'PATCH', body: payload })
+    client.request(`/platform/facilities/${facilityId}`, { method: 'PATCH', body: payload }),
+  modules: async (client) => client.request('/platform/modules'),
+  setFacilityModules: async (client, facilityId, modules) =>
+    client.request(`/platform/facilities/${facilityId}/modules`, { method: 'PUT', body: { modules } })
 };

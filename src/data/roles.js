@@ -21,7 +21,8 @@ import {
   Send,
   ServerCog,
   Clock,
-  CheckCircle2
+  CheckCircle2,
+  KeyRound
 } from 'lucide-react';
 
 export const ROLES = [
@@ -132,6 +133,7 @@ export const NAV_ITEMS = [
 
   { id: 'admin-dashboard', label: 'Admin', icon: ShieldCheck, roles: ['admin'], section: 'Admin' },
   { id: 'users', label: 'User Management', icon: UserCog, roles: ['admin'], section: 'Admin' },
+  { id: 'roles', label: 'Roles & Permissions', icon: KeyRound, roles: ['admin'], section: 'Admin' },
   { id: 'hospitals', label: 'Partner Hospitals', icon: Building2, roles: ['admin'], section: 'Admin' },
   { id: 'audit-log', label: 'Audit Log', icon: History, roles: ['admin'], section: 'Admin' },
   { id: 'security', label: 'Security & Reliability', icon: ShieldCheck, roles: ['admin'], section: 'Admin' },

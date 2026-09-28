@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Building2, Pause, Play, Plus, RefreshCw } from 'lucide-react';
+import { Building2, LayoutGrid, Pause, Play, Plus, RefreshCw } from 'lucide-react';
+import { ModulePicker } from './ModulePicker';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -22,7 +23,8 @@ const EMPTY_FORM = {
   adminName: '',
   adminUsername: 'admin',
   adminEmail: '',
-  adminPassword: ''
+  adminPassword: '',
+  modules: []
 };
 
 const STATUS_LABEL = { ACTIVE: 'Active', SUSPENDED: 'Suspended', DISABLED: 'Disabled' };
@@ -35,6 +37,7 @@ function toPayload(form) {
     phone: optional(form.phone),
     email: optional(form.email),
     address: optional(form.address),
+    modules: form.modules,
     admin: {
       name: form.adminName.trim(),
       username: form.adminUsername.trim(),
@@ -54,6 +57,10 @@ export function PlatformFacilitiesPage() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
   const [busyId, setBusyId] = useState('');
+  const [catalog, setCatalog] = useState([]);
+  const [modulesFacility, setModulesFacility] = useState(null);
+  const [modulesDraft, setModulesDraft] = useState([]);
+  const [savingModules, setSavingModules] = useState(false);
 
   const toast = useCallback((type, message) => dispatch({ type: 'SHOW_TOAST', toast: { type, message } }), [dispatch]);
 
@@ -61,7 +68,9 @@ export function PlatformFacilitiesPage() {
     setLoading(true);
     setLoadError('');
     try {
-      setFacilities(listItems(await platformService.facilities(apiClient)));
+      const [facilityList, moduleCatalog] = await Promise.all([platformService.facilities(apiClient), platformService.modules(apiClient)]);
+      setFacilities(listItems(facilityList));
+      setCatalog(listItems(moduleCatalog));
     } catch (error) {
       setLoadError(error?.message || 'Facilities could not be loaded.');
     } finally {
@@ -105,6 +114,33 @@ export function PlatformFacilitiesPage() {
     }
   }
 
+  function openCreate() {
+    setFormError('');
+    // New facilities start with every department; untick what they have not subscribed to.
+    setForm({ ...EMPTY_FORM, modules: catalog.map((m) => m.key) });
+    setModalOpen(true);
+  }
+
+  function openModules(facility) {
+    setModulesFacility(facility);
+    setModulesDraft(facility.modules || []);
+  }
+
+  async function saveModules() {
+    if (!modulesFacility) return;
+    setSavingModules(true);
+    try {
+      await platformService.setFacilityModules(apiClient, modulesFacility.id, modulesDraft);
+      toast('success', `Departments updated for ${modulesFacility.name}. Staff see the change on their next action.`);
+      setModulesFacility(null);
+      await load();
+    } catch (error) {
+      toast('error', error?.message || 'Departments could not be updated.');
+    } finally {
+      setSavingModules(false);
+    }
+  }
+
   const canSubmit = form.code.trim().length >= 3 && form.name.trim().length >= 2 && form.adminName.trim().length >= 2
     && form.adminUsername.trim().length >= 3 && form.adminPassword.length >= 8;
 
@@ -122,7 +158,7 @@ export function PlatformFacilitiesPage() {
         actions={(
           <>
             <Button variant="secondary" onClick={load} disabled={loading}><RefreshCw className="h-4 w-4" /> Refresh</Button>
-            <Button onClick={() => { setFormError(''); setModalOpen(true); }}><Plus className="h-4 w-4" /> New facility</Button>
+            <Button onClick={openCreate} disabled={loading}><Plus className="h-4 w-4" /> New facility</Button>
           </>
         )}
       >
@@ -137,20 +173,28 @@ export function PlatformFacilitiesPage() {
               { key: 'name', label: 'Facility', mobilePrimary: true },
               { key: 'code', label: 'Sign-in code' },
               { key: 'status', label: 'Status', render: (row) => <StatusBadge status={STATUS_LABEL[row.status] || row.status} /> },
+              { key: 'departments', label: 'Departments', render: (row) => `${row.modules?.length ?? 0} of ${catalog.length}` },
               { key: 'users', label: 'Staff', render: (row) => row._count?.users ?? 0 },
               { key: 'patients', label: 'Patients', render: (row) => row._count?.patients ?? 0 },
               { key: 'createdAt', label: 'Created', render: (row) => formatDateTime(row.createdAt) },
               {
                 key: 'actions',
                 label: 'Actions',
-                render: (row) => row.status === 'ACTIVE' ? (
-                  <Button size="sm" variant="secondary" disabled={busyId === row.id} onClick={() => setStatus(row, 'SUSPENDED')}>
-                    <Pause className="h-3.5 w-3.5" /> Suspend
-                  </Button>
-                ) : (
-                  <Button size="sm" variant="success" disabled={busyId === row.id} onClick={() => setStatus(row, 'ACTIVE')}>
-                    <Play className="h-3.5 w-3.5" /> Reactivate
-                  </Button>
+                render: (row) => (
+                  <div className="flex flex-wrap gap-2">
+                    <Button size="sm" variant="secondary" onClick={() => openModules(row)}>
+                      <LayoutGrid className="h-3.5 w-3.5" /> Departments
+                    </Button>
+                    {row.status === 'ACTIVE' ? (
+                      <Button size="sm" variant="secondary" disabled={busyId === row.id} onClick={() => setStatus(row, 'SUSPENDED')}>
+                        <Pause className="h-3.5 w-3.5" /> Suspend
+                      </Button>
+                    ) : (
+                      <Button size="sm" variant="success" disabled={busyId === row.id} onClick={() => setStatus(row, 'ACTIVE')}>
+                        <Play className="h-3.5 w-3.5" /> Reactivate
+                      </Button>
+                    )}
+                  </div>
                 )
               }
             ]}
@@ -188,8 +232,30 @@ export function PlatformFacilitiesPage() {
           <FormField label="Temporary password" required help="At least 8 characters. Share it privately; they should change it after signing in.">
             <input type="password" className={inputClass} autoComplete="new-password" value={form.adminPassword} onChange={set('adminPassword')} />
           </FormField>
+
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500 sm:col-span-2">Departments</p>
+          <div className="sm:col-span-2">
+            <ModulePicker catalog={catalog} value={form.modules} onChange={(modules) => setForm((c) => ({ ...c, modules }))} idPrefix="new-facility-module" />
+          </div>
           {formError && <p role="alert" className="text-sm font-semibold text-red-600 sm:col-span-2">{formError}</p>}
         </form>
+      </Modal>
+
+      <Modal
+        open={Boolean(modulesFacility)}
+        title={modulesFacility ? `Departments — ${modulesFacility.name}` : 'Departments'}
+        description="Switched-off departments disappear from this facility's menus and their pages stop working. No data is deleted."
+        onClose={() => setModulesFacility(null)}
+        footer={(
+          <>
+            <Button variant="secondary" onClick={() => setModulesFacility(null)}>Cancel</Button>
+            <Button onClick={saveModules} disabled={savingModules}>
+              <LayoutGrid className="h-4 w-4" /> {savingModules ? 'Saving…' : 'Save departments'}
+            </Button>
+          </>
+        )}
+      >
+        <ModulePicker catalog={catalog} value={modulesDraft} onChange={setModulesDraft} idPrefix="edit-facility-module" />
       </Modal>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Plus, Search, UserCog } from 'lucide-react';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
@@ -11,11 +11,17 @@ import { StatusBadge } from '../../components/ui/StatusBadge';
 import { useAppStore } from '../../store/AppStore';
 import { ROLES } from '../../data/roles';
 import { formatDateTime } from '../../utils/formatters';
+import { apiClient } from '../../store/commands';
+import { adminService } from '../../services/adminService';
+import { ROLE_FROM_API } from '../../api/normalizers';
 
 const blankUser = {
   id: '',
   name: '',
+  username: '',
+  password: '',
   role: 'receptionist',
+  roleChoice: 'receptionist',
   status: 'Active',
   email: '',
   phone: '',
@@ -30,11 +36,24 @@ export function UserManagementPage() {
   const [roleFilter, setRoleFilter] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState(blankUser);
+  const [customRoles, setCustomRoles] = useState([]);
+
+  // Facility-defined roles for the role picker (managed on the Roles page).
+  useEffect(() => {
+    let cancelled = false;
+    adminService.roles(apiClient)
+      .then((data) => { if (!cancelled) setCustomRoles(data?.custom || []); })
+      .catch(() => { if (!cancelled) setCustomRoles([]); });
+    return () => { cancelled = true; };
+  }, [modalOpen]);
+
+  const roleLabel = (user) => user.customRoleName || ROLES.find((role) => role.id === user.role)?.label || user.role;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return users.filter((user) => {
       const matchText = !q || [user.id, user.name, user.role, user.email, user.phone].some((value) => String(value || '').toLowerCase().includes(q));
+      // Filtering by a standard role includes custom roles built on it.
       const matchRole = !roleFilter || user.role === roleFilter;
       return matchText && matchRole;
     });
@@ -46,7 +65,7 @@ export function UserManagementPage() {
   };
 
   const openEdit = (user) => {
-    setForm({ ...blankUser, ...user });
+    setForm({ ...blankUser, ...user, password: '', roleChoice: user.customRoleId ? `custom:${user.customRoleId}` : user.role });
     setModalOpen(true);
   };
 
@@ -90,7 +109,7 @@ export function UserManagementPage() {
           columns={[
             { key: 'id', label: 'User ID' },
             { key: 'name', label: 'Name' },
-            { key: 'role', label: 'Role', render: (row) => <StatusBadge status={ROLES.find((role) => role.id === row.role)?.label || row.role} /> },
+            { key: 'role', label: 'Role', render: (row) => <StatusBadge status={roleLabel(row)} /> },
             { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> },
             { key: 'email', label: 'Email', render: (row) => row.email || '—' },
             { key: 'updatedAt', label: 'Updated', render: (row) => formatDateTime(row.updatedAt || row.createdAt) },
@@ -121,11 +140,32 @@ export function UserManagementPage() {
       >
         <form id="admin-user-form" onSubmit={save} className="grid gap-4 md:grid-cols-2">
           <FormField label="Full name"><input required className={inputClass} value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></FormField>
-          <FormField label="Role">
-            <select className={inputClass} value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })}>
-              {ROLES.map((role) => <option key={role.id} value={role.id}>{role.label}</option>)}
+          <FormField label="Role" help={form.roleChoice?.startsWith('custom:') ? 'A custom role: its permissions are set on the Roles page.' : undefined}>
+            <select className={inputClass} value={form.roleChoice} onChange={(event) => setForm({ ...form, roleChoice: event.target.value })}>
+              <optgroup label="Standard roles">
+                {ROLES.map((role) => <option key={role.id} value={role.id}>{role.label}</option>)}
+              </optgroup>
+              {customRoles.length > 0 && (
+                <optgroup label="Custom roles">
+                  {customRoles.map((role) => (
+                    <option key={role.id} value={`custom:${role.id}`}>
+                      {role.name} ({ROLES.find((r) => r.id === ROLE_FROM_API[role.baseRole])?.label || role.baseRole})
+                    </option>
+                  ))}
+                </optgroup>
+              )}
             </select>
           </FormField>
+          {!form.id && (
+            <>
+              <FormField label="Username" required help="Used to sign in, together with your facility code.">
+                <input required minLength={3} autoComplete="off" className={inputClass} value={form.username} onChange={(event) => setForm({ ...form, username: event.target.value.toLowerCase() })} />
+              </FormField>
+              <FormField label="Temporary password" required help="At least 8 characters. Share it privately.">
+                <input required minLength={8} type="password" autoComplete="new-password" className={inputClass} value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} />
+              </FormField>
+            </>
+          )}
           <FormField label="Status">
             <select className={inputClass} value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value })}>
               <option>Active</option>

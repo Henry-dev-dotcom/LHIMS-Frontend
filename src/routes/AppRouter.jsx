@@ -55,6 +55,7 @@ const ExpensesPage = lazyPage(() => import('../pages/billing/ExpensesPage'), 'Ex
 const AccountLedgerPage = lazyPage(() => import('../pages/billing/AccountLedgerPage'), 'AccountLedgerPage');
 const BillingAnalyticsPage = lazyPage(() => import('../pages/billing/BillingAnalyticsPage'), 'BillingAnalyticsPage');
 const ApiReadinessPage = lazyPage(() => import('../pages/system/ApiReadinessPage'), 'ApiReadinessPage');
+const RolesPage = lazyPage(() => import('../pages/admin/RolesPage'), 'RolesPage');
 const PlatformFacilitiesPage = lazyPage(() => import('../pages/platform/PlatformFacilitiesPage'), 'PlatformFacilitiesPage');
 
 const roleDashboardMap = {
@@ -74,8 +75,8 @@ function PageFallback() {
   );
 }
 
-function resolvePage(pageId, role) {
-  if (!canAccessPage(role, pageId)) {
+function resolvePage(pageId, role, modules) {
+  if (!canAccessPage(role, pageId, modules)) {
     return <AccessRestrictedPage pageId={pageId} />;
   }
 
@@ -124,6 +125,7 @@ function resolvePage(pageId, role) {
   if (pageId === 'price-catalog') return <PriceCatalogPage />;
   if (pageId === 'api-readiness') return <ApiReadinessPage />;
   if (pageId === 'platform-facilities') return <PlatformFacilitiesPage />;
+  if (pageId === 'roles') return <RolesPage />;
   if (roleDashboardMap[pageId]) return <RoleDashboard role={roleDashboardMap[pageId]} />;
 
   const meta = PAGE_META[pageId] || {
@@ -153,5 +155,5 @@ export function AppRouter() {
     }
   }, [pageId]);
 
-  return <Suspense fallback={<PageFallback />}>{resolvePage(pageId, role)}</Suspense>;
+  return <Suspense fallback={<PageFallback />}>{resolvePage(pageId, role, state.auth?.modules)}</Suspense>;
 }

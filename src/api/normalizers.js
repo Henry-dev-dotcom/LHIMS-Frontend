@@ -45,6 +45,9 @@ export function normalizeAuthUser(apiUser) {
     linkedDoctorId: apiUser.doctorProfileId || apiUser.doctorProfile?.id || '',
     hospitalId: apiUser.hospitalId || apiUser.doctorProfile?.hospitalId || '',
     permissions: apiUser.permissions || [],
+    // Switched-on department modules for this facility (empty for the platform operator).
+    modules: Array.isArray(apiUser.modules) ? apiUser.modules : [],
+    customRole: apiUser.customRole ? { id: apiUser.customRole.id, name: apiUser.customRole.name } : null,
     loginAt: apiUser.lastLoginAt || new Date().toISOString()
   };
 }
@@ -413,6 +416,8 @@ export function normalizeUser(user) {
     username: user.username || '',
     email: user.email || '',
     role: normalizeRole(user.role),
+    customRoleId: user.customRole?.id || '',
+    customRoleName: user.customRole?.name || '',
     status: enumLabel(user.status),
     lastLoginAt: user.lastLoginAt || '',
     linkedDoctorId: user.doctorProfile?.id || ''

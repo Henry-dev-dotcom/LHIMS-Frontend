@@ -204,6 +204,12 @@ export const PAGE_META = {
     requirements: ['TAT reports', 'Order volume by hospital/doctor/department', 'Revenue and outstanding balances', 'Abnormal result rates', 'Staff productivity', 'CSV/JSON export']
   },
 
+  roles: {
+    title: 'Roles & Permissions', section: 'Admin',
+    description: 'Facility-defined staff roles built on a standard workspace with a chosen permission list.',
+    requirements: ['Custom roles', 'Permission picker', 'Standard roles reference']
+  },
+
   'platform-facilities': {
     title: 'Facilities', section: 'Platform',
     description: 'Platform operator console for creating, suspending and reactivating subscribing facilities.',

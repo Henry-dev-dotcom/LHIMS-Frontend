@@ -12,6 +12,12 @@ export const adminService = {
   users: async (client, params = {}) => client.request(`/admin/users${buildQuery(params)}`),
   createUser: async (client, payload) => client.request('/admin/users', { method: 'POST', body: payload }),
   updateUser: async (client, userId, payload) => client.request(`/admin/users/${userId}`, { method: 'PATCH', body: payload }),
+  // Facility-defined staff roles.
+  permissions: async (client) => client.request('/admin/permissions'),
+  roles: async (client) => client.request('/admin/roles'),
+  createRole: async (client, payload) => client.request('/admin/roles', { method: 'POST', body: payload }),
+  updateRole: async (client, roleId, payload) => client.request(`/admin/roles/${roleId}`, { method: 'PATCH', body: payload }),
+  deleteRole: async (client, roleId) => client.request(`/admin/roles/${roleId}`, { method: 'DELETE' }),
   hospitals: async (client, params = {}) => client.request(`/admin/hospitals${buildQuery(params)}`),
   createHospital: async (client, payload) => client.request('/admin/hospitals', { method: 'POST', body: payload }),
   updateHospital: async (client, hospitalId, payload) => client.request(`/admin/hospitals/${hospitalId}`, { method: 'PATCH', body: payload }),

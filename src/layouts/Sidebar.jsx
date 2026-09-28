@@ -14,7 +14,7 @@ export function Sidebar() {
   const closeButtonRef = useRef(null);
   const drawerRef = useRef(null);
   useFocusTrap(drawerRef, state.ui.sidebarOpen);
-  const allItems = getNavForRole(role);
+  const allItems = getNavForRole(role, state.auth?.modules);
   const groups = groupNavItems(allItems);
 
   useEffect(() => {
