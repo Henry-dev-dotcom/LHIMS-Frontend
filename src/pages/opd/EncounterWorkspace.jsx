@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, CheckCircle2, ClipboardList, FlaskConical, HeartPulse, Pill, Plus, Stethoscope, Trash2, XCircle } from 'lucide-react';
+import { AlertTriangle, BedDouble, CheckCircle2, ClipboardList, FlaskConical, HeartPulse, Pill, Plus, Stethoscope, Trash2, XCircle } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { FormField, inputClass } from '../../components/ui/FormField';
@@ -11,6 +11,8 @@ import { encounterService } from '../../services/encounterService';
 import { listItems } from '../../api/normalizers';
 import { formatDateTime } from '../../utils/formatters';
 import { isAllergyConflict } from '../../services/pharmacyService';
+import { inpatientService } from '../../services/inpatientService';
+import { BedPicker } from '../inpatient/BedPicker';
 import { P, STATUS, TRIAGE, ageLabel, can, patientName } from './opdUtils';
 
 const ACTIVE = ['WAITING_TRIAGE', 'WAITING_DOCTOR', 'IN_CONSULTATION'];
@@ -57,6 +59,7 @@ export function EncounterWorkspace({ encounterId }) {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [completeOpen, setCompleteOpen] = useState(false);
+  const [admitOpen, setAdmitOpen] = useState(false);
 
   const toast = useCallback((type, message) => dispatch({ type: 'SHOW_TOAST', toast: { type, message } }), [dispatch]);
 
@@ -95,6 +98,9 @@ export function EncounterWorkspace({ encounterId }) {
 
   const open = ACTIVE.includes(encounter.status);
   const inConsult = encounter.status === 'IN_CONSULTATION';
+  // Inpatient stays are opened by admission and closed by discharge, on the ward screens.
+  const inpatient = encounter.type === 'INPATIENT';
+  const canAdmit = inConsult && !inpatient && can(auth, 'inpatient:admit') && (auth?.modules || []).includes('inpatient');
   const patient = encounter.patient;
   const latestVitals = encounter.vitalSigns?.[0];
 
@@ -104,7 +110,7 @@ export function EncounterWorkspace({ encounterId }) {
       <Card>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">{encounter.encounterCode} · {encounter.type === 'EMERGENCY' ? 'Emergency' : 'Outpatient'}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">{encounter.encounterCode} · {encounter.type === 'EMERGENCY' ? 'Emergency' : inpatient ? 'Inpatient stay' : 'Outpatient'}</p>
             <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">{patientName(patient)}</h2>
             <p className="mt-1 text-sm text-slate-600">
               {[patient.patientCode, ageLabel(patient.dateOfBirth), patient.gender, patient.insuranceProvider && `${patient.insuranceProvider}${patient.policyNumber ? ` ${patient.policyNumber}` : ''}`].filter(Boolean).join(' · ')}
@@ -133,10 +139,13 @@ export function EncounterWorkspace({ encounterId }) {
                   <Stethoscope className="h-4 w-4" /> Start consultation
                 </Button>
               )}
-              {inConsult && can(auth, P.COMPLETE) && (
+              {canAdmit && (
+                <Button variant="secondary" disabled={busy} onClick={() => setAdmitOpen(true)}><BedDouble className="h-4 w-4" /> Admit to ward</Button>
+              )}
+              {inConsult && !inpatient && can(auth, P.COMPLETE) && (
                 <Button variant="success" disabled={busy} onClick={() => setCompleteOpen(true)}><CheckCircle2 className="h-4 w-4" /> Complete visit</Button>
               )}
-              {open && !inConsult && can(auth, P.CANCEL) && (
+              {open && !inConsult && !inpatient && can(auth, P.CANCEL) && (
                 <Button
                   variant="secondary"
                   disabled={busy}
@@ -167,6 +176,17 @@ export function EncounterWorkspace({ encounterId }) {
         <PrescriptionsCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
         <ChargesCard encounter={encounter} />
       </div>
+
+      <AdmitFromVisitModal
+        open={admitOpen}
+        encounter={encounter}
+        onClose={() => setAdmitOpen(false)}
+        onAdmitted={async (admission) => {
+          setAdmitOpen(false);
+          toast('success', `Admitted to ${admission.ward.name}, bed ${admission.bed.label} (${admission.admissionCode}). This visit is now closed.`);
+          await load();
+        }}
+      />
 
       <CompleteModal
         open={completeOpen}
@@ -628,6 +648,44 @@ function ChargesCard({ encounter }) {
         )) : <li className="text-slate-500">No visit charges.</li>}
       </ul>
     </Card>
+  );
+}
+
+/** The decision to admit: choose a ward and bed; the visit closes as ADMITTED. */
+function AdmitFromVisitModal({ open, encounter, onClose, onAdmitted }) {
+  const [wards, setWards] = useState([]);
+  const [target, setTarget] = useState({ wardId: '', bedId: '' });
+  const [reason, setReason] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  useEffect(() => {
+    if (!open) return;
+    setTarget({ wardId: '', bedId: '' });
+    setReason(encounter.diagnoses?.[0]?.description || encounter.chiefComplaint || '');
+    setError('');
+    inpatientService.wards(apiClient).then((data) => setWards(listItems(data))).catch(() => setWards([]));
+  }, [open, encounter]);
+  async function admit() {
+    setSaving(true);
+    setError('');
+    try {
+      onAdmitted(await inpatientService.admit(apiClient, { patientId: encounter.patient.id, ...target, reason: reason.trim(), sourceEncounterId: encounter.id }));
+    } catch (e) {
+      setError(e?.message || 'The patient could not be admitted.');
+    } finally {
+      setSaving(false);
+    }
+  }
+  return (
+    <Modal open={open} title="Admit to ward" description="Diagnoses from this visit carry over to the stay, and this visit closes as admitted." onClose={onClose}
+      footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button disabled={!target.bedId || reason.trim().length < 3 || saving} onClick={admit}><BedDouble className="h-4 w-4" /> {saving ? 'Admitting…' : 'Admit'}</Button></>}>
+      <div className="space-y-3">
+        {!encounter.diagnoses?.length && <p role="alert" className="rounded-2xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">Record a diagnosis before admitting.</p>}
+        <BedPicker wards={wards} gender={encounter.patient.gender} value={target} onChange={setTarget} />
+        <FormField label="Reason for admission" required><input className={inputClass} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={500} /></FormField>
+        {error && <p role="alert" className="text-sm font-semibold text-red-600">{error}</p>}
+      </div>
+    </Modal>
   );
 }
 

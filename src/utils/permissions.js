@@ -9,6 +9,7 @@ import { ALL_ROLES, NAV_ITEMS, ROLES } from '../data/roles';
 const SECTION_MODULES = {
   Outpatient: 'opd',
   Emergency: 'emergency',
+  Wards: 'inpatient',
   Pharmacy: 'pharmacy',
   Clinician: 'clinician_portal',
   Reception: 'reception',

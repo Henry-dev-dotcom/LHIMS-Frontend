@@ -26,7 +26,8 @@ import {
   Stethoscope,
   Siren,
   Pill,
-  Package
+  Package,
+  BedDouble
 } from 'lucide-react';
 
 export const ROLES = [
@@ -107,6 +108,7 @@ export const NAV_ITEMS = [
 
   { id: 'opd-queue', label: 'OPD Visits', icon: Stethoscope, roles: ['nurse','doctor','receptionist','admin'], section: 'Outpatient' },
   { id: 'emergency-board', label: 'Emergency Board', icon: Siren, roles: ['nurse','doctor','receptionist','admin'], section: 'Emergency' },
+  { id: 'ward-board', label: 'Ward Board', icon: BedDouble, roles: ['nurse','doctor','admin'], section: 'Wards' },
   { id: 'pharmacy-dispensing', label: 'Dispensing', icon: Pill, roles: ['pharmacist','admin'], section: 'Pharmacy' },
   { id: 'pharmacy-stock', label: 'Drugs & Stock', icon: Package, roles: ['pharmacist','admin'], section: 'Pharmacy' },
 

@@ -1,4 +1,9 @@
 export const PAGE_META = {
+  'ward-board': {
+    title: 'Ward Board', section: 'Wards',
+    description: 'Wards and beds at a glance; admissions, bed moves, the medication chart and discharge.',
+    requirements: ['Bed board', 'Admission', 'Medication chart', 'Transfer', 'Discharge', 'Ward setup']
+  },
   'emergency-board': {
     title: 'Emergency Board', section: 'Emergency',
     description: 'Emergency arrivals ordered by triage colour, with quick registration of unidentified patients.',
