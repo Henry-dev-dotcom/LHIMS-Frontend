@@ -57,6 +57,9 @@ const BillingAnalyticsPage = lazyPage(() => import('../pages/billing/BillingAnal
 const ApiReadinessPage = lazyPage(() => import('../pages/system/ApiReadinessPage'), 'ApiReadinessPage');
 const RolesPage = lazyPage(() => import('../pages/admin/RolesPage'), 'RolesPage');
 const OpdQueuePage = lazyPage(() => import('../pages/opd/OpdQueuePage'), 'OpdQueuePage');
+const EmergencyBoardPage = lazyPage(() => import('../pages/opd/OpdQueuePage'), 'EmergencyBoardPage');
+const PharmacyDispensingPage = lazyPage(() => import('../pages/pharmacy/PharmacyDispensingPage'), 'PharmacyDispensingPage');
+const PharmacyStockPage = lazyPage(() => import('../pages/pharmacy/PharmacyStockPage'), 'PharmacyStockPage');
 const PlatformFacilitiesPage = lazyPage(() => import('../pages/platform/PlatformFacilitiesPage'), 'PlatformFacilitiesPage');
 
 const roleDashboardMap = {
@@ -128,6 +131,9 @@ function resolvePage(pageId, role, modules) {
   if (pageId === 'platform-facilities') return <PlatformFacilitiesPage />;
   if (pageId === 'roles') return <RolesPage />;
   if (pageId === 'opd-queue') return <OpdQueuePage />;
+  if (pageId === 'emergency-board') return <EmergencyBoardPage />;
+  if (pageId === 'pharmacy-dispensing') return <PharmacyDispensingPage />;
+  if (pageId === 'pharmacy-stock') return <PharmacyStockPage />;
   if (roleDashboardMap[pageId]) return <RoleDashboard role={roleDashboardMap[pageId]} />;
 
   const meta = PAGE_META[pageId] || {

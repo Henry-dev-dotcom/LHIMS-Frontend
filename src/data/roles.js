@@ -23,7 +23,10 @@ import {
   Clock,
   CheckCircle2,
   KeyRound,
-  Stethoscope
+  Stethoscope,
+  Siren,
+  Pill,
+  Package
 } from 'lucide-react';
 
 export const ROLES = [
@@ -49,6 +52,13 @@ export const ROLES = [
     subtitle: 'Triage, vitals and patient care',
     landing: 'opd-queue',
     accessSummary: 'Triages outpatients, records vital signs and allergies, and hands patients to the doctor queue.'
+  },
+  {
+    id: 'pharmacist',
+    label: 'Pharmacist',
+    subtitle: 'Dispensing and drug stock',
+    landing: 'pharmacy-dispensing',
+    accessSummary: 'Dispenses prescriptions, manages the drug list, receives and adjusts stock, and tracks expiry.'
   },
   {
     id: 'lab',
@@ -96,6 +106,9 @@ export const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard, roles: ['doctor','receptionist','lab','scan','billing','admin'], section: 'Overview' },
 
   { id: 'opd-queue', label: 'OPD Visits', icon: Stethoscope, roles: ['nurse','doctor','receptionist','admin'], section: 'Outpatient' },
+  { id: 'emergency-board', label: 'Emergency Board', icon: Siren, roles: ['nurse','doctor','receptionist','admin'], section: 'Emergency' },
+  { id: 'pharmacy-dispensing', label: 'Dispensing', icon: Pill, roles: ['pharmacist','admin'], section: 'Pharmacy' },
+  { id: 'pharmacy-stock', label: 'Drugs & Stock', icon: Package, roles: ['pharmacist','admin'], section: 'Pharmacy' },
 
   { id: 'doctor-dashboard', label: 'Clinician Dashboard', icon: UserRound, roles: ['doctor','admin'], section: 'Clinician' },
   { id: 'doctor-new-order', label: 'New Order', icon: ClipboardList, roles: ['doctor','admin'], section: 'Clinician' },

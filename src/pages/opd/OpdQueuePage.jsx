@@ -18,10 +18,17 @@ function TriageBadge({ level }) {
   return <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${TRIAGE[level]?.className}`}>{TRIAGE[level]?.short}</span>;
 }
 
-export function OpdQueuePage() {
+/** The emergency department board: the same visit workflow, emergency visits only. */
+export function EmergencyBoardPage() {
+  return <OpdQueuePage mode="EMERGENCY" />;
+}
+
+export function OpdQueuePage({ mode = 'OPD' }) {
+  const emergency = mode === 'EMERGENCY';
   const { state, dispatch } = useAppStore();
   const auth = state.auth;
-  const [tab, setTab] = useState(() => (can(auth, P.CONSULT) ? 'WAITING_DOCTOR' : 'WAITING_TRIAGE'));
+  // In the ED everyone starts at triage, where new arrivals land.
+  const [tab, setTab] = useState(() => (!emergency && can(auth, P.CONSULT) ? 'WAITING_DOCTOR' : 'WAITING_TRIAGE'));
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState('');
@@ -33,13 +40,13 @@ export function OpdQueuePage() {
     setLoading(true);
     try {
       const params = tab === 'COMPLETED' ? { status: 'COMPLETED', date: todayIso() } : { status: tab };
-      setRows(listItems(await encounterService.list(apiClient, params)));
+      setRows(listItems(await encounterService.list(apiClient, { ...params, type: mode })));
     } catch (error) {
       toast('error', error?.message || 'Visits could not be loaded.');
     } finally {
       setLoading(false);
     }
-  }, [tab, toast]);
+  }, [tab, toast, mode]);
 
   useEffect(() => {
     if (!openId) load();
@@ -56,7 +63,11 @@ export function OpdQueuePage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader eyebrow="Outpatient" title="OPD visits" description="Patients waiting for triage, waiting for the doctor, and in consultation." />
+      <PageHeader
+        eyebrow={emergency ? 'Emergency' : 'Outpatient'}
+        title={emergency ? 'Emergency board' : 'OPD visits'}
+        description={emergency ? 'Emergency arrivals by triage colour: red first, then longest waiting.' : 'Patients waiting for triage, waiting for the doctor, and in consultation.'}
+      />
 
       <Card
         title="Visit queue"
@@ -64,7 +75,7 @@ export function OpdQueuePage() {
         actions={(
           <>
             <Button variant="secondary" onClick={load} disabled={loading}><RefreshCw className="h-4 w-4" /> Refresh</Button>
-            {can(auth, P.CREATE) && <Button onClick={() => setNewOpen(true)}><Plus className="h-4 w-4" /> New visit</Button>}
+            {can(auth, P.CREATE) && <Button onClick={() => setNewOpen(true)}><Plus className="h-4 w-4" /> {emergency ? 'Emergency arrival' : 'New visit'}</Button>}
           </>
         )}
       >
@@ -104,6 +115,7 @@ export function OpdQueuePage() {
       </Card>
 
       <NewVisitModal
+        mode={mode}
         open={newOpen}
         onClose={() => setNewOpen(false)}
         onStarted={(encounter) => {
@@ -117,12 +129,14 @@ export function OpdQueuePage() {
   );
 }
 
-function NewVisitModal({ open, onClose, onStarted }) {
+function NewVisitModal({ mode = 'OPD', open, onClose, onStarted }) {
+  const emergency = mode === 'EMERGENCY';
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
   const [patient, setPatient] = useState(null);
+  const [unidentified, setUnidentified] = useState(false);
+  const [quick, setQuick] = useState({ firstName: '', lastName: '', gender: 'UNKNOWN', estimatedAgeYears: '', triageLevel: '' });
   const [complaint, setComplaint] = useState('');
-  const [type, setType] = useState('OPD');
   const [fees, setFees] = useState([]);
   const [feeItemId, setFeeItemId] = useState('');
   const [saving, setSaving] = useState(false);
@@ -133,17 +147,19 @@ function NewVisitModal({ open, onClose, onStarted }) {
     setSearch('');
     setResults([]);
     setPatient(null);
+    setUnidentified(false);
+    setQuick({ firstName: '', lastName: '', gender: 'UNKNOWN', estimatedAgeYears: '', triageLevel: '' });
     setComplaint('');
-    setType('OPD');
     setError('');
     encounterService.catalog(apiClient)
       .then((data) => {
         const services = listItems(data).filter((item) => item.type === 'SERVICE' && item.isActive !== false);
         setFees(services);
-        setFeeItemId(services.find((s) => /consult/i.test(s.catalogCode || s.name))?.id || '');
+        // Emergency care is not held up for payment; the fee can be added later.
+        setFeeItemId(emergency ? '' : services.find((s) => /consult/i.test(s.catalogCode || s.name))?.id || '');
       })
       .catch(() => setFees([]));
-  }, [open]);
+  }, [open, emergency]);
 
   async function find(event) {
     event.preventDefault();
@@ -159,12 +175,22 @@ function NewVisitModal({ open, onClose, onStarted }) {
     setSaving(true);
     setError('');
     try {
-      const encounter = await encounterService.start(apiClient, {
-        patientId: patient.id,
-        type,
-        chiefComplaint: complaint.trim() || undefined,
-        feeItemId: feeItemId || undefined
-      });
+      const encounter = unidentified
+        ? await encounterService.registerEmergency(apiClient, {
+            firstName: quick.firstName.trim() || undefined,
+            lastName: quick.lastName.trim() || undefined,
+            gender: quick.gender,
+            estimatedAgeYears: quick.estimatedAgeYears === '' ? undefined : Number(quick.estimatedAgeYears),
+            chiefComplaint: complaint.trim(),
+            triageLevel: quick.triageLevel || undefined,
+            feeItemId: feeItemId || undefined
+          })
+        : await encounterService.start(apiClient, {
+            patientId: patient.id,
+            type: mode,
+            chiefComplaint: complaint.trim() || undefined,
+            feeItemId: feeItemId || undefined
+          });
       onStarted(encounter);
     } catch (e) {
       setError(e?.message || 'The visit could not be started.');
@@ -173,61 +199,92 @@ function NewVisitModal({ open, onClose, onStarted }) {
     }
   }
 
+  const ready = unidentified ? complaint.trim().length >= 2 : Boolean(patient);
+  const setQ = (key) => (e) => setQuick((c) => ({ ...c, [key]: e.target.value }));
+
   return (
     <Modal
       open={open}
-      title="New outpatient visit"
-      description="Find the patient, then send them to triage. Register new patients at Walk-In Registration first."
+      title={emergency ? 'Emergency arrival' : 'New outpatient visit'}
+      description={emergency
+        ? 'Find the patient, or register them now if they cannot be identified; correct the record later.'
+        : 'Find the patient, then send them to triage. Register new patients at Walk-In Registration first.'}
       onClose={onClose}
       footer={(
         <>
           <Button variant="secondary" onClick={onClose}>Cancel</Button>
-          <Button onClick={start} disabled={!patient || saving}>{saving ? 'Starting…' : 'Send to triage'}</Button>
+          <Button onClick={start} disabled={!ready || saving}>{saving ? 'Starting…' : emergency ? 'Add to board' : 'Send to triage'}</Button>
         </>
       )}
     >
       <div className="space-y-4">
-        <form onSubmit={find} className="flex gap-2">
-          <label className="sr-only" htmlFor="opd-patient-search">Search patients</label>
-          <input id="opd-patient-search" className={inputClass} placeholder="Name, patient number or phone" value={search} onChange={(e) => setSearch(e.target.value)} />
-          <Button type="submit" variant="secondary"><Search className="h-4 w-4" /> Find</Button>
-        </form>
-        {results.length > 0 && !patient && (
-          <ul className="max-h-60 divide-y divide-slate-100 overflow-y-auto rounded-2xl border border-slate-200">
-            {results.map((p) => (
-              <li key={p.id}>
-                <button type="button" className="w-full px-4 py-3 text-left hover:bg-slate-50" onClick={() => setPatient(p)}>
-                  <span className="font-semibold text-slate-900">{patientName(p)}</span>
-                  <span className="block text-xs text-slate-500">{p.patientCode} {p.phone && `· ${p.phone}`}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
+        {emergency && (
+          <label className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+            <input type="checkbox" className="h-4 w-4 accent-clinical-600" checked={unidentified} onChange={(e) => { setUnidentified(e.target.checked); setPatient(null); }} />
+            Patient cannot be identified or is not registered
+          </label>
         )}
-        {patient && (
-          <div className="flex items-center justify-between rounded-2xl bg-clinical-50 px-4 py-3">
-            <span>
-              <span className="font-semibold text-slate-900">{patientName(patient)}</span>
-              <span className="block text-xs text-slate-600">{patient.patientCode}</span>
-            </span>
-            <button type="button" className="text-sm font-semibold text-clinical-700 hover:underline" onClick={() => setPatient(null)}>Change</button>
+
+        {unidentified ? (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <FormField label="First name (if known)"><input className={inputClass} value={quick.firstName} onChange={setQ('firstName')} maxLength={80} /></FormField>
+            <FormField label="Surname (if known)"><input className={inputClass} value={quick.lastName} onChange={setQ('lastName')} maxLength={80} /></FormField>
+            <FormField label="Sex">
+              <select className={inputClass} value={quick.gender} onChange={setQ('gender')}>
+                <option value="UNKNOWN">Unknown</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </FormField>
+            <FormField label="Estimated age (years)"><input type="number" min="0" max="120" className={inputClass} value={quick.estimatedAgeYears} onChange={setQ('estimatedAgeYears')} /></FormField>
+            <FormField label="Triage on arrival" className="sm:col-span-2">
+              <select className={inputClass} value={quick.triageLevel} onChange={setQ('triageLevel')}>
+                <option value="">Triage later</option>
+                {Object.entries(TRIAGE).map(([key, t]) => <option key={key} value={key}>{t.label}</option>)}
+              </select>
+            </FormField>
           </div>
+        ) : (
+          <>
+            <form onSubmit={find} className="flex gap-2">
+              <label className="sr-only" htmlFor="opd-patient-search">Search patients</label>
+              <input id="opd-patient-search" className={inputClass} placeholder="Name, patient number or phone" value={search} onChange={(e) => setSearch(e.target.value)} />
+              <Button type="submit" variant="secondary"><Search className="h-4 w-4" /> Find</Button>
+            </form>
+            {results.length > 0 && !patient && (
+              <ul className="max-h-60 divide-y divide-slate-100 overflow-y-auto rounded-2xl border border-slate-200">
+                {results.map((p) => (
+                  <li key={p.id}>
+                    <button type="button" className="w-full px-4 py-3 text-left hover:bg-slate-50" onClick={() => setPatient(p)}>
+                      <span className="font-semibold text-slate-900">{patientName(p)}</span>
+                      <span className="block text-xs text-slate-500">{p.patientCode} {p.phone && `· ${p.phone}`}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {patient && (
+              <div className="flex items-center justify-between rounded-2xl bg-clinical-50 px-4 py-3">
+                <span>
+                  <span className="font-semibold text-slate-900">{patientName(patient)}</span>
+                  <span className="block text-xs text-slate-600">{patient.patientCode}</span>
+                </span>
+                <button type="button" className="text-sm font-semibold text-clinical-700 hover:underline" onClick={() => setPatient(null)}>Change</button>
+              </div>
+            )}
+          </>
         )}
+
         <div className="grid gap-4 sm:grid-cols-2">
-          <FormField label="Visit type">
-            <select className={inputClass} value={type} onChange={(e) => setType(e.target.value)}>
-              <option value="OPD">Outpatient</option>
-              <option value="EMERGENCY">Emergency</option>
-            </select>
+          <FormField label={emergency ? 'Reason for attending' : 'Main complaint'} required={unidentified} className="sm:col-span-2">
+            <input className={inputClass} maxLength={500} value={complaint} onChange={(e) => setComplaint(e.target.value)} placeholder={emergency ? 'e.g. Road traffic accident, head injury' : 'e.g. Fever and headache for 3 days'} />
           </FormField>
           <FormField label="Consultation fee" help={fees.length ? undefined : 'No service items in the catalog; no fee will be charged.'}>
             <select className={inputClass} value={feeItemId} onChange={(e) => setFeeItemId(e.target.value)}>
               <option value="">No fee</option>
               {fees.map((fee) => <option key={fee.id} value={fee.id}>{fee.name} — {Number(fee.price).toFixed(2)}</option>)}
             </select>
-          </FormField>
-          <FormField label="Main complaint" className="sm:col-span-2">
-            <input className={inputClass} maxLength={500} value={complaint} onChange={(e) => setComplaint(e.target.value)} placeholder="e.g. Fever and headache for 3 days" />
           </FormField>
         </div>
         {error && <p role="alert" className="text-sm font-semibold text-red-600">{error}</p>}

@@ -10,6 +10,7 @@ import { apiClient } from '../../store/commands';
 import { encounterService } from '../../services/encounterService';
 import { listItems } from '../../api/normalizers';
 import { formatDateTime } from '../../utils/formatters';
+import { isAllergyConflict } from '../../services/pharmacyService';
 import { P, STATUS, TRIAGE, ageLabel, can, patientName } from './opdUtils';
 
 const ACTIVE = ['WAITING_TRIAGE', 'WAITING_DOCTOR', 'IN_CONSULTATION'];
@@ -27,7 +28,7 @@ const VITAL_FIELDS = [
   { key: 'bloodGlucose', label: 'Glucose (mmol/L)', step: '0.1' }
 ];
 
-const EMPTY_RX_LINE = { drugName: '', strength: '', dosageForm: '', dose: '', route: 'Oral', frequency: '', durationDays: '', quantity: '', instructions: '' };
+const EMPTY_RX_LINE = { drugId: '', drugName: '', strength: '', dosageForm: '', dose: '', route: 'Oral', frequency: '', durationDays: '', quantity: '', instructions: '' };
 
 function numbersOnly(values) {
   const out = {};
@@ -479,9 +480,12 @@ function PrescriptionsCard({ encounter, auth, open, busy, act }) {
   const valid = lines.every((l) => l.drugName.trim().length >= 2 && l.dose.trim() && l.route.trim() && l.frequency.trim());
 
   const setLine = (index, key, value) => setLines((c) => c.map((line, i) => (i === index ? { ...line, [key]: value } : line)));
+  // Prescribe from the pharmacy's drug list when this facility runs a pharmacy.
+  const useFormulary = can(auth, 'pharmacy:formulary:read') && (auth?.modules || []).includes('pharmacy');
 
   async function save() {
     const items = lines.map((l) => ({
+      drugId: l.drugId || undefined,
       drugName: l.drugName.trim(),
       strength: l.strength.trim() || undefined,
       dosageForm: l.dosageForm.trim() || undefined,
@@ -492,7 +496,17 @@ function PrescriptionsCard({ encounter, auth, open, busy, act }) {
       quantity: l.quantity ? Number(l.quantity) : undefined,
       instructions: l.instructions.trim() || undefined
     }));
-    const ok = await act(() => encounterService.prescribe(apiClient, encounter.id, { items }), 'Prescription issued.');
+    const ok = await act(async () => {
+      try {
+        return await encounterService.prescribe(apiClient, encounter.id, { items });
+      } catch (error) {
+        // A recorded allergy blocks the prescription unless the prescriber gives a reason.
+        if (!isAllergyConflict(error)) throw error;
+        const reason = window.prompt(`${error.message}\n\nReason for prescribing anyway:`);
+        if (!reason || reason.trim().length < 5) throw new Error('Prescription not issued: an allergy override needs a reason (at least 5 characters).');
+        return encounterService.prescribe(apiClient, encounter.id, { items, allergyOverrideReason: reason.trim() });
+      }
+    }, 'Prescription issued.');
     if (ok) setLines([{ ...EMPTY_RX_LINE }]);
   }
 
@@ -502,7 +516,17 @@ function PrescriptionsCard({ encounter, auth, open, busy, act }) {
         <div className="space-y-3">
           {lines.map((line, index) => (
             <div key={index} className="grid gap-2 rounded-2xl border border-slate-200 p-3 sm:grid-cols-4">
-              <FormField label="Medicine" required className="sm:col-span-2"><input className={inputClass} value={line.drugName} onChange={(e) => setLine(index, 'drugName', e.target.value)} /></FormField>
+              <div className="sm:col-span-2">
+                {useFormulary ? (
+                  <DrugPicker
+                    line={line}
+                    onText={(value) => setLines((c) => c.map((l, i) => (i === index ? { ...l, drugName: value, drugId: '' } : l)))}
+                    onPick={(drug) => setLines((c) => c.map((l, i) => (i === index ? { ...l, drugId: drug.id, drugName: drug.genericName, strength: drug.strength || l.strength, dosageForm: drug.dosageForm || l.dosageForm } : l)))}
+                  />
+                ) : (
+                  <FormField label="Medicine" required><input className={inputClass} value={line.drugName} onChange={(e) => setLine(index, 'drugName', e.target.value)} /></FormField>
+                )}
+              </div>
               <FormField label="Strength"><input className={inputClass} value={line.strength} onChange={(e) => setLine(index, 'strength', e.target.value)} placeholder="500 mg" /></FormField>
               <FormField label="Form"><input className={inputClass} value={line.dosageForm} onChange={(e) => setLine(index, 'dosageForm', e.target.value)} placeholder="Tablet" /></FormField>
               <FormField label="Dose" required><input className={inputClass} value={line.dose} onChange={(e) => setLine(index, 'dose', e.target.value)} placeholder="1 tablet" /></FormField>
@@ -535,6 +559,52 @@ function PrescriptionsCard({ encounter, auth, open, busy, act }) {
         )) : <li className="text-slate-500">No prescriptions.</li>}
       </ul>
     </Card>
+  );
+}
+
+/** Medicine field with suggestions from the pharmacy's drug list; free text is still allowed. */
+function DrugPicker({ line, onText, onPick }) {
+  const [matches, setMatches] = useState([]);
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    const q = line.drugName.trim();
+    if (!focused || line.drugId || q.length < 2) {
+      setMatches([]);
+      return undefined;
+    }
+    const timer = window.setTimeout(() => {
+      encounterService.formulary(apiClient, q).then((data) => setMatches(listItems(data))).catch(() => setMatches([]));
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [line.drugName, line.drugId, focused]);
+
+  return (
+    <div className="relative">
+      <FormField label="Medicine" required help={line.drugId ? 'From the pharmacy drug list.' : 'Type to search the drug list, or enter any medicine.'}>
+        <input
+          className={inputClass}
+          value={line.drugName}
+          onChange={(e) => onText(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => window.setTimeout(() => setFocused(false), 150)}
+          autoComplete="off"
+          aria-autocomplete="list"
+        />
+      </FormField>
+      {matches.length > 0 && (
+        <ul role="listbox" className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-lg">
+          {matches.map((drug) => (
+            <li key={drug.id}>
+              <button type="button" className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm hover:bg-slate-50" onMouseDown={(e) => e.preventDefault()} onClick={() => { onPick(drug); setMatches([]); }}>
+                <span>{[drug.genericName, drug.strength, drug.dosageForm].filter(Boolean).join(' ')}{drug.brandName ? ` (${drug.brandName})` : ''}</span>
+                <span className={`text-xs font-semibold ${drug.onHand > 0 ? 'text-emerald-700' : 'text-red-600'}`}>{drug.onHand > 0 ? `${drug.onHand} in stock` : 'Out of stock'}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

@@ -16,6 +16,7 @@ import { ALL_ROLES } from '../data/roles';
 export const ROLE_FROM_API = {
   PLATFORM_ADMIN: 'platform',
   NURSE: 'nurse',
+  PHARMACIST: 'pharmacist',
   ADMIN: 'admin',
   DOCTOR: 'doctor',
   RECEPTIONIST: 'receptionist',

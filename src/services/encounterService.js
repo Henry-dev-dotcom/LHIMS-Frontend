@@ -17,6 +17,8 @@ export const encounterService = {
   diagnosisCodes: async (client, q) => client.request(`/encounters/diagnosis-codes${buildQuery({ q })}`),
   addAllergy: async (client, patientId, payload) => client.request(`/patients/${patientId}/allergies`, { method: 'POST', body: payload }),
   timeline: async (client, patientId) => client.request(`/patients/${patientId}/timeline`),
+  formulary: async (client, q) => client.request(`/encounters/formulary${buildQuery({ q })}`),
+  registerEmergency: async (client, payload) => client.request('/encounters/emergency-arrivals', { method: 'POST', body: payload }),
   searchPatients: async (client, search) => client.request(`/patients${buildQuery({ search, limit: 10 })}`),
   catalog: async (client) => client.request(`/catalog${buildQuery({ limit: 100 })}`)
 };

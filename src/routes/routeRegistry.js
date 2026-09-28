@@ -1,4 +1,19 @@
 export const PAGE_META = {
+  'emergency-board': {
+    title: 'Emergency Board', section: 'Emergency',
+    description: 'Emergency arrivals ordered by triage colour, with quick registration of unidentified patients.',
+    requirements: ['Triage-first board', 'Unidentified patient registration', 'Encounter workspace']
+  },
+  'pharmacy-dispensing': {
+    title: 'Dispensing', section: 'Pharmacy',
+    description: 'Prescriptions awaiting dispensing, allergy checks, first-expiry-first-out stock and partial dispensing.',
+    requirements: ['Prescription queue', 'Allergy alerts', 'Match lines to stock', 'Partial dispensing']
+  },
+  'pharmacy-stock': {
+    title: 'Drugs & Stock', section: 'Pharmacy',
+    description: 'Drug list, stock by batch and expiry, receiving, adjustments and the stock ledger.',
+    requirements: ['Drug list', 'Receive batches', 'Adjust and write off', 'Stock history', 'Reorder and expiry alerts']
+  },
   'opd-queue': {
     title: 'OPD Visits', section: 'Outpatient',
     description: 'Outpatient visit queue and encounter workspace: triage, vitals, notes, diagnoses, investigations, prescriptions and charges.',
