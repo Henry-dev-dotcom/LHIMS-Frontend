@@ -11,6 +11,7 @@ import { StatusBadge } from '../../components/ui/StatusBadge';
 import { useAppStore } from '../../store/AppStore';
 import { apiClient } from '../../store/commands';
 import { platformService } from '../../services/platformService';
+import { subscriptionService } from '../../services/subscriptionService';
 import { listItems } from '../../api/normalizers';
 import { formatDateTime } from '../../utils/formatters';
 
@@ -24,7 +25,10 @@ const EMPTY_FORM = {
   adminUsername: 'admin',
   adminEmail: '',
   adminPassword: '',
-  modules: []
+  modules: [],
+  // '' = managed directly (departments chosen here); a plan id starts a free trial of that plan.
+  planId: '',
+  interval: 'MONTHLY'
 };
 
 const STATUS_LABEL = { ACTIVE: 'Active', SUSPENDED: 'Suspended', DISABLED: 'Disabled' };
@@ -37,7 +41,7 @@ function toPayload(form) {
     phone: optional(form.phone),
     email: optional(form.email),
     address: optional(form.address),
-    modules: form.modules,
+    ...(form.planId ? { planId: form.planId, interval: form.interval } : { modules: form.modules }),
     admin: {
       name: form.adminName.trim(),
       username: form.adminUsername.trim(),
@@ -58,6 +62,7 @@ export function PlatformFacilitiesPage() {
   const [formError, setFormError] = useState('');
   const [busyId, setBusyId] = useState('');
   const [catalog, setCatalog] = useState([]);
+  const [plans, setPlans] = useState([]);
   const [modulesFacility, setModulesFacility] = useState(null);
   const [modulesDraft, setModulesDraft] = useState([]);
   const [savingModules, setSavingModules] = useState(false);
@@ -68,9 +73,10 @@ export function PlatformFacilitiesPage() {
     setLoading(true);
     setLoadError('');
     try {
-      const [facilityList, moduleCatalog] = await Promise.all([platformService.facilities(apiClient), platformService.modules(apiClient)]);
+      const [facilityList, moduleCatalog, planList] = await Promise.all([platformService.facilities(apiClient), platformService.modules(apiClient), subscriptionService.plans(apiClient).catch(() => [])]);
       setFacilities(listItems(facilityList));
       setCatalog(listItems(moduleCatalog));
+      setPlans(listItems(planList).filter((p) => p.isActive));
     } catch (error) {
       setLoadError(error?.message || 'Facilities could not be loaded.');
     } finally {
@@ -233,10 +239,26 @@ export function PlatformFacilitiesPage() {
             <input type="password" className={inputClass} autoComplete="new-password" value={form.adminPassword} onChange={set('adminPassword')} />
           </FormField>
 
-          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500 sm:col-span-2">Departments</p>
-          <div className="sm:col-span-2">
-            <ModulePicker catalog={catalog} value={form.modules} onChange={(modules) => setForm((c) => ({ ...c, modules }))} idPrefix="new-facility-module" />
-          </div>
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500 sm:col-span-2">Subscription</p>
+          <FormField label="Plan" help={form.planId ? 'The facility starts a free trial with the plan\'s departments, then pays online.' : 'Departments are set by hand and nothing is billed online.'}>
+            <select className={inputClass} value={form.planId} onChange={set('planId')}>
+              <option value="">Managed directly (no online billing)</option>
+              {plans.map((p) => <option key={p.id} value={p.id}>{p.name} — free trial ({p.trialDays} days)</option>)}
+            </select>
+          </FormField>
+          {form.planId && (
+            <FormField label="Billing">
+              <select className={inputClass} value={form.interval} onChange={set('interval')}>
+                <option value="MONTHLY">Monthly</option>
+                <option value="YEARLY">Yearly</option>
+              </select>
+            </FormField>
+          )}
+          {!form.planId && (
+            <div className="sm:col-span-2">
+              <ModulePicker catalog={catalog} value={form.modules} onChange={(modules) => setForm((c) => ({ ...c, modules }))} idPrefix="new-facility-module" />
+            </div>
+          )}
           {formError && <p role="alert" className="text-sm font-semibold text-red-600 sm:col-span-2">{formError}</p>}
         </form>
       </Modal>

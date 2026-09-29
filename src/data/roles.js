@@ -195,6 +195,7 @@ export const NAV_ITEMS = [
   { id: 'admin-dashboard', label: 'Admin', icon: ShieldCheck, roles: ['admin'], section: 'Admin' },
   { id: 'users', label: 'User Management', icon: UserCog, roles: ['admin'], section: 'Admin' },
   { id: 'roles', label: 'Roles & Permissions', icon: KeyRound, roles: ['admin'], section: 'Admin' },
+  { id: 'subscription', label: 'Subscription & Billing', icon: CreditCard, roles: ['admin'], section: 'Admin' },
   { id: 'hospitals', label: 'Partner Hospitals', icon: Building2, roles: ['admin'], section: 'Admin' },
   { id: 'audit-log', label: 'Audit Log', icon: History, roles: ['admin'], section: 'Admin' },
   { id: 'security', label: 'Security & Reliability', icon: ShieldCheck, roles: ['admin'], section: 'Admin' },
@@ -205,7 +206,8 @@ export const NAV_ITEMS = [
   { id: 'settings', label: 'Settings', icon: Settings, roles: ['admin'], section: 'System' },
   { id: 'api-readiness', label: 'API Readiness', icon: ServerCog, roles: ['admin'], section: 'System' },
 
-  { id: 'platform-facilities', label: 'Facilities', icon: Building2, roles: ['platform'], section: 'Platform' }
+  { id: 'platform-facilities', label: 'Facilities', icon: Building2, roles: ['platform'], section: 'Platform' },
+  { id: 'platform-billing', label: 'Plans & Billing', icon: CreditCard, roles: ['platform'], section: 'Platform' }
 ];
 
 export const ROLE_DASHBOARD_REQUIREMENTS = {

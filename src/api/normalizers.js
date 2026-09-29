@@ -49,6 +49,8 @@ export function normalizeAuthUser(apiUser) {
     permissions: apiUser.permissions || [],
     // Switched-on department modules for this facility (empty for the platform operator).
     modules: Array.isArray(apiUser.modules) ? apiUser.modules : [],
+    // { status, readOnly, trialEndsAt, graceEndsAt, currentPeriodEnd, cancelAtPeriodEnd }; null when not on a plan.
+    subscription: apiUser.subscription || null,
     customRole: apiUser.customRole ? { id: apiUser.customRole.id, name: apiUser.customRole.name } : null,
     loginAt: apiUser.lastLoginAt || new Date().toISOString()
   };

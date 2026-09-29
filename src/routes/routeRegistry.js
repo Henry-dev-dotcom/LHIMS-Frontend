@@ -330,6 +330,16 @@ export const PAGE_META = {
     requirements: ['Custom roles', 'Permission picker', 'Standard roles reference']
   },
 
+  subscription: {
+    title: 'Subscription & Billing', section: 'Admin',
+    description: "The facility's LHIMS plan, departments, payments and invoices.",
+    requirements: ['Plan', 'Add-on departments', 'Pay by card or mobile money', 'Invoices']
+  },
+  'platform-billing': {
+    title: 'Plans & Billing', section: 'Platform',
+    description: 'Subscription plans, add-on prices and every facility subscription.',
+    requirements: ['Plans', 'Add-on prices', 'Subscribers', 'Billing run']
+  },
   'platform-facilities': {
     title: 'Facilities', section: 'Platform',
     description: 'Platform operator console for creating, suspending and reactivating subscribing facilities.',

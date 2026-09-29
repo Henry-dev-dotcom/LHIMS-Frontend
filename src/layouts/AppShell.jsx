@@ -4,6 +4,7 @@ import { ToastHost } from '../components/ui/ToastHost';
 import { MobileBottomNav } from '../components/ui/MobileBottomNav';
 import { NetworkStatusBanner } from '../components/ui/NetworkStatusBanner';
 import { ServiceWorkerUpdateBanner } from '../components/ui/ServiceWorkerUpdateBanner';
+import { SubscriptionBanner } from '../components/ui/SubscriptionBanner';
 import { AppRouter } from '../routes/AppRouter';
 import { ErrorBoundary } from '../components/ui/ErrorBoundary';
 
@@ -14,6 +15,7 @@ export function AppShell() {
       <Sidebar />
       <div className="flex min-h-screen min-w-0 flex-col overflow-x-hidden lg:ml-[19rem]">
         <Header />
+        <SubscriptionBanner />
         <NetworkStatusBanner />
         <ServiceWorkerUpdateBanner />
         <main

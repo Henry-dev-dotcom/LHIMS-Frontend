@@ -75,6 +75,8 @@ const StoreRequestsPage = lazyPage(() => import('../pages/stores/StoresPage'), '
 const ClaimsPage = lazyPage(() => import('../pages/claims/ClaimsPage'), 'ClaimsPage');
 const TheatreListPage = lazyPage(() => import('../pages/theatre/TheatreListPage'), 'TheatreListPage');
 const PlatformFacilitiesPage = lazyPage(() => import('../pages/platform/PlatformFacilitiesPage'), 'PlatformFacilitiesPage');
+const PlatformBillingPage = lazyPage(() => import('../pages/platform/PlatformBillingPage'), 'PlatformBillingPage');
+const SubscriptionPage = lazyPage(() => import('../pages/subscription/SubscriptionPage'), 'SubscriptionPage');
 
 const roleDashboardMap = {
   'doctor-dashboard': 'doctor',
@@ -143,6 +145,8 @@ function resolvePage(pageId, role, modules) {
   if (pageId === 'price-catalog') return <PriceCatalogPage />;
   if (pageId === 'api-readiness') return <ApiReadinessPage />;
   if (pageId === 'platform-facilities') return <PlatformFacilitiesPage />;
+  if (pageId === 'platform-billing') return <PlatformBillingPage />;
+  if (pageId === 'subscription') return <SubscriptionPage />;
   if (pageId === 'roles') return <RolesPage />;
   if (pageId === 'opd-queue') return <OpdQueuePage />;
   if (pageId === 'emergency-board') return <EmergencyBoardPage />;
