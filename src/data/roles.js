@@ -120,6 +120,7 @@ export const NAV_ITEMS = [
   { id: 'emergency-board', label: 'Emergency Board', icon: Siren, roles: ['nurse','doctor','receptionist','admin'], section: 'Emergency' },
   { id: 'ward-board', label: 'Ward Board', icon: BedDouble, roles: ['nurse','doctor','admin'], section: 'Wards' },
   { id: 'theatre-list', label: 'Theatre List', icon: Scissors, roles: ['nurse','doctor','admin'], section: 'Theatre' },
+  { id: 'insurance-claims', label: 'Insurance Claims', icon: ShieldCheck, roles: ['billing','admin'], section: 'Claims' },
   { id: 'clinic-antenatal', label: 'Antenatal Clinic', icon: HeartHandshake, roles: ['nurse','doctor','receptionist','admin'], section: 'Maternity' },
   { id: 'clinic-postnatal', label: 'Postnatal Clinic', icon: Baby, roles: ['nurse','doctor','receptionist','admin'], section: 'Maternity' },
   { id: 'maternity-register', label: 'Maternity Register', icon: BookHeart, roles: ['nurse','doctor','admin'], section: 'Maternity' },

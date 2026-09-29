@@ -1,4 +1,9 @@
 export const PAGE_META = {
+  'insurance-claims': {
+    title: 'Insurance Claims', section: 'Claims',
+    description: 'Claim completed visits from NHIS and other schemes, submit monthly batches, and record decisions and scheme payments.',
+    requirements: ['Claimable visits', 'Claim preparation', 'Monthly batches', 'Adjudication', 'Scheme payments']
+  },
   'clinic-child-welfare': {
     title: 'Child Welfare Clinic', section: 'Child Health',
     description: 'Child welfare visits: growth monitoring and immunisations against the EPI schedule.',

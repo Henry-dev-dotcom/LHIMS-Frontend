@@ -13,6 +13,7 @@ const SECTION_MODULES = {
   Theatre: 'theatre',
   Maternity: 'maternity',
   'Child Health': 'child_health',
+  Claims: 'claims',
   Pharmacy: 'pharmacy',
   Clinician: 'clinician_portal',
   Reception: 'reception',

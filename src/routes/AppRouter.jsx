@@ -64,6 +64,7 @@ const WardBoardPage = lazyPage(() => import('../pages/inpatient/WardBoardPage'),
 const ClinicQueuePage = lazyPage(() => import('../pages/opd/OpdQueuePage'), 'ClinicQueuePage');
 const MaternityRegisterPage = lazyPage(() => import('../pages/maternity/MaternityRegisterPage'), 'MaternityRegisterPage');
 const ImmunizationDueListPage = lazyPage(() => import('../pages/childHealth/ImmunizationDueListPage'), 'ImmunizationDueListPage');
+const ClaimsPage = lazyPage(() => import('../pages/claims/ClaimsPage'), 'ClaimsPage');
 const TheatreListPage = lazyPage(() => import('../pages/theatre/TheatreListPage'), 'TheatreListPage');
 const PlatformFacilitiesPage = lazyPage(() => import('../pages/platform/PlatformFacilitiesPage'), 'PlatformFacilitiesPage');
 
@@ -146,6 +147,7 @@ function resolvePage(pageId, role, modules) {
   if (pageId === 'maternity-register') return <MaternityRegisterPage />;
   if (pageId === 'clinic-child-welfare') return <ClinicQueuePage clinic="CHILD_WELFARE" />;
   if (pageId === 'immunisation-due') return <ImmunizationDueListPage />;
+  if (pageId === 'insurance-claims') return <ClaimsPage />;
   if (pageId === 'clinic-dental') return <ClinicQueuePage clinic="DENTAL" />;
   if (pageId === 'clinic-eye') return <ClinicQueuePage clinic="EYE" />;
   if (pageId === 'clinic-physiotherapy') return <ClinicQueuePage clinic="PHYSIOTHERAPY" />;

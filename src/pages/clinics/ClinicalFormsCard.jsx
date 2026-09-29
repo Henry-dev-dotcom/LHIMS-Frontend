@@ -17,7 +17,9 @@ export function ClinicalFormsCard({ encounter, auth, open, busy, act }) {
   const [history, setHistory] = useState(null);
   const modules = auth?.modules;
   const clinician = can(auth, 'encounters:consult');
-  const offered = formsFor(encounter.clinic, modules).filter((type) => clinician || !FORMS[type].clinicianOnly);
+  // Forms are recorded by clinicians, or by nursing staff for the forms open to them; reception records none.
+  const clinicalStaff = clinician || can(auth, 'encounters:triage');
+  const offered = clinicalStaff ? formsFor(encounter.clinic, modules).filter((type) => clinician || !FORMS[type].clinicianOnly) : [];
   const forms = encounter.forms || [];
   // The clinic's main form, whose earlier versions matter most (e.g. the last dental chart).
   const primary = (CLINICS[encounter.clinic]?.forms || []).find((type) => offered.includes(type));
@@ -39,7 +41,7 @@ export function ClinicalFormsCard({ encounter, auth, open, busy, act }) {
               {FORMS[form.type]?.label || form.type} · {form.author?.name || 'Unknown'} · {formatDateTime(form.createdAt)}{form.amendsId ? ' · correction' : ''}
             </p>
             <FormSummary type={form.type} data={form.data} />
-            {open && (clinician || !FORMS[form.type]?.clinicianOnly) && (
+            {open && clinicalStaff && (clinician || !FORMS[form.type]?.clinicianOnly) && (
               <button type="button" className="mt-2 text-xs font-semibold text-clinical-700 hover:underline" onClick={() => setEditing({ type: form.type, amends: form })}>Correct</button>
             )}
           </article>
