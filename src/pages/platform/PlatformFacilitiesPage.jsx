@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Building2, LayoutGrid, Pause, Play, Plus, RefreshCw } from 'lucide-react';
+import { Building2, LayoutGrid, LifeBuoy, Pause, Play, Plus, RefreshCw } from 'lucide-react';
 import { ModulePicker } from './ModulePicker';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
@@ -12,6 +12,9 @@ import { useAppStore } from '../../store/AppStore';
 import { apiClient } from '../../store/commands';
 import { platformService } from '../../services/platformService';
 import { subscriptionService } from '../../services/subscriptionService';
+import { onboardingService } from '../../services/onboardingService';
+import { normalizeAuthUser } from '../../api/normalizers';
+import { setStoredTokens } from '../../api/config';
 import { listItems } from '../../api/normalizers';
 import { formatDateTime } from '../../utils/formatters';
 
@@ -66,6 +69,10 @@ export function PlatformFacilitiesPage() {
   const [modulesFacility, setModulesFacility] = useState(null);
   const [modulesDraft, setModulesDraft] = useState([]);
   const [savingModules, setSavingModules] = useState(false);
+  const [supportFacility, setSupportFacility] = useState(null);
+  const [supportReason, setSupportReason] = useState('');
+  const [supportError, setSupportError] = useState('');
+  const [startingSupport, setStartingSupport] = useState(false);
 
   const toast = useCallback((type, message) => dispatch({ type: 'SHOW_TOAST', toast: { type, message } }), [dispatch]);
 
@@ -147,6 +154,21 @@ export function PlatformFacilitiesPage() {
     }
   }
 
+  async function startSupport() {
+    setStartingSupport(true);
+    setSupportError('');
+    try {
+      const result = await onboardingService.startSupportSession(apiClient, supportFacility.id, supportReason.trim());
+      setStoredTokens(result);
+      const auth = normalizeAuthUser(result.user);
+      dispatch({ type: 'SET_AUTH', auth, navigate: auth.landing });
+      toast('info', `Support session in ${supportFacility.name} — read-only for 30 minutes. End it to return to the console.`);
+    } catch (error) {
+      setSupportError(error?.message || 'The support session could not be started.');
+      setStartingSupport(false);
+    }
+  }
+
   const canSubmit = form.code.trim().length >= 3 && form.name.trim().length >= 2 && form.adminName.trim().length >= 2
     && form.adminUsername.trim().length >= 3 && form.adminPassword.length >= 8;
 
@@ -188,6 +210,9 @@ export function PlatformFacilitiesPage() {
                 label: 'Actions',
                 render: (row) => (
                   <div className="flex flex-wrap gap-2">
+                    <Button size="sm" variant="secondary" disabled={row.status !== 'ACTIVE'} onClick={() => { setSupportFacility(row); setSupportReason(''); setSupportError(''); }}>
+                      <LifeBuoy className="h-3.5 w-3.5" /> Support
+                    </Button>
                     <Button size="sm" variant="secondary" onClick={() => openModules(row)}>
                       <LayoutGrid className="h-3.5 w-3.5" /> Departments
                     </Button>
@@ -261,6 +286,26 @@ export function PlatformFacilitiesPage() {
           )}
           {formError && <p role="alert" className="text-sm font-semibold text-red-600 sm:col-span-2">{formError}</p>}
         </form>
+      </Modal>
+
+      <Modal
+        open={Boolean(supportFacility)}
+        title={supportFacility ? `Support session — ${supportFacility.name}` : 'Support session'}
+        description="You will see this facility as its administrator, read-only, for 30 minutes. The facility sees the visit and your reason in its audit log. Your console session ends; sign in again afterwards."
+        onClose={() => setSupportFacility(null)}
+        footer={(
+          <>
+            <Button variant="secondary" onClick={() => setSupportFacility(null)}>Cancel</Button>
+            <Button onClick={startSupport} disabled={startingSupport || supportReason.trim().length < 10}>
+              <LifeBuoy className="h-4 w-4" /> {startingSupport ? 'Opening…' : 'Open support session'}
+            </Button>
+          </>
+        )}
+      >
+        <FormField label="Reason" required help="For example the ticket or the problem the facility reported. At least 10 characters.">
+          <textarea className={`${inputClass} min-h-24`} value={supportReason} onChange={(e) => setSupportReason(e.target.value)} />
+        </FormField>
+        {supportError && <p role="alert" className="mt-2 text-sm font-semibold text-red-600">{supportError}</p>}
       </Modal>
 
       <Modal

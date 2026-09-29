@@ -42,9 +42,13 @@ export function Sidebar() {
     <>
       <div className="border-b border-slate-100 p-5 pr-14">
         <div className="flex items-center gap-3">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-clinical-500 text-white shadow-lift">
-            <Activity className="h-5 w-5" />
-          </div>
+          {facility?.logoDataUrl ? (
+            <img src={facility.logoDataUrl} alt="" className="h-11 w-11 shrink-0 rounded-2xl border border-slate-200 bg-white object-contain p-1" />
+          ) : (
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-clinical-500 text-white shadow-lift">
+              <Activity className="h-5 w-5" />
+            </div>
+          )}
           <div className="min-w-0">
             <div className="truncate text-base font-bold tracking-tight text-slate-900">{facility?.name || (role === 'platform' ? 'LHIMS Platform' : 'Diagnosis Center')}</div>
             <div className="truncate text-xs font-medium text-slate-500">{facility ? `Facility code ${facility.code}` : 'Orders · Billing · Results'}</div>

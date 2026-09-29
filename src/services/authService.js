@@ -1,7 +1,12 @@
 import { clearStoredTokens, setStoredTokens } from '../api/config';
 
 export const authService = {
-  me: async (client) => client.request('/auth/me'),
+  me: async (client) => {
+    const user = await client.request('/auth/me');
+    // Keep the cached profile current (setup finished, plan changed, new logo).
+    if (user) setStoredTokens({ user: user?.user || user });
+    return user;
+  },
   login: async (client, credentials) => {
     const data = await client.login(credentials);
     setStoredTokens(data);

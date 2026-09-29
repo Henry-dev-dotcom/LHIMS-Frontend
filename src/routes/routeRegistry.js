@@ -330,6 +330,16 @@ export const PAGE_META = {
     requirements: ['Custom roles', 'Permission picker', 'Standard roles reference']
   },
 
+  setup: {
+    title: 'Facility Setup', section: 'Admin',
+    description: 'Facility details and logo, departments, staff, price list and support access.',
+    requirements: ['Details', 'Logo', 'Staff', 'Price list import', 'Support access']
+  },
+  'platform-dashboard': {
+    title: 'Business overview', section: 'Platform',
+    description: 'Recurring revenue, subscriptions, churn, failed payments and demo requests.',
+    requirements: ['MRR / ARR', 'Churn', 'Failed payments', 'Trials ending', 'Demo requests']
+  },
   subscription: {
     title: 'Subscription & Billing', section: 'Admin',
     description: "The facility's LHIMS plan, departments, payments and invoices.",

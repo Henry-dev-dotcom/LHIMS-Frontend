@@ -24,9 +24,10 @@ function rememberFacilityCode(code) {
   }
 }
 
-export function LoginPage() {
+export function LoginPage({ initialCode = '' }) {
   const { dispatch } = useAppStore();
-  const [facilityCode, setFacilityCode] = useState(readRememberedFacilityCode);
+  // A facility sign-in link (#/login/CODE) fills in the code.
+  const [facilityCode, setFacilityCode] = useState(() => String(initialCode || readRememberedFacilityCode()).toUpperCase().replace(/[^A-Z0-9]/g, ''));
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -123,6 +124,9 @@ export function LoginPage() {
 
               <p className="mt-4 text-xs leading-5 text-slate-500">
                 Sessions are secured with httpOnly cookies. Contact your system administrator if you need an account or a password reset.
+              </p>
+              <p className="mt-3 text-sm text-slate-600">
+                New to LHIMS? <a href="#/pricing" className="font-semibold text-clinical-700 underline">Start a free trial</a> · <a href="#/home" className="font-semibold text-clinical-700 underline">About LHIMS</a>
               </p>
             </div>
           </section>

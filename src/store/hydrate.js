@@ -51,6 +51,9 @@ export async function loadCollections(client, auth, dispatch, only = null) {
   const role = auth?.role;
   // The platform operator has no facility workspace to load.
   if (!role || role === 'platform') return;
+  // Departments this facility has switched off are not asked for: the server
+  // would refuse them anyway, and every refusal lands in the audit log.
+  const on = (moduleKey) => !Array.isArray(auth?.modules) || auth.modules.includes(moduleKey);
   const wants = (name) => !only || only.includes(name);
 
   const failures = [];
@@ -92,11 +95,11 @@ export async function loadCollections(client, auth, dispatch, only = null) {
     (async () => {
       if (!wants('results') && !wants('sampleLogs')) return;
       const [labPayload, scanPayload, rejectedPayload] = await Promise.all([
-        labService.acceptedSamples(client, LIST_PARAMS).catch(() => null),
-        wants('results') ? scanService.reviewQueue(client, LIST_PARAMS).catch(() => null) : null,
+        on('laboratory') ? labService.acceptedSamples(client, LIST_PARAMS).catch(() => null) : null,
+        wants('results') && on('imaging') ? scanService.reviewQueue(client, LIST_PARAMS).catch(() => null) : null,
         // Rejected / recollection samples live on a separate endpoint; they feed
         // the rejected-samples tracker (they are excluded from accepted-samples).
-        wants('sampleLogs') ? labService.rejectedRetest(client, LIST_PARAMS).catch(() => null) : null
+        wants('sampleLogs') && on('laboratory') ? labService.rejectedRetest(client, LIST_PARAMS).catch(() => null) : null
       ]);
       if (wants('sampleLogs')) {
         if (labPayload === null && rejectedPayload === null) {
@@ -118,17 +121,17 @@ export async function loadCollections(client, auth, dispatch, only = null) {
         }
       }
     })(),
-    load('resultReports', () => resultService.list(client, LIST_PARAMS), (item) => normalizeReport(item, orderCodeById)),
-    load('deliveryLogs', () => resultService.deliveryLogs(client, LIST_PARAMS), (item) => normalizeDeliveryLog(item, orderCodeById)),
+    on('results_delivery') && load('resultReports', () => resultService.list(client, LIST_PARAMS), (item) => normalizeReport(item, orderCodeById)),
+    on('results_delivery') && load('deliveryLogs', () => resultService.deliveryLogs(client, LIST_PARAMS), (item) => normalizeDeliveryLog(item, orderCodeById)),
     load('notifications', () => notificationService.list(client, LIST_PARAMS), (item) => normalizeNotification(item, orderCodeById)),
     load('appointments', () => receptionService.appointments(client, LIST_PARAMS), (item) => normalizeAppointment(item, orderCodeById)),
     load('dailyVisits', () => receptionService.dailyVisits(client, LIST_PARAMS), (item) => normalizeVisit(item, orderCodeById)),
     load('doctors', () => adminService.doctors(client, LIST_PARAMS), normalizeDoctor),
     load('hospitals', () => adminService.hospitals(client, LIST_PARAMS), normalizeHospital),
-    load('scanBookings', () => scanService.bookings(client, LIST_PARAMS), (item) => normalizeScanBooking(item, orderCodeById))
+    on('imaging') && load('scanBookings', () => scanService.bookings(client, LIST_PARAMS), (item) => normalizeScanBooking(item, orderCodeById))
   ];
 
-  if (role === 'billing' || role === 'admin') {
+  if ((role === 'billing' || role === 'admin') && on('finance')) {
     loaders.push(
       load('financeShifts', () => financeService.shifts(client, LIST_PARAMS), normalizeShift),
       load('expenses', () => financeService.expenses(client, LIST_PARAMS), normalizeExpense)

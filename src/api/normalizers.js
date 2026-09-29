@@ -42,8 +42,20 @@ export function normalizeAuthUser(apiUser) {
     username: apiUser.username || '',
     email: apiUser.email || '',
     // The facility (tenant) this account belongs to; null for the platform operator.
-    facility: apiUser.facility ? { id: apiUser.facility.id, code: apiUser.facility.code, name: apiUser.facility.name } : null,
-    landing: roleInfo?.landing || 'overview',
+    facility: apiUser.facility
+      ? {
+        id: apiUser.facility.id,
+        code: apiUser.facility.code,
+        name: apiUser.facility.name,
+        logoDataUrl: apiUser.facility.logoDataUrl || null,
+        // null only for a facility whose administrator has not finished setup yet.
+        onboardingCompletedAt: apiUser.facility.onboardingCompletedAt
+      }
+      : null,
+    // A new facility's administrator starts on the setup checklist.
+    landing: role === 'admin' && apiUser.facility?.onboardingCompletedAt === null && !apiUser.support ? 'setup' : roleInfo?.landing || 'overview',
+    // { operatorName, reason, expiresAt } during a platform operator's read-only support session.
+    support: apiUser.support || null,
     linkedDoctorId: apiUser.doctorProfileId || apiUser.doctorProfile?.id || '',
     hospitalId: apiUser.hospitalId || apiUser.doctorProfile?.hospitalId || '',
     permissions: apiUser.permissions || [],
