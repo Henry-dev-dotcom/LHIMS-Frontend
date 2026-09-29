@@ -9,6 +9,7 @@ import { apiClient } from '../../store/commands';
 import { authService } from '../../services/authService';
 import { normalizeAuthUser } from '../../api/normalizers';
 import { STARTER_PRICE_LIST, onboardingService, parseCsv, priceListTemplateCsv } from '../../services/onboardingService';
+import { getApiConfig } from '../../api/config';
 
 const MAX_LOGO_BYTES = 200 * 1024;
 
@@ -124,6 +125,28 @@ export function SetupPage() {
     URL.revokeObjectURL(url);
   }
 
+  const [exporting, setExporting] = useState(false);
+  async function downloadExport() {
+    setExporting(true);
+    try {
+      const response = await fetch(`${getApiConfig().baseUrl}/admin/data-export`, { credentials: 'include' });
+      if (!response.ok) throw new Error((await response.json().catch(() => null))?.message || 'The export could not be made.');
+      const blob = await response.blob();
+      const name = /filename="([^"]+)"/.exec(response.headers.get('content-disposition') || '')?.[1] || 'lhims-export.json';
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('success', 'Your data was downloaded. Keep the file somewhere safe: it contains patient records.');
+    } catch (error) {
+      toast('error', error?.message || 'The export could not be made.');
+    } finally {
+      setExporting(false);
+    }
+  }
+
   async function finish() {
     try {
       await onboardingService.complete(apiClient);
@@ -229,6 +252,11 @@ export function SetupPage() {
           <Button variant="secondary" onClick={() => navigate(modules.includes('reception') ? 'reception-walkins' : 'patients')}>Register a patient</Button>
           {modules.includes('opd') && <Button variant="ghost" onClick={() => navigate('opd-queue')}>Then open a visit in OPD Visits</Button>}
         </div>
+      </Card>
+
+      <Card title="Your data" subtitle="Everything this facility holds in LHIMS, as one file.">
+        <p className="text-sm text-slate-600">Download a complete copy for your own records, to move to another system, or to answer a patient's data request under the Data Protection Act. Passwords and payment details are left out. Each download is recorded in the audit log.</p>
+        <div className="mt-3"><Button variant="secondary" onClick={downloadExport} disabled={exporting}><Download className="h-4 w-4" /> {exporting ? 'Preparing…' : 'Download all data (JSON)'}</Button></div>
       </Card>
 
       {!data.completed && (
