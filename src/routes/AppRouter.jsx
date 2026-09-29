@@ -64,6 +64,9 @@ const WardBoardPage = lazyPage(() => import('../pages/inpatient/WardBoardPage'),
 const ClinicQueuePage = lazyPage(() => import('../pages/opd/OpdQueuePage'), 'ClinicQueuePage');
 const MaternityRegisterPage = lazyPage(() => import('../pages/maternity/MaternityRegisterPage'), 'MaternityRegisterPage');
 const ImmunizationDueListPage = lazyPage(() => import('../pages/childHealth/ImmunizationDueListPage'), 'ImmunizationDueListPage');
+const MyHrPage = lazyPage(() => import('../pages/hr/HrPages'), 'MyHrPage');
+const DutyRotaPage = lazyPage(() => import('../pages/hr/HrPages'), 'DutyRotaPage');
+const HrAdminPage = lazyPage(() => import('../pages/hr/HrPages'), 'HrAdminPage');
 const MortuaryPage = lazyPage(() => import('../pages/mortuary/MortuaryPage'), 'MortuaryPage');
 const BloodBankPage = lazyPage(() => import('../pages/bloodBank/BloodBankPage'), 'BloodBankPage');
 const StoresPage = lazyPage(() => import('../pages/stores/StoresPage'), 'StoresPage');
@@ -155,6 +158,9 @@ function resolvePage(pageId, role, modules) {
   if (pageId === 'stores') return <StoresPage />;
   if (pageId === 'blood-bank') return <BloodBankPage />;
   if (pageId === 'mortuary') return <MortuaryPage />;
+  if (pageId === 'my-hr') return <MyHrPage />;
+  if (pageId === 'duty-rota') return <DutyRotaPage />;
+  if (pageId === 'hr-admin') return <HrAdminPage />;
   if (pageId === 'store-requests') return <StoreRequestsPage />;
   if (pageId === 'clinic-dental') return <ClinicQueuePage clinic="DENTAL" />;
   if (pageId === 'clinic-eye') return <ClinicQueuePage clinic="EYE" />;

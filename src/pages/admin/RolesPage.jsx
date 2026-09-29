@@ -42,7 +42,8 @@ const GROUP_LABELS = {
   claims: 'Insurance claims',
   stores: 'Stores & procurement',
   bloodbank: 'Blood bank',
-  mortuary: 'Mortuary'
+  mortuary: 'Mortuary',
+  hr: 'HR & rota'
 };
 
 const EMPTY_FORM = { id: '', name: '', description: '', baseRole: 'LAB_STAFF', permissions: [] };

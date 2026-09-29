@@ -1,4 +1,19 @@
 export const PAGE_META = {
+  'my-hr': {
+    title: 'My Rota & Leave', section: 'HR',
+    description: 'Your shifts, leave balance and leave requests.',
+    requirements: ['My shifts', 'Leave balance', 'Leave requests']
+  },
+  'duty-rota': {
+    title: 'Duty Rota', section: 'HR',
+    description: 'Who is on duty each day, by ward or unit; HR adds and removes shifts.',
+    requirements: ['Week view', 'Assign shifts', 'Rest and leave rules']
+  },
+  'hr-admin': {
+    title: 'HR Admin', section: 'HR',
+    description: 'Leave approvals, staff profiles with professional registration, and shift types.',
+    requirements: ['Leave approvals', 'Staff profiles', 'Shift types']
+  },
   mortuary: {
     title: 'Mortuary', section: 'Mortuary',
     description: 'Cold-room slots, the deceased register, death certification, police cases and release to family.',

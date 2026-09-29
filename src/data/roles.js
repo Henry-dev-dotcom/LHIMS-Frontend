@@ -41,7 +41,9 @@ import {
   Warehouse,
   PackageOpen,
   Droplets,
-  Archive
+  Archive,
+  CalendarCheck,
+  IdCard
 } from 'lucide-react';
 
 export const ROLES = [
@@ -124,6 +126,9 @@ export const NAV_ITEMS = [
   { id: 'emergency-board', label: 'Emergency Board', icon: Siren, roles: ['nurse','doctor','receptionist','admin'], section: 'Emergency' },
   { id: 'ward-board', label: 'Ward Board', icon: BedDouble, roles: ['nurse','doctor','admin'], section: 'Wards' },
   { id: 'theatre-list', label: 'Theatre List', icon: Scissors, roles: ['nurse','doctor','admin'], section: 'Theatre' },
+  { id: 'my-hr', label: 'My Rota & Leave', icon: CalendarCheck, roles: ['doctor','nurse','pharmacist','receptionist','lab','scan','billing','admin'], section: 'HR' },
+  { id: 'duty-rota', label: 'Duty Rota', icon: CalendarDays, roles: ['doctor','nurse','pharmacist','receptionist','lab','scan','billing','admin'], section: 'HR' },
+  { id: 'hr-admin', label: 'HR Admin', icon: IdCard, roles: ['admin'], section: 'HR' },
   { id: 'mortuary', label: 'Mortuary', icon: Archive, roles: ['nurse','doctor','admin'], section: 'Mortuary' },
   { id: 'blood-bank', label: 'Blood Bank', icon: Droplets, roles: ['lab','doctor','nurse','admin'], section: 'Blood Bank' },
   { id: 'stores', label: 'Stores & Procurement', icon: Warehouse, roles: ['billing','admin'], section: 'Stores' },
