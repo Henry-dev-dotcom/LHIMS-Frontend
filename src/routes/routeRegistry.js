@@ -1,4 +1,14 @@
 export const PAGE_META = {
+  stores: {
+    title: 'Stores & Procurement', section: 'Stores',
+    description: 'Stock on hand, requisitions from wards and departments, purchase orders, approvals and deliveries.',
+    requirements: ['Stock levels', 'Requisitions', 'Purchase orders', 'Goods received', 'Suppliers']
+  },
+  'store-requests': {
+    title: 'Request Supplies', section: 'Stores',
+    description: 'Ask the store for supplies for your ward or unit and follow what was issued.',
+    requirements: ['Requisition', 'Issue status']
+  },
   'insurance-claims': {
     title: 'Insurance Claims', section: 'Claims',
     description: 'Claim completed visits from NHIS and other schemes, submit monthly batches, and record decisions and scheme payments.',

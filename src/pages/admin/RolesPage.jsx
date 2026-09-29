@@ -39,7 +39,8 @@ const GROUP_LABELS = {
   theatre: 'Theatre',
   maternity: 'Maternity',
   immunization: 'Immunisation',
-  claims: 'Insurance claims'
+  claims: 'Insurance claims',
+  stores: 'Stores & procurement'
 };
 
 const EMPTY_FORM = { id: '', name: '', description: '', baseRole: 'LAB_STAFF', permissions: [] };

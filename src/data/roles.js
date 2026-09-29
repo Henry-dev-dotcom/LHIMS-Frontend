@@ -37,7 +37,9 @@ import {
   HeartHandshake,
   BookHeart,
   Syringe,
-  ListChecks
+  ListChecks,
+  Warehouse,
+  PackageOpen
 } from 'lucide-react';
 
 export const ROLES = [
@@ -120,6 +122,8 @@ export const NAV_ITEMS = [
   { id: 'emergency-board', label: 'Emergency Board', icon: Siren, roles: ['nurse','doctor','receptionist','admin'], section: 'Emergency' },
   { id: 'ward-board', label: 'Ward Board', icon: BedDouble, roles: ['nurse','doctor','admin'], section: 'Wards' },
   { id: 'theatre-list', label: 'Theatre List', icon: Scissors, roles: ['nurse','doctor','admin'], section: 'Theatre' },
+  { id: 'stores', label: 'Stores & Procurement', icon: Warehouse, roles: ['billing','admin'], section: 'Stores' },
+  { id: 'store-requests', label: 'Request Supplies', icon: PackageOpen, roles: ['nurse','doctor','pharmacist','receptionist','lab','scan','billing','admin'], section: 'Stores' },
   { id: 'insurance-claims', label: 'Insurance Claims', icon: ShieldCheck, roles: ['billing','admin'], section: 'Claims' },
   { id: 'clinic-antenatal', label: 'Antenatal Clinic', icon: HeartHandshake, roles: ['nurse','doctor','receptionist','admin'], section: 'Maternity' },
   { id: 'clinic-postnatal', label: 'Postnatal Clinic', icon: Baby, roles: ['nurse','doctor','receptionist','admin'], section: 'Maternity' },

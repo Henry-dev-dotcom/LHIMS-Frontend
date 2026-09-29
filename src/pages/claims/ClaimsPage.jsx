@@ -31,7 +31,9 @@ export function ClaimsPage() {
   const [schemes, setSchemes] = useState([]);
   const [schemeId, setSchemeId] = useState('');
   const [tab, setTab] = useState('TO_CLAIM');
-  const [rows, setRows] = useState([]);
+  // Rows are kept with the tab they were loaded for, so a tab never renders another tab's rows.
+  const [data, setData] = useState({ key: null, rows: [] });
+  const rows = data.key === `${schemeId}:${tab}` ? data.rows : [];
   const [selected, setSelected] = useState([]);
   const [loading, setLoading] = useState(false);
   const [openId, setOpenId] = useState('');
@@ -50,9 +52,10 @@ export function ClaimsPage() {
     setLoading(true);
     setSelected([]);
     try {
-      if (tab === 'TO_CLAIM') setRows(listItems(await claimsService.candidates(apiClient, schemeId)));
-      else if (tab === 'BATCHES') setRows(listItems(await claimsService.batches(apiClient, schemeId)));
-      else setRows(listItems(await claimsService.claims(apiClient, { schemeId, status: tab })));
+      const loaded = tab === 'TO_CLAIM'
+        ? await claimsService.candidates(apiClient, schemeId)
+        : tab === 'BATCHES' ? await claimsService.batches(apiClient, schemeId) : await claimsService.claims(apiClient, { schemeId, status: tab });
+      setData({ key: `${schemeId}:${tab}`, rows: listItems(loaded) });
     } catch (e) {
       toast('error', e?.message || 'Claims could not be loaded.');
     } finally {
