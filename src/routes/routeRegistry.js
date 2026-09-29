@@ -1,4 +1,9 @@
 export const PAGE_META = {
+  mortuary: {
+    title: 'Mortuary', section: 'Mortuary',
+    description: 'Cold-room slots, the deceased register, death certification, police cases and release to family.',
+    requirements: ['Slot board', 'Deceased register', 'Certification', 'Police clearance', 'Release']
+  },
   'blood-bank': {
     title: 'Blood Bank', section: 'Blood Bank',
     description: 'Blood requests, crossmatch and issue, screened stock by group, donors and donations, and transfusion records.',

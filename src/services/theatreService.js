@@ -18,6 +18,9 @@ export const theatreService = {
 /** Procedures are SERVICE catalog items whose code starts with PROC-; other services are visit fees. */
 export const isProcedureItem = (item) => item?.type === 'SERVICE' && /^PROC-/i.test(item.catalogCode || '');
 
+/** Service items charged by their own department, never as a visit fee (procedures, mortuary storage). */
+export const isNonVisitService = (item) => item?.type === 'SERVICE' && /^(PROC|MORT)-/i.test(item.catalogCode || '');
+
 export const ANAESTHESIA = {
   GENERAL: 'General',
   SPINAL: 'Spinal',

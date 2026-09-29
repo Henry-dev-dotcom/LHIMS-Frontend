@@ -40,7 +40,8 @@ import {
   ListChecks,
   Warehouse,
   PackageOpen,
-  Droplets
+  Droplets,
+  Archive
 } from 'lucide-react';
 
 export const ROLES = [
@@ -123,6 +124,7 @@ export const NAV_ITEMS = [
   { id: 'emergency-board', label: 'Emergency Board', icon: Siren, roles: ['nurse','doctor','receptionist','admin'], section: 'Emergency' },
   { id: 'ward-board', label: 'Ward Board', icon: BedDouble, roles: ['nurse','doctor','admin'], section: 'Wards' },
   { id: 'theatre-list', label: 'Theatre List', icon: Scissors, roles: ['nurse','doctor','admin'], section: 'Theatre' },
+  { id: 'mortuary', label: 'Mortuary', icon: Archive, roles: ['nurse','doctor','admin'], section: 'Mortuary' },
   { id: 'blood-bank', label: 'Blood Bank', icon: Droplets, roles: ['lab','doctor','nurse','admin'], section: 'Blood Bank' },
   { id: 'stores', label: 'Stores & Procurement', icon: Warehouse, roles: ['billing','admin'], section: 'Stores' },
   { id: 'store-requests', label: 'Request Supplies', icon: PackageOpen, roles: ['nurse','doctor','pharmacist','receptionist','lab','scan','billing','admin'], section: 'Stores' },

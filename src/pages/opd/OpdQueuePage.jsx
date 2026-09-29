@@ -9,7 +9,7 @@ import { Modal } from '../../components/ui/Modal';
 import { useAppStore } from '../../store/AppStore';
 import { apiClient } from '../../store/commands';
 import { encounterService } from '../../services/encounterService';
-import { isProcedureItem } from '../../services/theatreService';
+import { isNonVisitService } from '../../services/theatreService';
 import { listItems } from '../../api/normalizers';
 import { EncounterWorkspace } from './EncounterWorkspace';
 import { CLINICS, clinicsFor } from '../clinics/clinicConfig';
@@ -181,7 +181,7 @@ function NewVisitModal({ mode = 'OPD', clinic: fixedClinic, open, onClose, onSta
     setClinic(fixedClinic || 'GENERAL');
     encounterService.catalog(apiClient)
       .then((data) => {
-        const services = listItems(data).filter((item) => item.type === 'SERVICE' && item.isActive !== false && !isProcedureItem(item));
+        const services = listItems(data).filter((item) => item.type === 'SERVICE' && item.isActive !== false && !isNonVisitService(item));
         setFees(services);
         // Emergency care is not held up for payment; the fee can be added later.
         setFeeItemId(emergency ? '' : defaultFee(services, fixedClinic || 'GENERAL'));

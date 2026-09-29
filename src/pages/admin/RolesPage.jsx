@@ -41,7 +41,8 @@ const GROUP_LABELS = {
   immunization: 'Immunisation',
   claims: 'Insurance claims',
   stores: 'Stores & procurement',
-  bloodbank: 'Blood bank'
+  bloodbank: 'Blood bank',
+  mortuary: 'Mortuary'
 };
 
 const EMPTY_FORM = { id: '', name: '', description: '', baseRole: 'LAB_STAFF', permissions: [] };
