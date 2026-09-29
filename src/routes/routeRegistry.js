@@ -1,4 +1,9 @@
 export const PAGE_META = {
+  'medical-records': {
+    title: 'Medical Records', section: 'Medical Records',
+    description: 'The full patient chart across departments, a log of who opened it, and release-of-information requests.',
+    requirements: ['Patient chart', 'Access log', 'Release requests']
+  },
   'my-hr': {
     title: 'My Rota & Leave', section: 'HR',
     description: 'Your shifts, leave balance and leave requests.',

@@ -43,7 +43,8 @@ const GROUP_LABELS = {
   stores: 'Stores & procurement',
   bloodbank: 'Blood bank',
   mortuary: 'Mortuary',
-  hr: 'HR & rota'
+  hr: 'HR & rota',
+  records: 'Medical records'
 };
 
 const EMPTY_FORM = { id: '', name: '', description: '', baseRole: 'LAB_STAFF', permissions: [] };

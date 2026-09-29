@@ -43,7 +43,8 @@ import {
   Droplets,
   Archive,
   CalendarCheck,
-  IdCard
+  IdCard,
+  FolderLock
 } from 'lucide-react';
 
 export const ROLES = [
@@ -126,6 +127,7 @@ export const NAV_ITEMS = [
   { id: 'emergency-board', label: 'Emergency Board', icon: Siren, roles: ['nurse','doctor','receptionist','admin'], section: 'Emergency' },
   { id: 'ward-board', label: 'Ward Board', icon: BedDouble, roles: ['nurse','doctor','admin'], section: 'Wards' },
   { id: 'theatre-list', label: 'Theatre List', icon: Scissors, roles: ['nurse','doctor','admin'], section: 'Theatre' },
+  { id: 'medical-records', label: 'Medical Records', icon: FolderLock, roles: ['doctor','nurse','receptionist','admin'], section: 'Medical Records' },
   { id: 'my-hr', label: 'My Rota & Leave', icon: CalendarCheck, roles: ['doctor','nurse','pharmacist','receptionist','lab','scan','billing','admin'], section: 'HR' },
   { id: 'duty-rota', label: 'Duty Rota', icon: CalendarDays, roles: ['doctor','nurse','pharmacist','receptionist','lab','scan','billing','admin'], section: 'HR' },
   { id: 'hr-admin', label: 'HR Admin', icon: IdCard, roles: ['admin'], section: 'HR' },
