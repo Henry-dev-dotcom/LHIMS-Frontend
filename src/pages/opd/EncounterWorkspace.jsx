@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, BedDouble, Scissors, CheckCircle2, ClipboardList, FlaskConical, HeartPulse, Pill, Plus, Stethoscope, Trash2, XCircle } from 'lucide-react';
+import { AlertTriangle, BedDouble, Droplets, Scissors, CheckCircle2, ClipboardList, FlaskConical, HeartPulse, Pill, Plus, Stethoscope, Trash2, XCircle } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { FormField, inputClass } from '../../components/ui/FormField';
@@ -18,6 +18,7 @@ import { ClinicalFormsCard } from '../clinics/ClinicalFormsCard';
 import { PregnancyCard } from '../maternity/PregnancyCard';
 import { ImmunizationCard } from '../childHealth/ImmunizationCard';
 import { MembershipCard } from '../claims/MembershipCard';
+import { RequestBloodModal } from '../bloodBank/BloodBankPage';
 import { CLINICS } from '../clinics/clinicConfig';
 import { P, STATUS, TRIAGE, ageLabel, can, patientName } from './opdUtils';
 
@@ -67,6 +68,7 @@ export function EncounterWorkspace({ encounterId }) {
   const [completeOpen, setCompleteOpen] = useState(false);
   const [admitOpen, setAdmitOpen] = useState(false);
   const [surgeryOpen, setSurgeryOpen] = useState(false);
+  const [bloodOpen, setBloodOpen] = useState(false);
 
   const toast = useCallback((type, message) => dispatch({ type: 'SHOW_TOAST', toast: { type, message } }), [dispatch]);
 
@@ -108,6 +110,7 @@ export function EncounterWorkspace({ encounterId }) {
   // Inpatient stays are opened by admission and closed by discharge, on the ward screens.
   const inpatient = encounter.type === 'INPATIENT';
   const canAdmit = inConsult && !inpatient && can(auth, 'inpatient:admit') && (auth?.modules || []).includes('inpatient');
+  const canRequestBlood = open && can(auth, 'bloodbank:request') && (!Array.isArray(auth?.modules) || auth.modules.includes('blood_bank'));
   const canBookSurgery = open && can(auth, 'theatre:schedule') && (auth?.modules || []).includes('theatre');
   const patient = encounter.patient;
   const latestVitals = encounter.vitalSigns?.[0];
@@ -146,6 +149,9 @@ export function EncounterWorkspace({ encounterId }) {
                 <Button disabled={busy} onClick={() => act(() => encounterService.startConsultation(apiClient, encounter.id), 'Consultation started.')}>
                   <Stethoscope className="h-4 w-4" /> Start consultation
                 </Button>
+              )}
+              {canRequestBlood && (
+                <Button variant="secondary" disabled={busy} onClick={() => setBloodOpen(true)}><Droplets className="h-4 w-4" /> Request blood</Button>
               )}
               {canBookSurgery && (
                 <Button variant="secondary" disabled={busy} onClick={() => setSurgeryOpen(true)}><Scissors className="h-4 w-4" /> Book operation</Button>
@@ -191,6 +197,16 @@ export function EncounterWorkspace({ encounterId }) {
         <PrescriptionsCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
         <ChargesCard encounter={encounter} />
       </div>
+
+      <RequestBloodModal
+        open={bloodOpen}
+        encounter={encounter}
+        onClose={() => setBloodOpen(false)}
+        onDone={(request) => {
+          setBloodOpen(false);
+          toast('success', `Blood requested (${request.requestCode}). Send a grouping and crossmatch sample to the lab.`);
+        }}
+      />
 
       <BookSurgeryModal
         open={surgeryOpen}

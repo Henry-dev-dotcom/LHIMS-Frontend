@@ -15,6 +15,7 @@ const SECTION_MODULES = {
   'Child Health': 'child_health',
   Claims: 'claims',
   Stores: 'stores',
+  'Blood Bank': 'blood_bank',
   Pharmacy: 'pharmacy',
   Clinician: 'clinician_portal',
   Reception: 'reception',

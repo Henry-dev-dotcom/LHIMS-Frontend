@@ -1,4 +1,9 @@
 export const PAGE_META = {
+  'blood-bank': {
+    title: 'Blood Bank', section: 'Blood Bank',
+    description: 'Blood requests, crossmatch and issue, screened stock by group, donors and donations, and transfusion records.',
+    requirements: ['Requests', 'Crossmatch', 'Issue', 'Emergency release', 'Stock', 'Donations', 'Transfusions']
+  },
   stores: {
     title: 'Stores & Procurement', section: 'Stores',
     description: 'Stock on hand, requisitions from wards and departments, purchase orders, approvals and deliveries.',
