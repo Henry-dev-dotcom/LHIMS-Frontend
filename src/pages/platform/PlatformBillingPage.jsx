@@ -22,7 +22,7 @@ const TABS = [
   { id: 'prices', label: 'Add-on prices' }
 ];
 const formatDate = (value) => (value ? new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium' }).format(new Date(value)) : '—');
-const EMPTY_PLAN = { code: '', name: '', description: '', monthlyPrice: '', yearlyDiscountPercent: '15', maxUsers: '', trialDays: '14', sortOrder: '0', isActive: true, isPublic: true, modules: [] };
+const EMPTY_PLAN = { code: '', name: '', description: '', monthlyPrice: '', yearlyDiscountPercent: '15', maxUsers: '', maxPatientsPerMonth: '', maxStorageMb: '', trialDays: '14', sortOrder: '0', isActive: true, isPublic: true, modules: [] };
 
 export function PlatformBillingPage() {
   const { dispatch } = useAppStore();
@@ -108,6 +108,7 @@ export function PlatformBillingPage() {
               { key: 'until', label: 'Until', render: (row) => formatDate(row.status === 'TRIALING' ? row.trialEndsAt : row.status === 'PAST_DUE' ? row.graceEndsAt : row.currentPeriodEnd) },
               { key: 'owing', label: 'Unpaid', render: (row) => (row.openInvoices.length ? money(row.openInvoices.reduce((t, i) => t + i.amount, 0)) : '—') },
               { key: 'card', label: 'Saved method', render: (row) => (row.hasSavedPaymentMethod ? 'Yes' : 'No') },
+              { key: 'usage', label: 'Use this month', render: (row) => (row.usage ? <span className={row.usage.overFairUse ? 'font-semibold text-amber-700' : ''}>{row.usage.users} staff · {row.usage.patientsThisMonth} patients · {row.usage.storageMb} MB{row.usage.overFairUse ? ' · over plan' : ''}</span> : '—') },
               { key: 'cancel', label: 'Cancelling', render: (row) => (row.cancelAtPeriodEnd ? 'At period end' : '') }
             ]}
           />
@@ -128,7 +129,7 @@ export function PlatformBillingPage() {
               { key: 'maxUsers', label: 'Staff', render: (row) => row.maxUsers ?? 'Unlimited' },
               { key: 'trialDays', label: 'Trial', render: (row) => `${row.trialDays} days` },
               { key: 'state', label: 'Shown', render: (row) => (!row.isActive ? 'Retired' : row.isPublic ? 'Public' : 'Private') },
-              { key: 'actions', label: '', render: (row) => <Button size="sm" variant="secondary" onClick={() => setEditing({ ...row, monthlyPrice: String(row.monthlyPrice), yearlyDiscountPercent: String(row.yearlyDiscountPercent), maxUsers: row.maxUsers ? String(row.maxUsers) : '', trialDays: String(row.trialDays), sortOrder: String(row.sortOrder), description: row.description || '' })}><Pencil className="h-3.5 w-3.5" /> Edit</Button> }
+              { key: 'actions', label: '', render: (row) => <Button size="sm" variant="secondary" onClick={() => setEditing({ ...row, monthlyPrice: String(row.monthlyPrice), yearlyDiscountPercent: String(row.yearlyDiscountPercent), maxUsers: row.maxUsers ? String(row.maxUsers) : '', maxPatientsPerMonth: row.maxPatientsPerMonth ? String(row.maxPatientsPerMonth) : '', maxStorageMb: row.maxStorageMb ? String(row.maxStorageMb) : '', trialDays: String(row.trialDays), sortOrder: String(row.sortOrder), description: row.description || '' })}><Pencil className="h-3.5 w-3.5" /> Edit</Button> }
             ]}
           />
         </Card>
@@ -177,6 +178,8 @@ function PlanEditor({ plan, catalog, onClose, onSaved }) {
       monthlyPrice: Number(form.monthlyPrice),
       yearlyDiscountPercent: Number(form.yearlyDiscountPercent || 0),
       maxUsers: form.maxUsers ? Number(form.maxUsers) : null,
+      maxPatientsPerMonth: form.maxPatientsPerMonth ? Number(form.maxPatientsPerMonth) : null,
+      maxStorageMb: form.maxStorageMb ? Number(form.maxStorageMb) : null,
       trialDays: Number(form.trialDays || 0),
       sortOrder: Number(form.sortOrder || 0),
       isActive: form.isActive,
@@ -215,6 +218,8 @@ function PlanEditor({ plan, catalog, onClose, onSaved }) {
         <FormField label="Price per month (GHS)" required><input type="number" min="0" className={inputClass} value={form.monthlyPrice} onChange={set('monthlyPrice')} /></FormField>
         <FormField label="Yearly discount (%)"><input type="number" min="0" max="60" className={inputClass} value={form.yearlyDiscountPercent} onChange={set('yearlyDiscountPercent')} /></FormField>
         <FormField label="Staff accounts" help="Leave empty for unlimited."><input type="number" min="1" className={inputClass} value={form.maxUsers} onChange={set('maxUsers')} /></FormField>
+        <FormField label="New patients a month (fair use)" help="Warned about, never blocked. Empty for none."><input type="number" min="1" className={inputClass} value={form.maxPatientsPerMonth} onChange={set('maxPatientsPerMonth')} /></FormField>
+        <FormField label="File storage, MB (fair use)" help="Warned about, never blocked. Empty for none."><input type="number" min="1" className={inputClass} value={form.maxStorageMb} onChange={set('maxStorageMb')} /></FormField>
         <FormField label="Free trial (days)"><input type="number" min="0" max="90" className={inputClass} value={form.trialDays} onChange={set('trialDays')} /></FormField>
         <FormField label="Order on the pricing page"><input type="number" min="0" className={inputClass} value={form.sortOrder} onChange={set('sortOrder')} /></FormField>
         <div className="flex flex-col gap-2 text-sm">

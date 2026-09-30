@@ -167,6 +167,20 @@ export function SubscriptionPage() {
           </div>
         </div>
 
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">New patients this month</p>
+            <p className="mt-1 text-sm font-bold text-slate-900">{s.usage.patientsThisMonth}{s.usage.maxPatientsPerMonth ? ` of ${s.usage.maxPatientsPerMonth}` : ''}</p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">File storage</p>
+            <p className="mt-1 text-sm font-bold text-slate-900">{s.usage.storageMb} MB{s.usage.maxStorageMb ? ` of ${s.usage.maxStorageMb} MB` : ''}</p>
+          </div>
+        </div>
+        {s.usage.overFairUse && (
+          <p className="mt-3 rounded-2xl bg-sky-50 px-4 py-2 text-sm text-sky-900">You are using more than your plan covers. Nothing is blocked — care always comes first — but please consider a larger plan.</p>
+        )}
+
         {s.readOnly && (
           <div role="alert" className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
             {s.status === 'CANCELLED' ? 'Your subscription has ended.' : 'Your subscription is unpaid.'} Staff can still view every record, but nothing can be added or changed until payment is made. No data has been deleted.
