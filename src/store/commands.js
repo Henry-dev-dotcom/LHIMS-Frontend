@@ -433,6 +433,25 @@ const commands = {
     dispatch(toastAction('success', 'Result signed off'));
   },
 
+  // A result already sent (signed off) is pulled back by the department itself to
+  // correct it. The order un-finalises if it had been released, and the report
+  // is voided; the corrected result goes back through draft -> submit -> sign-off.
+  REVERSE_LAB_RESULT: async (action, dispatch, getState) => {
+    const result = (getState().data.results || []).find((item) => item.id === action.resultId);
+    if (!result) throw new Error(`Result ${action.resultId} was not found.`);
+    await labService.reverseResult(apiClient, result.apiId, { reason: action.payload?.reason });
+    await refresh(dispatch, getState, ['orders', 'results', 'sampleLogs', 'resultReports', 'notifications']);
+    dispatch(toastAction('success', 'Laboratory result withdrawn for correction'));
+  },
+
+  REVERSE_SCAN_RESULT: async (action, dispatch, getState) => {
+    const result = (getState().data.results || []).find((item) => item.id === action.resultId);
+    if (!result) throw new Error(`Result ${action.resultId} was not found.`);
+    await scanService.reverseResult(apiClient, result.apiId, { reason: action.payload?.reason });
+    await refresh(dispatch, getState, ['orders', 'results', 'resultReports', 'notifications']);
+    dispatch(toastAction('success', 'Scan report withdrawn for correction'));
+  },
+
   /* ---------------------------------------------------------------- scan */
 
   ACCEPT_SCAN_ORDER: async (action, dispatch, getState) => {

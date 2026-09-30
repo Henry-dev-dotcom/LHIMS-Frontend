@@ -202,8 +202,8 @@ export const PAGE_META = {
   },
   'lab-results': {
     title: 'Lab Results', section: 'Laboratory',
-    description: 'Stored laboratory result archive for review, printing, corrections and future reference.',
-    requirements: ['Result archive', 'Print report', 'Edit corrections', 'Amendment history', 'Reference ranges']
+    description: 'Stored laboratory result archive for review, printing and reversing a sent result to correct it.',
+    requirements: ['Result archive', 'Print report', 'Reverse a sent result', 'Reversal history']
   },
   'lab-rejections': {
     title: 'Rejected / Retest Samples', section: 'Laboratory',
@@ -245,6 +245,11 @@ export const PAGE_META = {
     title: 'Scan Review & Sign-off', section: 'Imaging',
     description: 'Dedicated radiologist review queue for submitted imaging reports before final release.',
     requirements: ['Pending review queue', 'Radiologist review', 'DICOM metadata', 'Sign-off', 'Final release']
+  },
+  'scan-results': {
+    title: 'Scan Results', section: 'Imaging',
+    description: 'Stored scan report archive for review, printing and reversing a sent report to correct it.',
+    requirements: ['Report archive', 'Print report', 'Reverse a sent report', 'Reversal history']
   },
   'scan-rejections': {
     title: 'Rejected / Retake Scans', section: 'Imaging',

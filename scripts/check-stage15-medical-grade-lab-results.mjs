@@ -8,16 +8,19 @@ const requiredFiles = [
   'src/store/AppStore.jsx'
 ];
 
+// A sent (signed-off) laboratory result must stay auditable and reversible:
+// a real reversal endpoint the lab itself can use (not a silent overwrite),
+// a genuine history of every reversal (who/when/why), printing, and the
+// patient-facing verification links.
 const requiredMarkers = [
   ['src/pages/lab/LabResultsPage.jsx', 'VersionTimelineModal'],
-  ['src/pages/lab/LabResultsPage.jsx', 'CompareChangesModal'],
-  ['src/pages/lab/LabResultsPage.jsx', 'SignatureModal'],
+  ['src/pages/lab/LabResultsPage.jsx', 'ReverseResultModal'],
   ['src/pages/lab/LabResultsPage.jsx', 'openLabResultPdfWindow'],
   ['src/pages/lab/LabResultsPage.jsx', 'getQrCodeUrl'],
-  ['src/store/commands.js', 'SIGN_LAB_RESULT_WITH_SIGNATURE'],
-  ['src/pages/lab/LabResultsPage.jsx', 'reportHash'],
+  ['src/store/commands.js', 'REVERSE_LAB_RESULT'],
+  ['src/pages/lab/LabResultsPage.jsx', 'Reversal history'],
   ['src/api/normalizers.js', 'versionHistory'],
-  ['src/pages/lab/LabResultsPage.jsx', 'Needs re-sign after correction'],
+  ['src/pages/lab/LabResultsPage.jsx', 'Reverse this result'],
   ['src/utils/reporting.js', 'getReportVerificationUrl'],
   ['src/utils/reporting.js', 'getPatientPortalUrl'],
   ['src/utils/reporting.js', 'openLabResultPdfWindow'],
@@ -40,4 +43,4 @@ for (const [file, marker] of requiredMarkers) {
   }
 }
 
-console.log('Stage 15 medical-grade lab result security static check passed.');
+console.log('Stage 15 medical-grade lab result security static check passed (sent results are reversible and audited, not silently overwritten).');

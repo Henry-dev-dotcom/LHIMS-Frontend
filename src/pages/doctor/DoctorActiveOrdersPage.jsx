@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Eye, Search } from 'lucide-react';
+import { Eye, RotateCcw, Search } from 'lucide-react';
 import { useAppStore } from '../../store/AppStore';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
@@ -8,21 +8,34 @@ import { DataTable } from '../../components/ui/DataTable';
 import { Modal } from '../../components/ui/Modal';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { WorkflowTimeline } from '../../components/ui/WorkflowTimeline';
-import { inputClass } from '../../components/ui/FormField';
+import { FormField, inputClass } from '../../components/ui/FormField';
 import { formatDateTime } from '../../utils/formatters';
 import { getDoctorContextFromState, orderItemsText } from './doctorUtils';
 
 const statusOptions = ['Submitted', 'Confirmed', 'In Progress', 'Pending Review'];
 
-function ActiveOrderDetailModal({ order, onClose }) {
+function ActiveOrderDetailModal({ order, onClose, onReverse, reversing }) {
+  const [reversePrompt, setReversePrompt] = useState(false);
+  const [reason, setReason] = useState('');
   if (!order) return null;
+  // Withdrawing your own order (before reception or the department has acted on
+  // it) is only offered while it is still exactly as you sent it.
+  const canReverse = order.status === 'Submitted';
+
   return (
     <Modal
       open={Boolean(order)}
       title={`${order.id} · Active Order`}
       description="Focused order view for tracking processing status, expected completion, and department routing."
       onClose={onClose}
-      footer={<Button variant="secondary" onClick={onClose}>Close</Button>}
+      footer={(
+        <>
+          {canReverse && !reversePrompt && (
+            <Button variant="danger" onClick={() => setReversePrompt(true)}><RotateCcw className="h-4 w-4" /> Reverse this order</Button>
+          )}
+          <Button variant="secondary" onClick={onClose}>Close</Button>
+        </>
+      )}
     >
       <div className="space-y-5">
         <div className="grid gap-3 md:grid-cols-3">
@@ -39,18 +52,37 @@ function ActiveOrderDetailModal({ order, onClose }) {
         <Card title="Clinical Notes" compact>
           <p className="text-sm leading-6 text-slate-600">{order.clinicalNotes || 'No clinical notes entered.'}</p>
         </Card>
+        {reversePrompt && (
+          <Card title="Reverse this order" compact>
+            <p className="text-sm text-slate-600">This withdraws the order before it has been confirmed or started — nobody has acted on it yet.</p>
+            <FormField label="Reason" required className="mt-3">
+              <textarea className={inputClass} rows="2" value={reason} onChange={(event) => setReason(event.target.value)} placeholder="e.g. Ordered the wrong test for this patient" autoFocus />
+            </FormField>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button
+                variant="danger"
+                disabled={reason.trim().length < 3 || reversing}
+                onClick={() => { onReverse(order.id, reason.trim()); setReversePrompt(false); setReason(''); }}
+              >
+                {reversing ? 'Reversing…' : 'Confirm reversal'}
+              </Button>
+              <Button variant="subtle" onClick={() => { setReversePrompt(false); setReason(''); }}>Cancel</Button>
+            </div>
+          </Card>
+        )}
       </div>
     </Modal>
   );
 }
 
 export function DoctorActiveOrdersPage() {
-  const { state } = useAppStore();
+  const { state, dispatch } = useAppStore();
   const { activeOrders } = getDoctorContextFromState(state);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [urgencyFilter, setUrgencyFilter] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [reversing, setReversing] = useState(false);
 
   const summary = useMemo(() => ({
     all: activeOrders.length,
@@ -71,6 +103,14 @@ export function DoctorActiveOrdersPage() {
         .some((value) => String(value).toLowerCase().includes(term));
     });
   }, [activeOrders, search, statusFilter, urgencyFilter]);
+
+  function reverseOrder(orderId, reason) {
+    if (reversing) return;
+    setReversing(true);
+    dispatch({ type: 'TRANSITION_ORDER', payload: { orderId, nextStatus: 'Cancelled', reason } });
+    setSelectedOrder(null);
+    window.setTimeout(() => setReversing(false), 1500);
+  }
 
   return (
     <div className="space-y-5">
@@ -117,7 +157,7 @@ export function DoctorActiveOrdersPage() {
           emptyMessage="No matching active orders."
         />
       </Card>
-      <ActiveOrderDetailModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+      <ActiveOrderDetailModal order={selectedOrder} onClose={() => setSelectedOrder(null)} onReverse={reverseOrder} reversing={reversing} />
     </div>
   );
 }

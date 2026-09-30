@@ -180,6 +180,7 @@ export const NAV_ITEMS = [
   { id: 'scan-accept', label: 'Accept Scan', icon: CheckCircle2, roles: ['scan','admin'], section: 'Imaging' },
   { id: 'accepted-scans', label: 'Accepted Scans', icon: CheckCircle2, roles: ['scan','admin'], section: 'Imaging' },
   { id: 'scan-review', label: 'Review & Sign-off', icon: ShieldCheck, roles: ['scan','admin'], section: 'Imaging' },
+  { id: 'scan-results', label: 'Results', icon: FileText, roles: ['scan','admin'], section: 'Imaging' },
   { id: 'scan-rejections', label: 'Rejected / Retake', icon: History, roles: ['scan','admin'], section: 'Imaging' },
   { id: 'equipment-booking', label: 'Equipment Booking', icon: CalendarDays, roles: ['scan','admin'], section: 'Imaging' },
 

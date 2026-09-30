@@ -280,18 +280,16 @@ export function normalizeLabResult(result, orderCodeById = {}) {
     signedAt: result.signedOffAt || '',
     approvedAt: result.signedOffAt || '',
     approvedBy: result.signedOffBy?.name || '',
+    // Every reversal (a sent result pulled back by the lab to correct it) is kept here,
+    // newest first: who, when, why, and the status it moved from and to.
     versionHistory: (result.amendments || []).map((amendment) => ({
       id: amendment.id,
-      version: amendment.version,
-      versionBefore: Math.max(1, (amendment.version || 1) - 1),
-      versionAfter: amendment.version,
-      changedBy: amendment.changedBy?.name || amendment.changedById || '',
+      changedBy: amendment.amendedBy?.name || '',
       changedAt: amendment.createdAt,
       reason: amendment.reason || '',
-      previousValues: amendment.previousValues || [],
-      updatedValues: amendment.updatedValues || [],
-      previousHash: amendment.previousHash || '',
-      updatedHash: amendment.updatedHash || ''
+      fromStatus: amendment.beforeData?.status ? (LAB_RESULT_STATUS_FROM_API[amendment.beforeData.status] || enumLabel(amendment.beforeData.status)) : '',
+      toStatus: amendment.afterData?.status ? (LAB_RESULT_STATUS_FROM_API[amendment.afterData.status] || enumLabel(amendment.afterData.status)) : '',
+      parameters: amendment.beforeData?.parameters || []
     })),
     updatedAt: result.updatedAt || ''
   };
@@ -603,15 +601,27 @@ export function normalizeScanResult(result, orderCodeById = {}) {
     reportText: [result.findings, result.impression].filter(Boolean).join('\n\n'),
     findings: result.findings || '',
     impression: result.impression || '',
-    recommendation: result.recommendation || '',
+    recommendation: result.recommendations || '',
+    comparison: result.comparison || '',
     parameters: [],
     abnormal: Boolean(result.abnormal),
-    enteredBy: result.enteredBy?.name || '',
+    enteredBy: result.reportedBy?.name || result.enteredBy?.name || '',
     submittedAt: result.submittedAt || '',
-    signedBy: result.signedOffBy?.name || '',
+    signedBy: result.signedOffBy?.name || result.reviews?.[0]?.reviewer?.name || '',
     signedAt: result.signedOffAt || '',
     approvedAt: result.signedOffAt || '',
-    approvedBy: result.signedOffBy?.name || '',
+    approvedBy: result.signedOffBy?.name || result.reviews?.[0]?.reviewer?.name || '',
+    // Every reversal (a sent report pulled back by the unit to correct it), newest first.
+    versionHistory: (result.amendments || []).map((amendment) => ({
+      id: amendment.id,
+      changedBy: amendment.amendedBy?.name || '',
+      changedAt: amendment.createdAt,
+      reason: amendment.reason || '',
+      fromStatus: amendment.beforeData?.status ? (LAB_RESULT_STATUS_FROM_API[amendment.beforeData.status] || enumLabel(amendment.beforeData.status)) : '',
+      toStatus: amendment.afterData?.status ? (LAB_RESULT_STATUS_FROM_API[amendment.afterData.status] || enumLabel(amendment.afterData.status)) : '',
+      findings: amendment.beforeData?.findings || '',
+      impression: amendment.beforeData?.impression || ''
+    })),
     updatedAt: result.updatedAt || ''
   };
 }

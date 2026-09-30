@@ -8,6 +8,8 @@ export const labService = {
   saveResult: async (client, payload) => client.request('/lab/results', { method: 'POST', body: payload }),
   submitReview: async (client, payload) => client.request('/lab/results/submit-review', { method: 'POST', body: payload }),
   signOff: async (client, resultId, payload = {}) => client.request(`/lab/results/${resultId}/sign-off`, { method: 'POST', body: payload }),
+  // Reverses (retracts) a result the lab already sent (signed off), so it can be corrected.
+  reverseResult: async (client, resultId, payload) => client.request(`/lab/results/${resultId}/reverse`, { method: 'POST', body: payload }),
   attachFiles: async (client, resultId, files) => client.request(`/lab/results/${resultId}/files`, { method: 'POST', body: { files } }),
   rejectSample: async (client, sampleId, payload) => client.request(`/lab/samples/${sampleId}/reject`, { method: 'POST', body: payload }),
   reviewQueue: async (client, params = {}) => client.request(`/lab/review-queue${buildQuery(params)}`),

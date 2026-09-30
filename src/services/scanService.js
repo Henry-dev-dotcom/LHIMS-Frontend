@@ -10,6 +10,8 @@ export const scanService = {
   saveReport: async (client, payload) => client.request('/scan/results', { method: 'POST', body: payload }),
   submitReview: async (client, payload) => client.request('/scan/results/submit-review', { method: 'POST', body: payload }),
   signOff: async (client, resultId, payload = {}) => client.request(`/scan/results/${resultId}/sign-off`, { method: 'POST', body: payload }),
+  // Reverses (retracts) a report the unit already sent (signed off), so it can be corrected.
+  reverseResult: async (client, resultId, payload) => client.request(`/scan/results/${resultId}/reverse`, { method: 'POST', body: payload }),
   uploadFiles: async (client, resultId, files) => client.request(`/scan/results/${resultId}/files`, { method: 'POST', body: { files } }),
   retake: async (client, payload) => client.request('/scan/retake', { method: 'POST', body: payload }),
   reviewQueue: async (client, params = {}) => client.request(`/scan/review-queue${buildQuery(params)}`),
