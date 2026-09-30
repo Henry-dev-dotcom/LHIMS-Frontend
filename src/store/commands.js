@@ -138,6 +138,12 @@ function toApiPaymentMethod(method) {
 }
 
 const commands = {
+  // Reloads named workspace collections after a change made outside the command layer
+  // (for example a price list imported in Facility Setup).
+  REFRESH_COLLECTIONS: async (action, dispatch, getState) => {
+    await refresh(dispatch, getState, action.names || null);
+  },
+
   LOGIN_WITH_CREDENTIALS: async (action, dispatch) => {
     const facilityCode = String(action.facilityCode || '').trim().toUpperCase();
     const data = await authService.login(apiClient, {

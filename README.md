@@ -117,3 +117,22 @@ This package includes the Stage 24 UI fix:
 - Rendered header dropdowns through React portals.
 - Raised header/dropdown z-index while keeping modals above them.
 - Added `npm run lint:stage26` and included it in `npm run qa`.
+
+## End-to-end tests (Playwright)
+
+Real browser, real backend, real database — the key journeys:
+
+- a visitor goes from the pricing page to sign-up, setup, a first patient and the first payment;
+- the platform operator's overview and a read-only support session;
+- every demo role signs in, sees only its own menu, and every screen in it opens without crashing;
+- the public website on a phone (no sideways scrolling, menu, demo request).
+
+```bash
+npx playwright install chromium   # once per machine
+npm run test:e2e                  # starts its own backend (port 5001) and frontend (port 5174)
+npm run test:e2e:report           # open the last report (screenshots and traces of failures)
+```
+
+The run resets and seeds a separate database — the backend's `DATABASE_URL` with the database
+renamed `lhims_e2e` (or `E2E_DATABASE_URL`) — so development data is never touched. The backend
+is expected at `../diagnosis-center-backend` (or `E2E_BACKEND_DIR`).

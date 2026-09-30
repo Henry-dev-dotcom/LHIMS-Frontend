@@ -12,3 +12,7 @@ qa-screenshots
 qa-artifacts
 .claude
 *.bak
+
+# Playwright end-to-end output
+e2e-results
+e2e-report

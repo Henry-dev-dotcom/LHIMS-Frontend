@@ -98,6 +98,8 @@ export function SetupPage() {
     try {
       const result = await onboardingService.importPriceList(apiClient, rows);
       toast('success', `${label}: ${result.created} added, ${result.updated} updated. Check the prices in Price Catalog.`);
+      // New items must appear straight away wherever tests and fees are picked.
+      dispatch({ type: 'REFRESH_COLLECTIONS', names: ['catalog'] });
       await load();
     } catch (error) {
       const rowsWithErrors = error?.details?.errors || [];
