@@ -4,6 +4,7 @@ import { adminService } from '../services/adminService';
 import { billingService } from '../services/billingService';
 import { financeService } from '../services/financeService';
 import { labService } from '../services/labService';
+import { analyzerService } from '../services/analyzerService';
 import { scanService } from '../services/scanService';
 import { doctorService } from '../services/doctorService';
 import { receptionService } from '../services/receptionService';
@@ -11,6 +12,10 @@ import { resultService } from '../services/resultService';
 import { notificationService } from '../services/notificationService';
 import {
   listItems,
+  normalizeAnalyzerDevice,
+  normalizeAnalyzerMessage,
+  normalizeAnalyzerTestMap,
+  normalizeAnalyzerUnmappedCode,
   normalizeAppointment,
   normalizeAuditLog,
   normalizeCatalogItem,
@@ -155,6 +160,17 @@ export async function loadCollections(client, auth, dispatch, only = null) {
     loaders.push(
       load('financeShifts', () => financeService.shifts(client, LIST_PARAMS), normalizeShift),
       load('expenses', () => financeService.expenses(client, LIST_PARAMS), normalizeExpense)
+    );
+  }
+
+  // Analyzers belong to the bench that runs them, and to the administrator who
+  // sets the laboratory up.
+  if ((role === 'lab' || role === 'admin') && on('laboratory')) {
+    loaders.push(
+      load('analyzerDevices', () => analyzerService.devices(client, LIST_PARAMS), normalizeAnalyzerDevice),
+      load('analyzerTestMaps', () => analyzerService.testMaps(client, LIST_PARAMS), normalizeAnalyzerTestMap),
+      load('analyzerMessages', () => analyzerService.messages(client, LIST_PARAMS), normalizeAnalyzerMessage),
+      load('analyzerUnmappedCodes', () => analyzerService.unmappedCodes(client), normalizeAnalyzerUnmappedCode)
     );
   }
 

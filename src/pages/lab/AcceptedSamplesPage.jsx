@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   ClipboardList,
+  Cpu,
   FileText,
   FlaskConical,
   ListChecks,
@@ -91,6 +92,16 @@ function valueKey(testId, parameter) {
 function getExistingValue(result, testId, parameter) {
   const existing = (result?.parameters || []).find((item) => item.testId === testId && (item.name === parameter.name || item.id === parameter.id));
   return existing?.value || '';
+}
+
+/*
+  The value an analyzer sent for this field, if it sent one. The bench is checking
+  these rather than typing them, so they are marked as such — an unmarked field is
+  one somebody still has to fill.
+*/
+function analyzerValueFor(result, testId, parameter) {
+  const existing = (result?.parameters || []).find((item) => item.testId === testId && (item.name === parameter.name || item.id === parameter.id));
+  return existing?.fromAnalyzer ? existing : null;
 }
 
 function isTestComplete(testId, item, values) {
@@ -198,7 +209,7 @@ function AcceptedPatientCard({ row, onOpen }) {
   );
 }
 
-function TestResultModal({ test, values, files, onChange, onFileSelection, onRemoveFile, onClose, onSave }) {
+function TestResultModal({ test, values, files, result, onChange, onFileSelection, onRemoveFile, onClose, onSave }) {
   if (!test) return null;
   const parameters = parametersForItem(test);
   const testFiles = files.filter((file) => file.testId === test.id);
@@ -212,6 +223,11 @@ function TestResultModal({ test, values, files, onChange, onFileSelection, onRem
             <p className="text-xs font-semibold uppercase tracking-[0.08em] text-clinical-700">Enter test result</p>
             <h3 className="mt-1 text-2xl font-bold text-slate-900">{test.name}</h3>
             <p className="mt-1 text-sm text-slate-500">Fill the result fields for this test only. When saved, this test will be marked as completed.</p>
+            {result?.analyzer && (
+              <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-clinical-50 px-3 py-1 text-xs font-bold text-clinical-700">
+                <Cpu className="h-3.5 w-3.5" /> {result.analyzer} filled the marked fields — check them before you save
+              </p>
+            )}
           </div>
           <button type="button" onClick={onClose} className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-slate-500 hover:bg-slate-50" aria-label="Close result entry popup">
             <X className="h-5 w-5" />
@@ -220,20 +236,37 @@ function TestResultModal({ test, values, files, onChange, onFileSelection, onRem
 
         <div className="max-h-[calc(92vh-170px)] overflow-y-auto p-5">
           <div className="space-y-3">
-            {parameters.map((parameter) => (
-              <label key={valueKey(test.id, parameter)} className="block rounded-2xl border border-slate-200 bg-slate-50 p-3">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{parameter.name}</span>
-                <input
-                  className={`${inputClass} mt-2 bg-white`}
-                  value={values[valueKey(test.id, parameter)] || ''}
-                  onChange={(event) => onChange(test.id, parameter, event.target.value)}
-                  placeholder="Enter value"
-                />
-                <span className="mt-2 block text-xs font-semibold text-slate-500">
-                  {parameter.unit ? `Unit: ${parameter.unit}` : 'No unit'}{parameter.referenceRange ? ` · Ref: ${parameter.referenceRange}` : ''}
-                </span>
-              </label>
-            ))}
+            {parameters.map((parameter) => {
+              const fromAnalyzer = analyzerValueFor(result, test.id, parameter);
+              return (
+                <label key={valueKey(test.id, parameter)} className={`block rounded-2xl border p-3 ${fromAnalyzer ? 'border-clinical-200 bg-clinical-50/60' : 'border-slate-200 bg-slate-50'}`}>
+                  <span className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{parameter.name}</span>
+                    {fromAnalyzer && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-clinical-100 px-2 py-0.5 text-[10px] font-bold text-clinical-700">
+                        <Cpu className="h-3 w-3" /> From the analyzer
+                      </span>
+                    )}
+                  </span>
+                  <input
+                    className={`${inputClass} mt-2 bg-white`}
+                    value={values[valueKey(test.id, parameter)] || ''}
+                    onChange={(event) => onChange(test.id, parameter, event.target.value)}
+                    placeholder="Enter value"
+                  />
+                  <span className="mt-2 block text-xs font-semibold text-slate-500">
+                    {parameter.unit ? `Unit: ${parameter.unit}` : 'No unit'}{parameter.referenceRange ? ` · Ref: ${parameter.referenceRange}` : ''}
+                  </span>
+                  {fromAnalyzer && (
+                    <span className="mt-1 block text-xs text-clinical-700">
+                      Sent as <span className="font-mono font-bold">{fromAnalyzer.analyzerCode}</span>
+                      {fromAnalyzer.analyzerRawValue && fromAnalyzer.analyzerRawValue !== String(values[valueKey(test.id, parameter)] || '') ? <> · reading was {fromAnalyzer.analyzerRawValue}, converted</> : null}
+                      {fromAnalyzer.measuredAt ? ` · measured ${formatDateTime(fromAnalyzer.measuredAt)}` : ''}
+                    </span>
+                  )}
+                </label>
+              );
+            })}
           </div>
 
           <div className="mt-4 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-4">
@@ -609,6 +642,7 @@ export function AcceptedSamplesPage() {
         test={activeTest}
         values={values}
         files={files}
+        result={existingResult}
         onChange={updateValue}
         onFileSelection={handleFileSelection}
         onRemoveFile={removeFile}

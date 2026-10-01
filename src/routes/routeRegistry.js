@@ -210,6 +210,21 @@ export const PAGE_META = {
     description: 'Track rejected samples, recollection requests and retest notes.',
     requirements: ['Rejected sample log', 'Retest reason', 'Recollection tracking', 'Audit log']
   },
+  'lab-analyzers': {
+    title: 'Analyzers', section: 'Laboratory',
+    description: 'Register analyzers that file their own results, issue and rotate their keys, and upload a run exported from an instrument.',
+    requirements: ['Register an analyzer', 'Key shown once', 'Rotate or disable a key', 'Upload a run']
+  },
+  'lab-analyzer-mapping': {
+    title: 'Analyzer Test Mapping', section: 'Laboratory',
+    description: "Point each analyzer's own test codes at our test fields, with unit conversion, and map the codes instruments have already sent.",
+    requirements: ['Codes waiting to be mapped', 'Map a code to a field', 'Unit conversion factor', 'Remove a mapping']
+  },
+  'lab-analyzer-log': {
+    title: 'Analyzer Log', section: 'Laboratory',
+    description: 'Every payload the analyzers sent, kept verbatim, with why anything was not filed and the ability to try it again.',
+    requirements: ['Messages needing attention', 'Reason it was not filed', 'Replay a message', 'Discard with a reason']
+  },
   'finance-shift': {
     title: 'Shift Start / Close', section: 'Billing / Finance',
     description: 'Start and close finance shifts, link payments to active shift, and reconcile opening/closing float.',

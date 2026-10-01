@@ -34,6 +34,9 @@ const LabAcceptPage = lazyPage(() => import('../pages/lab/LabAcceptPage'), 'LabA
 const AcceptedSamplesPage = lazyPage(() => import('../pages/lab/AcceptedSamplesPage'), 'AcceptedSamplesPage');
 const LabReviewPage = lazyPage(() => import('../pages/lab/LabReviewPage'), 'LabReviewPage');
 const LabResultsPage = lazyPage(() => import('../pages/lab/LabResultsPage'), 'LabResultsPage');
+const AnalyzersPage = lazyPage(() => import('../pages/lab/AnalyzersPage'), 'AnalyzersPage');
+const AnalyzerMappingPage = lazyPage(() => import('../pages/lab/AnalyzerMappingPage'), 'AnalyzerMappingPage');
+const AnalyzerMessagesPage = lazyPage(() => import('../pages/lab/AnalyzerMessagesPage'), 'AnalyzerMessagesPage');
 const ScanResultsPage = lazyPage(() => import('../pages/scan/ScanResultsPage'), 'ScanResultsPage');
 const LabRejectedSamplesPage = lazyPage(() => import('../pages/lab/LabRejectedSamplesPage'), 'LabRejectedSamplesPage');
 const ScanQueuePage = lazyPage(() => import('../pages/scan/ScanQueuePage'), 'ScanQueuePage');
@@ -126,6 +129,9 @@ function resolvePage(pageId, role, modules) {
   if (pageId === 'accepted-samples') return <AcceptedSamplesPage />;
   if (pageId === 'lab-review') return <LabReviewPage />;
   if (pageId === 'lab-results') return <LabResultsPage />;
+  if (pageId === 'lab-analyzers') return <AnalyzersPage />;
+  if (pageId === 'lab-analyzer-mapping') return <AnalyzerMappingPage />;
+  if (pageId === 'lab-analyzer-log') return <AnalyzerMessagesPage />;
   if (pageId === 'scan-results') return <ScanResultsPage />;
   if (pageId === 'lab-rejections') return <LabRejectedSamplesPage />;
   if (pageId === 'scan-queue') return <ScanQueuePage />;

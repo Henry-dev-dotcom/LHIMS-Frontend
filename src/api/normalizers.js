@@ -271,7 +271,14 @@ export function normalizeLabResult(result, orderCodeById = {}) {
       unit: parameter.unit || '',
       referenceRange: parameter.referenceRange || '',
       flag: enumLabel(parameter.flag) || 'Pending',
-      notes: parameter.notes || ''
+      notes: parameter.notes || '',
+      // Where the value came from, so the bench can see at a glance which numbers
+      // it is checking rather than entering.
+      fromAnalyzer: parameter.source === 'ANALYZER',
+      analyzerCode: parameter.analyzerCode || '',
+      // The instrument's untouched reading, kept when a unit conversion changed it.
+      analyzerRawValue: parameter.analyzerRawValue || '',
+      measuredAt: parameter.measuredAt || ''
     })),
     abnormal: (result.parameters || []).some((parameter) => ['HIGH', 'LOW', 'CRITICAL'].includes(parameter.flag)),
     enteredBy: result.enteredBy?.name || '',
@@ -639,5 +646,111 @@ export function normalizeScanBooking(booking, orderCodeById = {}) {
     endAt: booking.endAt || '',
     status: enumLabel(booking.status),
     notes: booking.notes || ''
+  };
+}
+
+/* ------------------------------------------- analyzers that file their own results */
+
+export function normalizeAnalyzerDevice(device) {
+  if (!device) return null;
+  return {
+    id: device.id,
+    code: device.deviceCode || device.id,
+    name: device.name || '',
+    make: device.make || '',
+    model: device.model || '',
+    serialNumber: device.serialNumber || '',
+    // Kept raw as well: the forms and the API both speak the enum.
+    protocol: device.protocol || '',
+    protocolLabel: ANALYZER_PROTOCOL_LABELS[device.protocol] || enumLabel(device.protocol),
+    departmentId: device.departmentId || '',
+    departmentName: device.department?.name || '',
+    status: enumLabel(device.status),
+    rawStatus: device.status || '',
+    // Only the opening characters of the key are ever returned, so two can be told apart.
+    keyPrefix: device.apiKeyPrefix || '',
+    keyIssuedAt: device.apiKeyIssuedAt || '',
+    keyLastUsedAt: device.apiKeyLastUsedAt || '',
+    autoSubmitForReview: Boolean(device.autoSubmitForReview),
+    acceptUnmappedTests: Boolean(device.acceptUnmappedTests),
+    lastMessageAt: device.lastMessageAt || '',
+    notes: device.notes || '',
+    mappingCount: device._count?.testMaps ?? 0,
+    messageCount: device._count?.messages ?? 0,
+    registeredBy: device.createdBy?.name || '',
+    createdAt: device.createdAt || ''
+  };
+}
+
+export const ANALYZER_PROTOCOL_LABELS = {
+  HL7_V2: 'HL7 v2',
+  ASTM: 'ASTM',
+  CSV: 'Export file (CSV)',
+  JSON: 'JSON'
+};
+
+export function normalizeAnalyzerTestMap(map) {
+  if (!map) return null;
+  return {
+    id: map.id,
+    deviceId: map.deviceId || '',
+    // No device means the mapping applies to every analyzer in the facility.
+    deviceName: map.device?.name || 'All analyzers',
+    analyzerCode: map.analyzerCode || '',
+    catalogItemId: map.catalogItemId || '',
+    testName: map.catalogItem?.name || '',
+    referenceParameterId: map.referenceParameterId || '',
+    fieldName: map.referenceParameter?.name || '',
+    fieldUnit: map.referenceParameter?.unit || '',
+    factor: map.factor === null || map.factor === undefined ? '' : String(map.factor),
+    unitOverride: map.unitOverride || '',
+    isActive: map.isActive !== false,
+    createdBy: map.createdBy?.name || ''
+  };
+}
+
+export function normalizeAnalyzerMessage(message) {
+  if (!message) return null;
+  return {
+    id: message.id,
+    deviceId: message.deviceId || '',
+    deviceName: message.device?.name || '',
+    protocol: message.device?.protocol || '',
+    status: enumLabel(message.status),
+    rawStatus: message.status || '',
+    analyzerSampleId: message.analyzerSampleId || '',
+    sampleCode: message.sample?.sampleCode || '',
+    patientName: personName(message.sample?.patient),
+    patientCode: message.sample?.patient?.patientCode || '',
+    resultCode: message.labResult?.resultCode || '',
+    resultStatus: enumLabel(message.labResult?.status),
+    applied: message.appliedCount ?? 0,
+    skipped: message.skippedCount ?? 0,
+    // Why nothing (or only some) of it could be stored, in words the bench can act on.
+    reason: message.error || '',
+    resolutionNote: message.resolutionNote || '',
+    resolvedBy: message.resolvedBy?.name || '',
+    resolvedAt: message.resolvedAt || '',
+    receivedAt: message.receivedAt || '',
+    processedAt: message.processedAt || '',
+    contentType: message.contentType || '',
+    // Present only on a single-message read, not in the list.
+    rawPayload: message.rawPayload || ''
+  };
+}
+
+export function normalizeAnalyzerUnmappedCode(entry) {
+  if (!entry) return null;
+  return {
+    // The pair is the identity: the same code from two instruments may mean two things.
+    id: `${entry.deviceId}:${entry.analyzerCode}`,
+    analyzerCode: entry.analyzerCode || '',
+    label: entry.label || '',
+    unit: entry.sampleUnit || '',
+    exampleValue: entry.exampleValue || '',
+    deviceId: entry.deviceId || '',
+    deviceName: entry.deviceName || '',
+    occurrences: entry.occurrences ?? 0,
+    lastSeenAt: entry.lastSeenAt || ''
   };
 }

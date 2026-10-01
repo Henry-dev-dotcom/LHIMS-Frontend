@@ -13,6 +13,40 @@
 
 Quality control records and lab stock are under the Laboratory menu for authorised staff.
 
+### Letting the analyzers enter results
+
+If the lab has an analyzer — chemistry, haematology, or anything that can export
+or send its results — it can fill the result fields itself, so the bench checks
+numbers instead of typing them.
+
+1. **Analyzers → Register an analyzer.** Say what it is and how it sends results.
+   LHIMS issues it a key, **shown only once** — copy it then.
+2. Get the results to LHIMS, whichever suits:
+   - **Upload a run.** Export the run from the instrument and bring the file to
+     **Analyzers → Upload a run**. Nothing to install.
+   - **Run the bridge** on the computer beside the analyzer, so results arrive on
+     their own. Ask whoever set LHIMS up; it is a small program with a short guide.
+3. **Run one sample**, then open **Test mapping**. Whatever codes the instrument
+   used are listed there with an example value. Point each at the right field of
+   the right test, then **Analyzer log → Try again** to bring that first run in.
+
+Afterwards, nothing changes about how you work: the values appear on the
+patient's result as a **draft**, with the fields the analyzer filled marked as
+such, and you check and sign off exactly as before.
+
+Two things worth knowing:
+
+- **The tube's barcode is what ties a reading to a patient.** The analyzer must be
+  given the sample code LHIMS printed. Nothing is matched by name.
+- **An analyzer never releases a result.** Whatever it sends waits for a person.
+  A critical value is notified to the lab at once, while it is still a draft.
+
+**Analyzer log** holds everything the instruments sent, kept exactly as it
+arrived. A value that could not be stored — an unmapped code, a sample not yet
+accepted, a result already signed off — is there with the reason, and can be tried
+again once the cause is fixed. Nothing is ever thrown away, so a run on a sample
+you cannot take again is never lost.
+
 ## Imaging
 
 1. **Scan Queue** → **Accept Scan** (book the room or machine in **Equipment Booking** if needed).

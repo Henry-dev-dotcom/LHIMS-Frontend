@@ -8,6 +8,7 @@ import { billingService } from '../services/billingService';
 import { financeService } from '../services/financeService';
 import { adminService } from '../services/adminService';
 import { labService } from '../services/labService';
+import { analyzerService } from '../services/analyzerService';
 import { scanService } from '../services/scanService';
 import { resultService } from '../services/resultService';
 import { notificationService } from '../services/notificationService';
@@ -852,6 +853,70 @@ const commands = {
     });
     await refresh(dispatch, getState, ['doctors']);
     dispatch(toastAction('success', 'Notification preferences saved'));
+  },
+
+  /* ------------------------------------- analyzers that file their own results */
+
+  /*
+    Registering an analyzer hands back its key, once. Because dispatch does not
+    return anything to the page, the key is put in state for the page to show and
+    for the person to copy; the page clears it as soon as they are done with it.
+  */
+  REGISTER_ANALYZER: async (action, dispatch, getState) => {
+    const data = await analyzerService.registerDevice(apiClient, action.payload || {});
+    await refresh(dispatch, getState, ['analyzerDevices']);
+    dispatch({ type: 'SET_COLLECTIONS', collections: { analyzerIssuedKey: { deviceName: data?.device?.name || '', apiKey: data?.apiKey || '' } } });
+    dispatch(toastAction('success', 'Analyzer registered. Copy its key now — it cannot be shown again.'));
+  },
+
+  UPDATE_ANALYZER: async (action, dispatch, getState) => {
+    await analyzerService.updateDevice(apiClient, action.deviceId, action.payload || {});
+    await refresh(dispatch, getState, ['analyzerDevices']);
+    dispatch(toastAction('success', 'Analyzer updated'));
+  },
+
+  ROTATE_ANALYZER_KEY: async (action, dispatch, getState) => {
+    const data = await analyzerService.rotateKey(apiClient, action.deviceId);
+    await refresh(dispatch, getState, ['analyzerDevices']);
+    dispatch({ type: 'SET_COLLECTIONS', collections: { analyzerIssuedKey: { deviceName: data?.device?.name || '', apiKey: data?.apiKey || '', rotated: true } } });
+    dispatch(toastAction('success', 'A new key was issued. The old one stopped working immediately.'));
+  },
+
+  SAVE_ANALYZER_TEST_MAP: async (action, dispatch, getState) => {
+    await analyzerService.saveTestMap(apiClient, action.payload || {});
+    // The unmapped list is derived from the mappings, so it changes with them.
+    await refresh(dispatch, getState, ['analyzerTestMaps', 'analyzerUnmappedCodes']);
+    dispatch(toastAction('success', 'Test mapping saved'));
+  },
+
+  DELETE_ANALYZER_TEST_MAP: async (action, dispatch, getState) => {
+    await analyzerService.deleteTestMap(apiClient, action.mapId);
+    await refresh(dispatch, getState, ['analyzerTestMaps', 'analyzerUnmappedCodes']);
+    dispatch(toastAction('success', 'Test mapping removed'));
+  },
+
+  UPLOAD_ANALYZER_FILE: async (action, dispatch, getState) => {
+    const outcome = (await analyzerService.uploadFile(apiClient, action.payload || {}))?.outcome ?? {};
+    // A result that landed changes the bench's queues, so refresh those too.
+    await refresh(dispatch, getState, ['orders', 'results', 'sampleLogs', 'analyzerMessages', 'analyzerUnmappedCodes', 'analyzerDevices', 'notifications']);
+    dispatch({ type: 'SET_COLLECTIONS', collections: { analyzerLastUpload: { applied: outcome.applied ?? 0, skipped: outcome.skipped ?? 0, status: outcome.status || '', notes: outcome.notes || [] } } });
+    dispatch(toastAction(outcome.applied > 0 ? 'success' : 'error', outcome.applied > 0
+      ? `${outcome.applied} value(s) stored as a draft result awaiting your check.`
+      : 'Nothing could be stored from that file. See the reasons listed.'));
+  },
+
+  REPLAY_ANALYZER_MESSAGE: async (action, dispatch, getState) => {
+    const outcome = (await analyzerService.replayMessage(apiClient, action.messageId))?.outcome ?? {};
+    await refresh(dispatch, getState, ['orders', 'results', 'sampleLogs', 'analyzerMessages', 'analyzerUnmappedCodes', 'notifications']);
+    dispatch(toastAction(outcome.applied > 0 ? 'success' : 'error', outcome.applied > 0
+      ? `${outcome.applied} value(s) stored from that message.`
+      : 'Still nothing could be stored. The reasons are on the message.'));
+  },
+
+  DISCARD_ANALYZER_MESSAGE: async (action, dispatch, getState) => {
+    await analyzerService.discardMessage(apiClient, action.messageId, { reason: action.payload?.reason });
+    await refresh(dispatch, getState, ['analyzerMessages', 'analyzerUnmappedCodes']);
+    dispatch(toastAction('success', 'Analyzer message discarded'));
   },
 
   ADMIN_UPDATE_NOTIFICATION_SETTINGS: async (action, dispatch, getState) => {

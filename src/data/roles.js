@@ -32,6 +32,8 @@ import {
   Smile,
   Eye,
   Activity,
+  Cpu,
+  Link2,
   Apple,
   Baby,
   HeartHandshake,
@@ -174,6 +176,9 @@ export const NAV_ITEMS = [
   { id: 'lab-review', label: 'Review & Sign-off', icon: ShieldCheck, roles: ['admin'], section: 'Laboratory' },
   { id: 'lab-results', label: 'Results', icon: FileText, roles: ['lab','admin'], section: 'Laboratory' },
   { id: 'lab-rejections', label: 'Rejected / Retest', icon: History, roles: ['lab','admin'], section: 'Laboratory' },
+  { id: 'lab-analyzers', label: 'Analyzers', icon: Cpu, roles: ['lab','admin'], section: 'Laboratory' },
+  { id: 'lab-analyzer-mapping', label: 'Test Mapping', icon: Link2, roles: ['lab','admin'], section: 'Laboratory' },
+  { id: 'lab-analyzer-log', label: 'Analyzer Log', icon: Activity, roles: ['lab','admin'], section: 'Laboratory' },
 
   { id: 'scan-dashboard', label: 'Scan / Imaging', icon: ScanLine, roles: ['scan','admin'], section: 'Imaging' },
   { id: 'scan-queue', label: 'Scan Queue', icon: ClipboardList, roles: ['scan','admin'], section: 'Imaging' },
