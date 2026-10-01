@@ -173,7 +173,7 @@ export function ResultsDeliveryPage() {
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <p className="font-bold text-slate-900">Default patient notice</p>
-            <p className="mt-1 text-sm text-slate-600">Your diagnosis center result is ready. Please contact the center or your referring doctor for secure review.</p>
+            <p className="mt-1 text-sm text-slate-600">Your result is ready. Please contact the hospital or your referring doctor for secure review.</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <p className="font-bold text-slate-900">Doctor notice</p>
@@ -280,12 +280,12 @@ export function ResultsDeliveryPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <Card title="Doctor release template" subtitle="Used for doctor dashboard/email/SMS release prompts.">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-              A finalized diagnosis center report is ready for review. Please log in to the secure doctor portal to view and download the report.
+              A finalised report is ready for review. Please log in to the secure doctor portal to view and download it.
             </div>
           </Card>
           <Card title="Patient email / WhatsApp notice" subtitle="Patient-facing message avoids result values and clinical interpretation.">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-              Your diagnosis center result is ready. Please contact the center or your referring doctor for secure review.
+              Your result is ready. Please contact the hospital or your referring doctor for secure review.
             </div>
           </Card>
           <Card title="SMS privacy rule" subtitle="Safe SMS must never contain clinical details.">

@@ -1,7 +1,7 @@
 {
-  "name": "Diagnosis Center Platform",
-  "short_name": "Diagnosis Center",
-  "description": "Mobile-ready order, billing, laboratory, imaging, and results workflow platform.",
+  "name": "LHIMS Hospital Management System",
+  "short_name": "LHIMS",
+  "description": "Mobile-ready hospital management: outpatients, wards, theatre, maternity, laboratory, imaging, pharmacy, billing and claims — department by department.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

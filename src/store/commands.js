@@ -186,7 +186,7 @@ const commands = {
       items: (payload.itemIds || []).map((catalogItemId) => ({ catalogItemId }))
     });
     await refresh(dispatch, getState, ['orders', 'invoices', 'patients']);
-    dispatch(toastAction('success', 'Order submitted to the diagnosis center'));
+    dispatch(toastAction('success', 'Order submitted'));
   },
 
   TRANSITION_ORDER: async (action, dispatch, getState) => {

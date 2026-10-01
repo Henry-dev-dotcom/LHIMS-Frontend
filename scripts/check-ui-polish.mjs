@@ -5,7 +5,7 @@ const checks = [
   ['src/components/ui/Button.jsx', 'shadow-lift'],
   ['src/layouts/Header.jsx', 'Sparkles'],
   ['src/layouts/Header.jsx', 'Role notifications'],
-  ['src/layouts/Sidebar.jsx', 'Orders · Billing · Results'],
+  ['src/layouts/Sidebar.jsx', 'Hospital management system'],
   ['src/components/ui/DataTable.jsx', 'md:hidden'],
   ['src/components/ui/WorkflowTimeline.jsx', 'Order workflow'],
   ['src/components/ui/NotificationDrawer.jsx', 'Delivery & role notifications'],

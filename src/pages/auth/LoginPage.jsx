@@ -53,8 +53,8 @@ export function LoginPage({ initialCode = '' }) {
               <Activity className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900">Diagnosis Center</h1>
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Orders · Billing · Results</p>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">LHIMS</h1>
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Hospital management system</p>
             </div>
           </div>
         </header>
@@ -65,17 +65,17 @@ export function LoginPage({ initialCode = '' }) {
             <div className="absolute -bottom-20 -right-10 h-72 w-72 rounded-full bg-clinical-500/40 blur-3xl" />
             <div className="relative flex h-full flex-col justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-clinical-100">Clinical workspace</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-clinical-100">Hospital management system</p>
                 <h2 className="getlabs-serif mt-5 max-w-xl text-4xl leading-[1.06] tracking-[-0.03em] !text-white sm:text-5xl">
-                  Manage lab requests with a calmer, cleaner workflow.
+                  Run your whole hospital, or only the departments you need.
                 </h2>
                 <p className="mt-5 max-w-lg text-base leading-8 text-clinical-100">
-                  A calm, simple interface for clinicians, reception, laboratory, scan, billing, and administration teams.
+                  One patient record across every department you switch on — and nothing on your screens for the ones you do not.
                 </p>
               </div>
 
               <div className="mt-10 grid gap-3 text-sm sm:grid-cols-2">
-                {['Queue requests', 'Accept samples', 'Enter results', 'Send to clinician'].map((item) => (
+                {['Outpatients, wards & theatre', 'Laboratory & imaging', 'Pharmacy & stores', 'Billing & NHIS claims'].map((item) => (
                   <div key={item} className="flex items-center gap-2 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-white backdrop-blur">
                     <CheckCircle2 className="h-4 w-4 text-clinical-200" />
                     <span className="font-semibold">{item}</span>

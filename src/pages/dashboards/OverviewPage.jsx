@@ -22,8 +22,8 @@ export function OverviewPage() {
     <div>
       <PageHeader
         eyebrow="Clinical Operations"
-        title="Diagnosis Center command workspace"
-        description="A polished healthcare operations interface for role-based ordering, reception routing, laboratory and imaging work, billing, reporting, delivery, security and audit monitoring."
+        title="Hospital command workspace"
+        description="Every department this facility has switched on, in one place: outpatients and wards, theatre and maternity, laboratory and imaging, pharmacy and stores, billing, claims, reporting and audit."
       />
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         <MetricCard label="Patients" value={patients.length} icon={UsersRound} tone="blue" />

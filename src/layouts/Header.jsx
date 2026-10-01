@@ -50,7 +50,7 @@ function fallbackPageHeader(pageId, role) {
   const meta = dashboardMeta[pageId] || PAGE_META[pageId];
   return {
     eyebrow: meta?.section || meta?.eyebrow || roleInfo?.label || 'Workspace',
-    title: meta?.title || roleInfo?.label || 'Diagnosis Center',
+    title: meta?.title || roleInfo?.label || 'LHIMS',
     description: meta?.description || '',
     actions: null
   };
@@ -228,7 +228,7 @@ export function Header() {
           </div>
 
           <div className="mt-2.5 border-t border-slate-100 pt-2.5">
-            <h1 className="line-clamp-1 text-[1.05rem] font-semibold leading-tight tracking-tight text-slate-900">{pageHeader?.title || 'Diagnosis Center'}</h1>
+            <h1 className="line-clamp-1 text-[1.05rem] font-semibold leading-tight tracking-tight text-slate-900">{pageHeader?.title || 'LHIMS'}</h1>
             {pageHeader?.description && (
               isValidElement(pageHeader.description) ? (
                 <div className="mt-2">{pageHeader.description}</div>
@@ -272,7 +272,7 @@ export function Header() {
               </p>
             )}
             <div className="mt-1 min-w-0">
-              <h1 className="truncate text-xl font-semibold tracking-tight text-slate-900">{pageHeader?.title || 'Diagnosis Center'}</h1>
+              <h1 className="truncate text-xl font-semibold tracking-tight text-slate-900">{pageHeader?.title || 'LHIMS'}</h1>
               {pageHeader?.description && (
                 isValidElement(pageHeader.description) ? (
                   <div className="mt-1.5 max-w-5xl">{pageHeader.description}</div>

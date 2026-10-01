@@ -1,4 +1,17 @@
 import { formatDateTime, money } from './formatters';
+import { getStoredSession } from '../api/config';
+
+/**
+ * The name at the top of anything printed: the facility's own, since the report
+ * is theirs. Falls back to the product name on public pages with no session.
+ */
+export function reportBrand() {
+  try {
+    return getStoredSession()?.user?.facility?.name || 'LHIMS';
+  } catch {
+    return 'LHIMS';
+  }
+}
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
@@ -45,7 +58,7 @@ export function openReportPrintWindow(input) {
   body{font-family:Inter,Arial,sans-serif;margin:40px;color:#0f172a}.letterhead{border-bottom:4px solid #0ea5e9;padding-bottom:18px;margin-bottom:24px}.brand{font-size:28px;font-weight:900;color:#0369a1}.muted{color:#64748b;font-size:13px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}.box{border:1px solid #e2e8f0;border-radius:16px;padding:14px}table{width:100%;border-collapse:collapse;margin-top:18px}th,td{border-bottom:1px solid #e2e8f0;padding:10px;text-align:left;font-size:13px}th{background:#f8fafc;text-transform:uppercase;font-size:11px;color:#64748b}.abnormal{color:#dc2626;font-weight:800}.normal{color:#059669;font-weight:800}.footer{margin-top:32px;font-size:12px;color:#64748b}@media print{button{display:none}body{margin:24px}}</style></head>
   <body>
     <button onclick="window.print()" style="float:right;padding:10px 16px;border:0;border-radius:12px;background:#0284c7;color:white;font-weight:800">Print / Save as PDF</button>
-    <div class="letterhead"><div class="brand">Diagnosis Center</div><div class="muted">Final diagnostic report · ${escapeHtml(order.id)}${resultReport?.id ? ` · Report ${escapeHtml(resultReport.id)}` : ''}</div></div>
+    <div class="letterhead"><div class="brand">${escapeHtml(reportBrand())}</div><div class="muted">Final diagnostic report · ${escapeHtml(order.id)}${resultReport?.id ? ` · Report ${escapeHtml(resultReport.id)}` : ''}</div></div>
     <div class="grid">
       <div class="box"><strong>Patient</strong><br>${escapeHtml(patient?.fullName)}<br><span class="muted">${escapeHtml(patient?.id)} · ${escapeHtml(patient?.gender)} · DOB ${escapeHtml(patient?.dateOfBirth)}</span></div>
       <div class="box"><strong>Referring Doctor</strong><br>${escapeHtml(doctor?.name)}<br><span class="muted">${escapeHtml(doctor?.specialty)} · License ${escapeHtml(doctor?.licenseNumber)}</span></div>
@@ -54,7 +67,7 @@ export function openReportPrintWindow(input) {
     </div>
     <h2>Results</h2>
     <table><thead><tr><th>Department</th><th>Parameter / Report</th><th>Value</th><th>Reference Range</th><th>Flag</th></tr></thead><tbody>${rows || '<tr><td colspan="5">No final result parameters available.</td></tr>'}</tbody></table>
-    <div class="footer">Generated from the Diagnosis Center Platform.${resultReport?.secureToken ? ` Secure report token: ${escapeHtml(resultReport.secureToken)}.` : ''} SMS notifications must not include patient-identifying clinical data.</div>
+    <div class="footer">Generated from LHIMS.${resultReport?.secureToken ? ` Secure report token: ${escapeHtml(resultReport.secureToken)}.` : ''} SMS notifications must not include patient-identifying clinical data.</div>
   </body></html>`;
   const win = window.open('', '_blank', 'width=1000,height=800');
   if (!win) return;
@@ -112,7 +125,7 @@ export function openLabResultPdfWindow({ data, result }) {
   body{font-family:Inter,Arial,sans-serif;margin:34px;color:#0f172a}.top{display:flex;justify-content:space-between;gap:24px;border-bottom:4px solid #0ea5e9;padding-bottom:16px}.brand{font-size:27px;font-weight:900;color:#0369a1}.muted{color:#64748b;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.box{border:1px solid #e2e8f0;border-radius:14px;padding:12px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border-bottom:1px solid #e2e8f0;padding:9px;text-align:left;font-size:12px;vertical-align:top}th{background:#f8fafc;text-transform:uppercase;font-size:10px;color:#64748b}.abnormal{color:#dc2626;font-weight:900}.normal{color:#059669;font-weight:900}.signature{display:grid;grid-template-columns:1fr 220px;gap:16px;margin-top:24px}.sigbox{border:1px solid #cbd5e1;border-radius:14px;min-height:120px;padding:12px}.sigbox img{max-height:72px;max-width:100%}.integrity{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;word-break:break-all}.qr{text-align:center}.qr img{width:150px;height:150px}.footer{margin-top:20px;font-size:11px;color:#64748b}.button{float:right;padding:10px 16px;border:0;border-radius:12px;background:#0284c7;color:white;font-weight:900}@media print{.button{display:none}body{margin:20px}.box{break-inside:avoid}}</style></head>
   <body>
     <button class="button" onclick="window.print()">Generate PDF / Save</button>
-    <div class="top"><div><div class="brand">Diagnosis Center</div><div class="muted">Official laboratory report · ${escapeHtml(result?.id)} · ${escapeHtml(order?.id)}</div></div><div class="qr"><img src="${escapeHtml(qrUrl)}" alt="QR verification code"><div class="muted">Scan to verify</div></div></div>
+    <div class="top"><div><div class="brand">${escapeHtml(reportBrand())}</div><div class="muted">Official laboratory report · ${escapeHtml(result?.id)} · ${escapeHtml(order?.id)}</div></div><div class="qr"><img src="${escapeHtml(qrUrl)}" alt="QR verification code"><div class="muted">Scan to verify</div></div></div>
     <div class="grid">
       <div class="box"><strong>Patient</strong><br>${escapeHtml(patient?.fullName)}<br><span class="muted">${escapeHtml(patient?.id)} · ${escapeHtml(patient?.gender)} · DOB ${escapeHtml(patient?.dateOfBirth)}</span></div>
       <div class="box"><strong>Referring Doctor</strong><br>${escapeHtml(doctor?.name)}<br><span class="muted">${escapeHtml(doctor?.specialty)} · ${escapeHtml(hospital?.name)}</span></div>

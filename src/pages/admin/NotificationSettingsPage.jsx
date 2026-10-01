@@ -15,7 +15,7 @@ const defaultSettings = {
   smsProvider: 'SMS Gateway',
   retryAttempts: 3,
   emailTemplate: 'Result {{orderId}} is ready. Log in to view the finalized report.',
-  smsTemplate: 'A diagnosis center result is ready. Please log in to view it.'
+  smsTemplate: 'Your result is ready. Please log in, or contact the hospital, to view it.'
 };
 
 export function NotificationSettingsPage() {

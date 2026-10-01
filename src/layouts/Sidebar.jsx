@@ -50,8 +50,8 @@ export function Sidebar() {
             </div>
           )}
           <div className="min-w-0">
-            <div className="truncate text-base font-bold tracking-tight text-slate-900">{facility?.name || (role === 'platform' ? 'LHIMS Platform' : 'Diagnosis Center')}</div>
-            <div className="truncate text-xs font-medium text-slate-500">{facility ? `Facility code ${facility.code}` : 'Orders · Billing · Results'}</div>
+            <div className="truncate text-base font-bold tracking-tight text-slate-900">{facility?.name || (role === 'platform' ? 'LHIMS Platform' : 'LHIMS')}</div>
+            <div className="truncate text-xs font-medium text-slate-500">{facility ? `Facility code ${facility.code}` : 'Hospital management system'}</div>
           </div>
         </div>
       </div>
