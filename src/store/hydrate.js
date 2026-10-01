@@ -5,6 +5,7 @@ import { billingService } from '../services/billingService';
 import { financeService } from '../services/financeService';
 import { labService } from '../services/labService';
 import { scanService } from '../services/scanService';
+import { doctorService } from '../services/doctorService';
 import { receptionService } from '../services/receptionService';
 import { resultService } from '../services/resultService';
 import { notificationService } from '../services/notificationService';
@@ -55,6 +56,8 @@ export async function loadCollections(client, auth, dispatch, only = null) {
   // would refuse them anyway, and every refusal lands in the audit log.
   const on = (moduleKey) => !Array.isArray(auth?.modules) || auth.modules.includes(moduleKey);
   const wants = (name) => !only || only.includes(name);
+  // A doctor's session cannot reach the admin-only lists; it reads its own profile.
+  const isClinician = role === 'doctor';
 
   const failures = [];
   const collections = {};
@@ -126,8 +129,25 @@ export async function loadCollections(client, auth, dispatch, only = null) {
     load('notifications', () => notificationService.list(client, LIST_PARAMS), (item) => normalizeNotification(item, orderCodeById)),
     load('appointments', () => receptionService.appointments(client, LIST_PARAMS), (item) => normalizeAppointment(item, orderCodeById)),
     load('dailyVisits', () => receptionService.dailyVisits(client, LIST_PARAMS), (item) => normalizeVisit(item, orderCodeById)),
-    load('doctors', () => adminService.doctors(client, LIST_PARAMS), normalizeDoctor),
-    load('hospitals', () => adminService.hospitals(client, LIST_PARAMS), normalizeHospital),
+    // The doctor and hospital lists live behind the admin-only /admin routes. A
+    // clinician reads their own profile instead, which carries their hospital —
+    // without it their workspace cannot tell which orders are theirs.
+    isClinician
+      ? (async () => {
+        if (!wants('doctors') && !wants('hospitals')) return;
+        const profile = await doctorService.profile(client).catch(() => null);
+        if (!profile) {
+          if (!only) {
+            if (wants('doctors')) collections.doctors = [];
+            if (wants('hospitals')) collections.hospitals = [];
+          }
+          return;
+        }
+        if (wants('doctors')) collections.doctors = [normalizeDoctor(profile)].filter(Boolean);
+        if (wants('hospitals')) collections.hospitals = [normalizeHospital(profile.hospital)].filter(Boolean);
+      })()
+      : load('doctors', () => adminService.doctors(client, LIST_PARAMS), normalizeDoctor),
+    isClinician ? null : load('hospitals', () => adminService.hospitals(client, LIST_PARAMS), normalizeHospital),
     on('imaging') && load('scanBookings', () => scanService.bookings(client, LIST_PARAMS), (item) => normalizeScanBooking(item, orderCodeById))
   ];
 
