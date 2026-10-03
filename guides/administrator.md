@@ -44,9 +44,14 @@ are updated. If any row is wrong, nothing is imported and every bad row is liste
 - See your plan, departments, price, next payment date and invoices.
 - **Choose a plan and pay** / **Renew**: you are taken to Paystack (card or mobile money). The
   method you pay with is kept for automatic renewals.
-- **Change plan or departments**: adding departments or a bigger plan takes effect now, for a
-  part-price for the rest of the period. Smaller plans and a change of billing period start at the
-  next renewal.
+- **Change plan or departments**: plans are grouped by the kind of facility you run — diagnostic
+  centre, pharmacy, clinic or hospital — so start by picking yours, then the plan within it. You
+  can switch kind here too, if what you run has changed.
+- Any department can be added to any plan, whatever kind you chose: a diagnostic centre that opens
+  a dispensary simply adds Pharmacy.
+- Adding departments or moving to a bigger plan takes effect now, charged only for the rest of the
+  period. Removing departments, a smaller plan and a change of billing period start at the next
+  renewal — you keep what you have paid for until then.
 - If a renewal fails, you have a grace period (shown in the banner). After it, the facility becomes
   read-only until paid — nothing is deleted.
 - **Cancel subscription** ends it at the end of the paid period; **Keep my subscription** undoes that.

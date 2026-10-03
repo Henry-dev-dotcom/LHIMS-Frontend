@@ -286,6 +286,11 @@ function PlanChooser({ mode, data, names, defaultEmail, onClose, onDone }) {
   const [saving, setSaving] = useState(false);
 
   const plan = data.plans.find((p) => p.id === planId);
+  // A facility that changes what it is - a clinic that becomes a hospital - says
+  // so here, so the plan list is grouped the same way as the public pricing page.
+  const [kind, setKind] = useState(() => data.plans.find((p) => p.id === s.planId)?.facilityKind || '');
+  const kinds = (data.facilityKinds || []).filter((k) => data.plans.some((p) => p.facilityKind === k.key));
+  const kindPlans = data.plans.filter((p) => p.facilityKind === kind);
   const availableAddOns = data.addOns.filter((a) => !plan?.modules.includes(a.moduleKey));
   const chosenAddOns = addOns.filter((k) => availableAddOns.some((a) => a.moduleKey === k));
 
@@ -335,10 +340,34 @@ function PlanChooser({ mode, data, names, defaultEmail, onClose, onDone }) {
       )}
     >
       <form id="plan-chooser" onSubmit={submit} className="space-y-4">
+        {kinds.length > 1 && (
+          <fieldset>
+            <legend className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Kind of facility</legend>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {kinds.map((k) => (
+                <label key={k.key} className={`cursor-pointer rounded-xl border px-3 py-2 text-sm font-semibold ${kind === k.key ? 'border-clinical-500 bg-clinical-25' : 'border-slate-200'}`}>
+                  <input
+                    type="radio"
+                    name="facilityKind"
+                    className="sr-only"
+                    checked={kind === k.key}
+                    onChange={() => {
+                      setKind(k.key);
+                      const first = data.plans.find((p) => p.facilityKind === k.key);
+                      if (first) setPlanId(first.id);
+                    }}
+                  />
+                  {k.name}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        )}
+
         <fieldset>
           <legend className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Plan</legend>
-          <div className="mt-2 grid gap-2 sm:grid-cols-3">
-            {data.plans.map((p) => (
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {kindPlans.map((p) => (
               <label key={p.id} className={`cursor-pointer rounded-2xl border p-3 text-sm ${p.id === planId ? 'border-clinical-500 bg-clinical-25 ring-2 ring-clinical-200' : 'border-slate-200 bg-white'}`}>
                 <input type="radio" name="plan" className="sr-only" checked={p.id === planId} onChange={() => setPlanId(p.id)} />
                 <span className="block font-bold text-slate-900">{p.name}</span>

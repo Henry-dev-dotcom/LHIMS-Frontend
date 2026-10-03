@@ -22,7 +22,14 @@ const TABS = [
   { id: 'prices', label: 'Add-on prices' }
 ];
 const formatDate = (value) => (value ? new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium' }).format(new Date(value)) : '—');
-const EMPTY_PLAN = { code: '', name: '', description: '', monthlyPrice: '', yearlyDiscountPercent: '15', maxUsers: '', maxPatientsPerMonth: '', maxStorageMb: '', trialDays: '14', sortOrder: '0', isActive: true, isPublic: true, modules: [] };
+const FACILITY_KINDS = [
+  { key: 'DIAGNOSTIC_CENTRE', label: 'Diagnostic Centre' },
+  { key: 'PHARMACY', label: 'Pharmacy' },
+  { key: 'CLINIC', label: 'Clinic / Health Centre' },
+  { key: 'HOSPITAL', label: 'Hospital' }
+];
+
+const EMPTY_PLAN = { code: '', name: '', facilityKind: 'HOSPITAL', description: '', monthlyPrice: '', yearlyDiscountPercent: '15', maxUsers: '', maxPatientsPerMonth: '', maxStorageMb: '', trialDays: '14', sortOrder: '0', isActive: true, isPublic: true, modules: [] };
 
 export function PlatformBillingPage() {
   const { dispatch } = useAppStore();
@@ -123,13 +130,14 @@ export function PlatformBillingPage() {
             rows={data.plans}
             columns={[
               { key: 'name', label: 'Plan', mobilePrimary: true, render: (row) => `${row.name} (${row.code})` },
+              { key: 'facilityKind', label: 'For', render: (row) => <span className="text-sm font-semibold text-slate-700">{FACILITY_KINDS.find((k) => k.key === row.facilityKind)?.label || row.facilityKind}</span> },
               { key: 'monthlyPrice', label: 'Per month', render: (row) => money(row.monthlyPrice) },
               { key: 'yearly', label: 'Yearly discount', render: (row) => `${row.yearlyDiscountPercent}%` },
               { key: 'modules', label: 'Departments', render: (row) => row.modules.length },
               { key: 'maxUsers', label: 'Staff', render: (row) => row.maxUsers ?? 'Unlimited' },
               { key: 'trialDays', label: 'Trial', render: (row) => `${row.trialDays} days` },
               { key: 'state', label: 'Shown', render: (row) => (!row.isActive ? 'Retired' : row.isPublic ? 'Public' : 'Private') },
-              { key: 'actions', label: '', render: (row) => <Button size="sm" variant="secondary" onClick={() => setEditing({ ...row, monthlyPrice: String(row.monthlyPrice), yearlyDiscountPercent: String(row.yearlyDiscountPercent), maxUsers: row.maxUsers ? String(row.maxUsers) : '', maxPatientsPerMonth: row.maxPatientsPerMonth ? String(row.maxPatientsPerMonth) : '', maxStorageMb: row.maxStorageMb ? String(row.maxStorageMb) : '', trialDays: String(row.trialDays), sortOrder: String(row.sortOrder), description: row.description || '' })}><Pencil className="h-3.5 w-3.5" /> Edit</Button> }
+              { key: 'actions', label: '', render: (row) => <Button size="sm" variant="secondary" onClick={() => setEditing({ ...row, monthlyPrice: String(row.monthlyPrice), yearlyDiscountPercent: String(row.yearlyDiscountPercent), maxUsers: row.maxUsers ? String(row.maxUsers) : '', maxPatientsPerMonth: row.maxPatientsPerMonth ? String(row.maxPatientsPerMonth) : '', maxStorageMb: row.maxStorageMb ? String(row.maxStorageMb) : '', trialDays: String(row.trialDays), sortOrder: String(row.sortOrder), description: row.description || '', facilityKind: row.facilityKind || 'HOSPITAL' })}><Pencil className="h-3.5 w-3.5" /> Edit</Button> }
             ]}
           />
         </Card>
@@ -174,6 +182,7 @@ function PlanEditor({ plan, catalog, onClose, onSaved }) {
     setError('');
     const payload = {
       name: form.name.trim(),
+      facilityKind: form.facilityKind,
       description: form.description.trim() || undefined,
       monthlyPrice: Number(form.monthlyPrice),
       yearlyDiscountPercent: Number(form.yearlyDiscountPercent || 0),
@@ -214,6 +223,11 @@ function PlanEditor({ plan, catalog, onClose, onSaved }) {
       <form id="plan-editor" onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
         {isNew && <FormField label="Code" required help="Short and unique, e.g. CLINIC."><input className={`${inputClass} uppercase`} value={form.code} onChange={set('code')} maxLength={20} /></FormField>}
         <FormField label="Name" required><input className={inputClass} value={form.name} onChange={set('name')} /></FormField>
+        <FormField label="Kind of facility" required help="Plans are grouped by this on the pricing page. A kind may have more than one plan, for different sizes.">
+          <select className={inputClass} value={form.facilityKind} onChange={set('facilityKind')}>
+            {FACILITY_KINDS.map((k) => <option key={k.key} value={k.key}>{k.label}</option>)}
+          </select>
+        </FormField>
         <FormField label="Description" className="sm:col-span-2"><input className={inputClass} value={form.description} onChange={set('description')} /></FormField>
         <FormField label="Price per month (GHS)" required><input type="number" min="0" className={inputClass} value={form.monthlyPrice} onChange={set('monthlyPrice')} /></FormField>
         <FormField label="Yearly discount (%)"><input type="number" min="0" max="60" className={inputClass} value={form.yearlyDiscountPercent} onChange={set('yearlyDiscountPercent')} /></FormField>

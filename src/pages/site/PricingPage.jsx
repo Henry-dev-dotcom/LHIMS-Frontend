@@ -1,22 +1,43 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Check } from 'lucide-react';
+import { ArrowLeft, Check } from 'lucide-react';
 import { SiteLayout } from './SiteLayout';
 import { useCatalogue } from './useCatalogue';
 import { publicService, readSiteRoute } from '../../services/publicService';
 import { money } from '../../utils/formatters';
 
-/** Plan builder: pick a plan, billing interval and extra departments; see the live price. */
+/*
+  Plan builder.
+
+  The first question is what kind of facility they run, not how big they are,
+  because that is the one a customer can answer without reading anything. The
+  plans for that kind follow, then the departments they want on top, then the
+  price. A diagnostic centre never has to scroll past hospital pricing to find
+  itself.
+*/
 export function PricingPage() {
   const { data, loading, error } = useCatalogue();
   const initial = readSiteRoute().params;
+  const plans = useMemo(() => data?.plans || [], [data]);
+  const kinds = data?.facilityKinds || [];
+
+  const [kind, setKind] = useState(initial.get('kind') || '');
   const [planId, setPlanId] = useState(initial.get('plan') || '');
   const [interval, setBillingInterval] = useState(initial.get('interval') === 'YEARLY' ? 'YEARLY' : 'MONTHLY');
   const [addOns, setAddOns] = useState(() => (initial.get('addOns') || '').split(',').filter(Boolean));
   const [quote, setQuote] = useState(null);
   const [quoteError, setQuoteError] = useState('');
 
-  const plans = data?.plans || [];
-  const plan = plans.find((p) => p.id === planId) || plans[Math.min(1, plans.length - 1)] || null;
+  // A link straight to a plan implies its kind, so the page opens where it should.
+  useEffect(() => {
+    if (kind || !planId || plans.length === 0) return;
+    const linked = plans.find((p) => p.id === planId);
+    if (linked) setKind(linked.facilityKind);
+  }, [kind, planId, plans]);
+
+  const kindPlans = useMemo(() => plans.filter((p) => p.facilityKind === kind), [plans, kind]);
+  const plan = kindPlans.find((p) => p.id === planId) || kindPlans[0] || null;
+  const activeKind = kinds.find((k) => k.key === kind) || null;
+
   const names = useMemo(() => Object.fromEntries((data?.departments || []).map((d) => [d.key, d.name])), [data]);
   const availableAddOns = (data?.addOns || []).filter((a) => plan && !plan.modules.includes(a.moduleKey));
   const chosen = addOns.filter((k) => availableAddOns.some((a) => a.moduleKey === k));
@@ -33,21 +54,62 @@ export function PricingPage() {
   }, [plan?.id, interval, chosen.join()]);
 
   const toggle = (key) => setAddOns((list) => (list.includes(key) ? list.filter((k) => k !== key) : [...list, key]));
+  const chooseKind = (key) => {
+    setKind(key);
+    // The plan belongs to the old kind, and so may some of the departments.
+    setPlanId('');
+    setAddOns([]);
+  };
   const signupHref = plan ? `#/signup?plan=${encodeURIComponent(plan.id)}&interval=${interval}${chosen.length ? `&addOns=${chosen.join(',')}` : ''}` : '#/signup';
 
   return (
     <SiteLayout active="pricing">
       <section className="mx-auto max-w-6xl px-4 py-12">
         <p className="text-xs font-bold uppercase tracking-[0.12em] text-clinical-700">Pricing</p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Pay for the departments you use</h1>
-        <p className="mt-3 max-w-2xl text-slate-600">Choose a plan, add departments, and see your price. Every plan starts with a free trial; you pay only when you decide to continue.</p>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+          {activeKind ? activeKind.name : 'What kind of facility do you run?'}
+        </h1>
+        <p className="mt-3 max-w-2xl text-slate-600">
+          {activeKind
+            ? 'Start from the plan that fits, then add any other department you need. Every plan starts with a free trial; you pay only when you decide to continue.'
+            : 'Pick the one closest to yours and we will show you the plans built for it — not a list of everything we sell.'}
+        </p>
 
         {loading && <p className="mt-8 text-sm text-slate-500">Loading prices…</p>}
         {error && <p role="alert" className="mt-8 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
 
-        {plan && (
+        {/* Step one: what they run. */}
+        {!activeKind && kinds.length > 0 && (
+          <div className="mt-8 grid gap-4 sm:grid-cols-2" role="radiogroup" aria-label="Kind of facility">
+            {kinds.map((k) => {
+              const from = plans.filter((p) => p.facilityKind === k.key).reduce((lowest, p) => (lowest === null || p.monthlyPrice < lowest ? p.monthlyPrice : lowest), null);
+              return (
+                <button
+                  key={k.key}
+                  type="button"
+                  role="radio"
+                  aria-checked="false"
+                  onClick={() => chooseKind(k.key)}
+                  className="rounded-3xl border border-slate-200 bg-white p-6 text-left transition hover:border-clinical-400 hover:shadow-lift focus:outline-none focus-visible:ring-4 focus-visible:ring-clinical-100"
+                >
+                  <span className="text-xl font-bold text-slate-900">{k.name}</span>
+                  <span className="mt-2 block text-sm leading-6 text-slate-600">{k.summary}</span>
+                  <span className="mt-3 block text-xs font-semibold text-slate-500">{k.examples}</span>
+                  {from !== null && <span className="mt-4 block text-sm font-bold text-clinical-700">From {money(from)} a month</span>}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Step two: the plans for that kind, and what to add. */}
+        {activeKind && plan && (
           <>
-            <div className="mt-8 inline-flex rounded-2xl bg-white p-1 ring-1 ring-slate-200" role="radiogroup" aria-label="Billing">
+            <button type="button" onClick={() => chooseKind('')} className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-clinical-700 hover:underline">
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" /> A different kind of facility
+            </button>
+
+            <div className="mt-5 inline-flex rounded-2xl bg-white p-1 ring-1 ring-slate-200" role="radiogroup" aria-label="Billing">
               {['MONTHLY', 'YEARLY'].map((value) => (
                 <button key={value} type="button" role="radio" aria-checked={interval === value} onClick={() => setBillingInterval(value)}
                   className={`rounded-xl px-4 py-2 text-sm font-semibold ${interval === value ? 'bg-clinical-500 text-white' : 'text-slate-600'}`}>
@@ -56,8 +118,8 @@ export function PricingPage() {
               ))}
             </div>
 
-            <div className="mt-5 grid gap-4 md:grid-cols-3" role="radiogroup" aria-label="Plan">
-              {plans.map((p) => {
+            <div className={`mt-5 grid gap-4 ${kindPlans.length > 1 ? 'md:grid-cols-2' : 'max-w-md'}`} role="radiogroup" aria-label="Plan">
+              {kindPlans.map((p) => {
                 const selected = p.id === plan.id;
                 const yearly = Math.round(p.monthlyPrice * 12 * (1 - p.yearlyDiscountPercent / 100) * 100) / 100;
                 return (
@@ -82,8 +144,9 @@ export function PricingPage() {
             <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_22rem]">
               <div>
                 <h2 className="text-lg font-bold">Add departments</h2>
+                <p className="mt-1 text-sm text-slate-600">Anything the {plan.name} plan does not already include. Nothing here is locked to the kind of facility you chose — a diagnostic centre that opens a dispensary just adds Pharmacy.</p>
                 {availableAddOns.length === 0 ? (
-                  <p className="mt-2 text-sm text-slate-600">The {plan.name} plan already includes every department.</p>
+                  <p className="mt-3 text-sm text-slate-600">The {plan.name} plan already includes every department.</p>
                 ) : (
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     {availableAddOns.map((a) => (

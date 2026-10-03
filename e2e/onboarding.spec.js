@@ -14,7 +14,10 @@ test('a new hospital signs up, sets up, registers a patient and pays', async ({ 
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Run your whole hospital on one system.' })).toBeVisible();
   await page.getByRole('link', { name: 'Build your plan and start free' }).click();
-  await page.getByRole('radio', { name: /^Starter/ }).click();
+  // The builder asks what kind of facility this is before it shows any price.
+  // One plan is sold for a clinic, so choosing the kind selects it.
+  await page.getByRole('radio', { name: /^Clinic \/ Health Centre/ }).click();
+  await expect(page.getByRole('heading', { name: 'Clinic / Health Centre', level: 1 })).toBeVisible();
   await page.getByRole('checkbox', { name: /Maternity/ }).check();
   const price = page.locator('aside', { hasText: 'Your price' });
   await expect(price).toContainText('Add-on: Maternity');

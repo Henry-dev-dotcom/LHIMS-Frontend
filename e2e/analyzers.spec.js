@@ -32,12 +32,13 @@ async function acceptedSample(request, catalogItemId, patientId) {
   expect(confirmed.status).toBeLessThan(300);
   const accepted = await post('/lab/samples/accept', lab, { orderId: order.body.data.id });
   expect(accepted.status, JSON.stringify(accepted.body)).toBe(201);
-  return accepted.body.data.samples[0].sampleCode;
+  const sample = accepted.body.data.samples[0];
+  return { sampleCode: sample.sampleCode, sampleId: sample.id, lab, post };
 }
 
 test('a lab connects an analyzer, maps the code it did not know, and the values reach the bench', async ({ page, request }) => {
   const crashes = watchForCrashes(page);
-  const sampleCode = await acceptedSample(request, 't3', 'PAT-0003');
+  const { sampleCode } = await acceptedSample(request, 't3', 'PAT-0003');
 
   await signIn(page, { code: 'DEMO', username: 'lab', password: 'lab123' });
   await openFromMenu(page, 'Analyzers');
@@ -112,7 +113,18 @@ test('a lab connects an analyzer, maps the code it did not know, and the values 
 
 test('an analyzer cannot overwrite a result the lab has already sent', async ({ page, request }) => {
   const crashes = watchForCrashes(page);
-  const sampleCode = await acceptedSample(request, 't6', 'PAT-0001');
+  const { sampleCode, sampleId, lab, post } = await acceptedSample(request, 't6', 'PAT-0001');
+
+  /*
+    Enter, submit and sign the result off first — through the API, on this exact
+    sample. Doing it through the list would act on whichever row is at the top,
+    which is not necessarily the one this test just created.
+  */
+  const draft = await post('/lab/results', lab, { sampleId, parameters: [{ name: 'Blood Glucose', value: '5.0', unit: 'mmol/L' }] });
+  expect(draft.status, JSON.stringify(draft.body)).toBe(201);
+  const resultId = draft.body.data.id;
+  expect((await post('/lab/results/submit-review', lab, { resultId })).status).toBeLessThan(300);
+  expect((await post(`/lab/results/${resultId}/sign-off`, lab, { decision: 'SIGNED_OFF' })).status).toBeLessThan(300);
 
   await signIn(page, { code: 'DEMO', username: 'lab', password: 'lab123' });
   await openFromMenu(page, 'Analyzers');
@@ -122,17 +134,7 @@ test('an analyzer cannot overwrite a result the lab has already sent', async ({ 
   await page.getByRole('button', { name: 'Register and issue a key' }).click();
   await page.getByRole('button', { name: 'I have copied it' }).click();
 
-  // Enter, submit and sign the result off by hand first.
-  await openFromMenu(page, 'Accepted Samples');
-  await page.getByRole('button', { name: 'Enter Results' }).first().click();
-  await page.getByRole('button', { name: 'Enter Result' }).first().click();
-  const entry = page.getByRole('dialog').filter({ hasText: 'Enter test result' });
-  await entry.locator('input[placeholder="Enter value"]').first().fill('5.0');
-  await entry.getByRole('button', { name: 'Done with Test' }).click();
-  await page.getByRole('button', { name: 'Push Results to Clinician' }).click();
-
-  // Now the analyzer sends a different number for the same sample.
-  await openFromMenu(page, 'Analyzers');
+  // Now the analyzer sends a different number for that same, already-sent sample.
   await page.getByRole('button', { name: 'Upload a run' }).click();
   const upload = page.getByRole('dialog').filter({ hasText: 'Upload a run from an analyzer' });
   await upload.getByLabel('Which analyzer did this come from?').selectOption({ label: 'E2E Guarded · Export file (CSV)' });

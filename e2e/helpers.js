@@ -30,7 +30,7 @@ export async function openFromMenu(page, label) {
 }
 
 /** Signs up a facility through the public API, returning its code and admin login. */
-export async function signUpViaApi(request, { name, plan = 'STARTER' } = {}) {
+export async function signUpViaApi(request, { name, plan = 'CLINIC' } = {}) {
   const catalogue = await (await request.get(`${API}/public/plans`)).json();
   const planId = catalogue.data.plans.find((p) => p.code === plan).id;
   const username = `admin${tag().toLowerCase()}`;
