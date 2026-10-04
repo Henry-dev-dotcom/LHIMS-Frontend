@@ -24,8 +24,13 @@ test('a new hospital signs up, sets up, registers a patient and pays', async ({ 
   await expect(price).toContainText('GH₵800.00');
   await price.getByRole('link', { name: /free trial/ }).click();
 
-  // Sign-up form.
+  // Sign-up form. The price carried across must be the one they were quoted,
+  // not the plan's own price: this is the last number seen before committing.
   await expect(page.getByRole('heading', { name: 'Create your hospital on LHIMS' })).toBeVisible();
+  const chosen = page.locator('aside', { hasText: 'Your plan' });
+  await expect(chosen).toContainText('Add-on: Maternity');
+  await expect(chosen).toContainText('GH₵800.00');
+
   await page.getByLabel(/^Facility name/).fill(facilityName);
   await page.getByLabel(/^Type/).selectOption('Clinic');
   await page.getByLabel(/^Phone/).fill('+233 24 555 0100');

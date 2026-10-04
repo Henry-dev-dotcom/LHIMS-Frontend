@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { SiteLayout } from './SiteLayout';
 import { useCatalogue } from './useCatalogue';
@@ -32,12 +32,32 @@ export function SignupPage() {
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(null);
+  const [quote, setQuote] = useState(null);
 
   const plans = data?.plans || [];
   const plan = plans.find((p) => p.id === params.get('plan')) || plans[Math.min(1, plans.length - 1)] || null;
   const interval = params.get('interval') === 'YEARLY' ? 'YEARLY' : 'MONTHLY';
   const addOns = useMemo(() => (params.get('addOns') || '').split(',').filter(Boolean), [params]);
   const names = Object.fromEntries((data?.departments || []).map((d) => [d.key, d.name]));
+
+  /*
+    The price they are actually agreeing to, worked out by the same endpoint the
+    pricing page uses. Showing the plan's own monthly price here understated it
+    whenever departments had been added or the billing was yearly - and this is
+    the last number anyone sees before they sign up.
+  */
+  useEffect(() => {
+    if (!plan) return undefined;
+    let cancelled = false;
+    setQuote(null);
+    publicService.quote({ planId: plan.id, interval, addOns })
+      .then((q) => { if (!cancelled) setQuote(q); })
+      .catch(() => { if (!cancelled) setQuote(null); });
+    return () => { cancelled = true; };
+    // The params object is rebuilt every render, so depend on the contents of
+    // addOns rather than its identity, or this refetches forever.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plan?.id, interval, addOns.join()]);
   const set = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }));
 
   function localErrors() {
@@ -146,8 +166,27 @@ export function SignupPage() {
           {plan ? (
             <>
               <p className="mt-2 text-lg font-bold">{plan.name}</p>
-              <p className="text-sm text-slate-600">{interval === 'YEARLY' ? 'Yearly' : 'Monthly'} billing · from {money(plan.monthlyPrice)} a month</p>
-              {addOns.length > 0 && <p className="mt-2 text-sm text-slate-600">Plus {addOns.map((k) => names[k] || k).join(', ')}</p>}
+              <p className="text-sm text-slate-600">{interval === 'YEARLY' ? 'Yearly' : 'Monthly'} billing</p>
+              {quote ? (
+                <>
+                  <ul className="mt-3 space-y-1.5 text-sm">
+                    {quote.lines.map((line) => (
+                      <li key={line.description} className="flex justify-between gap-3">
+                        <span className="text-slate-600">{line.description}</span>
+                        <span className="font-semibold">{money(line.amount)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-3 flex items-baseline justify-between border-t border-slate-200 pt-3">
+                    <span className="font-bold">Total</span>
+                    <span className="text-xl font-bold">{money(quote.total)}<span className="text-sm font-semibold text-slate-500"> / {interval === 'MONTHLY' ? 'month' : 'year'}</span></span>
+                  </p>
+                  {interval === 'YEARLY' && <p className="mt-1 text-right text-xs text-slate-500">{money(quote.monthlyEquivalent)} a month</p>}
+                </>
+              ) : (
+                /* Until the quote lands, "from" is the one thing we can say truthfully. */
+                <p className="mt-2 text-sm text-slate-600">From {money(plan.monthlyPrice)} a month{addOns.length > 0 ? `, plus ${addOns.map((k) => names[k] || k).join(', ')}` : ''}</p>
+              )}
               <p className="mt-3 rounded-2xl bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800">{plan.trialDays}-day free trial. No payment today.</p>
               <a href={`#/pricing?plan=${plan.id}&interval=${interval}${addOns.length ? `&addOns=${addOns.join(',')}` : ''}`} className="mt-3 inline-block text-sm font-semibold text-clinical-700 underline">Change plan or departments</a>
             </>
