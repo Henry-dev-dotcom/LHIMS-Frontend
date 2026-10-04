@@ -52,3 +52,64 @@ test('signing out does not leave a workspace page in the address', async ({ page
   expect(page.url()).not.toContain('#/app/');
   crashes.assertNone();
 });
+
+/*
+  What someone sees when the server does not answer.
+
+  Free hosting sleeps when idle and takes the better part of a minute to wake.
+  The browser's own AbortError used to reach the screen as "signal is aborted
+  without reason" — which reads like a crash and tells nobody what to do. For a
+  demo link, that is the first impression.
+*/
+test('a server that cannot be reached says so in words', async ({ page }) => {
+  const crashes = watchForCrashes(page);
+  await page.route('**/api/auth/login', (route) => route.abort('failed'));
+  await page.goto('/#/login');
+
+  await page.getByPlaceholder('e.g. KBTH').fill('DEMO');
+  await page.locator('#login-username').fill('lab');
+  await page.locator('input[type="password"]').fill('lab123');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+
+  await expect(page.getByText('We could not reach the server', { exact: false })).toBeVisible();
+  await expect(page.getByText('aborted', { exact: false })).toHaveCount(0);
+  crashes.assertNone();
+});
+
+test('a slow server is described as waking, not as a failure', async ({ page }) => {
+  const crashes = watchForCrashes(page);
+  // Never answers: the client's own deadline is what gives up.
+  await page.route('**/api/auth/login', () => {});
+  await page.goto('/#/login');
+
+  await page.getByPlaceholder('e.g. KBTH').fill('DEMO');
+  await page.locator('#login-username').fill('lab');
+  await page.locator('input[type="password"]').fill('lab123');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+
+  await expect(page.getByText('may be starting up', { exact: false })).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText('aborted', { exact: false })).toHaveCount(0);
+  crashes.assertNone();
+});
+
+test('signing in survives a server that was asleep for the first attempt', async ({ page }) => {
+  const crashes = watchForCrashes(page);
+  // The first attempt hangs, as a sleeping host does; the retry is let through.
+  let attempts = 0;
+  await page.route('**/api/auth/login', (route) => {
+    attempts += 1;
+    if (attempts === 1) return; // never answered: the client times out and wakes it
+    return route.continue();
+  });
+
+  await page.goto('/#/login');
+  await page.getByPlaceholder('e.g. KBTH').fill('DEMO');
+  await page.locator('#login-username').fill('lab');
+  await page.locator('input[type="password"]').fill('lab123');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+
+  // No error shown, and the workspace opens on the retry.
+  await expect(page.locator('#main-content')).toBeVisible({ timeout: 25_000 });
+  expect(attempts).toBeGreaterThan(1);
+  crashes.assertNone();
+});

@@ -1,14 +1,32 @@
 import { API_MODES, clearStoredTokens, getApiConfig, getStoredTokens, setStoredTokens } from './config';
 
 export class ApiError extends Error {
-  constructor(message, { status = 500, details = null, requestId = '' } = {}) {
+  constructor(message, { status = 500, details = null, requestId = '', code = '' } = {}) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.details = details;
     this.requestId = requestId;
+    // Set for failures that never reached the server, so callers can tell a
+    // refused request from one that could not be made at all.
+    this.code = code;
   }
 }
+
+/*
+  A request can fail three ways before the server ever answers, and they need
+  different words.
+
+  A host that sleeps when idle - which free hosting does - takes the better part
+  of a minute to wake. Left alone, the browser's own AbortError reaches the
+  screen as "signal is aborted without reason", which tells nobody anything and
+  reads like a crash. The first thing a visitor sees should not be that.
+*/
+export const REQUEST_TIMED_OUT = 'REQUEST_TIMED_OUT';
+export const SERVER_UNREACHABLE = 'SERVER_UNREACHABLE';
+
+const TIMED_OUT_MESSAGE = 'The server is taking longer than usual to answer. If it has been idle it may be starting up, which can take up to a minute — please try again.';
+const UNREACHABLE_MESSAGE = 'We could not reach the server. Check your internet connection and try again.';
 
 export function unwrapApiEnvelope(payload) {
   if (payload && typeof payload === 'object' && payload.success === true && Object.prototype.hasOwnProperty.call(payload, 'data')) {
@@ -84,7 +102,13 @@ async function executeRequest(path, { method = 'GET', body, token, headers = {},
   const config = getApiConfig();
   const url = `${config.baseUrl}${path.startsWith('/') ? path : `/${path}`}`;
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), config.timeoutMs);
+  // Which side gave up matters: our own deadline is worth explaining, a caller
+  // cancelling (a page closed, a newer search typed) is not worth a word.
+  let timedOut = false;
+  const timeout = window.setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, config.timeoutMs);
   // Forward an external abort onto the internal controller so both the caller's
   // signal and the timeout can cancel the same fetch.
   const onExternalAbort = () => controller.abort();
@@ -112,17 +136,44 @@ async function executeRequest(path, { method = 'GET', body, token, headers = {},
       });
     }
     return unwrap ? unwrapApiEnvelope(payload) : payload;
+  } catch (error) {
+    if (timedOut) throw new ApiError(TIMED_OUT_MESSAGE, { status: 0, code: REQUEST_TIMED_OUT });
+    // The caller cancelled on purpose; let that through untouched and unreported.
+    if (signal?.aborted) throw error;
+    // fetch rejects with a TypeError when the host cannot be reached at all.
+    if (error instanceof TypeError) throw new ApiError(UNREACHABLE_MESSAGE, { status: 0, code: SERVER_UNREACHABLE });
+    throw error;
   } finally {
     window.clearTimeout(timeout);
     if (signal) signal.removeEventListener('abort', onExternalAbort);
   }
 }
 
+/*
+  Repeating a request after a timeout is only safe when doing it twice is the
+  same as doing it once. A GET is; so is signing in. A POST that creates an
+  order might have reached the server and succeeded before we gave up waiting,
+  and sending it again would make a second order - so those are never repeated,
+  and the person is told to try again themselves.
+*/
+function safeToRepeat(path, options) {
+  const method = (options.method || 'GET').toUpperCase();
+  return method === 'GET' || path === '/auth/login';
+}
+
 export async function request(path, options = {}) {
-  const { skipAuth = false, token, _retried = false } = options;
+  const { skipAuth = false, token, _retried = false, _wokeUp = false } = options;
   try {
     return await executeRequest(path, options);
   } catch (error) {
+    /*
+      A host that sleeps when idle wakes on the request that times out, so the
+      next one usually succeeds. Repeating it once turns a visible failure into
+      a slow page - which is the honest description of what happened.
+    */
+    if (error instanceof ApiError && error.code === REQUEST_TIMED_OUT && !_wokeUp && safeToRepeat(path, options)) {
+      return request(path, { ...options, _wokeUp: true });
+    }
     // On an expired access token, attempt a one-time silent refresh and retry.
     // Skipped for unauthenticated calls and calls with an explicit token.
     if (error instanceof ApiError && error.status === 401 && !skipAuth && !token && !_retried) {

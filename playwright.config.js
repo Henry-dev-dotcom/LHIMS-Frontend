@@ -81,7 +81,9 @@ export default defineConfig({
       url: E2E.webUrl,
       reuseExistingServer: false,
       timeout: 120_000,
-      env: { VITE_API_BASE_URL: E2E.apiUrl }
+      // Short, so a test can exercise the request timeout without waiting the
+      // real 15 seconds for it twice.
+      env: { VITE_API_BASE_URL: E2E.apiUrl, VITE_API_TIMEOUT_MS: '2000' }
     }
   ]
 });
