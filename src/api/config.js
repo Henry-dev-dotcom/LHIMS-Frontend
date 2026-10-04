@@ -48,6 +48,57 @@ export function clearStoredSession() {
   window.localStorage.removeItem(API_TOKEN_STORAGE_KEY);
 }
 
+/*
+  The cookie-less fallback.
+
+  Tokens in httpOnly cookies cannot be read by JavaScript, which is why this app
+  prefers them. But the site and the API are on different registrable domains
+  (github.io and onrender.com), so that cookie is a third-party cookie - and iOS
+  Safari, and the in-app browsers inside WhatsApp and the like, refuse those by
+  default. Nothing arrives, every request is unauthenticated, and a reload looks
+  like being signed out.
+
+  So when, and only when, the cookie is shown not to work, the tokens the server
+  already returned are kept here and sent as a bearer header instead. Where the
+  cookie does work nothing is stored and the XSS protection is untouched.
+
+  sessionStorage, not localStorage: it survives a reload, which is the thing that
+  was broken, but dies with the tab rather than persisting on a shared phone.
+*/
+const FALLBACK_TOKEN_KEY = `${API_TOKEN_STORAGE_KEY}.fallback`;
+
+export function getFallbackTokens() {
+  if (typeof window === 'undefined') return {};
+  try {
+    return JSON.parse(window.sessionStorage.getItem(FALLBACK_TOKEN_KEY) || '{}');
+  } catch {
+    return {};
+  }
+}
+
+export function setFallbackTokens({ accessToken, refreshToken } = {}) {
+  if (typeof window === 'undefined' || !accessToken) return;
+  try {
+    window.sessionStorage.setItem(FALLBACK_TOKEN_KEY, JSON.stringify({ accessToken, refreshToken: refreshToken || null }));
+  } catch {
+    // Private mode can refuse storage; the session then lasts this page only.
+  }
+}
+
+export function clearFallbackTokens() {
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.removeItem(FALLBACK_TOKEN_KEY);
+  } catch {
+    // Nothing to clear if storage was never available.
+  }
+}
+
+/** True once the cookie has been shown not to reach the server. */
+export function usingFallbackTokens() {
+  return Boolean(getFallbackTokens().accessToken);
+}
+
 // Backwards-compatible aliases for existing call sites.
 export const getStoredTokens = getStoredSession;
 export const setStoredTokens = setStoredSession;

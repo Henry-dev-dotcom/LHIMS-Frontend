@@ -177,3 +177,97 @@ test('the facility code starts empty, and is remembered only after a sign-in tha
 
   crashes.assertNone();
 });
+
+/*
+  A browser that refuses the session cookie.
+
+  The site and the API are on different registrable domains, so the auth cookie
+  is a third-party cookie - and iOS Safari, and the in-app browsers inside
+  WhatsApp and the like, drop those by default. Every request then arrives
+  unauthenticated: the workspace loads nothing and a reload looks like being
+  signed out. This strips Set-Cookie from every API response to reproduce that
+  exactly, and the app has to work anyway.
+*/
+async function refuseAuthCookies(page) {
+  await page.route('**/api/**', async (route) => {
+    const response = await route.fetch();
+    const headers = { ...response.headers() };
+    // Every spelling, and never pass `response` through - doing so re-applies
+    // the original headers and the cookie survives, which quietly stops this
+    // from reproducing anything at all.
+    for (const name of Object.keys(headers)) {
+      if (name.toLowerCase() === 'set-cookie') delete headers[name];
+    }
+    const body = await response.body();
+    // route.fetch() already put any Set-Cookie into the context's jar, so
+    // stripping the header is not enough - the jar has to be emptied before the
+    // page ever sees the response.
+    await page.context().clearCookies();
+    await route.fulfill({ status: response.status(), headers, body });
+  });
+  await page.context().clearCookies();
+}
+
+/** Proves the simulation is still working: no auth cookie may exist. */
+async function assertNoAuthCookie(page) {
+  const cookies = await page.context().cookies();
+  const auth = cookies.filter((c) => /token/i.test(c.name));
+  expect(auth, `the cookie was not actually refused, so this proves nothing: ${auth.map((c) => c.name).join(', ')}`).toEqual([]);
+}
+
+test('signing in works in a browser that drops the session cookie', async ({ page }) => {
+  const crashes = watchForCrashes(page);
+  await refuseAuthCookies(page);
+
+  await signIn(page, { code: 'DEMO', username: 'lab', password: 'lab123' });
+  await assertNoAuthCookie(page);
+
+  // The symptom was an empty workspace and a bar of failures.
+  await expect(page.getByText('Authentication token is required', { exact: false })).toHaveCount(0);
+  await expect(page.getByText('Some data failed to load', { exact: false })).toHaveCount(0);
+
+  // Real data has to be there, not just an empty shell.
+  await openFromMenu(page, 'Accepted Samples');
+  await expect.poll(async () => page.getByRole('button', { name: 'Enter Results' }).count(),
+    { message: 'the workspace loaded no data without a cookie' }).toBeGreaterThan(0);
+
+  crashes.assertNone();
+});
+
+test('a reload keeps you signed in when the cookie is refused', async ({ page }) => {
+  const crashes = watchForCrashes(page);
+  await refuseAuthCookies(page);
+
+  await signIn(page, { code: 'DEMO', username: 'lab', password: 'lab123' });
+  await assertNoAuthCookie(page);
+  await openFromMenu(page, 'Analyzers');
+  await expect(page.getByRole('heading', { name: 'Analyzers', level: 1 })).toBeVisible();
+
+  await page.reload();
+
+  // Previously this landed back on the sign-in form, or the public website.
+  await expect(page.getByRole('heading', { name: 'Analyzers', level: 1 })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toHaveCount(0);
+  crashes.assertNone();
+});
+
+test('the platform operator works without a cookie too', async ({ page }) => {
+  const crashes = watchForCrashes(page);
+  await refuseAuthCookies(page);
+
+  await page.goto('/#/login');
+  await page.locator('#login-username').fill('platform');
+  await page.locator('input[type="password"]').fill('platform123');
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+
+  await expect(page.locator('#main-content')).toBeVisible();
+  await assertNoAuthCookie(page);
+
+  // An empty shell renders with or without a session, so look for data only the
+  // platform console can fetch: the facilities it manages.
+  await openFromMenu(page, 'Facilities');
+  await expect.poll(async () => page.getByText('DEMO', { exact: false }).count(),
+    { message: 'the platform console loaded no facilities without a cookie' }).toBeGreaterThan(0);
+  await expect(page.getByText('Authentication token is required', { exact: false })).toHaveCount(0);
+  crashes.assertNone();
+});

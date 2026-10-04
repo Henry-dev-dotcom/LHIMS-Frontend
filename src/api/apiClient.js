@@ -1,4 +1,4 @@
-import { API_MODES, clearStoredTokens, getApiConfig, getStoredTokens, setStoredTokens } from './config';
+import { API_MODES, clearFallbackTokens, clearStoredTokens, getApiConfig, getFallbackTokens, getStoredTokens, setFallbackTokens, setStoredTokens } from './config';
 
 export class ApiError extends Error {
   constructor(message, { status = 500, details = null, requestId = '', code = '' } = {}) {
@@ -51,12 +51,16 @@ export function buildQuery(params = {}) {
 
 function normalizeHeaders({ body, headers, token, skipAuth }) {
   const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+  /*
+    The httpOnly cookie is still the first choice and is sent automatically with
+    credentials: 'include'. A bearer token is added only where the cookie has
+    been shown not to arrive - a browser that refuses third-party cookies - or
+    when a caller passes one explicitly.
+  */
+  const bearer = token || getFallbackTokens().accessToken;
   return {
     ...(!isFormData ? { 'Content-Type': 'application/json' } : {}),
-    // Browser sessions authenticate via the httpOnly cookie (sent automatically
-    // with credentials: 'include'). An explicit `token` is only honored for
-    // non-browser API callers that pass one directly.
-    ...(!skipAuth && token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(!skipAuth && bearer ? { Authorization: `Bearer ${bearer}` } : {}),
     ...headers
   };
 }
@@ -76,19 +80,25 @@ async function parseResponse(response) {
 let refreshPromise = null;
 
 async function refreshAccessToken() {
-  // The refresh token lives in an httpOnly cookie sent automatically with the
-  // request, so no token is read or passed from JavaScript.
+  // Normally the refresh token rides in an httpOnly cookie and nothing is read
+  // from JavaScript. Where that cookie is refused, the stored one is sent in the
+  // body instead - which the endpoint already accepts.
+  const stored = getFallbackTokens();
   if (!refreshPromise) {
     refreshPromise = executeRequest('/auth/refresh', {
       method: 'POST',
-      skipAuth: true
+      skipAuth: true,
+      ...(stored.refreshToken ? { body: { refreshToken: stored.refreshToken } } : {})
     })
       .then((data) => {
         setStoredTokens(data);
+        // Keep the fallback in step, but only if it was already in use.
+        if (stored.accessToken) setFallbackTokens(data);
         return data;
       })
       .catch(() => {
         clearStoredTokens();
+        clearFallbackTokens();
         return null;
       })
       .finally(() => {
@@ -188,15 +198,34 @@ export async function request(path, options = {}) {
 export async function loginRequest(credentials) {
   const data = await request('/auth/login', { method: 'POST', body: credentials, skipAuth: true });
   setStoredTokens(data);
+
+  /*
+    Find out, once, whether the session cookie actually arrived. Asking the
+    server is the only honest test: a browser gives no way to inspect a cookie
+    it silently refused, and there is no reliable list of which ones do.
+
+    If this answers, the cookie works and nothing is kept in storage. If it does
+    not, the tokens the login already returned are kept for this tab and sent as
+    a bearer header from here on.
+  */
+  clearFallbackTokens();
+  try {
+    await executeRequest('/auth/me', { skipAuth: true });
+  } catch {
+    setFallbackTokens(data);
+  }
   return data;
 }
 
 export async function logoutRequest() {
+  // Normally the refresh cookie identifies the session server-side. Without it,
+  // the stored token has to say which session is ending, or it would stay open.
+  const { refreshToken } = getFallbackTokens();
   try {
-    // The refresh cookie identifies the session server-side; no body needed.
-    return await request('/auth/logout', { method: 'POST' });
+    return await request('/auth/logout', { method: 'POST', ...(refreshToken ? { body: { refreshToken } } : {}) });
   } finally {
     clearStoredTokens();
+    clearFallbackTokens();
   }
 }
 
