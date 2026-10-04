@@ -64,7 +64,7 @@ export function Modal({ open, title, description, onClose, children, footer }) {
     <>
       {/* Stage 26 layering marker: z-[150] */}
       <div
-      className="fixed inset-0 z-[160] flex items-end justify-center overflow-hidden bg-slate-950/62 px-0 py-0 backdrop-blur-md sm:items-center sm:px-4 sm:py-8"
+      className="fixed inset-0 z-[160] flex items-end justify-center overflow-hidden bg-slate-950/60 px-0 py-0 backdrop-blur-md sm:items-center sm:px-4 sm:py-8"
       onMouseDown={(event) => { if (event.target === event.currentTarget) onClose?.(); }}
       role="presentation"
     >
@@ -92,7 +92,7 @@ export function Modal({ open, title, description, onClose, children, footer }) {
         </div>
         <div className="min-h-0 min-w-0 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6 sm:py-5 [&_*]:min-w-0">{children}</div>
         {footer && (
-          <div className="border-t border-slate-100 bg-slate-50/96 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:flex sm:flex-wrap sm:justify-end sm:gap-2 sm:px-6 sm:py-4 [&_button]:w-full sm:[&_button]:w-auto">
+          <div className="border-t border-slate-100 bg-slate-50/95 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:flex sm:flex-wrap sm:justify-end sm:gap-2 sm:px-6 sm:py-4 [&_button]:w-full sm:[&_button]:w-auto">
             <div className="grid min-w-0 gap-2 sm:flex sm:flex-wrap sm:justify-end">{footer}</div>
           </div>
         )}

@@ -6,7 +6,7 @@ export function ResponsiveTabs({ tabs, activeTab, onChange, className, ariaLabel
   return (
     <div
       className={clsx(
-        'rounded-[1.25rem] border border-slate-200/80 bg-white/94 p-1.5 shadow-soft backdrop-blur-xl sm:rounded-3xl sm:p-2',
+        'rounded-[1.25rem] border border-slate-200/80 bg-white/95 p-1.5 shadow-soft backdrop-blur-xl sm:rounded-3xl sm:p-2',
         className
       )}
       role="tablist"

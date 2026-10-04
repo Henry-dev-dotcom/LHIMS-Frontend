@@ -6,7 +6,7 @@ export function MobileActionBar({ children, className, label = 'Page actions' })
   return (
     <section
       className={clsx(
-        'lg:hidden max-h-[42dvh] overflow-y-auto overscroll-contain rounded-[1.25rem] border border-white/80 bg-white/94 p-3 shadow-soft backdrop-blur-xl',
+        'lg:hidden max-h-[42dvh] overflow-y-auto overscroll-contain rounded-[1.25rem] border border-white/80 bg-white/95 p-3 shadow-soft backdrop-blur-xl',
         'mobile-action-bar',
         className
       )}

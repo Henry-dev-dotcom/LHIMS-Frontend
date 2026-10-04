@@ -172,7 +172,7 @@ export function Header() {
   return (
     <header className="relative z-[90] border-b border-white/60 bg-white/85 px-3 py-2 shadow-sm backdrop-blur-2xl sm:px-5 lg:px-8 print:hidden">
       <div className="lg:hidden">
-        <div className="rounded-[1.35rem] border border-slate-200/70 bg-white/96 px-3 py-2.5 shadow-card">
+        <div className="rounded-[1.35rem] border border-slate-200/70 bg-white/95 px-3 py-2.5 shadow-card">
           <div className="flex items-center justify-between gap-2">
             <div className="inline-flex min-w-0 flex-1 items-center gap-1.5 rounded-full border border-clinical-100 bg-clinical-50/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-clinical-800">
               <Sparkles className="h-3 w-3 shrink-0" />
@@ -249,7 +249,7 @@ export function Header() {
                     id="mobile-screen-guide-panel"
                     role="status"
                     className={clsx(
-                      'pointer-events-none absolute left-0 top-[calc(100%+0.45rem)] z-[140] w-[min(20rem,calc(100vw-2rem))] origin-top-left rounded-2xl border border-clinical-100 bg-white/98 p-3 text-xs font-semibold leading-5 text-slate-600 opacity-0 shadow-lift ring-1 ring-slate-950/5 backdrop-blur-xl transition duration-200 ease-out',
+                      'pointer-events-none absolute left-0 top-[calc(100%+0.45rem)] z-[140] w-[min(20rem,calc(100vw-2rem))] origin-top-left rounded-2xl border border-clinical-100 bg-white p-3 text-xs font-semibold leading-5 text-slate-600 opacity-0 shadow-lift ring-1 ring-slate-950/5 backdrop-blur-xl transition duration-200 ease-out',
                       screenGuideOpen ? 'pointer-events-auto translate-y-0 scale-100 opacity-100' : '-translate-y-1 scale-[0.98] opacity-0'
                     )}
                   >
@@ -264,7 +264,7 @@ export function Header() {
       </div>
 
       <div className="hidden overflow-visible lg:block">
-        <div className="relative flex min-h-[4.6rem] max-w-full items-start justify-between gap-4 overflow-visible rounded-[1.35rem] border border-slate-200/70 bg-white/94 px-6 py-2.5 shadow-card">
+        <div className="relative flex min-h-[4.6rem] max-w-full items-start justify-between gap-4 overflow-visible rounded-[1.35rem] border border-slate-200/70 bg-white/95 px-6 py-2.5 shadow-card">
           <div className="min-w-0 flex-1 pr-2">
             {pageHeader?.eyebrow && (
               <p className="inline-flex items-center gap-1.5 rounded-full border border-clinical-100 bg-clinical-50/80 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-clinical-800">

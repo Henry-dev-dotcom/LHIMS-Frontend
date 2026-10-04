@@ -4,6 +4,7 @@ import { buildParameterEntries } from '../utils/labFlags';
 import { apiClient, hasCommand, runCommand } from './commands';
 import { authService } from '../services/authService';
 import { getStoredSession } from '../api/config';
+import { canAccessPage } from '../utils/permissions';
 import { normalizeAuthUser } from '../api/normalizers';
 import { hydrateWorkspace } from './hydrate';
 
@@ -61,6 +62,26 @@ const initialState = {
   }
 };
 
+/*
+  The workspace page named in the address, if the signed-in role may open it.
+
+  Reloading used to drop whoever was signed in back on their landing page,
+  losing the screen they were working on. The page now lives in the address as
+  #/app/<page>, and this reads it back. It is checked against the same
+  canAccessPage the sidebar uses, so an address cannot open a page the role
+  could not otherwise reach.
+*/
+function pageFromAddress(auth) {
+  try {
+    const path = (window.location.hash || '').replace(/^#\/?/, '').split('?')[0];
+    const [section, pageId] = path.split('/').filter(Boolean);
+    if (section !== 'app' || !pageId) return null;
+    return canAccessPage(auth.role, pageId, auth.modules) ? pageId : null;
+  } catch {
+    return null;
+  }
+}
+
 function getInitialState() {
   try {
     window.localStorage.removeItem(LEGACY_STORAGE_KEY);
@@ -70,7 +91,7 @@ function getInitialState() {
     if (cached) {
       // Data hydrates asynchronously right after mount; start in the
       // hydrating state so pages don't flash an empty/"no records" view.
-      return { ...initialState, auth: cached, currentPage: cached.landing, hydrating: true };
+      return { ...initialState, auth: cached, currentPage: pageFromAddress(cached) || cached.landing, hydrating: true };
     }
   } catch {
     // Fall through to the logged-out state.

@@ -38,7 +38,7 @@ export function ReceptionWorkflowNav() {
   const data = state.data || {};
 
   return (
-    <section className="rounded-[1.15rem] border border-white/80 bg-white/92 p-2.5 shadow-soft backdrop-blur-xl sm:rounded-[1.4rem]">
+    <section className="rounded-[1.15rem] border border-white/80 bg-white/90 p-2.5 shadow-soft backdrop-blur-xl sm:rounded-[1.4rem]">
       <div className="mb-2 flex flex-col gap-1 px-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Reception workflow</p>

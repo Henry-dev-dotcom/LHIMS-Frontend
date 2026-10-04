@@ -7,7 +7,7 @@ export function FilterPanel({ title = 'Filters', children, className, defaultOpe
   return (
     <details
       className={clsx(
-        'group rounded-[1.25rem] border border-slate-200/80 bg-white/94 p-3 shadow-sm backdrop-blur-xl lg:rounded-[1.5rem]',
+        'group rounded-[1.25rem] border border-slate-200/80 bg-white/95 p-3 shadow-sm backdrop-blur-xl lg:rounded-[1.5rem]',
         className
       )}
       open={defaultOpen}
