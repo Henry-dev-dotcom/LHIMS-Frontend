@@ -32,6 +32,16 @@ export function LoginPage({ initialCode = '' }) {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  /*
+    The code box remembers the last facility used on this device, which is right
+    for staff and wrong for the one person who belongs to no facility. Rather
+    than expect them to notice a prefilled box and clear it, offer it as a step.
+  */
+  function signInAsOperator() {
+    setFacilityCode('');
+    window.requestAnimationFrame(() => document.getElementById('login-username')?.focus());
+  }
+
   function submitCredentials(event) {
     event.preventDefault();
     if (submitting || !username.trim() || !password) return;
@@ -109,6 +119,16 @@ export function LoginPage({ initialCode = '' }) {
                   />
                   <span id="login-facility-hint" className="mt-1.5 block text-xs text-slate-500">The code your hospital or clinic was given.</span>
                 </label>
+                {/* Only worth offering while there is a code in the way. */}
+                {facilityCode ? (
+                  <button
+                    type="button"
+                    onClick={signInAsOperator}
+                    className="-mt-1 block text-left text-xs font-semibold text-clinical-700 underline underline-offset-2 hover:text-clinical-800"
+                  >
+                    Platform operator? Clear the facility code
+                  </button>
+                ) : null}
                 <label className="block" htmlFor="login-username">
                   <span className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-600"><UserRound className="h-3.5 w-3.5" aria-hidden="true" /> Username</span>
                   <input id="login-username" name="username" autoComplete="username" autoFocus={Boolean(facilityCode)} value={username} onChange={(event) => setUsername(event.target.value)} className="getlabs-input" />

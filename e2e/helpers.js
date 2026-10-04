@@ -20,7 +20,7 @@ export async function signIn(page, { code = '', username, password }) {
   await codeBox.fill(code);
   await page.locator('#login-username').fill(username);
   await page.locator('input[type="password"]').fill(password);
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page.locator('#main-content')).toBeVisible();
 }
 
