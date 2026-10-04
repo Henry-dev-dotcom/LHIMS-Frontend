@@ -146,35 +146,34 @@ test('the plain address shows the website even after somebody has signed in here
 });
 
 /*
-  The platform operator belongs to no facility, so their sign-in needs the code
-  box empty. It remembers the last facility used on the device, which is right
-  for staff and exactly wrong for them — so the way past it is offered rather
-  than left to be noticed.
+  The facility code is remembered per device, so staff type it once and never
+  again. Two things that matter: it starts empty on a device nobody has signed
+  in on, and a code that did not work must not stick - otherwise one typo
+  follows that computer around.
 */
-test('the operator can clear a remembered facility code in one click', async ({ page }) => {
+test('the facility code starts empty, and is remembered only after a sign-in that worked', async ({ page }) => {
   const crashes = watchForCrashes(page);
+  const code = page.getByPlaceholder('e.g. KBTH');
 
-  // Sign in and out as staff, which is what leaves the code behind.
+  await page.goto('/#/login');
+  await expect(code, 'nobody has signed in on this device yet').toHaveValue('');
+
+  // A wrong code must not be remembered.
+  await code.fill('WRONGCODE');
+  await page.locator('#login-username').fill('lab');
+  await page.locator('input[type="password"]').fill('lab123');
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await expect(page.getByText(/Invalid username or password|not found/i).first()).toBeVisible();
+
+  await page.goto('/#/login');
+  await page.reload();
+  await expect(code, 'a code that failed should not follow the device around').toHaveValue('');
+
+  // A sign-in that works is remembered for next time.
   await signIn(page, { code: 'DEMO', username: 'lab', password: 'lab123' });
   await page.getByRole('button', { name: 'Open user menu' }).click();
   await page.getByRole('button', { name: /Sign out/i }).click();
+  await expect(page.getByPlaceholder('e.g. KBTH')).toHaveValue('DEMO');
 
-  const code = page.getByPlaceholder('e.g. KBTH');
-  await expect(code).toHaveValue('DEMO');
-
-  await page.getByRole('button', { name: /Clear the facility code/i }).click();
-  await expect(code).toHaveValue('');
-  // The cursor is waiting where they type next, and the offer is gone.
-  await expect(page.locator('#login-username')).toBeFocused();
-  await expect(page.getByRole('button', { name: /Clear the facility code/i })).toHaveCount(0);
-
-  crashes.assertNone();
-});
-
-test('staff are not offered the operator link when no code is in the way', async ({ page }) => {
-  const crashes = watchForCrashes(page);
-  await page.goto('/#/login');
-  await expect(page.getByPlaceholder('e.g. KBTH')).toHaveValue('');
-  await expect(page.getByRole('button', { name: /Clear the facility code/i })).toHaveCount(0);
   crashes.assertNone();
 });

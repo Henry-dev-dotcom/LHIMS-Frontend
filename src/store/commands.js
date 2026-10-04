@@ -14,6 +14,7 @@ import { resultService } from '../services/resultService';
 import { notificationService } from '../services/notificationService';
 import { ROLE_TO_API, listItems, normalizeAuthUser, toApiEnum } from '../api/normalizers';
 import { loadCollections } from './hydrate';
+import { rememberFacilityCode } from '../services/publicService';
 
 /**
  * The user form's role picker holds either a base role id ('receptionist') or
@@ -155,6 +156,9 @@ const commands = {
     });
     const auth = normalizeAuthUser(data?.user);
     if (!auth) throw new Error('Login response did not include a user profile.');
+    // Only now that it worked: a mistyped code must not stick to the device.
+    // An empty one (the platform operator) leaves any staff code alone.
+    rememberFacilityCode(facilityCode);
     dispatch({ type: 'SET_AUTH', auth, navigate: auth.landing });
     dispatch(toastAction('success', `Welcome, ${auth.userName}`));
   },
