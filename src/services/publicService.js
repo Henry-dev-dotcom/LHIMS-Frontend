@@ -36,13 +36,6 @@ export function goTo(path) {
 
 export const FACILITY_CODE_KEY = 'lhims.lastFacilityCode';
 
-export function rememberedFacilityCode() {
-  try {
-    return window.localStorage.getItem(FACILITY_CODE_KEY) || '';
-  } catch {
-    return '';
-  }
-}
 
 export function rememberFacilityCode(code) {
   try {

@@ -7,7 +7,7 @@ import { PatientPortalAccessPage } from '../pages/public/PatientPortalAccessPage
 import { ErrorBoundary } from '../components/ui/ErrorBoundary';
 import { WorkspaceLoading } from '../components/ui/WorkspaceLoading';
 import { useMobileViewportMetrics } from '../hooks/useMobileViewportMetrics';
-import { readSiteRoute, rememberedFacilityCode } from '../services/publicService';
+import { readSiteRoute } from '../services/publicService';
 
 // The public website loads only for visitors who are not signed in.
 const HomePage = lazy(() => import('../pages/site/HomePage').then((m) => ({ default: m.HomePage })));
@@ -62,8 +62,17 @@ function AppContent() {
 
   if (!state.auth) {
     if (route.path === 'login') return <LoginPage key={route.parts[1] || ''} initialCode={route.parts[1] || ''} />;
-    // Staff who have signed in on this device before go straight to sign-in.
-    const Page = SITE_PAGES[route.path] || (!route.path && !rememberedFacilityCode() ? HomePage : null);
+    /*
+       The website is the front door, always.
+
+       Signing in once used to be remembered forever, and from then on the plain
+       address skipped the site and went straight to the form - on that device,
+       for everybody who used it. So the one link you hand out stopped showing
+       what the product is to anyone who had ever signed in, including you. The
+       site carries "Sign in" in its header and footer, which is the one click
+       this costs staff; a facility that wants to skip it can bookmark #/login.
+    */
+    const Page = SITE_PAGES[route.path] || (!route.path ? HomePage : null);
     if (Page) {
       return (
         <Suspense fallback={<WorkspaceLoading />}>

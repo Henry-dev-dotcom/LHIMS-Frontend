@@ -113,3 +113,34 @@ test('signing in survives a server that was asleep for the first attempt', async
   expect(attempts).toBeGreaterThan(1);
   crashes.assertNone();
 });
+
+/*
+  The website is the front door, even on a device that has signed in before.
+
+  Signing in once was remembered forever, and from then on the plain address
+  skipped the site and opened the sign-in form instead — on that device, for
+  everyone who used it. One link is handed to investors and customers alike, so
+  it has to keep showing what the product is.
+*/
+test('the plain address shows the website even after somebody has signed in here', async ({ page }) => {
+  const crashes = watchForCrashes(page);
+
+  // Arrive cold: the website.
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: /Run your whole hospital/i })).toBeVisible();
+
+  // Sign in and out, which is what used to poison it.
+  await signIn(page, { code: 'DEMO', username: 'lab', password: 'lab123' });
+  await page.getByRole('button', { name: 'Open user menu' }).click();
+  await page.getByRole('button', { name: /Sign out/i }).click();
+  await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
+
+  // Open the plain address again: still the website, not the form.
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: /Run your whole hospital/i })).toBeVisible();
+
+  // And the way in is still one click away.
+  await page.getByRole('link', { name: 'Sign in' }).first().click();
+  await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
+  crashes.assertNone();
+});
