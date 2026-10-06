@@ -67,8 +67,20 @@ export function getAllowedRolesForPage(pageId) {
   return NAV_ITEMS.find((item) => item.id === pageId)?.roles || [];
 }
 
+/*
+  Some pages are reachable without being listed.
+
+  Accepting samples is the second half of the Incoming tab, not a destination of
+  its own: you get there by opening a request. Listing it would put the same work
+  in the menu twice. The retired laboratory pages are the same - an
+  administrator can still open the rejection and sign-off history, but they are
+  no longer part of the bench's day.
+
+  So `hidden` keeps a page out of the menu while canAccessPage still allows it,
+  which is what lets an address or an in-page button open it.
+*/
 export function getNavForRole(role, modules) {
-  return NAV_ITEMS.filter((item) => item.roles.includes(role) && moduleAllows(item.id, modules));
+  return NAV_ITEMS.filter((item) => !item.hidden && item.roles.includes(role) && moduleAllows(item.id, modules));
 }
 
 export function groupNavItems(items) {

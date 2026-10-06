@@ -54,6 +54,9 @@ const initialState = {
     sidebarOpen: false,
     toast: null,
     activeLabAcceptOrderId: '',
+    // What the laboratory just accepted, so the slip that goes with the samples
+    // can be printed. Cleared when the bench closes the printout.
+    acceptedPrintout: null,
     activeAcceptedSampleOrderId: '',
     activeScanAcceptOrderId: '',
     activeAcceptedScanOrderId: '',
@@ -488,7 +491,13 @@ function reducer(state, action) {
 
 
     case 'OPEN_LAB_ACCEPT': {
-      return { ...state, currentPage: 'lab-queue', ui: { ...state.ui, sidebarOpen: false, activeLabAcceptOrderId: action.orderId } };
+      return { ...state, currentPage: 'lab-accept', ui: { ...state.ui, sidebarOpen: false, activeLabAcceptOrderId: action.orderId, acceptedPrintout: null } };
+    }
+    case 'LAB_SAMPLES_ACCEPTED': {
+      return { ...state, ui: { ...state.ui, acceptedPrintout: { orderId: action.orderId, samples: action.samples || [] } } };
+    }
+    case 'CLOSE_ACCEPTED_PRINTOUT': {
+      return { ...state, ui: { ...state.ui, acceptedPrintout: null } };
     }
     case 'OPEN_ACCEPTED_SAMPLE': {
       return { ...state, currentPage: 'accepted-samples', ui: { ...state.ui, sidebarOpen: false, activeAcceptedSampleOrderId: action.orderId } };

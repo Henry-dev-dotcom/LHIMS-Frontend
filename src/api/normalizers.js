@@ -161,13 +161,33 @@ export function normalizeCatalogItem(item) {
     expectedHours: num(item.expectedCompletionHours, 24),
     sampleType: item.sampleType || '',
     searchText: [item.name, ...(item.aliases || [])].join(' '),
-    parameters: (item.parameters || []).map((parameter) => ({
-      name: parameter.name,
-      unit: parameter.unit || '',
-      referenceRange: parameter.referenceRange || parameter.rangeLabel || '',
-      low: parameter.low != null ? num(parameter.low) : undefined,
-      high: parameter.high != null ? num(parameter.high) : undefined
-    })),
+    /*
+      A test's measured fields, with the range each is read against.
+
+      The bounds live on the parameter's reference ranges, not on the parameter
+      itself, and this used to read them off the parameter - so low, high and the
+      printed range were always undefined and the bench typed values with nothing
+      to check them against. The first range is taken, which is the same one the
+      server uses when it stores the result and works out the flag.
+    */
+    parameters: (item.parameters || []).map((parameter) => {
+      const range = (parameter.ranges || [])[0] || {};
+      const low = range.low != null ? num(range.low) : undefined;
+      const high = range.high != null ? num(range.high) : undefined;
+      const printed = range.displayRange
+        || (low !== undefined && high !== undefined ? `${low} - ${high}` : '')
+        || (low !== undefined ? `>= ${low}` : '')
+        || (high !== undefined ? `<= ${high}` : '');
+      return {
+        name: parameter.name,
+        unit: parameter.unit || '',
+        referenceRange: printed,
+        low,
+        high,
+        criticalLow: range.criticalLow != null ? num(range.criticalLow) : undefined,
+        criticalHigh: range.criticalHigh != null ? num(range.criticalHigh) : undefined
+      };
+    }),
     isActive: item.isActive !== false
   };
 }
@@ -333,6 +353,11 @@ const LAB_SAMPLE_STATUS_FROM_API = {
 
 function mapSampleLog(sample, orderCodeById) {
   const orderApiId = sample.orderItem?.orderId || sample.orderItem?.order?.id || '';
+  const result = (sample.results || [])[0] || null;
+  // A result sent back for correction carries the reason it was returned.
+  const returnedReason = result && result.status === 'DRAFT'
+    ? (result.reviews || []).find((review) => review.decision === 'REVERSED')?.note || ''
+    : '';
   const orderCode = orderCodeById[orderApiId] || sample.orderItem?.order?.orderCode || orderApiId || '';
   const catalogCode = sample.orderItem?.catalogItem?.catalogCode || sample.orderItem?.catalogItemId || '';
   const rejection = (sample.rejections || [])[0];
@@ -345,6 +370,49 @@ function mapSampleLog(sample, orderCodeById) {
     sampleType: sample.sampleType || 'Blood',
     barcode: sample.barcodeValue || '',
     labItemIds: catalogCode ? [catalogCode] : [],
+    // One sample is one test, so the test it belongs to, and whether its result
+    // has been entered, belong on the row. The lab works test by test: it
+    // accepts the ones whose samples are in, and enters each result on its own.
+    orderItemId: sample.orderItemId || sample.orderItem?.id || '',
+    orderApiId,
+    catalogCode,
+    testName: sample.orderItem?.catalogItem?.name || catalogCode || '',
+    resultId: result?.id || '',
+    resultStatus: enumLabel(result?.status || ''),
+    /*
+      "Has a result" means one has been submitted, not merely that a row exists.
+      Reversing a sent result puts it back to DRAFT and keeps it, which is how
+      the old values survive for the correction - so counting any row at all
+      would make a reversed test vanish from the queue instead of returning to
+      it, which is the opposite of what reversing is for.
+    */
+    hasResult: Boolean(result) && result.status !== 'DRAFT',
+    returned: Boolean(returnedReason),
+    /*
+      A draft result on an accepted sample is what the result-entry popup opens
+      on. It exists for two reasons, and carries what each needs:
+
+        - an analyzer filed values and the bench has still to check them, so the
+          provenance of each value comes too;
+        - a sent result was reversed for correction, so the reason comes with it
+          and the old values are there to be edited rather than retyped.
+    */
+    draftResult: result && result.status === 'DRAFT'
+      ? {
+        reason: returnedReason,
+        analyzer: result.analyzerUsed || '',
+        reportText: result.interpretation || '',
+        comment: result.technicianNotes || '',
+        parameters: (result.parameters || []).map((parameter) => ({
+          name: parameter.name,
+          value: parameter.value ?? '',
+          fromAnalyzer: parameter.source === 'ANALYZER',
+          analyzerCode: parameter.analyzerCode || '',
+          analyzerRawValue: parameter.analyzerRawValue || '',
+          measuredAt: parameter.measuredAt || ''
+        }))
+      }
+      : null,
     collectedAt: sample.collectedAt || '',
     collectedBy: sample.acceptedBy?.name || '',
     acceptedAt: sample.acceptedAt || '',
@@ -354,12 +422,12 @@ function mapSampleLog(sample, orderCodeById) {
   };
 }
 
-/* The backend keeps one LabSample per order item (one per test). The accepted
-   lab workflow (queue, result-entry) works per order/patient, so accepted
-   samples are grouped by order into one entry carrying every accepted test's
-   catalog code (labItemIds). The rejected/recollection tracker instead needs
-   one row per sample (each has its own reason), so it passes groupByOrder=false. */
-export function normalizeSampleLogs(rawSamples = [], orderCodeById = {}, { groupByOrder = true } = {}) {
+/* The backend keeps one LabSample per order item (one per test), and so does
+   this: the laboratory accepts tests one at a time (only the ones whose samples
+   have arrived) and enters each result on its own, so collapsing them into one
+   row per order threw away exactly the distinction the bench works by. Grouping
+   remains available for anything that still wants a per-order summary. */
+export function normalizeSampleLogs(rawSamples = [], orderCodeById = {}, { groupByOrder = false } = {}) {
   const logs = rawSamples
     .filter(Boolean)
     .map((sample) => mapSampleLog(sample, orderCodeById))

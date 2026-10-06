@@ -301,6 +301,33 @@ const commands = {
 
   /* ---------------------------------------------------------------- lab */
 
+  /*
+    Accept only the tests whose samples are actually on the bench.
+
+    A request for six tests rarely arrives as six tubes. The ones that are here
+    are accepted and get an accession number; the rest stay in Incoming until
+    their samples are drawn. The accepted rows come back so the bench can print
+    the slip that goes with the samples.
+  */
+  ACCEPT_LAB_TESTS: async (action, dispatch, getState) => {
+    const { orderId, orderItemIds = [], sampleType, notes } = action.payload || {};
+    if (!orderItemIds.length) throw new Error('Tick at least one test whose sample is available.');
+    const orderApiId = requireApiId(getState().data.orders, orderId, 'Order');
+    const response = await labService.acceptSample(apiClient, orderApiId, {
+      orderItemIds,
+      sampleType: sampleType || undefined,
+      notes: notes || undefined
+    });
+    await refresh(dispatch, getState, ['orders', 'results', 'sampleLogs']);
+    const samples = (response?.samples || response?.data?.samples || []).map((sample) => ({
+      sampleCode: sample.sampleCode || sample.id,
+      testName: sample.orderItem?.catalogItem?.name || '',
+      acceptedAt: sample.acceptedAt || ''
+    }));
+    dispatch({ type: 'LAB_SAMPLES_ACCEPTED', orderId, samples });
+    dispatch(toastAction('success', `${samples.length || orderItemIds.length} sample(s) accepted for ${orderId}`));
+  },
+
   ACCEPT_LAB_SAMPLE: async (action, dispatch, getState) => {
     const orderApiId = requireApiId(getState().data.orders, action.orderId, 'Order');
     await labService.acceptSample(apiClient, orderApiId, {
@@ -357,6 +384,62 @@ const commands = {
     });
     await refresh(dispatch, getState, ['orders', 'results', 'sampleLogs']);
     dispatch(toastAction('success', `Recollection requested for ${action.sampleId}`));
+  },
+
+  /*
+    One test's result, entered and sent.
+
+    The laboratory reports test by test: a full blood count may be ready while
+    the culture is still growing, and waiting for the slowest test before the
+    clinician sees any of them helps nobody. So this submits exactly one test.
+
+    Measured values go in as parameters, which is what gives them their
+    reference ranges and high/low flags. A test that reports in words instead -
+    a culture, a film, a histology report - sends the narrative on its own. Both
+    carry the laboratory's comment alongside.
+
+    The backend keeps draft, submitted, signed-off and released as separate
+    steps, and they all happen here: the bench has one Submit, and the result is
+    with the clinician when it finishes.
+  */
+  SUBMIT_LAB_TEST_RESULT: async (action, dispatch, getState) => {
+    const { sampleApiId, orderId, testName, parameters = [], resultText = '', comment = '' } = action.payload || {};
+    if (!sampleApiId) throw new Error('The sample for this test could not be found. Accept it again and retry.');
+    const apiParameters = toApiParameters(parameters);
+    if (!apiParameters.length && !resultText.trim()) {
+      throw new Error('Enter the result before submitting.');
+    }
+
+    const saved = await labService.saveResult(apiClient, {
+      sampleId: sampleApiId,
+      overallComment: resultText.trim() || undefined,
+      comment: comment.trim() || undefined,
+      parameters: apiParameters
+    });
+    const resultApiId = saved?.result?.id || saved?.id;
+    if (!resultApiId) throw new Error('The laboratory result id was not returned by the server.');
+
+    await labService.submitReview(apiClient, { resultId: resultApiId });
+    await labService.signOff(apiClient, resultApiId, { decision: 'SIGNED_OFF' });
+
+    // Releasing is a separate permission. Where this role does not hold it the
+    // signed-off report waits for whoever does, rather than failing the entry.
+    let released = false;
+    try {
+      await refresh(dispatch, getState, ['resultReports']);
+      const report = findReportForOrder(getState, orderId);
+      if (report) {
+        await resultService.release(apiClient, report.apiId, { notifyDoctor: true, notifyReception: true });
+        released = true;
+      }
+    } catch {
+      released = false;
+    }
+
+    await refresh(dispatch, getState, ['orders', 'results', 'sampleLogs', 'resultReports', 'notifications', 'deliveryLogs']);
+    dispatch(toastAction('success', released
+      ? `${testName || 'Result'} submitted and sent to the clinician`
+      : `${testName || 'Result'} submitted — awaiting release`));
   },
 
   /* The demo's single "push to clinician" walks the backend's full chain:

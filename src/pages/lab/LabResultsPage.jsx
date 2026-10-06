@@ -163,6 +163,7 @@ export function LabResultsPage() {
   function confirmReverse(reason) {
     if (!activeRow || reversing) return;
     setReversing(true);
+    const orderId = activeRow.order?.id || activeRow.result.orderId;
     dispatch({ type: 'REVERSE_LAB_RESULT', resultId: activeRow.result.id, payload: { reason } });
     setReverseOpen(false);
     // The result is no longer "Final / Released", so it leaves this list once the
@@ -170,6 +171,9 @@ export function LabResultsPage() {
     setWorkspace('list');
     setActiveResultId('');
     window.setTimeout(() => setReversing(false), 1500);
+    // Reversing exists in order to correct something, so go where the correction
+    // is made. The test is waiting there with what was entered before filled in.
+    if (orderId) window.setTimeout(() => dispatch({ type: 'OPEN_ACCEPTED_SAMPLE', orderId }), 1600);
   }
 
   const verificationUrl = activeRow ? getReportVerificationUrl(activeRow.result) : '';

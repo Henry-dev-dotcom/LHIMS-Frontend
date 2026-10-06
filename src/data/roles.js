@@ -169,13 +169,26 @@ export const NAV_ITEMS = [
   { id: 'orders', label: 'Order Registry', icon: ClipboardList, roles: ['receptionist','doctor','scan','billing','admin'], section: 'Core Records' },
 
   { id: 'lab-dashboard', label: 'Laboratory', icon: FlaskConical, roles: ['admin'], section: 'Laboratory' },
-  { id: 'lab-queue', label: 'Queue', icon: ClipboardList, roles: ['lab','admin'], section: 'Laboratory' },
-  { id: 'sample-log', label: 'Sample Log', icon: Database, roles: ['admin'], section: 'Laboratory' },
-  { id: 'lab-accept', label: 'Accept Sample', icon: CheckCircle2, roles: ['admin'], section: 'Laboratory' },
+  /*
+    Three tabs, and the analyzers.
+
+    Incoming -> Accepted -> Results is the whole of the laboratory's day, and
+    each is one answer to one question: whose samples are waiting, what owes a
+    result, and what has been sent. Accept Sample is the second half of Incoming
+    rather than a destination of its own, so it stays reachable but unlisted.
+
+    Review & Sign-off, Sample Log and Rejected / Retest are gone from the menu.
+    Sign-off now happens as part of submitting, which is what a lab with one
+    person on the bench actually does; the sample log duplicated Incoming; and a
+    rejection is made where the sample is handled, on the acceptance screen.
+  */
+  { id: 'lab-queue', label: 'Incoming Labs', icon: ClipboardList, roles: ['lab','admin'], section: 'Laboratory' },
   { id: 'accepted-samples', label: 'Accepted Samples', icon: CheckCircle2, roles: ['lab','admin'], section: 'Laboratory' },
-  { id: 'lab-review', label: 'Review & Sign-off', icon: ShieldCheck, roles: ['admin'], section: 'Laboratory' },
   { id: 'lab-results', label: 'Results', icon: FileText, roles: ['lab','admin'], section: 'Laboratory' },
-  { id: 'lab-rejections', label: 'Rejected / Retest', icon: History, roles: ['lab','admin'], section: 'Laboratory' },
+  { id: 'lab-accept', label: 'Accept Sample', icon: CheckCircle2, roles: ['lab','admin'], section: 'Laboratory', hidden: true },
+  { id: 'sample-log', label: 'Sample Log', icon: Database, roles: ['admin'], section: 'Laboratory', hidden: true },
+  { id: 'lab-review', label: 'Review & Sign-off', icon: ShieldCheck, roles: ['admin'], section: 'Laboratory', hidden: true },
+  { id: 'lab-rejections', label: 'Rejected / Retest', icon: History, roles: ['lab','admin'], section: 'Laboratory', hidden: true },
   { id: 'lab-analyzers', label: 'Analyzers', icon: Cpu, roles: ['lab','admin'], section: 'Laboratory' },
   { id: 'lab-analyzer-mapping', label: 'Test Mapping', icon: Link2, roles: ['lab','admin'], section: 'Laboratory' },
   { id: 'lab-analyzer-log', label: 'Analyzer Log', icon: Activity, roles: ['lab','admin'], section: 'Laboratory' },
