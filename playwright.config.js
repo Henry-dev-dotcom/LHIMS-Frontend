@@ -66,6 +66,11 @@ export default defineConfig({
       env: {
         NODE_ENV: 'development',
         DATABASE_URL: databaseUrl,
+        // schema.prisma declares directUrl for Neon's pooler, and `migrate reset`
+        // uses it in preference to the pooled url. Left unset it falls back to
+        // the developer's own .env - which pointed the reset at the DEVELOPMENT
+        // database and left this one empty. Both must name the e2e database.
+        DIRECT_URL: databaseUrl,
         PORT: String(API_PORT),
         FRONTEND_URL: E2E.webUrl,
         FRONTEND_URLS: `${E2E.webUrl},http://127.0.0.1:${WEB_PORT}`,

@@ -169,15 +169,15 @@ function CatalogSearchModal({ open, onClose, catalog, selectedItems, toggleItem,
   );
 }
 
-function ReviewOrderModal({ open, onClose, onConfirm, patient, newPatient, patientMode, doctor, hospital, items, urgency, clinicalNotes, expected, duplicateOrders }) {
+function ReviewOrderModal({ open, onClose, onConfirm, patient, newPatient, patientMode, doctor, hospital, items, urgency, clinicalNotes, expected, duplicateOrders, destination }) {
   const patientName = patientMode === 'existing' ? patient?.fullName : newPatient.fullName;
   return (
     <Modal
       open={open}
       onClose={onClose}
       title="Review and submit order"
-      description="Confirm the selected patient, tests/scans, urgency, and clinical notes before sending to reception."
-      footer={<><Button variant="secondary" onClick={onClose}>Go Back</Button><Button onClick={onConfirm}><Send className="h-4 w-4" /> Submit to Reception</Button></>}
+      description={`Confirm the selected patient, tests/scans, urgency, and clinical notes before sending to ${destination}.`}
+      footer={<><Button variant="secondary" onClick={onClose}>Go Back</Button><Button onClick={onConfirm}><Send className="h-4 w-4" /> Submit</Button></>}
     >
       <div className="space-y-4">
         {duplicateOrders.length > 0 && (
@@ -303,6 +303,11 @@ export function DoctorNewOrderPage() {
   const [step, setStep] = useState(1);
   const [stepError, setStepError] = useState('');
 
+  // Where this facility routes a clinician's order. A diagnostic centre receives
+  // it at reception first; a hospital or clinic sends it straight to the bench.
+  const viaReception = Boolean(state.auth?.facility?.receptionConfirmsOrders);
+  const destination = viaReception ? 'reception' : 'the laboratory / scan unit';
+
   const systemPatients = useMemo(() => data.patients || [], [data.patients]);
   const patientMatches = systemPatients.filter((patient) => patientMatchesSearch(patient, patientSearch));
   const duplicateCandidates = findDuplicatePatients(data.patients, newPatient);
@@ -368,6 +373,15 @@ export function DoctorNewOrderPage() {
     setReviewOpen(true);
   }
 
+  /*
+    Submitting starts the next case.
+
+    A clinician sees one patient after another, and the form used to stay filled
+    in with the patient who had just been submitted - so the next order had to be
+    unpicked by hand, and an accidental second Submit sent the same tests twice.
+    The order is dispatched and the form goes straight back to step 1, empty. The
+    toast from the command layer is what confirms it was sent.
+  */
   function confirmSubmitOrder() {
     dispatch({
       type: 'CREATE_DOCTOR_ORDER',
@@ -383,6 +397,17 @@ export function DoctorNewOrderPage() {
       }
     });
     setReviewOpen(false);
+    setPatientMode('existing');
+    setPatientSearch('');
+    setSelectedPatientId('');
+    setNewPatient(newPatientBlank);
+    setSelectedItems([]);
+    setUrgency('Routine');
+    setClinicalNotes('');
+    setCatalogOpen(false);
+    setAttemptedSubmit(false);
+    setStepError('');
+    setStep(1);
   }
 
   const activeStep = WIZARD_STEPS.find((item) => item.id === step) || WIZARD_STEPS[0];
@@ -507,7 +532,7 @@ export function DoctorNewOrderPage() {
               </div>
             )}
 
-            <Card title="Review & Submit" subtitle="Confirm the order details before sending to reception.">
+            <Card title="Review & Submit" subtitle={`Confirm the order details before sending to ${destination}.`}>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl bg-slate-50 p-3">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Patient</p>
@@ -546,11 +571,21 @@ export function DoctorNewOrderPage() {
               )}
             </Card>
 
-            <Card title="What happens next" subtitle="Submission routes to reception and the required departments." compact>
+            <Card title="What happens next" subtitle={viaReception ? 'Submission routes to reception and the required departments.' : 'Submission goes straight to the departments you selected.'} compact>
               <ol className="space-y-2 text-sm font-semibold text-slate-600">
-                <li>1. Reception confirms the order</li>
-                <li>2. Routes to the lab / scan departments</li>
-                <li>3. Results return to you</li>
+                {viaReception ? (
+                  <>
+                    <li>1. Reception confirms the order</li>
+                    <li>2. Routes to the lab / scan departments</li>
+                    <li>3. Results return to you</li>
+                  </>
+                ) : (
+                  <>
+                    <li>1. The lab / scan department accepts the sample</li>
+                    <li>2. Results are entered and submitted</li>
+                    <li>3. Results return to you</li>
+                  </>
+                )}
               </ol>
               <p className="mt-3 rounded-2xl bg-slate-50 p-3 text-xs leading-5 text-slate-500">Price privacy: clinicians cannot view lab or scan prices. Pricing is visible only to Finance and Reception.</p>
             </Card>
@@ -560,17 +595,25 @@ export function DoctorNewOrderPage() {
         <div className="flex items-center justify-between gap-3 rounded-3xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
           <Button type="button" variant="secondary" onClick={goBack} disabled={step === 1}><ArrowLeft className="h-4 w-4" /> Back</Button>
           <p className="hidden text-xs font-semibold uppercase tracking-[0.08em] text-slate-500 sm:block">{activeStep.label}</p>
+          {/*
+            The keys matter. Without them React reconciles these two into the same
+            <button> element and only swaps its type attribute - so the click that
+            advanced to the last step found itself on a submit button by the time
+            the browser ran the default action, and the review dialog opened before
+            the clinician had seen the step at all. Separate keys make them
+            separate elements.
+          */}
           {step < WIZARD_STEPS.length ? (
-            <Button type="button" onClick={goNext}>Continue to {nextStep?.label || 'Review'} <ArrowRight className="h-4 w-4" /></Button>
+            <Button key="continue" type="button" onClick={goNext}>Continue to {nextStep?.label || 'Review'} <ArrowRight className="h-4 w-4" /></Button>
           ) : (
-            <Button type="submit"><ClipboardList className="h-4 w-4" /> Review Order</Button>
+            <Button key="review" type="submit"><ClipboardList className="h-4 w-4" /> Review Order</Button>
           )}
         </div>
         </form>
       </section>
 
       <CatalogSearchModal open={catalogOpen} onClose={() => setCatalogOpen(false)} catalog={data.catalog || []} selectedItems={selectedItems} toggleItem={toggleItem} clearItems={() => setSelectedItems([])} />
-      <ReviewOrderModal open={reviewOpen} onClose={() => setReviewOpen(false)} onConfirm={confirmSubmitOrder} patient={selectedPatient} newPatient={newPatient} patientMode={patientMode} doctor={doctor} hospital={hospital} items={chosenCatalogItems} urgency={urgency} clinicalNotes={clinicalNotes} expected={expected} duplicateOrders={sameDayDuplicates} />
+      <ReviewOrderModal open={reviewOpen} onClose={() => setReviewOpen(false)} onConfirm={confirmSubmitOrder} patient={selectedPatient} newPatient={newPatient} patientMode={patientMode} doctor={doctor} hospital={hospital} items={chosenCatalogItems} urgency={urgency} clinicalNotes={clinicalNotes} expected={expected} duplicateOrders={sameDayDuplicates} destination={destination} />
     </div>
   );
 }

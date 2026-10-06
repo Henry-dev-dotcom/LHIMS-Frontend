@@ -49,7 +49,10 @@ export function normalizeAuthUser(apiUser) {
         name: apiUser.facility.name,
         logoDataUrl: apiUser.facility.logoDataUrl || null,
         // null only for a facility whose administrator has not finished setup yet.
-        onboardingCompletedAt: apiUser.facility.onboardingCompletedAt
+        onboardingCompletedAt: apiUser.facility.onboardingCompletedAt,
+        // Whether a clinician's order waits for reception before the lab can see
+        // it. True in a diagnostic centre, false in a hospital or clinic.
+        receptionConfirmsOrders: Boolean(apiUser.facility.receptionConfirmsOrders)
       }
       : null,
     // A new facility's administrator starts on the setup checklist.

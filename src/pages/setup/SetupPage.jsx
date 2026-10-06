@@ -55,7 +55,8 @@ export function SetupPage() {
         email: result.facility.email || '',
         address: result.facility.address || '',
         logoDataUrl: result.facility.logoDataUrl || null,
-        allowSupportAccess: result.facility.allowSupportAccess
+        allowSupportAccess: result.facility.allowSupportAccess,
+        receptionConfirmsOrders: result.facility.receptionConfirmsOrders
       });
       setLoadError('');
     } catch (error) {
@@ -209,6 +210,10 @@ export function SetupPage() {
           <label className="flex items-start gap-3 text-sm text-slate-700 sm:col-span-2">
             <input type="checkbox" className="mt-1" checked={profile.allowSupportAccess} onChange={(e) => setProfile((p) => ({ ...p, allowSupportAccess: e.target.checked }))} />
             <span><strong>Allow LHIMS support to look in when you ask for help.</strong> Support can then open a 30-minute, read-only view of your facility. Every visit, with the reason, appears in your Audit Log. Untick to refuse all support access.</span>
+          </label>
+          <label className="flex items-start gap-3 text-sm text-slate-700 sm:col-span-2">
+            <input type="checkbox" className="mt-1" checked={profile.receptionConfirmsOrders} onChange={(e) => setProfile((p) => ({ ...p, receptionConfirmsOrders: e.target.checked }))} />
+            <span><strong>Reception receives and routes clinicians&rsquo; orders.</strong> Leave this off in a hospital or clinic, where a clinician&rsquo;s request goes straight to the laboratory or scan unit. Turn it on in a diagnostic centre, where requests arrive from clinicians elsewhere and someone has to take them in, check them and route them first.</span>
           </label>
           {profileError && <p role="alert" className="text-sm font-semibold text-red-600 sm:col-span-2">{profileError}</p>}
           <div className="sm:col-span-2"><Button type="submit" disabled={savingProfile || !profile.name.trim()}>{savingProfile ? 'Saving…' : 'Save details'}</Button></div>

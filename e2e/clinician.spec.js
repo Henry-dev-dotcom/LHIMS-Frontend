@@ -50,3 +50,52 @@ test('the clinician dashboard and completed orders are populated too', async ({ 
   await expect.poll(async () => page.getByRole('row').count()).toBeGreaterThan(1);
   crashes.assertNone();
 });
+
+/*
+  Submitting an order starts the next case.
+
+  A clinician sees one patient after another. The form used to stay filled in
+  with the patient who had just been submitted, so the next order had to be
+  unpicked by hand and an accidental second Submit sent the same tests twice.
+  The button also said "Submit to Reception", which is wrong in a hospital: the
+  request goes straight to the laboratory.
+*/
+test('submitting an order clears the form and returns to the first step', async ({ page }) => {
+  const crashes = watchForCrashes(page);
+  await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
+  await openFromMenu(page, 'New Order');
+
+  // Step 1: pick the first patient offered.
+  const firstPatient = page.getByRole('button', { name: /Select$/ }).first();
+  await firstPatient.click();
+  await expect(page.getByRole('button', { name: /Selected$/ }).first()).toBeVisible();
+  await page.getByRole('button', { name: /^Continue to/ }).click();
+
+  // Step 2: add one test.
+  await page.getByRole('button', { name: 'Add Test / Scan' }).click();
+  await page.getByRole('button', { name: 'Full Blood Count (FBC)' }).click();
+  await page.getByRole('button', { name: 'Done — Save Selected Tests' }).click();
+  await expect(page.getByRole('dialog'), 'the catalog modal stayed open').toHaveCount(0);
+  await expect(page.getByText('1 item(s) selected', { exact: false })).toBeVisible();
+  await page.getByRole('button', { name: /^Continue to/ }).click();
+
+  // Step 3: clinical context, left at its defaults.
+  await page.getByRole('button', { name: /^Continue to/ }).click();
+
+  // Step 4: review. The button says Submit, and names no receptionist.
+  await expect(page.getByRole('button', { name: 'Review Order' })).toBeVisible();
+  await expect(page.getByRole('dialog'), 'a dialog was open before Review Order was clicked').toHaveCount(0);
+  await page.getByRole('button', { name: 'Review Order' }).click();
+  await expect(page.getByRole('heading', { name: 'Review and submit order' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Submit to Reception' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Submit', exact: true }).click();
+
+  await expect(page.getByText('Order submitted')).toBeVisible();
+
+  // Back at step 1, with nothing left over from the patient just submitted.
+  await expect(page.getByText('Matching existing patients', { exact: false })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Selected$/ })).toHaveCount(0);
+  await expect(page.getByPlaceholder('Search patient name, ID, phone, email...')).toHaveValue('');
+
+  crashes.assertNone();
+});

@@ -23,13 +23,13 @@ async function acceptedSample(request, catalogItemId, patientId) {
   };
 
   const doctor = await login('doctor', 'doctor123');
-  const reception = await login('reception', 'reception123');
   const lab = await login('lab', 'lab123');
 
+  // The demo facility is a hospital, so a clinician's order reaches the bench
+  // without a receptionist in between: it arrives already confirmed and the lab
+  // can accept it straight away.
   const order = await post('/doctor/orders', doctor, { patientId, urgency: 'ROUTINE', items: [{ catalogItemId }] });
   expect(order.status, JSON.stringify(order.body)).toBe(201);
-  const confirmed = await post(`/reception/orders/${order.body.data.id}/confirm`, reception, { invoiceNow: true });
-  expect(confirmed.status).toBeLessThan(300);
   const accepted = await post('/lab/samples/accept', lab, { orderId: order.body.data.id });
   expect(accepted.status, JSON.stringify(accepted.body)).toBe(201);
   const sample = accepted.body.data.samples[0];
