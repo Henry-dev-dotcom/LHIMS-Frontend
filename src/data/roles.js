@@ -1,4 +1,5 @@
 import {
+  Wallet,
   ClipboardCheck,
   Monitor,
   LayoutDashboard,
@@ -219,13 +220,24 @@ export const NAV_ITEMS = [
   { id: 'equipment-booking', label: 'Equipment Booking', icon: CalendarDays, roles: ['scan','admin'], section: 'Imaging', hidden: true },
 
   { id: 'billing-dashboard', label: 'Billing / Finance', icon: CreditCard, roles: ['billing','admin'], section: 'Finance' },
+  /*
+    Cashiering first, accounting second.
+
+    Finance had seven entries of equal weight, and the one a cashier needs all
+    day - take this patient's money and give them a receipt - was no more
+    prominent than the float tracker. The window is now its own section;
+    expenses, float, shift reconciliation, the ledger and the analytics are
+    accounting, and are grouped as such rather than removed, because a facility
+    that does its books in here still needs them.
+  */
+  { id: 'finance-desk', label: 'Cashier', icon: Wallet, roles: ['billing','admin'], section: 'Finance' },
   { id: 'invoices', label: 'Invoices', icon: CreditCard, roles: ['billing','admin'], section: 'Finance' },
-  { id: 'finance-shift', label: 'Shift Start / Close', icon: Clock, roles: ['billing','admin'], section: 'Finance' },
-  { id: 'float-tracker', label: 'Float Tracker', icon: CreditCard, roles: ['billing','admin'], section: 'Finance' },
-  { id: 'expenses', label: 'Expenses', icon: ClipboardList, roles: ['billing','admin'], section: 'Finance' },
-  { id: 'account-ledger', label: 'Account Ledger', icon: FileBarChart2, roles: ['billing','admin'], section: 'Finance' },
-  { id: 'billing-analytics', label: 'Billing Analytics', icon: LineChart, roles: ['billing','admin'], section: 'Finance' },
   { id: 'price-catalog', label: 'Price Catalog', icon: ClipboardList, roles: ['billing','receptionist','admin'], section: 'Finance' },
+  { id: 'finance-shift', label: 'Shift Start / Close', icon: Clock, roles: ['billing','admin'], section: 'Accounting' },
+  { id: 'float-tracker', label: 'Float Tracker', icon: CreditCard, roles: ['billing','admin'], section: 'Accounting' },
+  { id: 'expenses', label: 'Expenses', icon: ClipboardList, roles: ['billing','admin'], section: 'Accounting' },
+  { id: 'account-ledger', label: 'Account Ledger', icon: FileBarChart2, roles: ['billing','admin'], section: 'Accounting' },
+  { id: 'billing-analytics', label: 'Billing Analytics', icon: LineChart, roles: ['billing','admin'], section: 'Accounting' },
 
   { id: 'admin-dashboard', label: 'Admin', icon: ShieldCheck, roles: ['admin'], section: 'Admin' },
   { id: 'users', label: 'User Management', icon: UserCog, roles: ['admin'], section: 'Admin' },

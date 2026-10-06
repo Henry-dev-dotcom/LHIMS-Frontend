@@ -61,6 +61,10 @@ const initialState = {
     activeAcceptedSampleOrderId: '',
     // Which accepted scan the DICOM viewer should open, when it is reached from a report.
     activeDicomResultId: '',
+    // The patient whose bills the cashier has open.
+    activeFinancePatientId: '',
+    // The receipt for the payment just taken, so it can be printed at the window.
+    lastReceipt: null,
     activeScanAcceptOrderId: '',
     activeAcceptedScanOrderId: '',
     activeWalkInPatientId: '',
@@ -495,6 +499,15 @@ function reducer(state, action) {
 
     case 'OPEN_LAB_ACCEPT': {
       return { ...state, currentPage: 'lab-accept', ui: { ...state.ui, sidebarOpen: false, activeLabAcceptOrderId: action.orderId, acceptedPrintout: null } };
+    }
+    case 'OPEN_FINANCE_PATIENT': {
+      return { ...state, currentPage: 'finance-desk', ui: { ...state.ui, sidebarOpen: false, activeFinancePatientId: action.patientId || '', lastReceipt: null } };
+    }
+    case 'PAYMENT_RECEIVED': {
+      return { ...state, ui: { ...state.ui, lastReceipt: action.receipt } };
+    }
+    case 'CLOSE_RECEIPT': {
+      return { ...state, ui: { ...state.ui, lastReceipt: null } };
     }
     case 'OPEN_DICOM_VIEWER': {
       return { ...state, currentPage: 'scan-viewer', ui: { ...state.ui, sidebarOpen: false, activeDicomResultId: action.acceptanceId || '' } };

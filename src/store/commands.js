@@ -795,6 +795,43 @@ const commands = {
     dispatch(toastAction('success', `Invoice ${payload.invoiceId} updated`));
   },
 
+  /*
+    Taking a payment at the cashier's window.
+
+    The same call as recording a payment, with one difference that matters at the
+    window: the receipt comes back, so it can be printed while the patient is
+    still standing there. Nobody wants to be told to come back for their receipt.
+  */
+  RECEIVE_PAYMENT: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    const amount = Number(payload.amount);
+    if (!Number.isFinite(amount) || amount <= 0) throw new Error('Enter the amount being paid.');
+    const apiId = requireApiId(getState().data.invoices, payload.invoiceId, 'Invoice');
+    const response = await billingService.recordPayment(apiClient, apiId, {
+      amount,
+      method: toApiPaymentMethod(payload.method),
+      reference: payload.reference || undefined
+    });
+    await refresh(dispatch, getState, ['invoices', 'orders', 'financeShifts']);
+
+    const receipt = response?.receipt || response?.data?.receipt || null;
+    const payment = response?.payment || response?.data?.payment || null;
+    dispatch({
+      type: 'PAYMENT_RECEIVED',
+      receipt: {
+        receiptId: receipt?.id || '',
+        receiptCode: receipt?.receiptCode || '',
+        invoiceId: payload.invoiceId,
+        patientId: payload.patientId || '',
+        amount,
+        method: payload.method,
+        reference: payload.reference || '',
+        paidAt: payment?.createdAt || new Date().toISOString()
+      }
+    });
+    dispatch(toastAction('success', `Payment received on ${payload.invoiceId}`));
+  },
+
   RECORD_PAYMENT: async (action, dispatch, getState) => {
     const payload = action.payload || {};
     const apiId = requireApiId(getState().data.invoices, payload.invoiceId, 'Invoice');

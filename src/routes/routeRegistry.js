@@ -302,6 +302,11 @@ export const PAGE_META = {
     description: 'Attributed account ledger combining billing credits and expense debits into a complete cash-flow balance.',
     requirements: ['Total credit', 'Total debit', 'Current balance', 'Cash flow', 'Reference tracking']
   },
+  'finance-desk': {
+    title: 'Cashier', section: 'Billing / Finance',
+    description: 'The cashier window: find the patient, open their bills, see what each is for, take the payment and print the receipt.',
+    requirements: ['Search patient', 'Owing only filter', 'Bills with itemised lines', 'Receive payment by method', 'Payments already taken', 'Printed receipt']
+  },
   'billing-analytics': {
     title: 'Billing Analytics', section: 'Billing / Finance',
     description: 'Period-end analytics for patient visits, collections, outstanding balances, paid invoices, write-offs and ageing.',

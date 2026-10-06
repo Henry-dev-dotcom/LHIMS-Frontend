@@ -258,6 +258,31 @@ export function normalizeInvoice(invoice, orderCodeById = {}) {
     paidAmount: num(invoice.amountPaid),
     balance: num(invoice.balance),
     insuranceClaimRef: invoice.insuranceClaimRef || '',
+    /*
+      What the bill is actually made of, and what has been paid against it.
+
+      The server has always sent both; the normaliser dropped them, so a cashier
+      could see only a total. You cannot tell somebody what they are paying for
+      from a total, and a receipt has to itemise.
+    */
+    items: (invoice.items || []).map((item) => ({
+      id: item.id,
+      description: item.description || item.catalogItem?.name || 'Item',
+      quantity: num(item.quantity, 1),
+      unitPrice: num(item.unitPrice ?? item.catalogItem?.price),
+      amount: num(item.total ?? item.amount),
+      type: ITEM_TYPE_FROM_API[item.catalogItem?.type] || item.catalogItem?.type || ''
+    })),
+    payments: (invoice.payments || []).map((payment) => ({
+      id: payment.id,
+      amount: num(payment.amount),
+      method: enumLabel(payment.method),
+      reference: payment.reference || '',
+      receivedBy: payment.receivedBy?.name || '',
+      receiptId: payment.receipt?.id || '',
+      receiptCode: payment.receipt?.receiptCode || '',
+      paidAt: payment.createdAt || ''
+    })),
     createdAt: invoice.createdAt,
     updatedAt: invoice.updatedAt
   };
