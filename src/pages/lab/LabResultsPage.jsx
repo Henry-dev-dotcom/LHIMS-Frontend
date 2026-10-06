@@ -266,6 +266,13 @@ export function LabResultsPage() {
                   <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{activeRow.result.reportText || 'No report summary provided.'}</p>
                 </div>
 
+                {activeRow.result.comment && (
+                  <div className="rounded-3xl border border-slate-200 p-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Comment</p>
+                    <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{activeRow.result.comment}</p>
+                  </div>
+                )}
+
                 <div className="grid gap-4 xl:grid-cols-3">
                   <div className="rounded-3xl border border-slate-200 p-4">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Attachments</p>

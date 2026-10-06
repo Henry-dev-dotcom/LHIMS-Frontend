@@ -265,6 +265,16 @@ export function normalizeInvoice(invoice, orderCodeById = {}) {
 
 /* Lab results use the frontend's release convention: a signed-off result is
    what pages call 'Final / Released'. */
+/* ScanStatus, in the words the imaging unit uses. */
+const SCAN_STATUS_FROM_API = {
+  NOT_ACCEPTED: 'Not Accepted',
+  ACCEPTED: 'Accepted',
+  DRAFT: 'Accepted',
+  PENDING_REVIEW: 'Accepted',
+  SIGNED_OFF: 'Accepted',
+  RETAKE_REQUESTED: 'Retake Requested'
+};
+
 const LAB_RESULT_STATUS_FROM_API = {
   DRAFT: 'Draft',
   PENDING_REVIEW: 'Pending Review',
@@ -284,6 +294,9 @@ export function normalizeLabResult(result, orderCodeById = {}) {
     department: 'Laboratory',
     status: LAB_RESULT_STATUS_FROM_API[result.status] || enumLabel(result.status),
     reportText: result.interpretation || '',
+    // The laboratory's comment on the result. It is written for the clinician,
+    // so it has to be readable wherever the result is.
+    comment: result.technicianNotes || '',
     internalNotes: result.technicianNotes || '',
     analyzer: result.analyzerUsed || '',
     parameters: (result.parameters || []).map((parameter) => ({
@@ -666,6 +679,88 @@ export function normalizeReport(report, orderCodeById = {}) {
 }
 
 /* Scan results carry narrative findings/impression rather than parameters. */
+/*
+  An accepted scan, one row per requested study.
+
+  The imaging unit works the way the laboratory does: a request may name a chest
+  film and an abdominal ultrasound, and the unit takes in whichever it is about
+  to do. The backend keeps one ScanAcceptance per order item, so this keeps one
+  row per study too, carrying whether its report has been written and what was
+  written before where a sent report was pulled back for correction.
+*/
+/*
+  The report on an accepted study.
+
+  An accepted study carries its report, but that nested report does not carry the
+  study it belongs to - so normalising it on its own produced a report with no
+  patient, no order and no test name. The parent's context is put back first,
+  which is exactly what normalizeLabResultFromSample does for a sample.
+*/
+export function normalizeScanResultFromAcceptance(acceptance, orderCodeById = {}) {
+  const result = (acceptance?.scanResults || [])[0];
+  if (!result) return null;
+  return normalizeScanResult({
+    ...result,
+    acceptance,
+    orderItem: result.orderItem || acceptance.orderItem,
+    patient: acceptance.orderItem?.order?.patient
+  }, orderCodeById);
+}
+
+export function normalizeScanAcceptance(acceptance, orderCodeById = {}) {
+  if (!acceptance) return null;
+  const orderApiId = acceptance.orderItem?.orderId || acceptance.orderItem?.order?.id || '';
+  const orderCode = orderCodeById[orderApiId] || acceptance.orderItem?.order?.orderCode || orderApiId || '';
+  const catalogCode = acceptance.orderItem?.catalogItem?.catalogCode || acceptance.orderItem?.catalogItemId || '';
+  const result = (acceptance.scanResults || [])[0] || null;
+  const returnedReason = result && result.status === 'DRAFT'
+    ? (result.reviews || []).find((review) => review.decision === 'REVERSED')?.note || ''
+    : '';
+  return {
+    id: acceptance.id,
+    apiId: acceptance.id,
+    orderId: orderCode,
+    orderApiId,
+    orderItemId: acceptance.orderItemId || acceptance.orderItem?.id || '',
+    patientId: acceptance.orderItem?.order?.patient?.patientCode || '',
+    status: SCAN_STATUS_FROM_API[acceptance.status] || enumLabel(acceptance.status),
+    catalogCode,
+    labItemIds: catalogCode ? [catalogCode] : [],
+    testName: acceptance.orderItem?.catalogItem?.name || catalogCode || '',
+    modality: acceptance.orderItem?.catalogItem?.modality || '',
+    acceptedAt: acceptance.acceptedAt || '',
+    acceptedBy: acceptance.acceptedBy?.name || '',
+    resultId: result?.id || '',
+    resultApiId: result?.id || '',
+    resultStatus: enumLabel(result?.status || ''),
+    // As in the laboratory: a report counts only once it has been submitted,
+    // because pulling a sent report back leaves it a draft so its text survives.
+    hasResult: Boolean(result) && result.status !== 'DRAFT',
+    returned: Boolean(returnedReason),
+    fileCount: (result?.files || []).length,
+    dicomCount: (result?.files || []).filter((file) => file.isDicom).length,
+    // The attached images themselves, so the viewer can ask for their bytes
+    // without going back through the results collection to find them.
+    dicomFiles: (result?.files || [])
+      .filter((file) => file.isDicom)
+      .map((file) => ({
+        id: file.id,
+        fileName: file.fileName || file.id,
+        modality: file.modality || '',
+        studyUid: file.studyUid || '',
+        seriesUid: file.seriesUid || ''
+      })),
+    draftResult: result && result.status === 'DRAFT'
+      ? {
+        reason: returnedReason,
+        reportText: result.findings || '',
+        comment: result.technicianNotes || '',
+        parameters: []
+      }
+      : null
+  };
+}
+
 export function normalizeScanResult(result, orderCodeById = {}) {
   if (!result) return null;
   const orderApiId = result.orderItem?.orderId || result.orderId;
@@ -677,6 +772,8 @@ export function normalizeScanResult(result, orderCodeById = {}) {
     department: 'Imaging',
     status: LAB_RESULT_STATUS_FROM_API[result.status] || enumLabel(result.status),
     reportText: [result.findings, result.impression].filter(Boolean).join('\n\n'),
+    // The unit's comment on the report, written for the clinician.
+    comment: result.technicianNotes || '',
     findings: result.findings || '',
     impression: result.impression || '',
     recommendation: result.recommendations || '',

@@ -261,6 +261,11 @@ export const PAGE_META = {
     description: 'Dedicated radiologist review queue for submitted imaging reports before final release.',
     requirements: ['Pending review queue', 'Radiologist review', 'DICOM metadata', 'Sign-off', 'Final release']
   },
+  'scan-viewer': {
+    title: 'DICOM Viewer', section: 'Imaging',
+    description: 'Open a study attached to a report, or read one straight off a disc or USB stick written by the modality.',
+    requirements: ['Open attached study', 'Open local files or folder', 'Window and level', 'Pan, zoom and invert', 'Multi-frame cine', 'DICOM tags']
+  },
   'scan-results': {
     title: 'Scan Results', section: 'Imaging',
     description: 'Stored scan report archive for review, printing and reversing a sent report to correct it.',

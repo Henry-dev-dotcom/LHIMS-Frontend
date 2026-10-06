@@ -9,7 +9,7 @@ const ROLES = [
   { username: 'nurse', password: 'nurse123', sees: 'OPD Visits', notSees: 'Invoices' },
   { username: 'reception', password: 'reception123', sees: 'Walk-Ins', notSees: 'Dispensing' },
   { username: 'lab', password: 'lab123', sees: 'Accepted Samples', notSees: 'Walk-Ins' },
-  { username: 'scan', password: 'scan123', sees: 'Scan Queue', notSees: 'Dispensing' },
+  { username: 'scan', password: 'scan123', sees: 'Incoming Scans', notSees: 'Dispensing' },
   { username: 'billing', password: 'billing123', sees: 'Invoices', notSees: 'OPD Visits' },
   { username: 'pharmacist', password: 'pharmacist123', sees: 'Dispensing', notSees: 'User Management' }
 ];

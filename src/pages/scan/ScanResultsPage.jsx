@@ -146,6 +146,7 @@ export function ScanResultsPage() {
   function confirmReverse(reason) {
     if (!activeRow || reversing) return;
     setReversing(true);
+    const orderId = activeRow.order?.id || activeRow.result.orderId;
     dispatch({ type: 'REVERSE_SCAN_RESULT', resultId: activeRow.result.id, payload: { reason } });
     setReverseOpen(false);
     // The report is no longer "Final / Released", so it leaves this list once the
@@ -153,6 +154,9 @@ export function ScanResultsPage() {
     setWorkspace('list');
     setActiveResultId('');
     window.setTimeout(() => setReversing(false), 1500);
+    // Pulling a report back exists in order to correct it, so go where the
+    // correction is written, with what was reported before already there.
+    if (orderId) window.setTimeout(() => dispatch({ type: 'OPEN_ACCEPTED_SCAN', orderId }), 1600);
   }
 
   function printActive() {
@@ -235,6 +239,12 @@ export function ScanResultsPage() {
                     <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Impression</p>
                     <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{activeRow.result.impression || 'No impression recorded.'}</p>
                   </div>
+                  {activeRow.result.comment && (
+                    <div className="rounded-3xl border border-slate-200 p-4 md:col-span-2">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Comment</p>
+                      <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{activeRow.result.comment}</p>
+                    </div>
+                  )}
                   {activeRow.result.comparison && (
                     <div className="rounded-3xl border border-slate-200 p-4 md:col-span-2">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Comparison to prior scans</p>

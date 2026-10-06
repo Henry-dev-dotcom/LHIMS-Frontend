@@ -6,7 +6,7 @@ import { Button } from '../../components/ui/Button';
 import { inputClass } from '../../components/ui/FormField';
 import { useAppStore } from '../../store/AppStore';
 import { formatDateTime } from '../../utils/formatters';
-import { incomingQueue, pendingTests, queueMatches, requestedBy } from '../../utils/labWorkflow';
+import { incomingQueue, pendingTests, queueMatches, requestedBy } from '../../utils/diagnosticWorkflow';
 
 /*
   Incoming Labs - the first of the laboratory's three tabs.

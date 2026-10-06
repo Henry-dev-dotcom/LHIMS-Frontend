@@ -1,4 +1,5 @@
 import {
+  Monitor,
   LayoutDashboard,
   UserRound,
   UsersRound,
@@ -194,13 +195,24 @@ export const NAV_ITEMS = [
   { id: 'lab-analyzer-log', label: 'Analyzer Log', icon: Activity, roles: ['lab','admin'], section: 'Laboratory' },
 
   { id: 'scan-dashboard', label: 'Scan / Imaging', icon: ScanLine, roles: ['scan','admin'], section: 'Imaging' },
-  { id: 'scan-queue', label: 'Scan Queue', icon: ClipboardList, roles: ['scan','admin'], section: 'Imaging' },
-  { id: 'scan-accept', label: 'Accept Scan', icon: CheckCircle2, roles: ['scan','admin'], section: 'Imaging' },
+  /*
+    The imaging unit runs the laboratory's three tabs, plus the viewer.
+
+    Incoming Scans -> Accepted Scans -> Results, and a DICOM viewer that opens
+    either an attached study or a disc the modality wrote. Accept Scan is the
+    second half of Incoming, so it stays reachable but unlisted. Review &
+    Sign-off, Rejected / Retake and Equipment Booking have left the menu for the
+    same reasons they left the laboratory's: signing off happens as part of
+    submitting, and a retake is asked for where the study is handled.
+  */
+  { id: 'scan-queue', label: 'Incoming Scans', icon: ClipboardList, roles: ['scan','admin'], section: 'Imaging' },
   { id: 'accepted-scans', label: 'Accepted Scans', icon: CheckCircle2, roles: ['scan','admin'], section: 'Imaging' },
-  { id: 'scan-review', label: 'Review & Sign-off', icon: ShieldCheck, roles: ['scan','admin'], section: 'Imaging' },
   { id: 'scan-results', label: 'Results', icon: FileText, roles: ['scan','admin'], section: 'Imaging' },
-  { id: 'scan-rejections', label: 'Rejected / Retake', icon: History, roles: ['scan','admin'], section: 'Imaging' },
-  { id: 'equipment-booking', label: 'Equipment Booking', icon: CalendarDays, roles: ['scan','admin'], section: 'Imaging' },
+  { id: 'scan-viewer', label: 'DICOM Viewer', icon: Monitor, roles: ['scan','admin','doctor'], section: 'Imaging' },
+  { id: 'scan-accept', label: 'Accept Scan', icon: CheckCircle2, roles: ['scan','admin'], section: 'Imaging', hidden: true },
+  { id: 'scan-review', label: 'Review & Sign-off', icon: ShieldCheck, roles: ['scan','admin'], section: 'Imaging', hidden: true },
+  { id: 'scan-rejections', label: 'Rejected / Retake', icon: History, roles: ['scan','admin'], section: 'Imaging', hidden: true },
+  { id: 'equipment-booking', label: 'Equipment Booking', icon: CalendarDays, roles: ['scan','admin'], section: 'Imaging', hidden: true },
 
   { id: 'billing-dashboard', label: 'Billing / Finance', icon: CreditCard, roles: ['billing','admin'], section: 'Finance' },
   { id: 'invoices', label: 'Invoices', icon: CreditCard, roles: ['billing','admin'], section: 'Finance' },

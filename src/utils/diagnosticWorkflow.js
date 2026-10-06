@@ -1,5 +1,5 @@
 /*
-  The laboratory works test by test.
+  The laboratory and the imaging unit both work test by test.
 
   A request from a clinician may name six tests; the samples for three of them
   are on the bench and the rest are still being drawn. So the lab accepts the
@@ -23,9 +23,9 @@ const DEPARTMENT_ITEM_TYPE = { Laboratory: 'Lab', Imaging: 'Scan' };
 /** Catalog codes whose sample has been accepted on this order. */
 function acceptedCodes(order) {
   return new Set(
-    (order.sampleLogs || [])
-      .filter((sample) => sample.status === 'Accepted')
-      .flatMap((sample) => sample.labItemIds || [])
+    (order.acceptances || [])
+      .filter((entry) => entry.status === 'Accepted')
+      .flatMap((entry) => entry.labItemIds || [])
   );
 }
 
@@ -43,7 +43,7 @@ export function departmentTests(order, department) {
     .filter((orderItem) => orderItem.type === wantedType)
     .map((orderItem) => {
       const item = (order.items || []).find((candidate) => candidate.id === orderItem.catalogItemId) || null;
-      const sample = (order.sampleLogs || []).find(
+      const sample = (order.acceptances || []).find(
         (candidate) => candidate.status === 'Accepted' && (candidate.labItemIds || []).includes(orderItem.catalogItemId)
       ) || null;
       return {

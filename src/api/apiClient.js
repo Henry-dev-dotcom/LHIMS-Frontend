@@ -229,6 +229,64 @@ export async function logoutRequest() {
   }
 }
 
+/*
+  Fetching bytes rather than JSON.
+
+  A DICOM study is pixels, not a payload, and the viewer needs the file exactly
+  as it was stored. This takes the same route as every other call - the same base
+  address, the same cookie or bearer token, the same deadline - and hands back an
+  ArrayBuffer instead of a parsed envelope.
+
+  A failure here still arrives as a readable sentence: the body of an error
+  response is JSON even when the body of a success is not, so it is read for the
+  message the server sent.
+*/
+export async function requestArrayBuffer(path, { token, signal } = {}) {
+  const config = getApiConfig();
+  const url = `${config.baseUrl}${path.startsWith('/') ? path : `/${path}`}`;
+  const controller = new AbortController();
+  let timedOut = false;
+  // Studies are large and the host may be waking, so this is given longer than
+  // an ordinary call rather than the shared deadline.
+  const timeout = window.setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, Math.max(config.timeoutMs, 60_000));
+  const onExternalAbort = () => controller.abort();
+  if (signal) {
+    if (signal.aborted) controller.abort();
+    else signal.addEventListener('abort', onExternalAbort, { once: true });
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: normalizeHeaders({ headers: { Accept: 'application/octet-stream' }, token }),
+      credentials: 'include',
+      signal: controller.signal
+    });
+    if (!response.ok) {
+      let message = `Request failed: ${response.status}`;
+      try {
+        const payload = await response.json();
+        if (payload?.message) message = payload.message;
+      } catch {
+        // Not JSON; the status is all there is to report.
+      }
+      throw new ApiError(message, { status: response.status });
+    }
+    return await response.arrayBuffer();
+  } catch (error) {
+    if (timedOut) throw new ApiError(TIMED_OUT_MESSAGE, { status: 0, code: REQUEST_TIMED_OUT });
+    if (signal?.aborted) throw error;
+    if (error instanceof TypeError) throw new ApiError(UNREACHABLE_MESSAGE, { status: 0, code: SERVER_UNREACHABLE });
+    throw error;
+  } finally {
+    window.clearTimeout(timeout);
+    if (signal) signal.removeEventListener('abort', onExternalAbort);
+  }
+}
+
 export function createApiClient({ auth } = {}) {
   const config = getApiConfig();
   return {
@@ -236,6 +294,7 @@ export function createApiClient({ auth } = {}) {
     config,
     auth,
     request,
+    requestArrayBuffer,
     login: loginRequest,
     logout: logoutRequest,
     tokens: getStoredTokens()

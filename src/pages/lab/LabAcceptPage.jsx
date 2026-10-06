@@ -9,7 +9,7 @@ import { FormField, inputClass } from '../../components/ui/FormField';
 import { useAppStore } from '../../store/AppStore';
 import { formatDateTime, money } from '../../utils/formatters';
 import { getLabOrders } from '../../utils/orderViews';
-import { departmentTests, paymentStateFor, pendingTests, requestedBy } from '../../utils/labWorkflow';
+import { departmentTests, paymentStateFor, pendingTests, requestedBy } from '../../utils/diagnosticWorkflow';
 import { escapeHtml, printDocument } from '../../utils/printDocument';
 
 /*

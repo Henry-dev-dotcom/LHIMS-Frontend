@@ -24,7 +24,18 @@ export function getDepartmentOrders(data, department) {
       invoice: (data.invoices || []).find((invoice) => invoice.orderId === order.id),
       result: (data.results || []).find((result) => result.orderId === order.id && result.department === department),
       sampleLogs: (data.sampleLogs || []).filter((sample) => sample.orderId === order.id),
-      scanBookings: (data.scanBookings || []).filter((booking) => booking.orderId === order.id)
+      scanBookings: (data.scanBookings || []).filter((booking) => booking.orderId === order.id),
+      /*
+        What this department has taken in, one row per test or study.
+
+        The laboratory and the imaging unit run the same three-tab workflow, and
+        differ only in what the row is called underneath - an accepted sample or
+        an accepted scan. Naming it the same thing for both is what lets one set
+        of helpers drive both units.
+      */
+      acceptances: department === 'Imaging'
+        ? (data.scanAcceptances || []).filter((acceptance) => acceptance.orderId === order.id)
+        : (data.sampleLogs || []).filter((sample) => sample.orderId === order.id)
     }));
 }
 

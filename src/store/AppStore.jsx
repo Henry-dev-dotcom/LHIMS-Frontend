@@ -28,6 +28,7 @@ const emptyData = {
   scanEquipment: [],
   sampleLogs: [],
   scanBookings: [],
+  scanAcceptances: [],
   scanRejections: [],
   appointments: [],
   dailyVisits: [],
@@ -58,6 +59,8 @@ const initialState = {
     // can be printed. Cleared when the bench closes the printout.
     acceptedPrintout: null,
     activeAcceptedSampleOrderId: '',
+    // Which accepted scan the DICOM viewer should open, when it is reached from a report.
+    activeDicomResultId: '',
     activeScanAcceptOrderId: '',
     activeAcceptedScanOrderId: '',
     activeWalkInPatientId: '',
@@ -352,7 +355,7 @@ function reducer(state, action) {
       return { ...state, data: nextData, ui: { ...state.ui, toast: toast('success', 'Lab result submitted for review') } };
     }
     case 'OPEN_SCAN_ACCEPT': {
-      return { ...state, currentPage: 'scan-queue', ui: { ...state.ui, sidebarOpen: false, activeScanAcceptOrderId: action.orderId } };
+      return { ...state, currentPage: 'scan-accept', ui: { ...state.ui, sidebarOpen: false, activeScanAcceptOrderId: action.orderId, acceptedPrintout: null } };
     }
     case 'OPEN_ACCEPTED_SCAN': {
       return { ...state, currentPage: 'accepted-scans', ui: { ...state.ui, sidebarOpen: false, activeAcceptedScanOrderId: action.orderId } };
@@ -492,6 +495,9 @@ function reducer(state, action) {
 
     case 'OPEN_LAB_ACCEPT': {
       return { ...state, currentPage: 'lab-accept', ui: { ...state.ui, sidebarOpen: false, activeLabAcceptOrderId: action.orderId, acceptedPrintout: null } };
+    }
+    case 'OPEN_DICOM_VIEWER': {
+      return { ...state, currentPage: 'scan-viewer', ui: { ...state.ui, sidebarOpen: false, activeDicomResultId: action.acceptanceId || '' } };
     }
     case 'LAB_SAMPLES_ACCEPTED': {
       return { ...state, ui: { ...state.ui, acceptedPrintout: { orderId: action.orderId, samples: action.samples || [] } } };

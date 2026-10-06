@@ -536,11 +536,83 @@ const commands = {
     const result = (getState().data.results || []).find((item) => item.id === action.resultId);
     if (!result) throw new Error(`Result ${action.resultId} was not found.`);
     await scanService.reverseResult(apiClient, result.apiId, { reason: action.payload?.reason });
-    await refresh(dispatch, getState, ['orders', 'results', 'resultReports', 'notifications']);
+    await refresh(dispatch, getState, ['orders', 'results', 'scanAcceptances', 'resultReports', 'notifications']);
     dispatch(toastAction('success', 'Scan report withdrawn for correction'));
   },
 
   /* ---------------------------------------------------------------- scan */
+
+  /*
+    Accept only the studies about to be done.
+
+    The imaging unit works the way the laboratory does: a request may name a
+    chest film and an abdominal ultrasound, and only one of them is happening
+    now. The accepted studies come back so the unit can print the slip that goes
+    with the patient to the modality.
+  */
+  ACCEPT_SCAN_TESTS: async (action, dispatch, getState) => {
+    const { orderId, orderItemIds = [], notes } = action.payload || {};
+    if (!orderItemIds.length) throw new Error('Tick at least one study you are about to do.');
+    const orderApiId = requireApiId(getState().data.orders, orderId, 'Order');
+    const response = await scanService.acceptScan(apiClient, orderApiId, { orderItemIds, notes: notes || undefined });
+    await refresh(dispatch, getState, ['orders', 'results', 'scanAcceptances']);
+    const accepted = response?.accepted || response?.data?.accepted || [];
+    const samples = accepted.map((acceptance) => ({
+      sampleCode: acceptance.id,
+      testName: acceptance.orderItem?.catalogItem?.name || '',
+      acceptedAt: acceptance.acceptedAt || ''
+    }));
+    dispatch({ type: 'LAB_SAMPLES_ACCEPTED', orderId, samples });
+    dispatch(toastAction('success', `${samples.length || orderItemIds.length} study(s) accepted for ${orderId}`));
+  },
+
+  /*
+    One study's report, written and sent.
+
+    Imaging reports in words, so there is one box for the findings and one for
+    the unit's comment - no parameters, and no separate impression,
+    comparison or recommendations fields to fill in before anything could be
+    sent. DICOM files are attached to the report here, as the study is reported.
+
+    As in the laboratory, the backend's draft, submitted, signed-off and released
+    steps all happen on the one Submit.
+  */
+  SUBMIT_SCAN_REPORT: async (action, dispatch, getState) => {
+    const { orderItemId, orderId, testName, reportText = '', comment = '', files = [] } = action.payload || {};
+    if (!orderItemId) throw new Error('The study for this report could not be found. Accept it again and retry.');
+    if (!reportText.trim()) throw new Error('Enter the report before submitting.');
+
+    // The images are part of the report, so they are saved with it rather than
+    // in a second call that could half-succeed and leave a report with no study.
+    const saved = await scanService.saveReport(apiClient, {
+      orderItemId,
+      findings: reportText.trim(),
+      technicianNotes: comment.trim() || undefined,
+      ...(files.length ? { files } : {})
+    });
+    const resultApiId = saved?.result?.id || saved?.id;
+    if (!resultApiId) throw new Error('The imaging result id was not returned by the server.');
+
+    await scanService.submitReview(apiClient, { resultId: resultApiId });
+    await scanService.signOff(apiClient, resultApiId, { decision: 'SIGNED_OFF' });
+
+    let released = false;
+    try {
+      await refresh(dispatch, getState, ['resultReports']);
+      const report = findReportForOrder(getState, orderId);
+      if (report) {
+        await resultService.release(apiClient, report.apiId, { notifyDoctor: true, notifyReception: true });
+        released = true;
+      }
+    } catch {
+      released = false;
+    }
+
+    await refresh(dispatch, getState, ['orders', 'results', 'scanAcceptances', 'resultReports', 'notifications', 'deliveryLogs']);
+    dispatch(toastAction('success', released
+      ? `${testName || 'Report'} submitted and sent to the clinician`
+      : `${testName || 'Report'} submitted — awaiting release`));
+  },
 
   ACCEPT_SCAN_ORDER: async (action, dispatch, getState) => {
     const orderApiId = requireApiId(getState().data.orders, action.orderId, 'Order');

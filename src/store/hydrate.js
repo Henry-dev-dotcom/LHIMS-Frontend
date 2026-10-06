@@ -33,6 +33,8 @@ import {
   normalizePatient,
   normalizeReport,
   normalizeSampleLogs,
+  normalizeScanAcceptance,
+  normalizeScanResultFromAcceptance,
   normalizeScanBooking,
   normalizeShift,
   normalizeUser,
@@ -97,14 +99,21 @@ export async function loadCollections(client, auth, dispatch, only = null) {
     load('invoices', () => billingService.invoices(client, LIST_PARAMS), (item) => normalizeInvoice(item, orderCodeById)),
     // Lab results ride on accepted samples; scan results come from the review
     // queue. Both merge into the single results collection pages read.
-    // Accepted lab samples feed both the results collection (samples that have
-    // a result) and the sampleLogs collection (every accepted sample, grouped
-    // by order for the queue / result-entry pages), so fetch them once.
+    /*
+      Both departments' results come from what they have accepted.
+
+      Accepted lab samples already fed both the results collection and the
+      sample rows the workspace works from. Imaging results used to come from the
+      review queue instead - which holds only what is waiting to be reviewed, so
+      a signed-off report was never in it and the imaging Results tab could not
+      show anything at all. Accepted studies carry their report just as accepted
+      samples do, so both now come from the same place.
+    */
     (async () => {
-      if (!wants('results') && !wants('sampleLogs')) return;
+      if (!wants('results') && !wants('sampleLogs') && !wants('scanAcceptances')) return;
       const [labPayload, scanPayload, rejectedPayload] = await Promise.all([
         on('laboratory') ? labService.acceptedSamples(client, LIST_PARAMS).catch(() => null) : null,
-        wants('results') && on('imaging') ? scanService.reviewQueue(client, LIST_PARAMS).catch(() => null) : null,
+        (wants('results') || wants('scanAcceptances')) && on('imaging') ? scanService.acceptedScans(client, LIST_PARAMS).catch(() => null) : null,
         // Rejected / recollection samples live on a separate endpoint; they feed
         // the rejected-samples tracker (they are excluded from accepted-samples).
         wants('sampleLogs') && on('laboratory') ? labService.rejectedRetest(client, LIST_PARAMS).catch(() => null) : null
@@ -119,12 +128,25 @@ export async function loadCollections(client, auth, dispatch, only = null) {
           collections.sampleLogs = [...acceptedLogs, ...rejectedLogs];
         }
       }
+      if (wants('scanAcceptances')) {
+        if (scanPayload === null) {
+          if (!only) collections.scanAcceptances = [];
+        } else {
+          collections.scanAcceptances = listItems(scanPayload)
+            .map((item) => normalizeScanAcceptance(item, orderCodeById))
+            .filter(Boolean);
+        }
+      }
       if (wants('results')) {
         if (labPayload === null && scanPayload === null) {
           if (!only) collections.results = [];
         } else {
           const labResults = listItems(labPayload).map((item) => normalizeLabResultFromSample(item, orderCodeById)).filter(Boolean);
-          const scanResults = listItems(scanPayload).map((item) => normalizeScanResult(item, orderCodeById)).filter(Boolean);
+          // One acceptance holds at most one report, and it is normalised through
+          // its acceptance so it keeps the patient, order and study it belongs to.
+          const scanResults = listItems(scanPayload)
+            .map((acceptance) => normalizeScanResultFromAcceptance(acceptance, orderCodeById))
+            .filter(Boolean);
           collections.results = [...labResults, ...scanResults];
         }
       }
