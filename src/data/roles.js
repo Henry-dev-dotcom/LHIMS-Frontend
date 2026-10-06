@@ -1,4 +1,5 @@
 import {
+  ClipboardCheck,
   Monitor,
   LayoutDashboard,
   UserRound,
@@ -130,6 +131,9 @@ export const NAV_ITEMS = [
   { id: 'emergency-board', label: 'Emergency Board', icon: Siren, roles: ['nurse','doctor','receptionist','admin'], section: 'Emergency' },
   { id: 'ward-board', label: 'Ward Board', icon: BedDouble, roles: ['nurse','doctor','admin'], section: 'Wards' },
   { id: 'theatre-list', label: 'Theatre List', icon: Scissors, roles: ['nurse','doctor','admin'], section: 'Theatre' },
+  /* The records desk. LHIMS's receptionist is its front-office role, which is
+     where registration and check-in already lived, so this belongs to them. */
+  { id: 'records-desk', label: 'Registration & Check-in', icon: ClipboardCheck, roles: ['receptionist','admin'], section: 'Records' },
   { id: 'medical-records', label: 'Medical Records', icon: FolderLock, roles: ['doctor','nurse','receptionist','admin'], section: 'Medical Records' },
   { id: 'my-hr', label: 'My Rota & Leave', icon: CalendarCheck, roles: ['doctor','nurse','pharmacist','receptionist','lab','scan','billing','admin'], section: 'HR' },
   { id: 'duty-rota', label: 'Duty Rota', icon: CalendarDays, roles: ['doctor','nurse','pharmacist','receptionist','lab','scan','billing','admin'], section: 'HR' },

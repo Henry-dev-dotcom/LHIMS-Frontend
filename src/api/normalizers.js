@@ -472,6 +472,11 @@ export function normalizeVisit(visit, orderCodeById = {}) {
     visitType: visit.visitType || 'Order',
     walkIn: String(visit.visitType || '').toLowerCase().includes('walk'),
     identityVerified: Boolean(visit.identityVerified),
+    // Whether the visit went on the patient's scheme or was paid for directly,
+    // and who took them in - both of which the records desk reads back.
+    insuranceUsed: Boolean(visit.insuranceUsed),
+    checkedInBy: visit.checkedInBy?.name || '',
+    patientName: [visit.patient?.firstName, visit.patient?.lastName].filter(Boolean).join(' '),
     checkedInAt: visit.checkedInAt || '',
     completedAt: visit.completedAt || '',
     notes: visit.notes || ''

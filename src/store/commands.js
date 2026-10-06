@@ -69,6 +69,7 @@ function toApiPatientPayload(form = {}) {
     nationalId: form.nationalId || undefined,
     insuranceProvider: form.insuranceProvider || undefined,
     policyNumber: form.policyNumber || undefined,
+    insuranceExpiresAt: form.insuranceExpiresAt || undefined,
     emergencyContact: form.emergencyContact || undefined,
     allergiesAndConditions: form.allergies || form.allergiesAndConditions || undefined,
     hospitalId: form.hospitalId || undefined,
@@ -235,6 +236,61 @@ const commands = {
     await receptionService.confirmOrder(apiClient, apiId, { invoiceNow: true, notes: action.payload?.receptionNotes || undefined });
     await refresh(dispatch, getState, ['orders', 'invoices', 'notifications']);
     dispatch(toastAction('success', `${action.orderId} confirmed and invoiced`));
+  },
+
+  /*
+    Registering a patient at the records desk.
+
+    The membership card is in front of the clerk, so its number, scheme and
+    expiry are taken while they can be read rather than left for later. The
+    hospital number is issued by the server, which is what makes it unique.
+  */
+  REGISTER_PATIENT: async (action, dispatch, getState) => {
+    const form = action.payload || {};
+    if (!String(form.fullName || '').trim()) throw new Error('Enter the patient\'s full name.');
+    const created = await patientService.create(apiClient, toApiPatientPayload(form));
+    const patient = created?.patient || created;
+    await refresh(dispatch, getState, ['patients']);
+    dispatch(toastAction('success', `${form.fullName.trim()} registered as ${patient?.patientCode || 'a new patient'}`));
+  },
+
+  /*
+    Checking a patient in for today's visit.
+
+    Two things are recorded that the old walk-in path did not: whether the visit
+    is going on the patient's scheme or being paid for directly, and the
+    membership details as read off the card. Both are decided at the desk, and
+    both are what Finance and the claims module need later.
+  */
+  RECORDS_CHECK_IN: async (action, dispatch, getState) => {
+    const payload = action.payload || {};
+    if (!payload.patientId) throw new Error('Select a patient to check in.');
+    if (payload.insuranceUsed && !String(payload.policyNumber || '').trim()) {
+      throw new Error('Enter the membership number to check in on insurance.');
+    }
+    // Pages show the hospital number; the API addresses the patient by its own
+    // id. The seeded patients share the two, which is why passing the code
+    // worked until the first newly registered patient came through the desk.
+    const patientApiId = requireApiId(getState().data.patients, payload.patientId, 'Patient');
+    await receptionService.checkIn(apiClient, {
+      patientId: patientApiId,
+      visitType: payload.visitType || 'Outpatient',
+      identityVerified: payload.identityVerified !== false,
+      insuranceUsed: Boolean(payload.insuranceUsed),
+      notes: payload.reason || undefined,
+      ...(String(payload.policyNumber || '').trim()
+        ? {
+          insurance: {
+            provider: String(payload.insuranceProvider || '').trim() || 'NHIS',
+            policyNumber: String(payload.policyNumber).trim(),
+            expiresAt: payload.insuranceExpiresAt || undefined,
+            verified: Boolean(payload.insuranceVerified)
+          }
+        }
+        : {})
+    });
+    await refresh(dispatch, getState, ['dailyVisits', 'patients']);
+    dispatch(toastAction('success', `${payload.patientName || 'Patient'} checked in`));
   },
 
   CHECK_IN_PATIENT: async (action, dispatch, getState) => {
