@@ -44,6 +44,7 @@ const ScanAcceptPage = lazyPage(() => import('../pages/scan/ScanAcceptPage'), 'S
 const DicomViewerPage = lazyPage(() => import('../pages/scan/DicomViewerPage'), 'DicomViewerPage');
 const RecordsDeskPage = lazyPage(() => import('../pages/records/RecordsDeskPage'), 'RecordsDeskPage');
 const FinanceDeskPage = lazyPage(() => import('../pages/billing/FinanceDeskPage'), 'FinanceDeskPage');
+const MessagesPage = lazyPage(() => import('../pages/core/MessagesPage'), 'MessagesPage');
 const AcceptedScansPage = lazyPage(() => import('../pages/scan/AcceptedScansPage'), 'AcceptedScansPage');
 const ScanReviewPage = lazyPage(() => import('../pages/scan/ScanReviewPage'), 'ScanReviewPage');
 const ScanRejectedPage = lazyPage(() => import('../pages/scan/ScanRejectedPage'), 'ScanRejectedPage');
@@ -142,6 +143,7 @@ function resolvePage(pageId, role, modules) {
   if (pageId === 'scan-viewer') return <DicomViewerPage />;
   if (pageId === 'records-desk') return <RecordsDeskPage />;
   if (pageId === 'finance-desk') return <FinanceDeskPage />;
+  if (pageId === 'messages') return <MessagesPage />;
   if (pageId === 'accepted-scans') return <AcceptedScansPage />;
   if (pageId === 'scan-review') return <ScanReviewPage />;
   if (pageId === 'scan-rejections') return <ScanRejectedPage />;

@@ -1,4 +1,9 @@
 export const PAGE_META = {
+  messages: {
+    title: 'Department Messages', section: 'Messages',
+    description: 'A shared channel for the whole facility and one for each department. Messages are kept for 24 hours and then deleted.',
+    requirements: ['All-departments channel', 'Per-department channels', 'Role-aware channel access', 'New messages arrive without reloading', 'Expiry shown on every message', 'Deleted after 24 hours']
+  },
   'records-desk': {
     title: 'Registration & Check-in', section: 'Records',
     description: 'The records desk: find a patient, register a new one, capture membership details from the card, and check somebody in for today’s visit.',

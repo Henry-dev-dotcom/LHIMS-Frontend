@@ -12,3 +12,4 @@ export { resultService } from './resultService';
 export { reportService } from './reportService';
 export { notificationService } from './notificationService';
 export { fileService } from './fileService';
+export { messageService } from './messageService';
