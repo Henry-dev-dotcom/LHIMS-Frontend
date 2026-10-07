@@ -43,7 +43,7 @@ export function LoginPage({ initialCode = '' }) {
   }
 
   return (
-    <div className="getlabs-login min-h-screen bg-slate-50 p-4 text-slate-900 sm:p-6">
+    <div className="getlabs-login login-shell min-h-screen p-4 text-slate-900 sm:p-6">
       <div className="mx-auto flex min-h-[calc(100dvh-2rem)] max-w-6xl flex-col">
         <header className="flex items-center justify-between gap-4 py-3 sm:py-5">
           <div className="flex items-center gap-3">
@@ -57,8 +57,8 @@ export function LoginPage({ initialCode = '' }) {
           </div>
         </header>
 
-        <main className="grid flex-1 overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white shadow-panel lg:grid-cols-[1.1fr_0.9fr]">
-          <section className="relative min-h-[20rem] overflow-hidden bg-clinical-700 p-7 sm:p-10 lg:p-12">
+        <main className="login-panel grid flex-1 overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-panel lg:grid-cols-[1.1fr_0.9fr]">
+          <section className="login-hero relative min-h-[20rem] overflow-hidden bg-clinical-700 p-7 sm:p-10 lg:p-12">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(255,255,255,0.14),transparent_30%)]" />
             <div className="absolute -bottom-20 -right-10 h-72 w-72 rounded-full bg-clinical-500/40 blur-3xl" />
             <div className="relative flex h-full flex-col justify-between">
@@ -83,13 +83,13 @@ export function LoginPage({ initialCode = '' }) {
             </div>
           </section>
 
-          <section className="flex items-center p-5 sm:p-8 lg:p-12">
+          <section className="login-form-section flex items-center p-5 sm:p-8 lg:p-12">
             <div className="w-full max-w-md">
               <p className="text-xs font-semibold uppercase tracking-[0.1em] text-slate-500">Secure sign in</p>
               <h2 className="getlabs-serif mt-2 text-4xl leading-tight tracking-[-0.03em] text-slate-900">Open your workspace.</h2>
               <p className="mt-3 text-sm leading-6 text-slate-500">Sign in with the staff account issued by your administrator.</p>
 
-              <form onSubmit={submitCredentials} className="mt-6 space-y-4 rounded-3xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+              <form onSubmit={submitCredentials} className="login-form mt-6 space-y-4 rounded-3xl border border-cyan-100 bg-cyan-50/45 p-4 sm:p-5">
                 <label className="block" htmlFor="login-facility">
                   <span className="mb-2 flex items-center gap-2 text-xs font-semibold text-slate-600"><Building2 className="h-3.5 w-3.5" aria-hidden="true" /> Facility code</span>
                   <input

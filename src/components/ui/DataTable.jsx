@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { memo } from 'react';
 import { ChevronDown, SearchX } from 'lucide-react';
 
 // Phase 6: mobile/tablet cards are intentionally lg:hidden; legacy QA marker: md:hidden.
@@ -36,7 +37,7 @@ function MobileDetail({ column, row, compact = false }) {
 // Database ids (cuid) mean nothing to staff; older records used readable ids (ORD-2026-0001) that are worth showing.
 const MACHINE_ID = /^c[a-z0-9]{20,}$/;
 
-export function DataTable({ columns, rows, emptyMessage = 'No records found.', dense = false, caption, rowBadge }) {
+export const DataTable = memo(function DataTable({ columns, rows, emptyMessage = 'No records found.', dense = false, caption, rowBadge }) {
   const badgeFor = (row) => (rowBadge ? rowBadge(row) : row.id && !MACHINE_ID.test(row.id) ? row.id : null);
   const mobileColumns = columns.filter((column) => !column.mobileHidden);
   const actionColumn = mobileColumns.find(isActionColumn);
@@ -134,4 +135,4 @@ export function DataTable({ columns, rows, emptyMessage = 'No records found.', d
       </div>
     </div>
   );
-}
+});

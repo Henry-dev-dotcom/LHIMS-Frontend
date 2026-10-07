@@ -78,6 +78,41 @@ async function parseResponse(response) {
 // A single in-flight refresh is shared across concurrent 401s so a burst of
 // requests triggers only one token renewal instead of a stampede.
 let refreshPromise = null;
+// Short-lived, per-tab caching prevents duplicate reads when multiple widgets
+// mount together. Mutations clear it so clinical lists do not remain stale.
+const GET_CACHE_TTL_MS = 15_000;
+const GET_CACHE_MAX_ENTRIES = 200;
+const responseCache = new Map();
+const inFlightGets = new Map();
+const CACHEABLE_GET_PREFIXES = ['/patients', '/orders', '/catalog', '/public', '/notifications', '/messages', '/reports', '/billing', '/lab', '/scan', '/reception', '/admin', '/platform', '/subscription'];
+function isCacheableGet(path, options) {
+  const method = (options.method || 'GET').toUpperCase();
+  return method === 'GET' && options.cache !== false && CACHEABLE_GET_PREFIXES.some((prefix) => path.startsWith(prefix)) && !path.startsWith('/auth/') && !path.includes('/files');
+}
+function clearResponseCache() {
+  responseCache.clear();
+}
+function readCachedResponse(key) {
+  const entry = responseCache.get(key);
+  if (!entry) return undefined;
+  if (entry.expiresAt <= Date.now()) {
+    responseCache.delete(key);
+    return undefined;
+  }
+  responseCache.delete(key);
+  responseCache.set(key, entry);
+  return entry.value;
+}
+function writeCachedResponse(key, value) {
+  responseCache.delete(key);
+  responseCache.set(key, { value, expiresAt: Date.now() + GET_CACHE_TTL_MS });
+  while (responseCache.size > GET_CACHE_MAX_ENTRIES) responseCache.delete(responseCache.keys().next().value);
+}
+function getCacheKey(path) {
+  const config = getApiConfig();
+  const url = `${config.baseUrl}${path.startsWith('/') ? path : `/${path}`}`;
+  return `${url}|${getFallbackTokens().accessToken || 'cookie-session'}`;
+}
 
 async function refreshAccessToken() {
   // Normally the refresh token rides in an httpOnly cookie and nothing is read
@@ -173,8 +208,24 @@ function safeToRepeat(path, options) {
 
 export async function request(path, options = {}) {
   const { skipAuth = false, token, _retried = false, _wokeUp = false } = options;
+  const cacheable = isCacheableGet(path, options) && !_retried && !_wokeUp;
+  const cacheKey = cacheable ? getCacheKey(path) : null;
+  if (cacheKey) {
+    const cached = readCachedResponse(cacheKey);
+    if (cached !== undefined) return cached;
+    if (inFlightGets.has(cacheKey)) return inFlightGets.get(cacheKey);
+  }
+  const operation = executeRequest(path, options)
+    .then((result) => {
+      if (cacheKey) writeCachedResponse(cacheKey, result);
+      return result;
+    })
+    .finally(() => {
+      if (cacheKey) inFlightGets.delete(cacheKey);
+    });
+  if (cacheKey) inFlightGets.set(cacheKey, operation);
   try {
-    return await executeRequest(path, options);
+    return await operation;
   } catch (error) {
     /*
       A host that sleeps when idle wakes on the request that times out, so the
@@ -182,16 +233,18 @@ export async function request(path, options = {}) {
       a slow page - which is the honest description of what happened.
     */
     if (error instanceof ApiError && error.code === REQUEST_TIMED_OUT && !_wokeUp && safeToRepeat(path, options)) {
-      return request(path, { ...options, _wokeUp: true });
+      return request(path, { ...options, _wokeUp: true, cache: false });
     }
     // On an expired access token, attempt a one-time silent refresh and retry.
     // Skipped for unauthenticated calls and calls with an explicit token.
     if (error instanceof ApiError && error.status === 401 && !skipAuth && !token && !_retried) {
       const refreshed = await refreshAccessToken();
-      if (refreshed) return request(path, { ...options, _retried: true });
+      if (refreshed) return request(path, { ...options, _retried: true, cache: false });
       clearStoredTokens();
     }
     throw error;
+  } finally {
+    if ((options.method || 'GET').toUpperCase() !== 'GET' && !options.skipCacheInvalidation) clearResponseCache();
   }
 }
 
@@ -224,6 +277,7 @@ export async function logoutRequest() {
   try {
     return await request('/auth/logout', { method: 'POST', ...(refreshToken ? { body: { refreshToken } } : {}) });
   } finally {
+    clearResponseCache();
     clearStoredTokens();
     clearFallbackTokens();
   }

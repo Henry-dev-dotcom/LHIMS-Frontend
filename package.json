@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "node node_modules/vite/bin/vite.js build",
+    "audit:lighthouse": "node ./scripts/run-lighthouse.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "lint:routes": "node ./scripts/check-routes.mjs",
     "lint:auth": "node ./scripts/check-auth.mjs",

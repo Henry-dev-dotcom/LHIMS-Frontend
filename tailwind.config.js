@@ -26,10 +26,10 @@ export default {
         ink: '#0f172a'
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif']
+        sans: ['Atkinson Hyperlegible', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif']
       },
       boxShadow: {
-        soft: '0 6px 18px rgba(15, 23, 42, 0.05)',
+        soft: '0 8px 24px rgba(15, 78, 92, 0.07), inset 0 1px 0 rgba(255,255,255,0.85)',
         panel: '0 12px 32px rgba(15, 23, 42, 0.08)',
         lift: '0 8px 22px rgba(8, 145, 178, 0.12)',
         insetline: 'inset 0 1px 0 rgba(255,255,255,0.75)'

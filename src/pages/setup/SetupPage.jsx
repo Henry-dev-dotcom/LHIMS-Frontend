@@ -10,17 +10,9 @@ import { authService } from '../../services/authService';
 import { normalizeAuthUser } from '../../api/normalizers';
 import { STARTER_PRICE_LIST, onboardingService, parseCsv, priceListTemplateCsv } from '../../services/onboardingService';
 import { getApiConfig } from '../../api/config';
+import { compressImage } from '../../utils/compressImage';
 
 const MAX_LOGO_BYTES = 200 * 1024;
-
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error('The file could not be read.'));
-    reader.readAsDataURL(file);
-  });
-}
 
 /** Facility setup checklist: details and logo, departments, staff, price list, first patient. */
 export function SetupPage() {
@@ -87,10 +79,13 @@ export function SetupPage() {
     event.target.value = '';
     if (!file) return;
     if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) return setProfileError('Choose a PNG, JPEG or WebP image.');
-    if (file.size > MAX_LOGO_BYTES) return setProfileError('The logo must be 200 KB or smaller. Try a smaller image.');
     setProfileError('');
-    const dataUrl = await readFileAsDataUrl(file);
-    setProfile((p) => ({ ...p, logoDataUrl: dataUrl }));
+    try {
+      const dataUrl = await compressImage(file, { maxBytes: MAX_LOGO_BYTES });
+      setProfile((p) => ({ ...p, logoDataUrl: dataUrl }));
+    } catch (error) {
+      setProfileError(error?.message || 'The image could not be compressed.');
+    }
   }
 
   async function importRows(rows, label) {

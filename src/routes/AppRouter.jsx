@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { useAppStore } from '../store/AppStore';
 import { canAccessPage } from '../utils/permissions';
 import { PAGE_META } from './routeRegistry';
+import { PageSkeleton } from '../components/ui/LoadingSkeleton';
 
 // Lazy-load every page so each becomes its own chunk, split out of the main
 // bundle and fetched on demand. `lazyPage` adapts our named page exports to the
@@ -98,11 +99,7 @@ const roleDashboardMap = {
 };
 
 function PageFallback() {
-  return (
-    <div role="status" aria-live="polite" style={{ padding: '2rem', textAlign: 'center', color: '#475569', fontWeight: 600 }}>
-      Loading…
-    </div>
-  );
+  return <PageSkeleton />;
 }
 
 function resolvePage(pageId, role, modules) {

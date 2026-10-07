@@ -14,12 +14,54 @@
   --calm-border: #e2e8f0;
   --calm-surface: #ffffff;
   --calm-shadow: 0 8px 22px rgba(8, 145, 178, 0.10);
+  --calm-soft-shadow: 0 18px 48px rgba(15, 78, 92, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.login-shell {
+  background:
+    radial-gradient(circle at 8% 8%, rgba(34, 211, 238, 0.18), transparent 28%),
+    radial-gradient(circle at 92% 82%, rgba(5, 150, 105, 0.08), transparent 24%),
+    #f3fbfc;
+}
+
+.login-panel {
+  box-shadow: var(--calm-soft-shadow);
+}
+
+.login-hero {
+  background-image:
+    linear-gradient(140deg, rgba(15, 78, 92, 0.98), rgba(8, 145, 178, 0.92)),
+    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.18), transparent 28%);
+}
+
+.login-hero::after {
+  position: absolute;
+  inset: auto -12% -28% 30%;
+  height: 15rem;
+  content: '';
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  transform: rotate(-12deg);
+  box-shadow: 0 -18px 0 rgba(255, 255, 255, 0.05), 0 -36px 0 rgba(255, 255, 255, 0.04);
+  pointer-events: none;
+}
+
+.login-form-section {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fdfe 100%);
+}
+
+.login-form {
+  box-shadow: inset 0 1px 2px rgba(8, 145, 178, 0.06), 0 12px 26px rgba(15, 78, 92, 0.06);
+}
+
+.login-form .getlabs-input {
+  background: rgba(255, 255, 255, 0.88);
 }
 
 /* Headline hook (formerly serif). Keeps Inter, calm weight and color. */
 .getlabs-serif,
 .getlabs-login h2 {
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif;
   font-weight: 650;
   color: var(--calm-ink);
 }
