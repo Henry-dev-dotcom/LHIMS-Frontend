@@ -20,6 +20,7 @@ export function SetupPage() {
   const [data, setData] = useState(null);
   const [loadError, setLoadError] = useState('');
   const [profile, setProfile] = useState(null);
+  const [verificationAsked, setVerificationAsked] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileError, setProfileError] = useState('');
   const [importing, setImporting] = useState(false);
@@ -172,6 +173,28 @@ export function SetupPage() {
         title={data.completed ? 'Facility setup' : `Welcome to LHIMS, ${state.auth?.userName?.split(' ')[0] || ''}`}
         description={data.completed ? 'Your facility details, logo and support access.' : `Five short steps to get ${data.facility.name} ready. Only the first is needed — you can start working at any time.`}
       />
+
+      {/*
+        Confirm the address the account signs in with.
+
+        Shown to whoever is looking at this page while their own address is
+        unconfirmed, and gone once it is. The email can be asked for again, which
+        retires the previous link, so there is no harm in pressing it twice.
+      */}
+      {state.auth?.email && !state.auth?.emailVerified && (
+        <Card title="Confirm your email address" subtitle={`We will send a link to ${state.auth.email}. It is good for 24 hours.`} compact>
+          <Button
+            disabled={verificationAsked}
+            onClick={() => {
+              setVerificationAsked(true);
+              dispatch({ type: 'REQUEST_EMAIL_VERIFICATION' });
+              window.setTimeout(() => setVerificationAsked(false), 4000);
+            }}
+          >
+            {verificationAsked ? 'Sending…' : 'Send verification email'}
+          </Button>
+        </Card>
+      )}
 
       {!data.completed && (
         <Card title={`${doneCount} of ${data.steps.length} done`} subtitle={`Staff sign in with facility code ${data.facility.code}. Share this link with them: ${window.location.origin}${window.location.pathname}#/login/${data.facility.code}`}>

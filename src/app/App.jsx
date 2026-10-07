@@ -4,6 +4,7 @@ import { LoginPage } from '../pages/auth/LoginPage';
 import { AppShell } from '../layouts/AppShell';
 import { ReportVerificationPage } from '../pages/public/ReportVerificationPage';
 import { PatientPortalAccessPage } from '../pages/public/PatientPortalAccessPage';
+import { VerifyEmailPage } from '../pages/public/VerifyEmailPage';
 import { ErrorBoundary } from '../components/ui/ErrorBoundary';
 import { WorkspaceLoading } from '../components/ui/WorkspaceLoading';
 import { useMobileViewportMetrics } from '../hooks/useMobileViewportMetrics';
@@ -30,7 +31,7 @@ function useHashRoute() {
 }
 
 /** Deep links that belong to a recipient, not to the workspace. */
-const PUBLIC_DEEP_LINKS = ['#/verify-report/', '#/patient/results/'];
+const PUBLIC_DEEP_LINKS = ['#/verify-report/', '#/patient/results/', '#/verify-email/'];
 
 function AppContent() {
   const { state, dispatch } = useAppStore();
@@ -88,6 +89,7 @@ function AppContent() {
 
   if (hash.startsWith('#/verify-report/')) return <ReportVerificationPage />;
   if (hash.startsWith('#/patient/results/')) return <PatientPortalAccessPage />;
+  if (hash.startsWith('#/verify-email/')) return <VerifyEmailPage />;
 
   if (!state.auth) {
     if (route.path === 'login') return <LoginPage key={route.parts[1] || ''} initialCode={route.parts[1] || ''} />;

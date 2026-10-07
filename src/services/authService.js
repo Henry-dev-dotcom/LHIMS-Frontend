@@ -25,5 +25,10 @@ export const authService = {
       clearStoredTokens();
     }
   },
-  changePassword: async (client, payload) => client.request('/auth/change-password', { method: 'PATCH', body: payload })
+  changePassword: async (client, payload) => client.request('/auth/change-password', { method: 'PATCH', body: payload }),
+  // Emails the signed-in user a link to confirm their address.
+  requestEmailVerification: async (client) => client.request('/auth/email/request-verification', { method: 'POST', body: {} }),
+  // Public: the token in the emailed link is the only credential, and the link is
+  // often opened on a phone that is not signed in, so no session is sent.
+  verifyEmail: async (client, token) => client.request('/auth/email/verify', { method: 'POST', body: { token }, skipAuth: true })
 };

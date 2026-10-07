@@ -39,7 +39,12 @@ test('the unit accepts one of two studies, reports it with images, and can take 
   /* ---- Incoming: both studies waiting, only one being done now ---- */
   await openFromMenu(page, 'Incoming Scans');
   const row = page.getByRole('row').filter({ hasText: 'X-Ray' }).first();
-  await expect(row).toBeVisible();
+  // The first visit to this screen downloads its code from the Vite dev server,
+  // and in a full run that has occasionally taken longer than the default 15
+  // seconds (it never has when this spec runs alone, and a production build
+  // serves static files). Allow for it rather than let a slow download read as a
+  // missing queue.
+  await expect(row).toBeVisible({ timeout: 45_000 });
   await row.getByRole('button', { name: 'Open' }).click();
 
   await page.getByRole('checkbox', { name: 'Accept X-Ray - Chest' }).check();

@@ -12,6 +12,7 @@ import { formatDateTime } from '../../utils/formatters';
 import { getOrderViewModel } from '../../workflow/workflowEngine';
 import { openReportPrintWindow } from '../../utils/reporting';
 import { ClippedList } from '../../components/ui/ClippedList';
+import { armPrintButtons } from '../../utils/printDocument';
 
 const DELIVERY_CHANNELS = ['All Channels', 'In-platform', 'Email', 'SMS'];
 const DELIVERY_STATUSES = ['All Statuses', 'Queued', 'Delivered', 'Failed', 'Read', 'Printed'];
@@ -84,11 +85,12 @@ function printManifest(releasedOrders, data) {
     const readiness = getDeliveryReadiness(data, order);
     return `<tr><td>${order.id}</td><td>${order.patient?.fullName || '—'}</td><td>${order.doctor?.name || '—'}</td><td>${order.hospital?.name || '—'}</td><td>${readiness.report?.id || 'Missing'}</td><td>${readiness.events.length}</td><td>${readiness.missingChannels.join(', ') || 'Complete'}</td></tr>`;
   }).join('');
-  const html = `<!doctype html><html><head><title>Result Delivery Manifest</title><style>body{font-family:Arial,sans-serif;margin:32px;color:#0f172a}h1{color:#0369a1}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left;font-size:13px}th{background:#f8fafc;text-transform:uppercase;font-size:11px;color:#64748b}@media print{button{display:none}}</style></head><body><button onclick="window.print()" style="float:right;padding:10px 16px;border:0;border-radius:10px;background:#0284c7;color:#fff;font-weight:800">Print Manifest</button><h1>Result Delivery Manifest</h1><p>Released reports, generated PDF records and delivery channel readiness.</p><table><thead><tr><th>Order</th><th>Patient</th><th>Doctor</th><th>Hospital</th><th>Report</th><th>Events</th><th>Missing Channels</th></tr></thead><tbody>${rows || '<tr><td colspan="7">No released orders.</td></tr>'}</tbody></table></body></html>`;
+  const html = `<!doctype html><html><head><title>Result Delivery Manifest</title><style>body{font-family:Arial,sans-serif;margin:32px;color:#0f172a}h1{color:#0369a1}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left;font-size:13px}th{background:#f8fafc;text-transform:uppercase;font-size:11px;color:#64748b}@media print{button{display:none}}</style></head><body><button data-print style="float:right;padding:10px 16px;border:0;border-radius:10px;background:#0284c7;color:#fff;font-weight:800">Print Manifest</button><h1>Result Delivery Manifest</h1><p>Released reports, generated PDF records and delivery channel readiness.</p><table><thead><tr><th>Order</th><th>Patient</th><th>Doctor</th><th>Hospital</th><th>Report</th><th>Events</th><th>Missing Channels</th></tr></thead><tbody>${rows || '<tr><td colspan="7">No released orders.</td></tr>'}</tbody></table></body></html>`;
   const win = window.open('', '_blank', 'width=1100,height=800');
   if (!win) return;
   win.document.write(html);
   win.document.close();
+  armPrintButtons(win);
 }
 
 function Select({ children, ...props }) {

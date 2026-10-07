@@ -71,8 +71,11 @@ function ResultPreviewModal({ result, data, onClose, dispatch }) {
   const printPreview = () => {
     const win = window.open('', '_blank', 'width=860,height=700');
     if (!win) return;
-    win.document.write(`<html><head><title>Lab Review ${result.orderId}</title></head><body style="font-family:Arial,sans-serif;padding:28px;"><h1>Laboratory Review</h1><p><strong>Patient:</strong> ${patient?.fullName || ''}</p><p><strong>Order:</strong> ${result.orderId}</p><p><strong>Doctor:</strong> ${doctor?.name || ''}</p><table border="1" cellspacing="0" cellpadding="8"><thead><tr><th>Test</th><th>Parameter</th><th>Value</th><th>Unit</th><th>Reference Range</th><th>Flag</th></tr></thead><tbody>${(result.parameters || []).map((p) => `<tr><td>${p.testName || ''}</td><td>${p.name}</td><td>${p.value}</td><td>${p.unit || ''}</td><td>${p.referenceRange || ''}</td><td>${p.flag || ''}</td></tr>`).join('')}</tbody></table><script>window.print();<\/script></body></html>`);
+    win.document.write(`<html><head><title>Lab Review ${result.orderId}</title></head><body style="font-family:Arial,sans-serif;padding:28px;"><h1>Laboratory Review</h1><p><strong>Patient:</strong> ${patient?.fullName || ''}</p><p><strong>Order:</strong> ${result.orderId}</p><p><strong>Doctor:</strong> ${doctor?.name || ''}</p><table border="1" cellspacing="0" cellpadding="8"><thead><tr><th>Test</th><th>Parameter</th><th>Value</th><th>Unit</th><th>Reference Range</th><th>Flag</th></tr></thead><tbody>${(result.parameters || []).map((p) => `<tr><td>${p.testName || ''}</td><td>${p.name}</td><td>${p.value}</td><td>${p.unit || ''}</td><td>${p.referenceRange || ''}</td><td>${p.flag || ''}</td></tr>`).join('')}</tbody></table></body></html>`);
     win.document.close();
+    // From here rather than from a <script> in the popup: inline script is what a
+    // strict Content-Security-Policy refuses.
+    win.print();
   };
   return (
     <Modal open={Boolean(result)} onClose={onClose} title={`Review Lab Result · ${result.orderId}`} description="Senior review/sign-off before final release to the doctor and reception.">

@@ -35,7 +35,8 @@
     "lint:mobile": "node ./scripts/check-mobile-hardening.mjs && node ./scripts/check-mobile-continuation.mjs && node ./scripts/check-mobile-phase7.mjs && node ./scripts/check-mobile-phase8.mjs && node ./scripts/check-mobile-phase9.mjs",
     "lint:walkin": "node ./scripts/check-walkin-test-request.mjs",
     "test:e2e": "playwright test",
-    "test:e2e:report": "playwright show-report e2e-report"
+    "test:e2e:report": "playwright show-report e2e-report",
+    "test:csp": "node scripts/test-csp.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "6.0.2",
