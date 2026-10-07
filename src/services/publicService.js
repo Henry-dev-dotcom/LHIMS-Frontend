@@ -34,7 +34,7 @@ export function goTo(path) {
   window.scrollTo?.(0, 0);
 }
 
-export const FACILITY_CODE_KEY = 'lhims.lastFacilityCode';
+export const FACILITY_CODE_KEY = 'curatamed.lastFacilityCode';
 
 
 export function rememberFacilityCode(code) {

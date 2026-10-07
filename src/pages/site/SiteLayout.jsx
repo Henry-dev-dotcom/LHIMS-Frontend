@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Activity, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { goTo } from '../../services/publicService';
 
 const LINKS = [
@@ -27,12 +27,8 @@ export function SiteLayout({ active, children }) {
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
-          <a href="#/home" className="flex items-center gap-2.5" aria-label="LHIMS home">
-            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-clinical-500 text-white shadow-lift"><Activity className="h-5 w-5" /></span>
-            <span>
-              <span className="block text-lg font-bold leading-5 tracking-tight">LHIMS</span>
-              <span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">Hospital management</span>
-            </span>
+          <a href="#/home" className="flex items-center gap-2.5" aria-label="CurataMed home">
+            <img src="/icons/curatamed-logo.png" alt="CurataMed — Hospital Management System" className="h-10 w-auto" />
           </a>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Website">
             {LINKS.map((l) => link(l.path, l.label))}
@@ -56,7 +52,7 @@ export function SiteLayout({ active, children }) {
 
       <footer className="mt-16 border-t border-slate-200 bg-white">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} LHIMS · Hospital management for Ghana and beyond. Prices in Ghana cedis (GHS).</p>
+          <p>© {new Date().getFullYear()} CurataMed · Hospital management for Ghana and beyond. Prices in Ghana cedis (GHS).</p>
           <div className="flex flex-wrap gap-4">
             <a href="#/features" className="hover:text-slate-900">Departments</a>
             <a href="#/pricing" className="hover:text-slate-900">Pricing</a>

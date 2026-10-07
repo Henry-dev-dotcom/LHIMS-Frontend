@@ -21,7 +21,7 @@ export class ErrorBoundary extends Component {
 
   componentDidCatch(error, info) {
     // Keep the production app from going blank while still surfacing enough context in dev tools.
-    console.error('LHIMS UI error:', error, info);
+    console.error('CurataMed UI error:', error, info);
   }
 
   handleReload = () => {

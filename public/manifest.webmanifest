@@ -1,6 +1,6 @@
 {
-  "name": "LHIMS Hospital Management System",
-  "short_name": "LHIMS",
+  "name": "CurataMed Hospital Management System",
+  "short_name": "CurataMed",
   "description": "Mobile-ready hospital management: outpatients, wards, theatre, maternity, laboratory, imaging, pharmacy, billing and claims — department by department.",
   "start_url": "./",
   "scope": "./",
@@ -11,9 +11,9 @@
   "categories": ["medical", "productivity", "business"],
   "icons": [
     {
-      "src": "./icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "./icons/curatamed-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
