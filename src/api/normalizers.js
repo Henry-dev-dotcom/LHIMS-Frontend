@@ -635,6 +635,21 @@ export function normalizeEquipment(equipment) {
   };
 }
 
+/*
+  The audit trail stores structured details (the server records that someone
+  viewed the log together with how many rows and which filters). A page that
+  renders that object as text crashes React, and one that searches it sees
+  "[object Object]", so structured details become readable text here.
+*/
+export function describeAuditDetails(details) {
+  if (details == null || details === '') return '';
+  if (typeof details !== 'object') return String(details);
+  const flat = (value) => (value && typeof value === 'object'
+    ? Object.entries(value).map(([key, inner]) => `${key} ${flat(inner)}`).join(', ')
+    : String(value));
+  return Object.entries(details).map(([key, value]) => `${key}: ${flat(value)}`).join(' · ');
+}
+
 export function normalizeAuditLog(log) {
   if (!log) return null;
   return {
@@ -644,7 +659,7 @@ export function normalizeAuditLog(log) {
     action: log.action || '',
     module: log.module || '',
     entityId: log.entityId || '',
-    details: log.details || '',
+    details: describeAuditDetails(log.details),
     timestamp: log.createdAt
   };
 }
