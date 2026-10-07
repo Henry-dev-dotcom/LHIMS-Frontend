@@ -11,6 +11,7 @@ import { useAppStore } from '../../store/AppStore';
 import { formatDateTime } from '../../utils/formatters';
 import { getOrderViewModel } from '../../workflow/workflowEngine';
 import { openReportPrintWindow } from '../../utils/reporting';
+import { ClippedList } from '../../components/ui/ClippedList';
 
 const DELIVERY_CHANNELS = ['All Channels', 'In-platform', 'Email', 'SMS'];
 const DELIVERY_STATUSES = ['All Statuses', 'Queued', 'Delivered', 'Failed', 'Read', 'Printed'];
@@ -205,7 +206,7 @@ export function ResultsDeliveryPage() {
               { key: 'id', label: 'Order ID', render: (order) => <span className="font-bold text-slate-900">{order.id}</span> },
               { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold">{order.patient?.fullName}</p><p className="text-xs text-slate-500">{order.patient?.id} · {order.patient?.phone}</p></div> },
               { key: 'doctor', label: 'Doctor / Hospital', render: (order) => <div><p className="font-bold">{order.doctor?.name}</p><p className="text-xs text-slate-500">{order.hospital?.name}</p></div> },
-              { key: 'items', label: 'Investigations', render: (order) => order.items.map((item) => item.name).join(', ') || '—' },
+              { key: 'items', label: 'Investigations', render: (order) => <ClippedList items={order.items} /> },
               { key: 'report', label: 'PDF Report', render: (order) => {
                 const readiness = getDeliveryReadiness(data, order);
                 return readiness.report ? <div><StatusBadge status={readiness.report.status} /><p className="mt-1 text-xs text-slate-500">{readiness.report.id}</p></div> : <StatusBadge status="Missing" />;

@@ -11,6 +11,7 @@ import { WorkflowTimeline } from '../../components/ui/WorkflowTimeline';
 import { FormField, inputClass } from '../../components/ui/FormField';
 import { formatDateTime } from '../../utils/formatters';
 import { getDoctorContextFromState, orderItemsText } from './doctorUtils';
+import { ClippedList } from '../../components/ui/ClippedList';
 
 const statusOptions = ['Submitted', 'Confirmed', 'In Progress', 'Pending Review'];
 
@@ -146,7 +147,7 @@ export function DoctorActiveOrdersPage() {
           columns={[
             { key: 'id', label: 'Order ID', render: (order) => <span className="font-bold text-slate-900">{order.id}</span> },
             { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold">{order.patient?.fullName}</p><p className="text-xs text-slate-500">{order.patient?.id}</p></div> },
-            { key: 'items', label: 'Tests / Scans', render: orderItemsText },
+            { key: 'items', label: 'Tests / Scans', render: (order) => <ClippedList items={order.items} /> },
             { key: 'urgency', label: 'Urgency', render: (order) => <StatusBadge status={order.urgency} /> },
             { key: 'status', label: 'Processing Status', render: (order) => <StatusBadge status={order.status} /> },
             { key: 'billing', label: 'Billing Status', render: (order) => <StatusBadge status={order.billingStatus} /> },

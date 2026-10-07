@@ -10,6 +10,7 @@ import { StatusBadge } from '../../components/ui/StatusBadge';
 import { FormField, inputClass } from '../../components/ui/FormField';
 import { formatDateTime } from '../../utils/formatters';
 import { buildPatientOrderHistory, calculateAge, findDuplicatePatients, patientMatchesSearch } from '../../utils/patientUtils';
+import { ClippedList } from '../../components/ui/ClippedList';
 
 const blankPatient = {
   fullName: '',
@@ -131,7 +132,7 @@ function PatientDetail({ patient, data }) {
         <DataTable
           columns={[
             { key: 'id', label: 'Order ID', render: (order) => <span className="font-bold text-slate-900">{order.id}</span> },
-            { key: 'items', label: 'Tests / Scans', render: (order) => order.items.map((item) => item.name).join(', ') || '—' },
+            { key: 'items', label: 'Tests / Scans', render: (order) => <ClippedList items={order.items} /> },
             { key: 'status', label: 'Status', render: (order) => <StatusBadge status={order.status} /> },
             { key: 'billingStatus', label: 'Billing', render: (order) => <StatusBadge status={order.billingStatus} /> },
             { key: 'createdAt', label: 'Date', render: (order) => formatDateTime(order.createdAt) }

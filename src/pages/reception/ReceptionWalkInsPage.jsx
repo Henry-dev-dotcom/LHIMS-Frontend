@@ -9,8 +9,9 @@ import { StatusBadge } from '../../components/ui/StatusBadge';
 import { MetricCard } from '../../components/ui/MetricCard';
 import { useAppStore } from '../../store/AppStore';
 import { formatDateTime, getById, money } from '../../utils/formatters';
-import { describeOrderItems, getOrderItems } from '../../utils/orderViews';
+import { getOrderItems } from '../../utils/orderViews';
 import { ReceptionPageTabs } from './ReceptionPageTabs';
+import { ClippedList } from '../../components/ui/ClippedList';
 
 const blankPatient = { fullName: '', dateOfBirth: '', gender: 'Female', phone: '', email: '', address: '', nationalId: '', insuranceProvider: '', policyNumber: '', emergencyContact: '', allergies: '' };
 const COMMON_WALK_IN_ITEMS = ['t1', 't6', 't7', 't12', 't13', 't17', 't19'];
@@ -445,7 +446,7 @@ export function ReceptionWalkInsPage() {
             columns={[
               { key: 'id', label: 'Order', render: (row) => <span className="font-bold text-slate-900">{row.id}</span> },
               { key: 'patient', label: 'Patient', render: (row) => <div><p className="font-bold text-slate-900">{row.patient?.fullName || '—'}</p><p className="text-xs text-slate-500">{row.patient?.id}</p></div> },
-              { key: 'items', label: 'Requested Items', render: (row) => <div className="max-w-full text-sm font-semibold text-slate-700">{describeOrderItems(row.items)}</div> },
+              { key: 'items', label: 'Requested Items', render: (row) => <ClippedList items={row.items} /> },
               { key: 'status', label: 'Order Status', render: (row) => <StatusBadge status={row.status} /> },
               { key: 'billing', label: 'Billing', render: (row) => <StatusBadge status={row.invoice?.status || row.billingStatus || 'Pending'} /> },
               { key: 'amount', label: 'Amount', render: (row) => money(row.invoice?.amount || row.invoice?.total || 0) },

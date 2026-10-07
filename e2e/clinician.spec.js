@@ -99,3 +99,45 @@ test('submitting an order clears the form and returns to the first step', async 
 
   crashes.assertNone();
 });
+
+/*
+  The Tests / Scans column has one width, however long the list.
+
+  An order can name one test or a dozen. Rendered in full, the longest list set the
+  width of the column and pushed urgency and status off the edge of the table. So
+  this measures it rather than looking: every cell in the column must be the same
+  width, a long list must end in "...", and the whole list must still be there to
+  hover over.
+*/
+test('the Tests / Scans column is one width, and a long list is clipped with "..."', async ({ page, request }) => {
+  const crashes = watchForCrashes(page);
+
+  // An order for five tests, so there is certainly something long to clip.
+  const login = await request.post('http://localhost:5001/api/auth/login', { data: { facilityCode: 'DEMO', username: 'doctor', password: 'doctor123' } });
+  const token = (await login.json()).data.accessToken;
+  const made = await request.post('http://localhost:5001/api/doctor/orders', {
+    data: { patientId: 'PAT-0002', urgency: 'ROUTINE', items: ['t1', 't2', 't3', 't17', 't19'].map((catalogItemId) => ({ catalogItemId })) },
+    headers: { authorization: `Bearer ${token}` }
+  });
+  expect(made.status(), await made.text()).toBe(201);
+
+  await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
+  await openFromMenu(page, 'Active Orders');
+
+  const cells = page.locator('table tbody tr td:nth-child(3)');
+  await expect.poll(async () => cells.count(), { message: 'no orders were listed' }).toBeGreaterThan(1);
+
+  const widths = await cells.evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().width)));
+  expect(new Set(widths).size, `the column is not one width: ${widths.join(', ')}`).toBe(1);
+
+  // The five-test order shows three names and "...", not all five.
+  const long = page.locator('table tbody tr td:nth-child(3) span').filter({ hasText: '...' }).first();
+  await expect(long).toContainText('...');
+  const shown = (await long.innerText()).split(',').filter((part) => part.trim() && part.trim() !== '...');
+  expect(shown.length, 'more than three names were shown').toBeLessThanOrEqual(3);
+
+  // Nothing was thrown away: the whole list is on the element for hovering.
+  expect(await long.getAttribute('title'), 'the clipped names are not recoverable').toContain('Ultrasound - Abdomen');
+
+  crashes.assertNone();
+});

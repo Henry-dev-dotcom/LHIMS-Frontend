@@ -11,6 +11,7 @@ import { inputClass } from '../../components/ui/FormField';
 import { formatDateTime } from '../../utils/formatters';
 import { openReportPrintWindow } from '../../utils/reporting';
 import { getDoctorContextFromState, getReportForOrder, orderItemsText } from './doctorUtils';
+import { ClippedList } from '../../components/ui/ClippedList';
 
 function hasDepartment(order, department) {
   return (order.items || []).some((item) => item.department === department);
@@ -116,7 +117,7 @@ export function DoctorCompletedOrdersPage() {
           columns={[
             { key: 'id', label: 'Order ID', render: (order) => <span className="font-bold text-slate-900">{order.id}</span> },
             { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold">{order.patient?.fullName}</p><p className="text-xs text-slate-500">{order.patient?.id}</p></div> },
-            { key: 'items', label: 'Tests / Scans', render: orderItemsText },
+            { key: 'items', label: 'Tests / Scans', render: (order) => <ClippedList items={order.items} /> },
             { key: 'released', label: 'Released', render: (order) => formatDateTime(order.updatedAt) },
             { key: 'status', label: 'Status', render: (order) => <StatusBadge status={hasAbnormal(order) ? 'Abnormal' : order.status} /> },
             { key: 'actions', label: 'Actions', render: (order) => <div className="flex gap-2"><Button variant="secondary" onClick={() => setSelectedOrder(order)}><Eye className="h-4 w-4" /> View</Button><Button onClick={() => { const report = getReportForOrder(data, order.id); if (report) dispatch({ type: 'MARK_REPORT_DOWNLOADED', reportId: report.id }); openReportPrintWindow({ ...order, resultReport: report }); }}><Download className="h-4 w-4" /> PDF</Button></div> }
