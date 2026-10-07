@@ -41,6 +41,9 @@ export function normalizeAuthUser(apiUser) {
     userId: apiUser.id,
     username: apiUser.username || '',
     email: apiUser.email || '',
+    // Whether the person has proved they own that address by following the link
+    // mailed to it. False until they do, and false again if it is ever changed.
+    emailVerified: Boolean(apiUser.emailVerified),
     // The facility (tenant) this account belongs to; null for the platform operator.
     facility: apiUser.facility
       ? {

@@ -47,6 +47,23 @@ const STYLES = `
            color: #fff; font-weight: 700; cursor: pointer; }
 `;
 
+/*
+  Making a popup's Print button work under a strict Content-Security-Policy.
+
+  A button written into the popup's HTML as onclick="window.print()", or a
+  <script> that calls it, is inline script - and a policy of script-src 'self'
+  exists precisely to refuse that. Under it the popup opened normally and its
+  Print button did nothing. So the markup carries a data-print attribute instead
+  and the page that opened the popup attaches the handler through the DOM, which
+  the policy has no objection to. Behaviour is identical; the handler just does
+  not travel inside the document.
+*/
+export function armPrintButtons(win) {
+  win.document.querySelectorAll('[data-print]').forEach((element) => {
+    element.addEventListener('click', () => win.print());
+  });
+}
+
 /**
  * Opens a printable document. `title` names the window, `body` is already-escaped
  * HTML. Returns false when the browser refused the popup.
@@ -57,10 +74,11 @@ export function printDocument(title, body) {
   win.document.write(
     `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(title)}</title>`
     + `<style>${STYLES}</style></head><body>`
-    + '<div class="no-print"><button onclick="window.print()">Print</button></div>'
+    + '<div class="no-print"><button data-print>Print</button></div>'
     + `${body}</body></html>`
   );
   win.document.close();
+  armPrintButtons(win);
   win.focus();
   return true;
 }

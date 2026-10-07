@@ -802,6 +802,28 @@ const commands = {
     window: the receipt comes back, so it can be printed while the patient is
     still standing there. Nobody wants to be told to come back for their receipt.
   */
+  /*
+    Asking for the email that confirms an address.
+
+    What the server did decides what the person is told, and the three outcomes
+    are not alike: a real email went out, a development server wrote the link to
+    its log, or no mail is configured at all. Saying "sent" in the last two cases
+    would send somebody off to wait for a message that is never coming.
+  */
+  REQUEST_EMAIL_VERIFICATION: async (action, dispatch) => {
+    const result = await authService.requestEmailVerification(apiClient);
+    if (result?.emailVerified) {
+      dispatch(toastAction('success', 'This email address is already confirmed.'));
+      return;
+    }
+    const text = {
+      sent: 'Verification email sent. The link is good for 24 hours.',
+      logged: 'Development mail is on: the link was written to the server log, not emailed.',
+      disabled: 'Email sending is not set up on this server yet. Ask whoever runs it to configure mail.'
+    }[result?.delivered] || 'Verification requested.';
+    dispatch(toastAction(result?.delivered === 'disabled' ? 'error' : 'success', text));
+  },
+
   RECEIVE_PAYMENT: async (action, dispatch, getState) => {
     const payload = action.payload || {};
     const amount = Number(payload.amount);
