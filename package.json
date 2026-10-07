@@ -39,7 +39,7 @@
     "test:csp": "node scripts/test-csp.mjs"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-react": "6.1.1",
     "clsx": "2.1.1",
     "dicom-parser": "^1.8.21",
     "lucide-react": "1.20.0",
