@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import clsx from 'clsx';
-import { Activity, ChevronRight, X } from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
 import { useAppStore } from '../store/AppStore';
 import { getNavForRole, groupNavItems } from '../utils/permissions';
 import { ALL_ROLES } from '../data/roles';
@@ -45,12 +45,10 @@ export function Sidebar() {
           {facility?.logoDataUrl ? (
             <img src={facility.logoDataUrl} alt="" className="h-11 w-11 shrink-0 rounded-2xl border border-slate-200 bg-white object-contain p-1" />
           ) : (
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-clinical-500 text-white shadow-lift">
-              <Activity className="h-5 w-5" />
-            </div>
+            <img src="/icons/curatamed-icon.png" alt="CurataMed" className="h-11 w-11 shrink-0 rounded-2xl border border-slate-200 bg-white object-contain p-1" />
           )}
           <div className="min-w-0">
-            <div className="truncate text-base font-bold tracking-tight text-slate-900">{facility?.name || (role === 'platform' ? 'LHIMS Platform' : 'LHIMS')}</div>
+            <div className="truncate text-base font-bold tracking-tight text-slate-900">{facility?.name || (role === 'platform' ? 'CurataMed Platform' : 'CurataMed')}</div>
             <div className="truncate text-xs font-medium text-slate-500">{facility ? `Facility code ${facility.code}` : 'Hospital management system'}</div>
           </div>
         </div>

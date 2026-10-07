@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Activity, Building2, CheckCircle2, KeyRound, Loader2, ShieldCheck, UserRound } from 'lucide-react';
+import { Building2, CheckCircle2, KeyRound, Loader2, ShieldCheck, UserRound } from 'lucide-react';
 import { useAppStore } from '../../store/AppStore';
 import { Button } from '../../components/ui/Button';
 import { ToastHost } from '../../components/ui/ToastHost';
@@ -11,7 +11,7 @@ import '../../styles/getlabs-theme.css';
   empty on a device nobody has signed in on, and the platform operator - who
   belongs to no facility - clears it.
 */
-const FACILITY_CODE_KEY = 'lhims.lastFacilityCode';
+const FACILITY_CODE_KEY = 'curatamed.lastFacilityCode';
 
 function readRememberedFacilityCode() {
   try {
@@ -47,13 +47,8 @@ export function LoginPage({ initialCode = '' }) {
       <div className="mx-auto flex min-h-[calc(100dvh-2rem)] max-w-6xl flex-col">
         <header className="flex items-center justify-between gap-4 py-3 sm:py-5">
           <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-clinical-500 text-white shadow-lift">
-              <Activity className="h-6 w-6" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900">LHIMS</h1>
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">Hospital management system</p>
-            </div>
+            <img src="/icons/curatamed-logo.png" alt="CurataMed — Hospital Management System" className="h-12 w-auto" />
+            <h1 className="sr-only">CurataMed</h1>
           </div>
         </header>
 
@@ -124,7 +119,7 @@ export function LoginPage({ initialCode = '' }) {
                 Sessions are secured with httpOnly cookies. Contact your system administrator if you need an account or a password reset.
               </p>
               <p className="mt-3 text-sm text-slate-600">
-                New to LHIMS? <a href="#/pricing" className="font-semibold text-clinical-700 underline">Start a free trial</a> · <a href="#/home" className="font-semibold text-clinical-700 underline">About LHIMS</a>
+                New to CurataMed? <a href="#/pricing" className="font-semibold text-clinical-700 underline">Start a free trial</a> · <a href="#/home" className="font-semibold text-clinical-700 underline">About CurataMed</a>
               </p>
             </div>
           </section>

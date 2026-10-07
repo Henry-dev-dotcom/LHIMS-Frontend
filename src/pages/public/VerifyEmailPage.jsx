@@ -18,7 +18,7 @@ import { authService } from '../../services/authService';
   presses cannot be spent by anything else.
 
   It is also public: the link is often opened on a phone that is not signed in to
-  LHIMS, and the token in it is the only credential needed.
+  CurataMed, and the token in it is the only credential needed.
 */
 
 function tokenFromAddress() {
@@ -52,7 +52,7 @@ export function VerifyEmailPage() {
       <div className="mx-auto max-w-lg">
         <Card
           title="Confirm your email address"
-          subtitle="One press and this address is confirmed for your LHIMS account."
+          subtitle="One press and this address is confirmed for your CurataMed account."
           actions={<MailCheck className="h-6 w-6 text-clinical-600" aria-hidden="true" />}
         >
           {!token && (
@@ -65,7 +65,7 @@ export function VerifyEmailPage() {
           {token && status !== 'done' && (
             <div className="space-y-4">
               <p className="text-sm leading-6 text-slate-600">
-                You asked LHIMS to confirm this email address. Press the button below to finish. If you did not ask for this, close the page; nothing changes.
+                You asked CurataMed to confirm this email address. Press the button below to finish. If you did not ask for this, close the page; nothing changes.
               </p>
               {status === 'failed' && (
                 <div role="alert" className="flex gap-2 rounded-2xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">
@@ -85,7 +85,7 @@ export function VerifyEmailPage() {
                 <CheckCircle2 className="h-5 w-5 shrink-0" aria-hidden="true" />
                 <p className="font-semibold">Your email address is confirmed.</p>
               </div>
-              <Button onClick={goToApp}>Continue to LHIMS</Button>
+              <Button onClick={goToApp}>Continue to CurataMed</Button>
             </div>
           )}
         </Card>
