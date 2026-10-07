@@ -392,8 +392,20 @@ const LAB_SAMPLE_STATUS_FROM_API = {
 function mapSampleLog(sample, orderCodeById) {
   const orderApiId = sample.orderItem?.orderId || sample.orderItem?.order?.id || '';
   const result = (sample.results || [])[0] || null;
+  /*
+    A result is finished only once it has been signed off.
+
+    Anything short of that - a draft, or one submitted and never signed - still
+    owes somebody work, so it belongs in the Accepted queue with whatever was
+    entered already filled in. Treating "submitted" as finished left such
+    results in a limbo once the separate review tab was retired: gone from
+    Accepted because they had a result, and absent from Results because they had
+    never been released.
+  */
+  const finished = Boolean(result) && (result.status === 'SIGNED_OFF' || result.status === 'AMENDED');
+  const unfinished = Boolean(result) && !finished;
   // A result sent back for correction carries the reason it was returned.
-  const returnedReason = result && result.status === 'DRAFT'
+  const returnedReason = unfinished
     ? (result.reviews || []).find((review) => review.decision === 'REVERSED')?.note || ''
     : '';
   const orderCode = orderCodeById[orderApiId] || sample.orderItem?.order?.orderCode || orderApiId || '';
@@ -424,7 +436,7 @@ function mapSampleLog(sample, orderCodeById) {
       would make a reversed test vanish from the queue instead of returning to
       it, which is the opposite of what reversing is for.
     */
-    hasResult: Boolean(result) && result.status !== 'DRAFT',
+    hasResult: finished,
     returned: Boolean(returnedReason),
     /*
       A draft result on an accepted sample is what the result-entry popup opens
@@ -435,7 +447,7 @@ function mapSampleLog(sample, orderCodeById) {
         - a sent result was reversed for correction, so the reason comes with it
           and the old values are there to be edited rather than retyped.
     */
-    draftResult: result && result.status === 'DRAFT'
+    draftResult: unfinished
       ? {
         reason: returnedReason,
         analyzer: result.analyzerUsed || '',
@@ -743,7 +755,10 @@ export function normalizeScanAcceptance(acceptance, orderCodeById = {}) {
   const orderCode = orderCodeById[orderApiId] || acceptance.orderItem?.order?.orderCode || orderApiId || '';
   const catalogCode = acceptance.orderItem?.catalogItem?.catalogCode || acceptance.orderItem?.catalogItemId || '';
   const result = (acceptance.scanResults || [])[0] || null;
-  const returnedReason = result && result.status === 'DRAFT'
+  // As in the laboratory: finished means signed off, not merely written.
+  const finished = Boolean(result) && (result.status === 'SIGNED_OFF' || result.status === 'AMENDED');
+  const unfinished = Boolean(result) && !finished;
+  const returnedReason = unfinished
     ? (result.reviews || []).find((review) => review.decision === 'REVERSED')?.note || ''
     : '';
   return {
@@ -765,7 +780,7 @@ export function normalizeScanAcceptance(acceptance, orderCodeById = {}) {
     resultStatus: enumLabel(result?.status || ''),
     // As in the laboratory: a report counts only once it has been submitted,
     // because pulling a sent report back leaves it a draft so its text survives.
-    hasResult: Boolean(result) && result.status !== 'DRAFT',
+    hasResult: finished,
     returned: Boolean(returnedReason),
     fileCount: (result?.files || []).length,
     dicomCount: (result?.files || []).filter((file) => file.isDicom).length,
@@ -780,7 +795,7 @@ export function normalizeScanAcceptance(acceptance, orderCodeById = {}) {
         studyUid: file.studyUid || '',
         seriesUid: file.seriesUid || ''
       })),
-    draftResult: result && result.status === 'DRAFT'
+    draftResult: unfinished
       ? {
         reason: returnedReason,
         reportText: result.findings || '',

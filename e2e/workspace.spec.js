@@ -271,3 +271,48 @@ test('the platform operator works without a cookie too', async ({ page }) => {
   await expect(page.getByText('Authentication token is required', { exact: false })).toHaveCount(0);
   crashes.assertNone();
 });
+
+/*
+  An address typed into the bar has to open that screen.
+
+  The page already lived in the address so a refresh would return to it, but the
+  address was only ever written from the state and never read back afterwards -
+  so typing or pasting one, or arriving at it with the back button, changed
+  nothing and then quietly reverted the bar to the page already open. To anyone
+  handed a link to a screen, that reads as the link being broken.
+*/
+test('typing a workspace address opens that screen, without a reload', async ({ page }) => {
+  const crashes = watchForCrashes(page);
+  await signIn(page, { code: 'DEMO', username: 'lab', password: 'lab123' });
+  await expect(page.getByRole('heading', { name: 'Incoming Labs', level: 1 }).first()).toBeVisible();
+
+  // As if somebody edited the bar: no reload, only the address changing.
+  await page.evaluate(() => { window.location.hash = '#/app/lab-results'; });
+
+  await expect(page.getByRole('heading', { name: 'Results', level: 1 }).first(),
+    'the typed address did not open its screen').toBeVisible({ timeout: 15_000 });
+  await expect.poll(() => page.evaluate(() => window.location.hash),
+    { message: 'the address was reverted to the page that was already open' }).toBe('#/app/lab-results');
+
+  // And going back returns where they were, rather than being overwritten.
+  await page.goBack();
+  await expect(page.getByRole('heading', { name: 'Incoming Labs', level: 1 }).first()).toBeVisible({ timeout: 15_000 });
+
+  crashes.assertNone();
+});
+
+test('a typed address for a page the role may not open corrects itself', async ({ page }) => {
+  const crashes = watchForCrashes(page);
+  await signIn(page, { code: 'DEMO', username: 'lab', password: 'lab123' });
+  await expect(page.getByRole('heading', { name: 'Incoming Labs', level: 1 }).first()).toBeVisible();
+
+  // HR Admin belongs to administrators; laboratory staff have no way to it.
+  await page.evaluate(() => { window.location.hash = '#/app/hr-admin'; });
+
+  // The screen does not change, and the bar stops describing one that is not open.
+  await expect(page.getByRole('heading', { name: 'Incoming Labs', level: 1 }).first()).toBeVisible();
+  await expect.poll(() => page.evaluate(() => window.location.hash),
+    { message: 'the address was left naming a page the role cannot open' }).toBe('#/app/lab-queue');
+
+  crashes.assertNone();
+});
