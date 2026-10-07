@@ -11,9 +11,9 @@
   "categories": ["medical", "productivity", "business"],
   "icons": [
     {
-      "src": "./icons/curatamed-icon.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "./icons/curatamed-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ],
