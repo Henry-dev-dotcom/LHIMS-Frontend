@@ -42,7 +42,7 @@ export function DemoRequestPage() {
         ) : (
           <>
             <h1 className="text-3xl font-bold tracking-tight">Request a demo</h1>
-            <p className="mt-2 text-slate-600">Tell us about your hospital and we will show you LHIMS with your departments, and help you plan the move from paper or your current system.</p>
+            <p className="mt-2 text-slate-600">Tell us about your hospital and we will show you CurataMed with your departments, and help you plan the move from paper or your current system.</p>
             <form onSubmit={submit} noValidate className="mt-8 grid gap-4 sm:grid-cols-2">
               {[
                 ['name', 'Your name', 'name'],

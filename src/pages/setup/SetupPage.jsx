@@ -119,7 +119,7 @@ export function SetupPage() {
     const url = URL.createObjectURL(new Blob([priceListTemplateCsv()], { type: 'text/csv' }));
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'lhims-price-list-template.csv';
+    a.download = 'curatamed-price-list-template.csv';
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -131,7 +131,7 @@ export function SetupPage() {
       const response = await fetch(`${getApiConfig().baseUrl}/admin/data-export`, { credentials: 'include' });
       if (!response.ok) throw new Error((await response.json().catch(() => null))?.message || 'The export could not be made.');
       const blob = await response.blob();
-      const name = /filename="([^"]+)"/.exec(response.headers.get('content-disposition') || '')?.[1] || 'lhims-export.json';
+      const name = /filename="([^"]+)"/.exec(response.headers.get('content-disposition') || '')?.[1] || 'curatamed-export.json';
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -170,7 +170,7 @@ export function SetupPage() {
     <div className="space-y-4">
       <PageHeader
         eyebrow="Admin"
-        title={data.completed ? 'Facility setup' : `Welcome to LHIMS, ${state.auth?.userName?.split(' ')[0] || ''}`}
+        title={data.completed ? 'Facility setup' : `Welcome to CurataMed, ${state.auth?.userName?.split(' ')[0] || ''}`}
         description={data.completed ? 'Your facility details, logo and support access.' : `Five short steps to get ${data.facility.name} ready. Only the first is needed — you can start working at any time.`}
       />
 
@@ -227,7 +227,7 @@ export function SetupPage() {
           </div>
           <label className="flex items-start gap-3 text-sm text-slate-700 sm:col-span-2">
             <input type="checkbox" className="mt-1" checked={profile.allowSupportAccess} onChange={(e) => setProfile((p) => ({ ...p, allowSupportAccess: e.target.checked }))} />
-            <span><strong>Allow LHIMS support to look in when you ask for help.</strong> Support can then open a 30-minute, read-only view of your facility. Every visit, with the reason, appears in your Audit Log. Untick to refuse all support access.</span>
+            <span><strong>Allow CurataMed support to look in when you ask for help.</strong> Support can then open a 30-minute, read-only view of your facility. Every visit, with the reason, appears in your Audit Log. Untick to refuse all support access.</span>
           </label>
           <label className="flex items-start gap-3 text-sm text-slate-700 sm:col-span-2">
             <input type="checkbox" className="mt-1" checked={profile.receptionConfirmsOrders} onChange={(e) => setProfile((p) => ({ ...p, receptionConfirmsOrders: e.target.checked }))} />
@@ -238,7 +238,7 @@ export function SetupPage() {
         </form>
       </Card>
 
-      <Card title={<span className="flex items-center gap-2"><Tick done /> 2. Departments and plan</span>} subtitle={data.subscription ? `${data.subscription.plan.name} plan${data.subscription.status === 'TRIALING' ? ' — free trial' : ''}.` : 'Your departments are set by your LHIMS provider.'}>
+      <Card title={<span className="flex items-center gap-2"><Tick done /> 2. Departments and plan</span>} subtitle={data.subscription ? `${data.subscription.plan.name} plan${data.subscription.status === 'TRIALING' ? ' — free trial' : ''}.` : 'Your departments are set by your CurataMed provider.'}>
         <p className="text-sm text-slate-600">{modules.length} departments are switched on. Add more, or choose how you will pay, under Subscription &amp; Billing.</p>
         <div className="mt-3"><Button variant="secondary" onClick={() => navigate('subscription')}>Open Subscription &amp; Billing</Button></div>
       </Card>
@@ -279,7 +279,7 @@ export function SetupPage() {
         </div>
       </Card>
 
-      <Card title="Your data" subtitle="Everything this facility holds in LHIMS, as one file.">
+      <Card title="Your data" subtitle="Everything this facility holds in CurataMed, as one file.">
         <p className="text-sm text-slate-600">Download a complete copy for your own records, to move to another system, or to answer a patient's data request under the Data Protection Act. Passwords and payment details are left out. Each download is recorded in the audit log.</p>
         <div className="mt-3"><Button variant="secondary" onClick={downloadExport} disabled={exporting}><Download className="h-4 w-4" /> {exporting ? 'Preparing…' : 'Download all data (JSON)'}</Button></div>
       </Card>

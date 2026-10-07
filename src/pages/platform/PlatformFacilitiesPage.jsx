@@ -177,7 +177,7 @@ export function PlatformFacilitiesPage() {
       <PageHeader
         eyebrow="Platform"
         title="Facilities"
-        description="Every hospital, clinic or diagnostic centre on LHIMS. Each facility's data is kept separate from every other."
+        description="Every hospital, clinic or diagnostic centre on CurataMed. Each facility's data is kept separate from every other."
       />
 
       <Card

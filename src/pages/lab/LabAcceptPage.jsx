@@ -120,7 +120,7 @@ export function LabAcceptPage() {
     setRejectReason('');
   }
 
-  const facilityName = state.auth?.facility?.name || 'LHIMS';
+  const facilityName = state.auth?.facility?.name || 'CurataMed';
 
   return (
     <div className="space-y-4">

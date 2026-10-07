@@ -121,7 +121,7 @@ export function SignupPage() {
     <SiteLayout active="signup">
       <section className="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-[1fr_20rem]">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Create your hospital on LHIMS</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Create your hospital on CurataMed</h1>
           <p className="mt-2 text-slate-600">It takes about two minutes. You become the administrator and can add your staff straight after.</p>
           <form onSubmit={submit} noValidate className="mt-8 space-y-8">
             <fieldset className="grid gap-4 sm:grid-cols-2">
@@ -149,7 +149,7 @@ export function SignupPage() {
             <div>
               <label className="flex items-start gap-3 text-sm text-slate-700">
                 <input type="checkbox" className="mt-1" checked={form.accept} onChange={set('accept')} />
-                <span>I am authorised to register this facility, and I agree that LHIMS may store and process its records to provide the service.</span>
+                <span>I am authorised to register this facility, and I agree that CurataMed may store and process its records to provide the service.</span>
               </label>
               {errors.acceptTerms && <p className="mt-1 text-xs font-semibold text-red-600">{errors.acceptTerms}</p>}
             </div>

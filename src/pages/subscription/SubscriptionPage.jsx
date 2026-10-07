@@ -118,8 +118,8 @@ export function SubscriptionPage() {
     return (
       <div className="space-y-4">
         <PageHeader eyebrow="Admin" title="Subscription & billing" description="Your plan, departments and payments." />
-        <Card title="Managed by your LHIMS provider">
-          <p className="text-sm text-slate-600">This facility's departments are set by the LHIMS platform operator under a separate agreement, so there is nothing to pay here. Contact them to change departments.</p>
+        <Card title="Managed by your CurataMed provider">
+          <p className="text-sm text-slate-600">This facility's departments are set by the CurataMed platform operator under a separate agreement, so there is nothing to pay here. Contact them to change departments.</p>
         </Card>
       </div>
     );
@@ -236,7 +236,7 @@ export function SubscriptionPage() {
         </div>
       </Card>
 
-      <Card title="Invoices" subtitle="Subscription invoices from LHIMS (not patient bills).">
+      <Card title="Invoices" subtitle="Subscription invoices from CurataMed (not patient bills).">
         <DataTable
           caption="Subscription invoices"
           emptyMessage="No invoices yet."

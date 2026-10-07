@@ -8,9 +8,9 @@ import { armPrintButtons } from './printDocument';
  */
 export function reportBrand() {
   try {
-    return getStoredSession()?.user?.facility?.name || 'LHIMS';
+    return getStoredSession()?.user?.facility?.name || 'CurataMed';
   } catch {
-    return 'LHIMS';
+    return 'CurataMed';
   }
 }
 
@@ -68,7 +68,7 @@ export function openReportPrintWindow(input) {
     </div>
     <h2>Results</h2>
     <table><thead><tr><th>Department</th><th>Parameter / Report</th><th>Value</th><th>Reference Range</th><th>Flag</th></tr></thead><tbody>${rows || '<tr><td colspan="5">No final result parameters available.</td></tr>'}</tbody></table>
-    <div class="footer">Generated from LHIMS.${resultReport?.secureToken ? ` Secure report token: ${escapeHtml(resultReport.secureToken)}.` : ''} SMS notifications must not include patient-identifying clinical data.</div>
+    <div class="footer">Generated from CurataMed.${resultReport?.secureToken ? ` Secure report token: ${escapeHtml(resultReport.secureToken)}.` : ''} SMS notifications must not include patient-identifying clinical data.</div>
   </body></html>`;
   const win = window.open('', '_blank', 'width=1000,height=800');
   if (!win) return;

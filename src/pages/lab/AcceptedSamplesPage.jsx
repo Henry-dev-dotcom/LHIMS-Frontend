@@ -268,7 +268,7 @@ export function AcceptedSamplesPage() {
   const queue = useMemo(() => acceptedQueue(data, 'Laboratory'), [data]);
   const visible = queue.filter((candidate) => queueMatches(candidate, query));
 
-  const facilityName = state.auth?.facility?.name || 'LHIMS';
+  const facilityName = state.auth?.facility?.name || 'CurataMed';
   const enteredBy = state.auth?.userName || 'Laboratory';
 
   const openOrder = (id) => dispatch({ type: 'OPEN_ACCEPTED_SAMPLE', orderId: id });

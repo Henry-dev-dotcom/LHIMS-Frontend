@@ -119,7 +119,7 @@ export const ROLES = [
 export const PLATFORM_ROLE = {
   id: 'platform',
   label: 'Platform Operator',
-  subtitle: 'Runs the LHIMS service',
+  subtitle: 'Runs the CurataMed service',
   landing: 'platform-dashboard',
   accessSummary: 'Creates and manages subscribing facilities. Has no access to any facility\'s patient or business data.'
 };
@@ -133,7 +133,7 @@ export const NAV_ITEMS = [
   { id: 'emergency-board', label: 'Emergency Board', icon: Siren, roles: ['nurse','doctor','receptionist','admin'], section: 'Emergency' },
   { id: 'ward-board', label: 'Ward Board', icon: BedDouble, roles: ['nurse','doctor','admin'], section: 'Wards' },
   { id: 'theatre-list', label: 'Theatre List', icon: Scissors, roles: ['nurse','doctor','admin'], section: 'Theatre' },
-  /* The records desk. LHIMS's receptionist is its front-office role, which is
+  /* The records desk. CurataMed's receptionist is its front-office role, which is
      where registration and check-in already lived, so this belongs to them. */
   /* Every department talks to the others, so this belongs to all of them. */
   { id: 'messages', label: 'Messages', icon: MessagesSquare, roles: ['doctor','nurse','receptionist','lab','scan','billing','pharmacist','admin'], section: 'Messages' },

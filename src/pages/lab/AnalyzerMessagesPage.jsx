@@ -27,7 +27,7 @@ const FILTERS = [
   { id: 'discarded', label: 'Discarded', statuses: ['DISCARDED'] }
 ];
 
-/* What LHIMS made of a message, and the payload itself. */
+/* What CurataMed made of a message, and the payload itself. */
 function MessageModal({ message, onClose, onReplay, onDiscard }) {
   const [raw, setRaw] = useState(message.rawPayload || '');
   const [loadingRaw, setLoadingRaw] = useState(!message.rawPayload);

@@ -1,4 +1,23 @@
-# Diagnosis Center Frontend — Stage 13 UI Cleanup + Lab Results Archive
+# CurataMed Frontend — Hospital Management System
+
+CurataMed is a modular hospital management system for outpatient, ward, theatre, maternity, laboratory, imaging, pharmacy, billing and claims workflows.
+
+## Development
+
+```bash
+npm ci
+npm run dev
+```
+
+The app is built with React and Vite. The production bundle is generated with `npm run build`.
+
+## QA and feature history
+
+The following sections record legacy release-stage implementation and regression checks.
+
+---
+
+# Legacy Stage 13 UI Cleanup + Lab Results Archive
 
 Current frontend version: `12.7.0`
 

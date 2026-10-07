@@ -206,7 +206,7 @@ export function AcceptedScansPage() {
   const queue = useMemo(() => acceptedQueue(data, 'Imaging'), [data]);
   const visible = queue.filter((candidate) => queueMatches(candidate, query));
 
-  const facilityName = state.auth?.facility?.name || 'LHIMS';
+  const facilityName = state.auth?.facility?.name || 'CurataMed';
   const reportedBy = state.auth?.userName || 'Imaging';
 
   const openOrder = (id) => dispatch({ type: 'OPEN_ACCEPTED_SCAN', orderId: id });

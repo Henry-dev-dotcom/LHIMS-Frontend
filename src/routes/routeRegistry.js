@@ -382,7 +382,7 @@ export const PAGE_META = {
   },
   subscription: {
     title: 'Subscription & Billing', section: 'Admin',
-    description: "The facility's LHIMS plan, departments, payments and invoices.",
+    description: "The facility's CurataMed plan, departments, payments and invoices.",
     requirements: ['Plan', 'Add-on departments', 'Pay by card or mobile money', 'Invoices']
   },
   'platform-billing': {

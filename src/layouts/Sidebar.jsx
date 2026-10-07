@@ -45,7 +45,7 @@ export function Sidebar() {
           {facility?.logoDataUrl ? (
             <img src={facility.logoDataUrl} alt="" className="h-11 w-11 shrink-0 rounded-2xl border border-slate-200 bg-white object-contain p-1" />
           ) : (
-            <img src="/icons/curatamed-icon.png" alt="CurataMed" className="h-11 w-11 shrink-0 rounded-2xl border border-slate-200 bg-white object-contain p-1" />
+            <img src="/icons/curatamed-icon.svg" alt="CurataMed" className="h-11 w-11 shrink-0 rounded-2xl border border-slate-200 bg-white object-contain p-1" />
           )}
           <div className="min-w-0">
             <div className="truncate text-base font-bold tracking-tight text-slate-900">{facility?.name || (role === 'platform' ? 'CurataMed Platform' : 'CurataMed')}</div>

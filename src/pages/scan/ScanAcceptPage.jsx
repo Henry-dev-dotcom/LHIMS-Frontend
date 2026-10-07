@@ -82,7 +82,7 @@ export function ScanAcceptPage() {
   const pending = pendingTests(order, 'Imaging');
   const accepted = departmentTests(order, 'Imaging').filter((row) => row.accepted);
   const allOn = pending.length > 0 && selected.length === pending.length;
-  const facilityName = state.auth?.facility?.name || 'LHIMS';
+  const facilityName = state.auth?.facility?.name || 'CurataMed';
 
   const toggle = (orderItemId) => {
     setError('');

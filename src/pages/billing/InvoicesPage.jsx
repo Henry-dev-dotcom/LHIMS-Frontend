@@ -143,7 +143,7 @@ export function InvoicesPage() {
       <Modal open={Boolean(receiptInvoice)} onClose={() => setReceiptInvoiceId('')} title="Payment Receipt">
         {receiptInvoice && <div className="space-y-5" id="receipt-print-area">
           <div className="rounded-3xl border border-slate-200 bg-white p-5 text-sm">
-            <div className="text-center"><div className="text-xl font-bold text-slate-900">{state.auth?.facility?.name || 'LHIMS'}</div><div className="text-slate-500">Official Payment Receipt</div></div>
+            <div className="text-center"><div className="text-xl font-bold text-slate-900">{state.auth?.facility?.name || 'CurataMed'}</div><div className="text-slate-500">Official Payment Receipt</div></div>
             <div className="mt-5 grid gap-3 md:grid-cols-2">
               <div><span className="font-bold text-slate-500">Receipt / Invoice</span><p className="font-bold">{receiptInvoice.id}</p></div>
               <div><span className="font-bold text-slate-500">Order</span><p className="font-bold">{receiptInvoice.orderId}</p></div>

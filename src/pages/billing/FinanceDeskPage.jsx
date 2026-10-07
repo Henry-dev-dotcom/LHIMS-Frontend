@@ -173,7 +173,7 @@ export function FinanceDeskPage() {
     window.setTimeout(() => setBusy(false), 1500);
   }
 
-  const facilityName = state.auth?.facility?.name || 'LHIMS';
+  const facilityName = state.auth?.facility?.name || 'CurataMed';
   const cashier = state.auth?.userName || 'Cashier';
 
   /* ------------------------------------------------------------ the patient's tab */
