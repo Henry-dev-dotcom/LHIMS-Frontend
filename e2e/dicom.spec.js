@@ -90,6 +90,39 @@ test('the viewer decodes a JPEG Baseline colour study, and steps through a serie
   crashes.assertNone();
 });
 
+/*
+  The study the demo ships with has to show a picture.
+
+  It used to be a row claiming an ultrasound was attached with no file behind it,
+  so opening it reported - correctly - that the record was metadata only. Anybody
+  sent the demo link would conclude the viewer did not work. This opens the
+  seeded study the way a person would, from the list, and reads the canvas back.
+*/
+test('the study attached to the demo facility opens and renders', async ({ page }) => {
+  const crashes = watchForCrashes(page);
+  await signIn(page, { code: 'DEMO', username: 'scan', password: 'scan123' });
+  await openFromMenu(page, 'DICOM Viewer');
+
+  await page.getByRole('button').filter({ hasText: 'Ultrasound - Abdomen' }).first().click();
+
+  // The file is fetched from the server, so give it room to arrive.
+  await expect.poll(async () => (await canvasReport(page))?.width ?? 0, {
+    message: 'the study the demo ships with did not render',
+    timeout: 45_000
+  }).toBeGreaterThan(0);
+
+  const report = await canvasReport(page);
+  expect(report.distinctColours, 'the study rendered as a single flat colour').toBeGreaterThan(20);
+  await expect(page.getByText('metadata-only', { exact: false }),
+    'the demo study is still only metadata').toHaveCount(0);
+
+  // It is a multi-frame study, so the cine controls are live rather than inert.
+  await expect(page.getByRole('button', { name: 'Cine' })).toBeEnabled();
+  await expect(page.getByRole('slider', { name: 'Frame' })).toBeVisible();
+
+  crashes.assertNone();
+});
+
 test('a file that is not DICOM is refused in words, not with a blank screen', async ({ page }) => {
   const crashes = watchForCrashes(page);
   await signIn(page, { code: 'DEMO', username: 'scan', password: 'scan123' });
