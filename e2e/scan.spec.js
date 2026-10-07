@@ -31,6 +31,10 @@ async function twoStudyRequest(request) {
 }
 
 test('the unit accepts one of two studies, reports it with images, and can take it back', async ({ page, request }) => {
+  // The longest journey in the suite: it signs in, accepts, reports, opens the
+  // viewer and reads the report back. Late in a full run the dev server is slow
+  // enough that it passed alone in about 35s and failed at the default 90s.
+  test.setTimeout(180_000);
   const crashes = watchForCrashes(page);
   await twoStudyRequest(request);
 
@@ -89,7 +93,7 @@ test('the unit accepts one of two studies, reports it with images, and can take 
   /* ---- Results: it is there, and it can be pulled back ---- */
   await openFromMenu(page, 'Results');
   const sent = page.getByRole('article').filter({ hasText: 'Lung fields clear' }).first();
-  await expect(sent, 'the signed-off report never reached the Results tab').toBeVisible();
+  await expect(sent, 'the signed-off report never reached the Results tab').toBeVisible({ timeout: 30_000 });
   await expect(sent).toContainText('Kojo Nyarko');
   await sent.getByRole('button', { name: /View Stored Report/i }).click();
   await expect(page.getByText('Compared with the film of last year', { exact: false }).first(),

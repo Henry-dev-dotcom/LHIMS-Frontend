@@ -39,17 +39,17 @@
     "test:csp": "node scripts/test-csp.mjs"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "6.0.2",
     "clsx": "2.1.1",
     "dicom-parser": "^1.8.21",
-    "lucide-react": "1.20.0",
-    "react": "19.2.7",
-    "react-dom": "19.2.7",
+    "lucide-react": "^1.52.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "vite": "8.0.16"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
-    "autoprefixer": "10.4.20",
+    "@vitejs/plugin-react": "^6.1.1",
+    "autoprefixer": "^10.6.1",
     "postcss": "8.5.28",
     "tailwindcss": "3.4.17"
   }
