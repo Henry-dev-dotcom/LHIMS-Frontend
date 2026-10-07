@@ -1,0 +1,37 @@
+# Frontend CI: build, the project's static checks, and a production-dependency
+# audit. The browser journeys (npm run test:e2e) need the backend and a database,
+# so they are run by hand before shipping rather than here.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run lint:routes
+      - run: npm run lint:auth
+      - run: npm run lint:ui
+      - run: npm run lint:tailwind
+
+  dependency-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm audit --omit=dev --audit-level=high
