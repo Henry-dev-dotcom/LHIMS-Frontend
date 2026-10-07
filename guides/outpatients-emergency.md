@@ -14,7 +14,7 @@
 
 ## Prescribing safely
 
-If a drug matches a recorded allergy (the drug itself or its class), LHIMS stops you. You may
+If a drug matches a recorded allergy (the drug itself or its class), CurataMed stops you. You may
 continue only by giving a reason, which is recorded.
 
 ## Corrections

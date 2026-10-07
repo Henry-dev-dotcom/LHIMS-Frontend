@@ -1,6 +1,6 @@
 # Platform operator guide
 
-You run LHIMS for all facilities. Sign in with **no facility code**.
+You run CurataMed for all facilities. Sign in with **no facility code**.
 
 ## Overview
 

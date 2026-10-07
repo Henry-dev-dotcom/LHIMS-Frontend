@@ -2,7 +2,7 @@
 
 ## Signing in
 
-1. Open the LHIMS address your facility gave you, or the sign-in link your administrator shared
+1. Open the CurataMed address your facility gave you, or the sign-in link your administrator shared
    (it ends in `#/login/` and your **facility code**, which fills the code in for you).
 2. Enter the **facility code** (for example `SMC`), your **username** and **password**.
 3. **Sign in.** The device remembers the facility code for next time.
@@ -30,10 +30,10 @@ your account — everything you do is recorded under your name in the audit log.
 | Blue, "free trial ends…" | Your facility is on a trial. The administrator chooses a plan. |
 | Amber, "payment overdue" | A subscription payment failed. Everything still works; the administrator should pay. |
 | Red, "read-only" | The subscription is unpaid or ended. You can look at everything but not add or change anything. Nothing is deleted. |
-| Purple, "support session" | LHIMS support is looking at your facility (read-only) at your administrator's request. |
+| Purple, "support session" | CurataMed support is looking at your facility (read-only) at your administrator's request. |
 | "You are offline" | No network. Saved screens may open, but new work needs a connection. |
 
 ## Getting help
 
-Ask your facility administrator first. They can reset passwords, change roles, and contact LHIMS
+Ask your facility administrator first. They can reset passwords, change roles, and contact CurataMed
 support.

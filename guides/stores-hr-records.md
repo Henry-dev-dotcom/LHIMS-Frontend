@@ -11,7 +11,7 @@
 ## HR and duty rota
 
 - **My Rota & Leave**: your shifts, leave balance and requests.
-- **Duty Rota**: who is on duty. LHIMS refuses overlapping shifts, less than 11 hours' rest between
+- **Duty Rota**: who is on duty. CurataMed refuses overlapping shifts, less than 11 hours' rest between
   shifts, and shifts during approved leave.
 - **HR Admin**: staff profiles with professional registration and its expiry, shift types, and leave
   approvals (by someone other than the person asking; counted in working days).

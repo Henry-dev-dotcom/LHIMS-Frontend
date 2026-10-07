@@ -12,7 +12,7 @@
 ## Child health
 
 - **Child Welfare Clinic**: growth (weight, length, MUAC) with alerts when growth falters.
-- **Immunisations** follow the Ghana EPI schedule. LHIMS checks the order and the minimum gap
+- **Immunisations** follow the Ghana EPI schedule. CurataMed checks the order and the minimum gap
   between doses, and refuses expired vaccine batches. A dose given in error is voided, not deleted.
 - **Immunisation Due List**: children due or overdue — use it to follow up defaulters.
 

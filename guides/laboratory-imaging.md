@@ -20,12 +20,12 @@ or send its results — it can fill the result fields itself, so the bench check
 numbers instead of typing them.
 
 1. **Analyzers → Register an analyzer.** Say what it is and how it sends results.
-   LHIMS issues it a key, **shown only once** — copy it then.
-2. Get the results to LHIMS, whichever suits:
+   CurataMed issues it a key, **shown only once** — copy it then.
+2. Get the results to CurataMed, whichever suits:
    - **Upload a run.** Export the run from the instrument and bring the file to
      **Analyzers → Upload a run**. Nothing to install.
    - **Run the bridge** on the computer beside the analyzer, so results arrive on
-     their own. Ask whoever set LHIMS up; it is a small program with a short guide.
+     their own. Ask whoever set CurataMed up; it is a small program with a short guide.
 3. **Run one sample**, then open **Test mapping**. Whatever codes the instrument
    used are listed there with an example value. Point each at the right field of
    the right test, then **Analyzer log → Try again** to bring that first run in.
@@ -37,7 +37,7 @@ such, and you check and sign off exactly as before.
 Two things worth knowing:
 
 - **The tube's barcode is what ties a reading to a patient.** The analyzer must be
-  given the sample code LHIMS printed. Nothing is matched by name.
+  given the sample code CurataMed printed. Nothing is matched by name.
 - **An analyzer never releases a result.** Whatever it sends waits for a person.
   A critical value is notified to the lab at once, while it is still a draft.
 

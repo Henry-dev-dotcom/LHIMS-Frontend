@@ -1,6 +1,6 @@
 # Administrator guide
 
-You manage your facility's LHIMS: staff, what each person may do, prices, the subscription and
+You manage your facility's CurataMed: staff, what each person may do, prices, the subscription and
 your facility's data.
 
 ## First day: Facility Setup
@@ -8,7 +8,7 @@ your facility's data.
 After signing up you land on **Admin → Facility Setup**. Work down the list:
 
 1. **Facility details** — name, phone, address (needed to finish) and logo (PNG/JPEG/WebP, up to
-   200 KB). Also choose whether LHIMS support may look in when you ask for help (see below).
+   200 KB). Also choose whether CurataMed support may look in when you ask for help (see below).
 2. **Departments and plan** — shows what is switched on. Change it under **Subscription & Billing**.
 3. **Staff accounts** — **Add staff** opens **User Management**.
 4. **Price list** — import your prices from a CSV file, or **Add a starter list** and then set your
@@ -59,7 +59,7 @@ are updated. If any row is wrong, nothing is imported and every bad row is liste
 ## Audit log and support access
 
 - **Audit Log** records sign-ins, changes, refused actions, exports and support sessions.
-- **Support access** (Facility Setup): when on, LHIMS support can open a 30-minute, read-only view
+- **Support access** (Facility Setup): when on, CurataMed support can open a 30-minute, read-only view
   of your facility to help you. Each visit, with the reason, appears in your audit log. Turn it off
   to refuse all support access.
 

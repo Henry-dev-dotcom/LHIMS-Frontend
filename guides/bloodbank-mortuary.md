@@ -17,4 +17,4 @@
 - **Deceased register**: each body gets a tag and a storage slot (one body per slot).
 - A doctor **certifies** the death; police cases need **police clearance** before release.
 - **Release** only to an identified collector; storage charges are billed.
-- Once a patient is recorded as deceased, LHIMS refuses new visits and admissions for them.
+- Once a patient is recorded as deceased, CurataMed refuses new visits and admissions for them.

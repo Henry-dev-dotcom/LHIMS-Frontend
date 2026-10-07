@@ -4,7 +4,7 @@
 
 **Pharmacy → Dispensing** lists prescriptions waiting.
 
-1. Open the prescription. LHIMS picks the batch that expires first (and never an expired one).
+1. Open the prescription. CurataMed picks the batch that expires first (and never an expired one).
 2. Dispense all items, or part of them if stock is short; the rest stays outstanding.
 3. The pharmacy bill is created for the cashier.
 
