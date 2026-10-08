@@ -30,7 +30,7 @@ export function ClinicQueuePage({ clinic }) {
   return <OpdQueuePage key={clinic} clinic={clinic} />;
 }
 
-export function OpdQueuePage({ mode = 'OPD', clinic }) {
+export function OpdQueuePage({ mode = 'OPD', clinic, prescriptionMode = false }) {
   const emergency = mode === 'EMERGENCY';
   const clinicInfo = clinic ? CLINICS[clinic] : null;
   const { state, dispatch } = useAppStore();
@@ -64,7 +64,7 @@ export function OpdQueuePage({ mode = 'OPD', clinic }) {
     return (
       <div className="space-y-4">
         <Button variant="secondary" onClick={() => setOpenId('')}><ArrowLeft className="h-4 w-4" /> Back to visits</Button>
-        <EncounterWorkspace encounterId={openId} onChanged={() => {}} />
+        <EncounterWorkspace encounterId={openId} focusPrescriptions={prescriptionMode} onChanged={() => {}} />
       </div>
     );
   }
@@ -72,9 +72,9 @@ export function OpdQueuePage({ mode = 'OPD', clinic }) {
   return (
     <div className="space-y-4">
       <PageHeader
-        eyebrow={emergency ? 'Emergency' : clinicInfo ? 'Clinics' : 'Outpatient'}
-        title={emergency ? 'Emergency board' : clinicInfo ? clinicInfo.label : 'OPD visits'}
-        description={emergency ? 'Emergency arrivals by triage colour: red first, then longest waiting.' : clinicInfo ? `Patients booked into the ${clinicInfo.label.toLowerCase()}, by stage.` : 'Patients waiting for triage, waiting for the doctor, and in consultation, in every clinic.'}
+        eyebrow={prescriptionMode ? 'Clinician' : emergency ? 'Emergency' : clinicInfo ? 'Clinics' : 'Outpatient'}
+        title={prescriptionMode ? 'Prescriptions' : emergency ? 'Emergency board' : clinicInfo ? clinicInfo.label : 'OPD visits'}
+        description={prescriptionMode ? 'Choose a patient visit to review the clinical record and issue a medication prescription.' : emergency ? 'Emergency arrivals by triage colour: red first, then longest waiting.' : clinicInfo ? `Patients booked into the ${clinicInfo.label.toLowerCase()}, by stage.` : 'Patients waiting for triage, waiting for the doctor, and in consultation, in every clinic.'}
       />
 
       <Card
