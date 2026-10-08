@@ -41,15 +41,10 @@ export function Sidebar() {
   const content = (
     <>
       <div className="border-b border-slate-100 p-5 pr-14">
-        <div className="flex items-center gap-3">
-          {facility?.logoDataUrl ? (
-            <img src={facility.logoDataUrl} alt="" className="h-11 w-11 shrink-0 rounded-2xl border border-slate-200 bg-white object-contain p-1" />
-          ) : (
-            <img src={`${import.meta.env.BASE_URL}icons/curatamed-icon.svg`} alt="CurataMed" className="h-11 w-11 shrink-0 rounded-2xl border border-slate-200 bg-white object-contain p-1" />
-          )}
-          <div className="min-w-0">
-            <div className="truncate text-base font-bold tracking-tight text-slate-900">{facility?.name || (role === 'platform' ? 'CurataMed Platform' : 'CurataMed')}</div>
-            <div className="truncate text-xs font-medium text-slate-500">{facility ? `Facility code ${facility.code}` : 'Hospital management system'}</div>
+        <div className="flex flex-col items-start gap-2">
+          <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo.png`} alt="CurataMed — Hospital Management System" className="h-auto max-h-16 w-full max-w-52 object-contain object-left" />
+          <div className="min-w-0 w-full">
+            <div className="truncate text-xs font-medium text-slate-500">{facility ? `${facility.name} · ${facility.code}` : role === 'platform' ? 'Platform' : 'Hospital management system'}</div>
           </div>
         </div>
       </div>
