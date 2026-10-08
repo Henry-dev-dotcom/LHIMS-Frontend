@@ -1,52 +1,108 @@
-import { Activity, CheckCircle2, Database, ShieldCheck } from 'lucide-react';
-
 /* Shown only while the workspace hydrates right after login, so pages never
    flash an empty "no records" state before real data arrives. */
+function Skeleton({ className = '' }) {
+  return <span className={`loading-skeleton block rounded-lg ${className}`} aria-hidden="true" />;
+}
+
+const sidebarSections = [
+  ['Overview', 1],
+  ['Laboratory', 3],
+  ['Core records', 2],
+  ['Administration', 2]
+];
+
 export function WorkspaceLoading() {
   return (
-    <div className="relative grid min-h-[100dvh] overflow-hidden bg-[#f4fafb] p-4 text-slate-900 sm:p-8" aria-live="polite">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_8%,rgba(34,211,238,0.16),transparent_28%),radial-gradient(circle_at_88%_92%,rgba(16,185,129,0.10),transparent_30%)]" aria-hidden="true" />
-      <div className="pointer-events-none absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(15,118,110,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(15,118,110,0.05)_1px,transparent_1px)] [background-size:42px_42px]" aria-hidden="true" />
-
-      <div className="relative m-auto w-full max-w-2xl">
-        <div className="overflow-hidden rounded-[2rem] border border-white/80 bg-white/85 shadow-[0_24px_70px_rgba(15,78,92,0.12)] backdrop-blur-xl">
-          <div className="flex items-center justify-between border-b border-slate-100/90 px-5 py-4 sm:px-7">
-            <img src="/icons/curatamed-logo.png" alt="CurataMed" className="h-auto w-40 sm:w-48" />
-            <span className="hidden rounded-full border border-clinical-100 bg-clinical-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-clinical-800 sm:inline-flex">Secure workspace</span>
-          </div>
-
-          <div className="px-5 py-10 sm:px-12 sm:py-14">
-            <div className="mx-auto max-w-md text-center">
-              <div className="relative mx-auto grid h-20 w-20 place-items-center rounded-[1.65rem] bg-gradient-to-br from-clinical-500 to-cyan-600 text-white shadow-[0_16px_35px_rgba(8,145,178,0.28)] motion-safe:animate-pulse">
-                <span className="absolute inset-[-0.55rem] rounded-[2rem] border border-clinical-200/70 motion-safe:animate-ping" aria-hidden="true" />
-                <Activity className="relative h-9 w-9" strokeWidth={1.8} />
-              </div>
-              <p className="mt-7 text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">Preparing your workspace</p>
-              <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500">Connecting your hospital data and arranging the tools for your role.</p>
-
-              <div className="mt-8 h-2 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label="Loading workspace" aria-valuetext="Preparing workspace">
-                <div className="h-full w-2/5 rounded-full bg-gradient-to-r from-clinical-500 via-cyan-500 to-emerald-400 motion-safe:animate-[loading-sweep_1.4s_ease-in-out_infinite]" />
+    <div className="min-h-[100dvh] bg-app-radial text-slate-900" aria-live="polite" role="status" aria-label="Preparing your workspace">
+      <aside className="fixed inset-y-0 left-0 hidden w-[19rem] flex-col border-r border-slate-200/80 bg-white lg:flex" aria-hidden="true">
+        <div className="border-b border-slate-100 p-5">
+          <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo.png`} alt="" className="h-auto max-h-16 w-full max-w-52 object-contain object-left" />
+          <Skeleton className="mt-3 h-3 w-40" />
+        </div>
+        <div className="border-b border-slate-100 px-5 py-3">
+          <Skeleton className="h-2.5 w-24" />
+          <Skeleton className="mt-2 h-4 w-20" />
+        </div>
+        <nav className="flex-1 px-3 py-5">
+          {sidebarSections.map(([section, items]) => (
+            <div key={section} className="mb-6">
+              <Skeleton className="mb-3 ml-3 h-2.5 w-20" />
+              <div className="space-y-2">
+                {Array.from({ length: items }).map((_, index) => (
+                  <div key={`${section}-${index}`} className="flex min-h-11 items-center gap-3 rounded-xl px-3 py-2">
+                    <Skeleton className="h-8 w-8 rounded-lg" />
+                    <Skeleton className={`h-3 ${index === 0 ? 'w-28' : 'w-24'}`} />
+                    <Skeleton className="ml-auto h-3 w-3 rounded-full" />
+                  </div>
+                ))}
               </div>
             </div>
+          ))}
+        </nav>
+      </aside>
 
-            <div className="mx-auto mt-10 grid max-w-lg gap-2 sm:grid-cols-3">
-              {[
-                [Database, 'Hospital data'],
-                [CheckCircle2, 'Orders & results'],
-                [ShieldCheck, 'Secure session']
-              ].map(([Icon, label]) => (
-                <div key={label} className="flex items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50/80 px-3 py-2.5 text-left">
-                  <Icon className="h-4 w-4 shrink-0 text-clinical-600" />
-                  <span className="text-xs font-semibold text-slate-600">{label}</span>
+      <div className="flex min-h-[100dvh] min-w-0 flex-col lg:ml-[19rem]">
+        <header className="border-b border-slate-200/80 bg-white/90 px-3 py-3 backdrop-blur sm:px-5 lg:px-8" aria-hidden="true">
+          <div className="mx-auto flex min-h-[4.5rem] max-w-[1540px] items-center justify-between gap-4 rounded-[1.35rem] border border-slate-200/70 bg-white px-4 shadow-sm sm:px-6">
+            <div className="min-w-0 flex-1">
+              <Skeleton className="h-2.5 w-28" />
+              <Skeleton className="mt-2 h-6 w-60 max-w-[70%]" />
+              <Skeleton className="mt-2 h-3 w-96 max-w-[90%]" />
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <Skeleton className="h-10 w-10 rounded-2xl" />
+              <Skeleton className="hidden h-10 w-24 rounded-2xl sm:block" />
+              <Skeleton className="h-10 w-12 rounded-2xl sm:w-36" />
+            </div>
+          </div>
+        </header>
+
+        <main className="relative flex-1 overflow-hidden px-3 pb-8 pt-4 sm:px-5 lg:px-8 lg:pt-5" aria-hidden="true">
+          <div className="mx-auto w-full max-w-[1540px]">
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <div>
+                <Skeleton className="h-2.5 w-28" />
+                <Skeleton className="mt-3 h-8 w-56" />
+                <Skeleton className="mt-2 h-3 w-80 max-w-[75vw]" />
+              </div>
+              <Skeleton className="hidden h-10 w-28 rounded-2xl sm:block" />
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="rounded-[1.2rem] border border-slate-200/70 bg-white p-4 shadow-sm">
+                  <Skeleton className="h-2.5 w-24" />
+                  <Skeleton className="mt-3 h-7 w-16" />
                 </div>
               ))}
             </div>
-          </div>
 
-          <div className="border-t border-slate-100/90 bg-slate-50/60 px-5 py-3 text-center text-[11px] font-semibold text-slate-400 sm:px-7">
-            CurataMed Hospital Management System
+            <section className="mt-5 overflow-hidden rounded-[1.65rem] border border-slate-200/70 bg-white p-4 shadow-[0_8px_24px_rgba(15,78,92,0.07)] sm:p-6">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <Skeleton className="h-5 w-52" />
+                  <Skeleton className="mt-2 h-3 w-72 max-w-[70vw]" />
+                </div>
+                <Skeleton className="h-10 w-full rounded-2xl sm:w-64" />
+              </div>
+              <div className="mt-6 overflow-hidden rounded-2xl border border-slate-100">
+                <div className="grid grid-cols-[1.15fr_1fr_1fr_auto] gap-4 border-b border-slate-100 bg-slate-50/70 px-4 py-3">
+                  {['w-20', 'w-24', 'w-32', 'w-16'].map((width) => <Skeleton key={width} className={`h-2.5 ${width}`} />)}
+                </div>
+                <div className="divide-y divide-slate-100">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <div key={index} className="grid grid-cols-[1.15fr_1fr_1fr_auto] items-center gap-4 px-4 py-4">
+                      <div><Skeleton className="h-3.5 w-36" /><Skeleton className="mt-2 h-2.5 w-24" /></div>
+                      <Skeleton className="h-7 w-28 rounded-full" />
+                      <div><Skeleton className="h-3.5 w-32" /><Skeleton className="mt-2 h-2.5 w-24" /></div>
+                      <Skeleton className="h-8 w-20 rounded-xl" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
