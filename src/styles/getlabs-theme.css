@@ -22,8 +22,9 @@
 }
 
 .login-panel {
-  border-color: rgba(204, 239, 236, 0.9);
-  box-shadow: 0 30px 90px rgba(12, 39, 55, 0.2), 0 0 0 4px rgba(191, 235, 231, 0.28);
+  border-color: rgba(148, 197, 255, 0.18);
+  background: #0b1423;
+  box-shadow: 0 30px 90px rgba(1, 7, 18, 0.46), 0 0 0 1px rgba(103, 232, 249, 0.04);
 }
 
 .login-hero {
@@ -40,16 +41,20 @@
   border: 1px solid rgba(94, 235, 230, 0.2);
   border-radius: 50%;
   transform: rotate(-9deg);
-  box-shadow: 0 -18px 0 rgba(91, 224, 229, 0.07), 0 -38px 0 rgba(91, 224, 229, 0.05), 0 -60px 0 rgba(91, 224, 229, 0.035);
+  opacity: 0.5;
+  box-shadow: 0 -18px 0 rgba(91, 224, 229, 0.05), 0 -38px 0 rgba(91, 224, 229, 0.035), 0 -60px 0 rgba(91, 224, 229, 0.02);
   pointer-events: none;
 }
 
 .login-form-section {
-  background: linear-gradient(160deg, #ffffff 0%, #ffffff 72%, #f6fcfc 100%);
+  background: #0b1423;
+  color: #eaf6ff;
 }
 
 .login-form {
-  box-shadow: inset 0 1px 2px rgba(8, 145, 178, 0.06), 0 14px 32px rgba(15, 78, 92, 0.08);
+  border-color: rgba(148, 197, 255, 0.14);
+  background: rgba(148, 197, 255, 0.045);
+  box-shadow: inset 0 1px 2px rgba(148, 197, 255, 0.04), 0 14px 32px rgba(1, 7, 18, 0.18);
 }
 
 .login-wave-glow {
@@ -57,14 +62,16 @@
 }
 
 .login-form .getlabs-input {
-  background: rgba(255, 255, 255, 0.88);
-  padding: 0.3rem 0.72rem;
-  font-size: 0.9rem;
+  min-height: 2.85rem;
+  background: #f7fbff;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.95rem;
 }
 
 .login-form .getlabs-primary-button {
-  min-height: 1.95rem;
-  padding-block: 0.3rem;
+  min-height: 2.85rem;
+  margin-top: 0.35rem;
+  padding-block: 0.55rem;
 }
 
 /* Headline hook (formerly serif). Keeps Inter, calm weight and color. */
@@ -73,6 +80,26 @@
   font-family: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif;
   font-weight: 650;
   color: var(--calm-ink);
+}
+
+.login-form-section .getlabs-serif {
+  color: #f4f8fc;
+}
+
+.login-form-section label,
+.login-form-section .text-slate-600,
+.login-form-section .text-slate-500,
+.login-form-section .text-slate-400 {
+  color: #b9c8dc;
+}
+
+.login-form-section a {
+  color: #67e8f9;
+  text-underline-offset: 3px;
+}
+
+.login-form-section a:hover {
+  color: #a5f3fc;
 }
 
 /* Input hook used on the login form. */
@@ -131,8 +158,24 @@
 }
 
 .getlabs-primary-button:disabled {
-  opacity: 0.82 !important;
+  opacity: 0.5 !important;
   cursor: not-allowed;
+}
+
+@media (max-width: 1023px) {
+  .login-panel {
+    max-width: 42rem;
+  }
+
+  .login-hero {
+    min-height: 22rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-wave-glow {
+    filter: none;
+  }
 }
 
 /* Gentle motion shared by interactive controls. */
