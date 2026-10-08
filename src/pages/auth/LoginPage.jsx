@@ -45,21 +45,16 @@ export function LoginPage({ initialCode = '' }) {
   return (
     <div className="getlabs-login login-shell min-h-screen p-4 text-slate-900 sm:p-6">
       <div className="mx-auto flex min-h-[calc(100dvh-2rem)] max-w-6xl flex-col">
-        <header className="flex items-center justify-between gap-4 py-3 sm:py-5">
-          <div className="flex items-center gap-3">
-            <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo.png`} alt="CurataMed — Hospital Management System" className="h-12 w-auto max-w-[min(80vw,22rem)] object-contain" />
-            <h1 className="sr-only">CurataMed</h1>
-          </div>
-        </header>
-
         <main className="login-panel grid flex-1 overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-panel lg:grid-cols-[1.1fr_0.9fr]">
           <section className="login-hero relative min-h-[20rem] overflow-hidden bg-clinical-700 p-7 sm:p-10 lg:p-12">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(255,255,255,0.14),transparent_30%)]" />
             <div className="absolute -bottom-20 -right-10 h-72 w-72 rounded-full bg-clinical-500/40 blur-3xl" />
             <div className="relative flex h-full flex-col justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-clinical-100">Hospital management system</p>
-                <h2 className="getlabs-serif mt-5 max-w-xl text-4xl leading-[1.06] tracking-[-0.03em] !text-white sm:text-5xl">
+                <div className="mb-8 inline-flex max-w-full rounded-2xl border border-white/70 bg-white p-2.5 shadow-xl shadow-slate-950/15 ring-1 ring-white/30 sm:mb-10">
+                  <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo.png`} alt="CurataMed — Hospital Management System" className="h-auto w-[min(18rem,68vw)] max-w-full object-contain" />
+                </div>
+                <h2 className="getlabs-serif mt-0 max-w-xl text-4xl leading-[1.06] tracking-[-0.03em] !text-white sm:text-5xl">
                   Run your whole hospital, or only the departments you need.
                 </h2>
                 <p className="mt-5 max-w-lg text-base leading-8 text-clinical-100">
