@@ -46,6 +46,11 @@ body {
   text-rendering: geometricPrecision;
 }
 
+@keyframes loading-sweep {
+  0%, 100% { transform: translateX(-115%); opacity: 0.65; }
+  50% { transform: translateX(210%); opacity: 1; }
+}
+
 button, input, textarea, select {
   max-width: 100%;
   font: inherit;
