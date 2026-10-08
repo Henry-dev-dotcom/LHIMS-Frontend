@@ -28,7 +28,7 @@ export function SiteLayout({ active, children }) {
       <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <a href="#/home" className="flex items-center gap-2.5" aria-label="CurataMed home">
-            <img src="/icons/curatamed-logo.png" alt="CurataMed — Hospital Management System" className="h-10 w-auto" />
+            <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo.png`} alt="CurataMed — Hospital Management System" className="h-10 w-auto" />
           </a>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Website">
             {LINKS.map((l) => link(l.path, l.label))}

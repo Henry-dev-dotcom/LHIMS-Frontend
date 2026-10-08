@@ -47,7 +47,7 @@ export function LoginPage({ initialCode = '' }) {
       <div className="mx-auto flex min-h-[calc(100dvh-2rem)] max-w-6xl flex-col">
         <header className="flex items-center justify-between gap-4 py-3 sm:py-5">
           <div className="flex items-center gap-3">
-            <img src="/icons/curatamed-logo.png" alt="CurataMed — Hospital Management System" className="h-12 w-auto max-w-[min(80vw,22rem)] object-contain" />
+            <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo.png`} alt="CurataMed — Hospital Management System" className="h-12 w-auto max-w-[min(80vw,22rem)] object-contain" />
             <h1 className="sr-only">CurataMed</h1>
           </div>
         </header>
