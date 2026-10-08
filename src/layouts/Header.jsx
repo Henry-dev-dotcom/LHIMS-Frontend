@@ -1,6 +1,8 @@
 import { isValidElement, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
+import { gsap } from 'gsap/gsap-core';
+import { useGSAP } from '@gsap/react';
 import { Bell, ChevronDown, Home, LogOut, Menu, Sparkles, UserRound } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { NotificationDrawer } from '../components/ui/NotificationDrawer';
@@ -11,6 +13,8 @@ import { useFocusTrap } from '../hooks/useFocusTrap';
 import { PAGE_META } from '../routes/routeRegistry';
 import { ALL_ROLES } from '../data/roles';
 import '../styles/getlabs-theme.css';
+
+gsap.registerPlugin(useGSAP);
 
 const dashboardMeta = {
   'doctor-dashboard': {
@@ -61,12 +65,14 @@ export function Header() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [pageHeader, setPageHeader] = useState(() => fallbackPageHeader(state.currentPage, state.auth?.role));
-  const notificationTriggerRef = useRef(null);
+  const notificationMobileTriggerRef = useRef(null);
+  const notificationDesktopTriggerRef = useRef(null);
   const userMenuRef = useRef(null);
   const userDropdownRef = useRef(null);
   const screenGuideRef = useRef(null);
   const [userMenuPosition, setUserMenuPosition] = useState({ top: 0, right: 16 });
   const [screenGuideOpen, setScreenGuideOpen] = useState(false);
+  const [compactViewport, setCompactViewport] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches);
   const role = state.auth?.role;
   const roleInfo = ALL_ROLES.find((item) => item.id === role);
   const userInitial = (state.auth?.userName || roleInfo?.label || 'U').charAt(0);
@@ -75,6 +81,14 @@ export function Header() {
     setPageHeader(fallbackPageHeader(state.currentPage, role));
     setScreenGuideOpen(false);
   }, [state.currentPage, role]);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 1023px)');
+    const handleChange = () => setCompactViewport(media.matches);
+    handleChange();
+    media.addEventListener?.('change', handleChange);
+    return () => media.removeEventListener?.('change', handleChange);
+  }, []);
 
   useEffect(() => {
     if (!screenGuideOpen) return undefined;
@@ -161,6 +175,20 @@ export function Header() {
     return () => window.removeEventListener(PAGE_HEADER_EVENT, handlePageHeader);
   }, []);
 
+  useGSAP(() => {
+    const menu = userDropdownRef.current;
+    if (!userMenuOpen || !menu || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    gsap.fromTo(menu,
+      { autoAlpha: 0, y: -10, scale: 0.97, transformOrigin: 'top right' },
+      { autoAlpha: 1, y: 0, scale: 1, duration: 0.24, ease: 'power2.out', clearProps: 'transform' }
+    );
+    gsap.fromTo(menu.querySelectorAll('[data-menu-item]'),
+      { autoAlpha: 0, y: -5 },
+      { autoAlpha: 1, y: 0, duration: 0.18, delay: 0.06, stagger: 0.035, ease: 'power1.out', clearProps: 'transform' }
+    );
+  }, { dependencies: [userMenuOpen], revertOnUpdate: true });
+
   const roleNotifications = useMemo(() => {
     return (state.data.notifications || []).filter((item) => {
       const audience = item.audience || item.role || item.channel;
@@ -180,7 +208,7 @@ export function Header() {
             </div>
 
             <div className="relative z-[95] flex shrink-0 items-center gap-1.5">
-              <div ref={notificationTriggerRef} className="relative">
+              <div ref={notificationMobileTriggerRef} className="relative">
                 <button
                   className="relative grid h-9 w-9 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-600 shadow-sm transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-95"
                   title="Role notifications"
@@ -192,13 +220,6 @@ export function Header() {
                   <Bell className="h-4 w-4" />
                   {unread > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-danger px-1 text-[10px] font-semibold text-white ring-2 ring-white">{unread}</span>}
                 </button>
-                <NotificationDrawer
-                  open={notificationsOpen}
-                  notifications={roleNotifications}
-                  onClose={() => setNotificationsOpen(false)}
-                  onMarkDelivered={(notificationId) => dispatch({ type: 'MARK_NOTIFICATION_DELIVERED', notificationId })}
-                  ignoreRef={notificationTriggerRef}
-                />
               </div>
 
               <button
@@ -284,7 +305,7 @@ export function Header() {
           </div>
           <div className="relative z-[95] flex shrink-0 flex-col items-end gap-2 pt-0.5">
             <div className="flex items-center gap-2">
-            <div ref={notificationTriggerRef} className="relative">
+            <div ref={notificationDesktopTriggerRef} className="relative">
               <button
                 className="relative grid h-10 w-10 place-items-center rounded-2xl border border-slate-200/80 bg-white/90 text-slate-600 shadow-sm transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-700"
                 title="Role notifications"
@@ -296,13 +317,6 @@ export function Header() {
                 <Bell className="h-4 w-4" />
                 {unread > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-danger px-1 text-[10px] font-semibold text-white ring-2 ring-white">{unread}</span>}
               </button>
-              <NotificationDrawer
-                open={notificationsOpen}
-                notifications={roleNotifications}
-                onClose={() => setNotificationsOpen(false)}
-                onMarkDelivered={(notificationId) => dispatch({ type: 'MARK_NOTIFICATION_DELIVERED', notificationId })}
-                ignoreRef={notificationTriggerRef}
-              />
             </div>
             <Button variant="secondary" onClick={() => dispatch({ type: 'GO_HOME' })}>
               <Home className="h-4 w-4" /> <span>Home</span>
@@ -331,6 +345,14 @@ export function Header() {
         </div>
       </div>
 
+      <NotificationDrawer
+        open={notificationsOpen}
+        notifications={roleNotifications}
+        onClose={() => setNotificationsOpen(false)}
+        onMarkDelivered={(notificationId) => dispatch({ type: 'MARK_NOTIFICATION_DELIVERED', notificationId })}
+        ignoreRef={compactViewport ? notificationMobileTriggerRef : notificationDesktopTriggerRef}
+      />
+
       {userMenuOpen && typeof document !== 'undefined' && createPortal(
         <>
           <button
@@ -358,17 +380,18 @@ export function Header() {
             </div>
           </div>
           <div className="max-h-[calc(86dvh-7rem-env(safe-area-inset-bottom))] space-y-2 overflow-y-auto overscroll-contain p-3">
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+              <div data-menu-item className="rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-600">
               <div className="flex items-center gap-2 font-semibold text-slate-800"><UserRound className="h-3.5 w-3.5" /> {roleInfo?.label || 'Workspace'}</div>
               <p className="mt-1 leading-5">Use this menu to view your session details or sign out securely.</p>
             </div>
-            <div className="grid gap-2 md:hidden">
-              <Button variant="secondary" size="sm" onClick={() => { setUserMenuOpen(false); dispatch({ type: 'GO_HOME' }); }}>
+              <div className="grid gap-2 md:hidden">
+              <Button data-menu-item variant="secondary" size="sm" onClick={() => { setUserMenuOpen(false); dispatch({ type: 'GO_HOME' }); }}>
                 <Home className="h-4 w-4" /> Home
               </Button>
             </div>
-            <Button
-              variant="danger"
+              <Button
+                data-menu-item
+                variant="danger"
               className="w-full"
               onClick={() => {
                 setUserMenuOpen(false);
