@@ -46,9 +46,15 @@ body {
   text-rendering: geometricPrecision;
 }
 
-@keyframes loading-sweep {
-  0%, 100% { transform: translateX(-115%); opacity: 0.65; }
-  50% { transform: translateX(210%); opacity: 1; }
+@keyframes loading-shimmer {
+  0% { background-position: 140% 0; }
+  100% { background-position: -40% 0; }
+}
+
+.loading-skeleton {
+  background: linear-gradient(100deg, #e6eef1 25%, #f8fbfc 45%, #e6eef1 65%);
+  background-size: 220% 100%;
+  animation: loading-shimmer 1.8s ease-in-out infinite;
 }
 
 button, input, textarea, select {
