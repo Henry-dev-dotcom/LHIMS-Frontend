@@ -40,7 +40,7 @@ export function PatientPortalAccessPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 px-3 py-4 text-slate-900 sm:px-4 sm:py-8">
+    <main className="public-ambient min-h-screen px-3 py-4 text-slate-900 sm:px-4 sm:py-8">
       <div className="mx-auto max-w-4xl space-y-5">
         <Card title="Secure Patient Result Portal" subtitle="Time-limited OTP-style access for patient report viewing." actions={<LockKeyhole className="h-6 w-6 text-clinical-600" />}>
           {!result && <div className="rounded-2xl bg-amber-50 p-5 text-sm font-semibold text-amber-800">No report found for secure ID <span className="font-mono">{secureId || 'missing'}</span>.</div>}

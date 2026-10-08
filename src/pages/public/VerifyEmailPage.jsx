@@ -48,7 +48,7 @@ export function VerifyEmailPage() {
   const goToApp = () => window.location.assign(window.location.pathname + window.location.search);
 
   return (
-    <main className="min-h-screen bg-slate-100 px-3 py-8 text-slate-900 sm:px-4">
+    <main className="public-ambient min-h-screen px-3 py-8 text-slate-900 sm:px-4">
       <div className="mx-auto max-w-lg">
         <Card
           title="Confirm your email address"

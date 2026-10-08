@@ -16,6 +16,10 @@
   --shadow-clinical: 0 8px 24px rgba(15, 78, 92, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.85);
   --shadow-clinical-hover: 0 14px 32px rgba(8, 145, 178, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   --clinical-grid: rgba(15, 23, 42, 0.045);
+  --public-ambient-background:
+    radial-gradient(circle at 7% 0%, rgba(34, 211, 238, 0.18), transparent 28%),
+    radial-gradient(circle at 96% 5%, rgba(5, 150, 105, 0.09), transparent 25%),
+    linear-gradient(180deg, #ffffff 0%, #f7fbfc 34%, #eef8f8 100%);
 }
 
 * {
@@ -55,6 +59,29 @@ img, svg, video, canvas {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
+}
+.public-ambient {
+  position: relative;
+  isolation: isolate;
+  background: var(--public-ambient-background);
+}
+.public-ambient::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: '';
+  pointer-events: none;
+  opacity: 0.42;
+  background-image:
+    linear-gradient(rgba(8, 145, 178, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(8, 145, 178, 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent 72%);
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+}
+.public-ambient > * {
+  position: relative;
+  z-index: 1;
 }
 
 @supports (height: 100dvh) {
