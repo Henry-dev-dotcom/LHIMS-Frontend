@@ -17,7 +17,7 @@ export function SiteLayout({ active, children }) {
       key={path}
       href={`#/${path}`}
       onClick={() => setOpen(false)}
-      className={`rounded-xl px-3 py-2 text-sm font-semibold ${active === path ? 'bg-clinical-50 text-clinical-800' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+      className={`rounded-xl px-3 py-2 text-sm font-semibold ${active === path ? (isLanding ? 'bg-clinical-50 text-clinical-800' : 'bg-cyan-400/15 text-cyan-200') : (isLanding ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' : 'text-slate-300 hover:bg-white/10 hover:text-white')}`}
       aria-current={active === path ? 'page' : undefined}
     >
       {label}
@@ -25,15 +25,15 @@ export function SiteLayout({ active, children }) {
   );
 
   return (
-    <div className={`min-h-screen text-slate-900 ${isLanding ? 'bg-slate-50' : 'public-ambient'}`}>
-      <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/82 backdrop-blur-xl">
+    <div className={`min-h-screen ${isLanding ? 'bg-slate-50 text-slate-900' : 'public-ambient'}`}>
+      <header className={`sticky top-0 z-20 border-b backdrop-blur-xl ${isLanding ? 'border-slate-200/80 bg-white/90' : 'border-white/10 bg-slate-950/60'}`}>
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <a href="#/home" className="flex items-center gap-2.5" aria-label="CurataMed home">
             <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo.png`} alt="CurataMed — Hospital Management System" className="h-10 w-auto" />
           </a>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Website">
             {LINKS.map((l) => link(l.path, l.label))}
-            <a href="#/login" className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">Sign in</a>
+            <a href="#/login" className={`rounded-xl px-3 py-2 text-sm font-semibold ${isLanding ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}>Sign in</a>
             <a href="#/pricing" className="ml-1 rounded-xl bg-clinical-500 px-4 py-2 text-sm font-semibold text-white shadow-lift hover:bg-clinical-600">Start free trial</a>
           </nav>
           <button type="button" className="rounded-xl p-2 md:hidden" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
@@ -43,7 +43,7 @@ export function SiteLayout({ active, children }) {
         {open && (
           <nav className="flex flex-col gap-1 border-t border-slate-200 px-4 py-3 md:hidden" aria-label="Website">
             {LINKS.map((l) => link(l.path, l.label))}
-            <a href="#/login" className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600">Sign in</a>
+            <a href="#/login" className={`rounded-xl px-3 py-2 text-sm font-semibold ${isLanding ? 'text-slate-600' : 'text-slate-300'}`}>Sign in</a>
             <a href="#/pricing" onClick={() => setOpen(false)} className="rounded-xl bg-clinical-500 px-4 py-2 text-center text-sm font-semibold text-white">Start free trial</a>
           </nav>
         )}
@@ -51,8 +51,8 @@ export function SiteLayout({ active, children }) {
 
       <main id="main-content">{children}</main>
 
-      <footer className="mt-16 border-t border-slate-200/80 bg-white/75 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+      <footer className={`mt-16 border-t backdrop-blur-xl ${isLanding ? 'border-slate-200 bg-white' : 'border-white/10 bg-slate-950/60'}`}>
+        <div className={`mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm sm:flex-row sm:items-center sm:justify-between ${isLanding ? 'text-slate-500' : 'text-slate-400'}`}>
           <p>© {new Date().getFullYear()} CurataMed · Hospital management for Ghana and beyond. Prices in Ghana cedis (GHS).</p>
           <div className="flex flex-wrap gap-4">
             <a href="#/features" className="hover:text-slate-900">Departments</a>

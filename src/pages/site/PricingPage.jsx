@@ -65,11 +65,11 @@ export function PricingPage() {
   return (
     <SiteLayout active="pricing">
       <section className="mx-auto max-w-6xl px-4 py-12">
-        <p className="text-xs font-bold uppercase tracking-[0.12em] text-clinical-700">Pricing</p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+        <p className="text-xs font-bold uppercase tracking-[0.12em] text-cyan-300">Pricing</p>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
           {activeKind ? activeKind.name : 'What kind of facility do you run?'}
         </h1>
-        <p className="mt-3 max-w-2xl text-slate-600">
+        <p className="mt-3 max-w-2xl text-slate-300">
           {activeKind
             ? 'Start from the plan that fits, then add any other department you need. Every plan starts with a free trial; you pay only when you decide to continue.'
             : 'Pick the one closest to yours and we will show you the plans built for it — not a list of everything we sell.'}
@@ -143,8 +143,8 @@ export function PricingPage() {
 
             <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_22rem]">
               <div>
-                <h2 className="text-lg font-bold">Add departments</h2>
-                <p className="mt-1 text-sm text-slate-600">Anything the {plan.name} plan does not already include. Nothing here is locked to the kind of facility you chose — a diagnostic centre that opens a dispensary just adds Pharmacy.</p>
+                <h2 className="text-lg font-bold text-white">Add departments</h2>
+                <p className="mt-1 text-sm text-slate-300">Anything the {plan.name} plan does not already include. Nothing here is locked to the kind of facility you chose — a diagnostic centre that opens a dispensary just adds Pharmacy.</p>
                 {availableAddOns.length === 0 ? (
                   <p className="mt-3 text-sm text-slate-600">The {plan.name} plan already includes every department.</p>
                 ) : (
