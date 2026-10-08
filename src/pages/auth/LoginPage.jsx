@@ -43,9 +43,9 @@ export function LoginPage({ initialCode = '' }) {
   }
 
   return (
-    <div className="getlabs-login login-shell public-ambient min-h-screen p-3 text-slate-900 sm:p-4">
+    <div className="getlabs-login login-shell public-ambient login-page min-h-screen p-3 text-slate-900 sm:p-4">
       <div className="mx-auto flex min-h-[calc(100dvh-2rem)] w-full items-center justify-center">
-        <main className="login-panel grid w-full overflow-hidden rounded-[1.5rem] border bg-white shadow-panel lg:aspect-[5/3] lg:w-[76vw] lg:max-w-6xl lg:grid-cols-[1.1fr_0.9fr]">
+        <main className="login-panel grid w-full overflow-hidden rounded-[1.5rem] border lg:aspect-[5/3] lg:w-[76vw] lg:max-w-6xl lg:grid-cols-[1.1fr_0.9fr]">
           <section className="login-hero relative min-h-[27rem] overflow-hidden bg-clinical-700 p-6 sm:p-8 lg:min-h-0 lg:px-8 lg:pb-8 lg:pt-10">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(255,255,255,0.14),transparent_30%)]" />
             <div className="absolute -bottom-20 -right-10 h-72 w-72 rounded-full bg-clinical-500/40 blur-3xl" />
@@ -101,11 +101,11 @@ export function LoginPage({ initialCode = '' }) {
             <div className="w-full max-w-md">
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 sm:text-xs">Secure sign in</p>
               <h2 className="getlabs-serif mt-1.5 text-[1.45rem] leading-tight tracking-[-0.035em] text-slate-900 sm:text-2xl">Open your workspace.</h2>
-              <p className="mt-1.5 text-[11px] leading-5 text-slate-500 sm:text-xs sm:leading-5 lg:whitespace-nowrap lg:text-[10px]">Sign in with the staff account issued by your administrator.</p>
+              <p className="mt-2 max-w-sm text-xs leading-5 text-slate-300 sm:text-sm">Sign in with the staff account issued by your administrator.</p>
 
-              <form onSubmit={submitCredentials} className="login-form mt-3 space-y-1 rounded-2xl border border-cyan-100 bg-cyan-50/45 p-2.5 sm:mt-3 sm:p-3">
+              <form onSubmit={submitCredentials} className="login-form mt-6 space-y-3 rounded-2xl border p-4 sm:p-5">
                 <label className="block" htmlFor="login-facility">
-                  <span className="mb-1 flex items-center gap-2 text-[11px] font-semibold text-slate-600"><Building2 className="h-3.5 w-3.5" aria-hidden="true" /> Facility code</span>
+                  <span className="mb-1.5 flex items-center gap-2 text-xs font-semibold"><Building2 className="h-3.5 w-3.5" aria-hidden="true" /> Facility code</span>
                   <input
                     id="login-facility"
                     name="facilityCode"
@@ -119,14 +119,14 @@ export function LoginPage({ initialCode = '' }) {
                     onChange={(event) => setFacilityCode(event.target.value.toUpperCase())}
                     className="getlabs-input uppercase tracking-[0.08em]"
                   />
-                  <span id="login-facility-hint" className="mt-1 block text-[10px] text-slate-500">The code your hospital or clinic was given.</span>
+                  <span id="login-facility-hint" className="mt-1.5 block text-[11px]">The code your hospital or clinic was given.</span>
                 </label>
                 <label className="block" htmlFor="login-username">
-                  <span className="mb-1 flex items-center gap-2 text-[11px] font-semibold text-slate-600"><UserRound className="h-3.5 w-3.5" aria-hidden="true" /> Username</span>
+                  <span className="mb-1.5 flex items-center gap-2 text-xs font-semibold"><UserRound className="h-3.5 w-3.5" aria-hidden="true" /> Username</span>
                   <input id="login-username" name="username" autoComplete="username" autoFocus={Boolean(facilityCode)} value={username} onChange={(event) => setUsername(event.target.value)} className="getlabs-input" />
                 </label>
                 <label className="block" htmlFor="login-password">
-                  <span className="mb-1 flex items-center gap-2 text-[11px] font-semibold text-slate-600"><KeyRound className="h-3.5 w-3.5" aria-hidden="true" /> Password</span>
+                  <span className="mb-1.5 flex items-center gap-2 text-xs font-semibold"><KeyRound className="h-3.5 w-3.5" aria-hidden="true" /> Password</span>
                   <input id="login-password" name="password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="getlabs-input" />
                 </label>
                 <Button className="getlabs-primary-button w-full justify-center" type="submit" disabled={submitting || !username.trim() || !password}>
@@ -134,10 +134,10 @@ export function LoginPage({ initialCode = '' }) {
                 </Button>
               </form>
 
-              <p className="mt-1.5 text-[10px] leading-4 text-slate-500 sm:mt-2 sm:text-[10px]">
+              <p className="mt-4 text-xs leading-5 text-slate-400">
                 Sessions are secured with httpOnly cookies. Contact your system administrator if you need an account or a password reset.
               </p>
-              <p className="mt-1 text-[11px] text-slate-600 sm:mt-1 sm:text-[10px] lg:whitespace-nowrap">
+              <p className="mt-3 text-xs leading-5 text-slate-300">
                 New to CurataMed? <a href="#/pricing" className="font-semibold text-clinical-700 underline">Start a free trial</a> · <a href="#/home" className="font-semibold text-clinical-700 underline">About CurataMed</a>
               </p>
             </div>
