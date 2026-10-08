@@ -81,6 +81,25 @@ img, svg, video, canvas {
   position: relative;
   z-index: 1;
 }
+.public-site-header {
+  box-shadow: 0 8px 28px rgba(1, 7, 18, 0.18);
+}
+.public-ambient .public-site-header a,
+.public-ambient .public-site-header button {
+  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+.public-ambient .public-site-header a:hover,
+.public-ambient .public-site-header button:hover {
+  transform: translateY(-1px);
+}
+.public-ambient #main-content h1,
+.public-ambient #main-content h2,
+.public-ambient #main-content h3 {
+  text-wrap: balance;
+}
+.public-ambient #main-content > section {
+  animation: public-page-enter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
 .public-ambient #main-content > section {
   margin-top: 2rem;
   margin-bottom: 2rem;
@@ -121,6 +140,56 @@ img, svg, video, canvas {
 .public-ambient footer a:hover,
 .public-ambient footer button:hover {
   color: #f4f8fc !important;
+}
+.public-ambient input,
+.public-ambient select,
+.public-ambient textarea {
+  border-color: rgba(148, 197, 255, 0.28) !important;
+  background: #f7fbff !important;
+  color: #132238 !important;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+.public-ambient input::placeholder,
+.public-ambient textarea::placeholder {
+  color: #60728a !important;
+}
+.public-ambient input:focus,
+.public-ambient select:focus,
+.public-ambient textarea:focus {
+  border-color: #22d3ee !important;
+  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.14) !important;
+}
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 50;
+  transform: translateY(-160%);
+  border: 1px solid rgba(103, 232, 249, 0.5);
+  border-radius: 0.75rem;
+  background: #0d1728;
+  padding: 0.65rem 0.9rem;
+  color: #eaf6ff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: transform 180ms ease;
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+@keyframes public-page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-ambient #main-content > section {
+    animation: none;
+  }
+  .public-ambient .public-site-header a,
+  .public-ambient .public-site-header button,
+  .skip-link {
+    transition: none;
+  }
 }
 @media (prefers-reduced-transparency: reduce) {
   .public-ambient .bg-white:not(input):not(select):not(textarea) {
