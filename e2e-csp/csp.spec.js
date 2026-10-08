@@ -69,3 +69,24 @@ test('the policy blocks nothing the app needs, and printing still works', async 
   await collect(popup);
   expect(violations, `the policy blocked something the app needs:\n${[...new Set(violations)].join('\n')}`).toEqual([]);
 });
+
+/*
+  The home page is the one page with its own fonts, a canvas and a noise texture
+  drawn from a data: image, so it is the likeliest to trip a policy that was
+  written for the rest of the app. Load it under the real policy and require
+  silence.
+*/
+test('the home page loads under the policy with no violations', async ({ page, context }) => {
+  await context.addInitScript(() => {
+    window.__csp = [];
+    document.addEventListener('securitypolicyviolation', (event) => {
+      window.__csp.push(`${event.violatedDirective} <- ${event.blockedURI || 'inline'}`);
+    });
+  });
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Run your whole hospital on one system.' })).toBeVisible();
+  // Let the fonts and the first frames of the heartbeat line arrive.
+  await page.waitForTimeout(1500);
+  const violations = await page.evaluate(() => window.__csp || []);
+  expect(violations, `the policy blocked: ${violations.join(' | ')}`).toEqual([]);
+});
