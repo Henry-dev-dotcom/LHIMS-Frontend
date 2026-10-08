@@ -12,10 +12,10 @@ const inputClass = 'mt-1 w-full rounded-2xl border border-slate-200 bg-white px-
 
 function Field({ label, error, help, children }) {
   return (
-    <label className="block text-sm font-semibold text-slate-700">
+    <label className="block text-sm font-semibold text-slate-200">
       {label}
       {children}
-      {error ? <span className="mt-1 block text-xs font-semibold text-red-600">{error}</span> : help ? <span className="mt-1 block text-xs font-normal text-slate-500">{help}</span> : null}
+      {error ? <span className="mt-1 block text-xs font-semibold text-red-300">{error}</span> : help ? <span className="mt-1 block text-xs font-normal text-slate-400">{help}</span> : null}
     </label>
   );
 }
@@ -121,11 +121,11 @@ export function SignupPage() {
     <SiteLayout active="signup">
       <section className="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-[1fr_20rem]">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Create your hospital on CurataMed</h1>
-          <p className="mt-2 text-slate-600">It takes about two minutes. You become the administrator and can add your staff straight after.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white">Create your hospital on CurataMed</h1>
+          <p className="mt-2 text-slate-300">It takes about two minutes. You become the administrator and can add your staff straight after.</p>
           <form onSubmit={submit} noValidate className="mt-8 space-y-8">
             <fieldset className="grid gap-4 sm:grid-cols-2">
-              <legend className="mb-3 text-xs font-bold uppercase tracking-[0.08em] text-slate-500">Your facility</legend>
+              <legend className="mb-3 text-xs font-bold uppercase tracking-[0.08em] text-slate-300">Your facility</legend>
               <Field label="Facility name" error={errors['facility.name']}><input className={inputClass} required value={form.facilityName} onChange={set('facilityName')} autoComplete="organization" /></Field>
               <Field label="Type"><select className={inputClass} value={form.facilityType} onChange={set('facilityType')}>{FACILITY_TYPES.map((t) => <option key={t}>{t}</option>)}</select></Field>
               <Field label="Phone" error={errors['facility.phone']}><input className={inputClass} required type="tel" value={form.phone} onChange={set('phone')} autoComplete="tel" /></Field>
@@ -134,7 +134,7 @@ export function SignupPage() {
             </fieldset>
 
             <fieldset className="grid gap-4 sm:grid-cols-2">
-              <legend className="mb-3 text-xs font-bold uppercase tracking-[0.08em] text-slate-500">Your administrator account</legend>
+              <legend className="mb-3 text-xs font-bold uppercase tracking-[0.08em] text-slate-300">Your administrator account</legend>
               <Field label="Your full name" error={errors['admin.name']}><input className={inputClass} required value={form.adminName} onChange={set('adminName')} autoComplete="name" /></Field>
               <Field label="Username" error={errors['admin.username']} help="Letters, digits, dots or dashes."><input className={inputClass} required value={form.username} onChange={set('username')} autoComplete="username" autoCapitalize="none" /></Field>
               <Field label="Password" error={errors['admin.password']} help="At least 10 characters, with a letter and a digit."><input className={inputClass} required type="password" value={form.password} onChange={set('password')} autoComplete="new-password" /></Field>
@@ -147,7 +147,7 @@ export function SignupPage() {
             </div>
 
             <div>
-              <label className="flex items-start gap-3 text-sm text-slate-700">
+              <label className="flex items-start gap-3 text-sm text-slate-200">
                 <input type="checkbox" className="mt-1" checked={form.accept} onChange={set('accept')} />
                 <span>I am authorised to register this facility, and I agree that CurataMed may store and process its records to provide the service.</span>
               </label>

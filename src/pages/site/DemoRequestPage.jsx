@@ -41,8 +41,8 @@ export function DemoRequestPage() {
           </div>
         ) : (
           <>
-            <h1 className="text-3xl font-bold tracking-tight">Request a demo</h1>
-            <p className="mt-2 text-slate-600">Tell us about your hospital and we will show you CurataMed with your departments, and help you plan the move from paper or your current system.</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white">Request a demo</h1>
+            <p className="mt-2 text-slate-300">Tell us about your hospital and we will show you CurataMed with your departments, and help you plan the move from paper or your current system.</p>
             <form onSubmit={submit} noValidate className="mt-8 grid gap-4 sm:grid-cols-2">
               {[
                 ['name', 'Your name', 'name'],
@@ -50,13 +50,13 @@ export function DemoRequestPage() {
                 ['email', 'Email', 'email'],
                 ['phone', 'Phone (optional)', 'tel']
               ].map(([key, label, auto]) => (
-                <label key={key} className="block text-sm font-semibold text-slate-700">
+                <label key={key} className="block text-sm font-semibold text-slate-200">
                   {label}
                   <input className={inputClass} type={key === 'email' ? 'email' : key === 'phone' ? 'tel' : 'text'} autoComplete={auto} value={form[key]} onChange={set(key)} />
                   {errors[key] && <span className="mt-1 block text-xs font-semibold text-red-600">{errors[key]}</span>}
                 </label>
               ))}
-              <label className="block text-sm font-semibold text-slate-700 sm:col-span-2">
+              <label className="block text-sm font-semibold text-slate-200 sm:col-span-2">
                 What would you like to see? (optional)
                 <textarea className={`${inputClass} min-h-28`} value={form.message} onChange={set('message')} placeholder="For example: number of beds, departments, whether you claim from NHIS." />
               </label>

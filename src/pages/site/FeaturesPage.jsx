@@ -12,9 +12,9 @@ export function FeaturesPage() {
   return (
     <SiteLayout active="features">
       <section className="mx-auto max-w-6xl px-4 py-12">
-        <p className="text-xs font-bold uppercase tracking-[0.12em] text-clinical-700">Departments</p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Switch on what your hospital needs</h1>
-        <p className="mt-3 max-w-2xl text-slate-600">Each department can be switched on or off on its own. Plans bundle the common ones; anything else can be added for a monthly price.</p>
+        <p className="text-xs font-bold uppercase tracking-[0.12em] text-cyan-300">Departments</p>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">Switch on what your hospital needs</h1>
+        <p className="mt-3 max-w-2xl text-slate-300">Each department can be switched on or off on its own. Plans bundle the common ones; anything else can be added for a monthly price.</p>
         {loading && <p className="mt-8 text-sm text-slate-500">Loading departments…</p>}
         {error && <p role="alert" className="mt-8 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}
         {Object.entries(CATEGORY_LABEL).map(([category, label]) => {
@@ -22,7 +22,7 @@ export function FeaturesPage() {
           if (!list.length) return null;
           return (
             <div key={category} className="mt-10">
-              <h2 className="text-lg font-bold">{label}</h2>
+              <h2 className="text-lg font-bold text-white">{label}</h2>
               <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {list.map((d) => {
                   const plan = cheapestPlanWith(d.key);
