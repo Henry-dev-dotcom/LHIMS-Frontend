@@ -30,6 +30,7 @@ const SECTION_MODULES = {
 };
 
 const PAGE_MODULE_OVERRIDES = {
+  'doctor-prescriptions': 'opd',
   'finance-shift': 'finance',
   'float-tracker': 'finance',
   expenses: 'finance',

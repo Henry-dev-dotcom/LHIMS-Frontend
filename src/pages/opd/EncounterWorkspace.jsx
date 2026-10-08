@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, BedDouble, Droplets, Scissors, CheckCircle2, ClipboardList, FlaskConical, HeartPulse, Pill, Plus, Stethoscope, Trash2, XCircle } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -59,7 +59,7 @@ function vitalsSummary(v) {
   return parts.join(' · ');
 }
 
-export function EncounterWorkspace({ encounterId }) {
+export function EncounterWorkspace({ encounterId, focusPrescriptions = false }) {
   const { state, dispatch } = useAppStore();
   const auth = state.auth;
   const [encounter, setEncounter] = useState(null);
@@ -69,6 +69,7 @@ export function EncounterWorkspace({ encounterId }) {
   const [admitOpen, setAdmitOpen] = useState(false);
   const [surgeryOpen, setSurgeryOpen] = useState(false);
   const [bloodOpen, setBloodOpen] = useState(false);
+  const prescriptionsRef = useRef(null);
 
   const toast = useCallback((type, message) => dispatch({ type: 'SHOW_TOAST', toast: { type, message } }), [dispatch]);
 
@@ -84,6 +85,14 @@ export function EncounterWorkspace({ encounterId }) {
   useEffect(() => {
     load();
   }, [load]);
+  useEffect(() => {
+    if (!focusPrescriptions || !encounter) return undefined;
+    const frame = window.requestAnimationFrame(() => {
+      prescriptionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      prescriptionsRef.current?.querySelector('input')?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [focusPrescriptions, encounter]);
 
   /** Runs a write, shows the result, and keeps the page in sync with the server's view of the visit. */
   const act = useCallback(async (fn, success) => {
@@ -194,7 +203,9 @@ export function EncounterWorkspace({ encounterId }) {
         <ClinicalFormsCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
         <DiagnosesCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
         <OrdersCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
-        <PrescriptionsCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
+        <div ref={prescriptionsRef} className="scroll-mt-6">
+          <PrescriptionsCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
+        </div>
         <ChargesCard encounter={encounter} />
       </div>
 

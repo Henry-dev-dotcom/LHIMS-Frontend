@@ -129,6 +129,14 @@ export const ALL_ROLES = [PLATFORM_ROLE, ...ROLES];
 export const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard, roles: ['doctor','receptionist','lab','scan','billing','admin'], section: 'Overview' },
 
+  { id: 'doctor-dashboard', label: 'Clinician Dashboard', icon: UserRound, roles: ['doctor','admin'], section: 'Clinician' },
+  { id: 'doctor-prescriptions', label: 'Prescriptions', icon: Pill, roles: ['doctor','admin'], section: 'Clinician' },
+  { id: 'doctor-new-order', label: 'New Order', icon: ClipboardList, roles: ['doctor','admin'], section: 'Clinician' },
+  { id: 'doctor-active-orders', label: 'Active Orders', icon: Clock, roles: ['doctor','admin'], section: 'Clinician' },
+  { id: 'doctor-completed-orders', label: 'Completed Orders', icon: CheckCircle2, roles: ['doctor','admin'], section: 'Clinician' },
+  { id: 'doctor-results', label: 'Results Viewer', icon: ShieldCheck, roles: ['doctor','admin'], section: 'Clinician' },
+  { id: 'doctor-patient-trends', label: 'Patient Trends', icon: LineChart, roles: ['doctor','admin'], section: 'Clinician' },
+
   { id: 'opd-queue', label: 'OPD Visits', icon: Stethoscope, roles: ['nurse','doctor','receptionist','admin'], section: 'Outpatient' },
   { id: 'emergency-board', label: 'Emergency Board', icon: Siren, roles: ['nurse','doctor','receptionist','admin'], section: 'Emergency' },
   { id: 'ward-board', label: 'Ward Board', icon: BedDouble, roles: ['nurse','doctor','admin'], section: 'Wards' },
@@ -158,13 +166,6 @@ export const NAV_ITEMS = [
   { id: 'clinic-dietetics', label: 'Dietetics', icon: Apple, roles: ['nurse','doctor','receptionist','admin'], section: 'Clinics' },
   { id: 'pharmacy-dispensing', label: 'Dispensing', icon: Pill, roles: ['pharmacist','admin'], section: 'Pharmacy' },
   { id: 'pharmacy-stock', label: 'Drugs & Stock', icon: Package, roles: ['pharmacist','admin'], section: 'Pharmacy' },
-
-  { id: 'doctor-dashboard', label: 'Clinician Dashboard', icon: UserRound, roles: ['doctor','admin'], section: 'Clinician' },
-  { id: 'doctor-new-order', label: 'New Order', icon: ClipboardList, roles: ['doctor','admin'], section: 'Clinician' },
-  { id: 'doctor-active-orders', label: 'Active Orders', icon: Clock, roles: ['doctor','admin'], section: 'Clinician' },
-  { id: 'doctor-completed-orders', label: 'Completed Orders', icon: CheckCircle2, roles: ['doctor','admin'], section: 'Clinician' },
-  { id: 'doctor-results', label: 'Results Viewer', icon: ShieldCheck, roles: ['doctor','admin'], section: 'Clinician' },
-  { id: 'doctor-patient-trends', label: 'Patient Trends', icon: LineChart, roles: ['doctor','admin'], section: 'Clinician' },
 
   { id: 'reception-dashboard', label: 'Reception', icon: LayoutDashboard, roles: ['receptionist','admin'], section: 'Reception' },
   { id: 'incoming-orders', label: 'Incoming Orders', icon: ClipboardList, roles: ['receptionist','admin'], section: 'Reception' },

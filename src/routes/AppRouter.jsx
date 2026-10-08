@@ -111,6 +111,7 @@ function resolvePage(pageId, role, modules) {
   if (pageId === 'orders') return <OrderRegistryPage />;
   if (pageId === 'patients') return <PatientRecordsPage />;
   if (pageId === 'doctor-dashboard') return <DoctorPortalPage />;
+  if (pageId === 'doctor-prescriptions') return <OpdQueuePage prescriptionMode />;
   if (pageId === 'doctor-new-order') return <DoctorNewOrderPage />;
   if (pageId === 'doctor-active-orders') return <DoctorActiveOrdersPage />;
   if (pageId === 'doctor-completed-orders') return <DoctorCompletedOrdersPage />;

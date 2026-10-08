@@ -134,6 +134,11 @@ export const PAGE_META = {
     description: 'Doctor order form for existing or new patients, tests/scans, clinical notes and urgency.',
     requirements: ['Select existing patient', 'Create new patient', 'Select test(s)/scan(s)', 'Clinical notes', 'Routine/Urgent flag']
   },
+  'doctor-prescriptions': {
+    title: 'Prescriptions', section: 'Clinician',
+    description: 'Select a patient visit, review the clinical context and issue a safe medication prescription for the pharmacy queue.',
+    requirements: ['Select patient visit', 'Review allergies', 'Search formulary or enter medicine', 'Issue prescription']
+  },
   'doctor-results': {
     title: 'Results Viewer', section: 'Doctor Portal',
     description: 'Doctor-side result review with structured values, reference ranges, abnormal flags and PDF download.',
