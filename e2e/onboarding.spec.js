@@ -26,7 +26,7 @@ test('a new hospital signs up, sets up, registers a patient and pays', async ({ 
 
   // Sign-up form. The price carried across must be the one they were quoted,
   // not the plan's own price: this is the last number seen before committing.
-  await expect(page.getByRole('heading', { name: 'Create your hospital on LHIMS' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Create your hospital on CurataMed' })).toBeVisible();
   const chosen = page.locator('aside', { hasText: 'Your plan' });
   await expect(chosen).toContainText('Add-on: Maternity');
   await expect(chosen).toContainText('GH₵800.00');
@@ -53,7 +53,7 @@ test('a new hospital signs up, sets up, registers a patient and pays', async ({ 
   await page.getByRole('button', { name: 'Go to my hospital' }).click();
 
   // Setup checklist.
-  await expect(page.getByRole('heading', { name: /Welcome to LHIMS/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Welcome to CurataMed/ })).toBeVisible();
   await expect(page.getByText(`Staff sign in with facility code ${code}`)).toBeVisible();
   await page.getByLabel(/^Address/).fill('7 Ring Road, Accra');
   await page.getByRole('button', { name: 'Save details' }).click();

@@ -87,8 +87,11 @@ export default defineConfig({
       reuseExistingServer: false,
       timeout: 120_000,
       // Short, so a test can exercise the request timeout without waiting the
-      // real 15 seconds for it twice.
-      env: { VITE_API_BASE_URL: E2E.apiUrl, VITE_API_TIMEOUT_MS: '2000' }
+      // real 15 seconds for it twice - but not so short that real work trips it.
+      // Signing a hospital up (two password hashes and a few dozen inserts) takes
+      // one to two seconds on a busy machine, and at 2000 that read as a dead
+      // server and failed the onboarding journey.
+      env: { VITE_API_BASE_URL: E2E.apiUrl, VITE_API_TIMEOUT_MS: '6000' }
     }
   ]
 });
