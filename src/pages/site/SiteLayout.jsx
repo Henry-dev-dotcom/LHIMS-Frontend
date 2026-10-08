@@ -11,6 +11,7 @@ const LINKS = [
 /** Header and footer shared by the public website pages. */
 export function SiteLayout({ active, children }) {
   const [open, setOpen] = useState(false);
+  const isLanding = active === 'home';
   const link = (path, label) => (
     <a
       key={path}
@@ -24,8 +25,8 @@ export function SiteLayout({ active, children }) {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
+    <div className={`min-h-screen text-slate-900 ${isLanding ? 'bg-slate-50' : 'public-ambient'}`}>
+      <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/82 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <a href="#/home" className="flex items-center gap-2.5" aria-label="CurataMed home">
             <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo.png`} alt="CurataMed — Hospital Management System" className="h-10 w-auto" />
@@ -50,7 +51,7 @@ export function SiteLayout({ active, children }) {
 
       <main id="main-content">{children}</main>
 
-      <footer className="mt-16 border-t border-slate-200 bg-white">
+      <footer className="mt-16 border-t border-slate-200/80 bg-white/75 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} CurataMed · Hospital management for Ghana and beyond. Prices in Ghana cedis (GHS).</p>
           <div className="flex flex-wrap gap-4">

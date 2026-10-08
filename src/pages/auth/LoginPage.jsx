@@ -43,7 +43,7 @@ export function LoginPage({ initialCode = '' }) {
   }
 
   return (
-    <div className="getlabs-login login-shell min-h-screen p-3 text-slate-900 sm:p-4">
+    <div className="getlabs-login login-shell public-ambient min-h-screen p-3 text-slate-900 sm:p-4">
       <div className="mx-auto flex min-h-[calc(100dvh-2rem)] w-full items-center justify-center">
         <main className="login-panel grid w-full overflow-hidden rounded-[1.5rem] border bg-white shadow-panel lg:aspect-[5/3] lg:w-[76vw] lg:max-w-6xl lg:grid-cols-[1.1fr_0.9fr]">
           <section className="login-hero relative min-h-[27rem] overflow-hidden bg-clinical-700 p-6 sm:p-8 lg:min-h-0 lg:px-8 lg:pb-8 lg:pt-10">

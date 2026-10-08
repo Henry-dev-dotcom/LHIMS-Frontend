@@ -18,10 +18,7 @@
 }
 
 .login-shell {
-  background:
-    radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.82), transparent 32%),
-    radial-gradient(circle at 88% 90%, rgba(190, 234, 231, 0.45), transparent 30%),
-    #f0efeb;
+  background: var(--public-ambient-background);
 }
 
 .login-panel {

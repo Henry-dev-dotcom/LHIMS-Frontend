@@ -25,7 +25,7 @@ export function ReportVerificationPage() {
   const verificationUrl = getReportVerificationUrl(result || { secureId });
 
   return (
-    <main className="min-h-screen bg-slate-100 px-3 py-4 text-slate-900 sm:px-4 sm:py-8">
+    <main className="public-ambient min-h-screen px-3 py-4 text-slate-900 sm:px-4 sm:py-8">
       <div className="mx-auto max-w-3xl space-y-5">
         <Card title="Report Verification" subtitle="Public read-only integrity check for reports issued through CurataMed." actions={valid ? <ShieldCheck className="h-6 w-6 text-emerald-600" /> : <AlertTriangle className="h-6 w-6 text-amber-600" />}>
           {result ? (
