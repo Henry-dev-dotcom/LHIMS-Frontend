@@ -97,38 +97,32 @@ function ReverseResultModal({ open, result, onClose, onConfirm, submitting }) {
 function LabResultCard({ row, onOpen }) {
   const abnormal = (row.result?.parameters || []).some((parameter) => ['High', 'Low', 'Critical'].includes(parameter.flag));
   return (
-    <article className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-clinical-200 hover:bg-slate-50/70">
-      <div className="grid gap-4 xl:grid-cols-[minmax(220px,0.9fr)_minmax(320px,1.2fr)_minmax(260px,0.9fr)]">
-        <div className="min-w-0">
-          <p className="truncate text-base font-bold text-slate-900">{row.order?.patient?.fullName || 'Unknown patient'}</p>
-          <p className="mt-0.5 text-sm font-semibold text-slate-500">{row.order?.patient?.id} · {row.result?.orderId}</p>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <StatusBadge status="Sent to Clinician" />
-            {abnormal && <StatusBadge status="Abnormal" />}
-            {(row.result?.versionHistory || []).length > 0 && <StatusBadge status="Previously reversed" />}
-          </div>
+    <tr className="border-b border-slate-100 align-top last:border-b-0">
+      <td className="py-3 pr-3">
+        <p className="font-bold text-slate-900">{row.order?.patient?.fullName || 'Unknown patient'}</p>
+        <p className="text-xs font-semibold text-slate-500">{row.order?.patient?.id || '—'} · {row.result?.orderId || '—'}</p>
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <StatusBadge status="Sent to Clinician" />
+          {abnormal && <StatusBadge status="Abnormal" />}
+          {(row.result?.versionHistory || []).length > 0 && <StatusBadge status="Previously reversed" />}
         </div>
-
-        <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Lab tests</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {resultTestNames(row.result, row.order).map((name) => (
-              <span key={`${row.result?.id}-${name}`} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm">{name}</span>
-            ))}
-          </div>
+      </td>
+      <td className="py-3 pr-3">
+        <div className="flex flex-wrap gap-1">
+          {resultTestNames(row.result, row.order).map((name) => (
+            <span key={`${row.result?.id}-${name}`} className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600">{name}</span>
+          ))}
         </div>
-
-        <div className="space-y-3">
-          <div className="rounded-2xl bg-slate-50 p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Clinician / Hospital</p>
-            <p className="mt-1 truncate font-bold text-slate-900">{row.order?.doctor?.name}</p>
-            <p className="truncate text-sm text-slate-500">{row.order?.hospital?.name}</p>
-          </div>
-          <p className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500">Sent {formatDateTime(row.result?.signedAt || row.result?.approvedAt || row.result?.updatedAt)}</p>
-          <Button onClick={() => onOpen(row)} className="w-full justify-center"><FileText className="h-4 w-4" /> View Stored Result</Button>
-        </div>
-      </div>
-    </article>
+      </td>
+      <td className="py-3 pr-3">
+        <p className="font-bold text-slate-900">{row.order?.doctor?.name || '—'}</p>
+        <p className="text-xs text-slate-500">{row.order?.hospital?.name || '—'}</p>
+      </td>
+      <td className="py-3 pr-3 text-xs text-slate-600">{formatDateTime(row.result?.signedAt || row.result?.approvedAt || row.result?.updatedAt)}</td>
+      <td className="py-3 text-right">
+        <Button size="sm" onClick={() => onOpen(row)}><FileText className="h-4 w-4" /> View Result</Button>
+      </td>
+    </tr>
   );
 }
 
@@ -201,15 +195,30 @@ export function LabResultsPage() {
               <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-500" />
               <input aria-label="Search patient, order ID, clinician, hospital, or test" className={`${inputClass} pl-9`} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search patient, order ID, clinician, hospital, or test..." />
             </div>
-            <div className="space-y-3">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[860px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+                    <th className="py-2 pr-3">Patient</th>
+                    <th className="py-2 pr-3">Lab Tests</th>
+                    <th className="py-2 pr-3">Clinician / Hospital</th>
+                    <th className="py-2 pr-3">Sent</th>
+                    <th className="py-2 text-right" />
+                  </tr>
+                </thead>
+                <tbody>
               {filteredRows.length ? filteredRows.map((row) => (
                 <LabResultCard key={row.result.id} row={row} onOpen={openResult} />
               )) : (
-                <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
-                  <p className="font-bold text-slate-900">No sent laboratory results found.</p>
-                  <p className="mt-2 text-sm text-slate-500">Completed results will appear here after they are pushed from Accepted Samples.</p>
-                </div>
+                <tr>
+                  <td colSpan="5" className="py-8 text-center">
+                    <p className="font-bold text-slate-900">No sent laboratory results found.</p>
+                    <p className="mt-2 text-sm text-slate-500">Completed results will appear here after they are pushed from Accepted Samples.</p>
+                  </td>
+                </tr>
               )}
+                </tbody>
+              </table>
             </div>
           </div>
         </Card>
