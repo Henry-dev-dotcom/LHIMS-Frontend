@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { gsap } from 'gsap/gsap-core';
+import { useGSAP } from '@gsap/react';
 import { BellRing, CheckCheck, Mail, MessageSquareText, X } from 'lucide-react';
 import { Button } from './Button';
 import { StatusBadge } from './StatusBadge';
 import { formatDateTime } from '../../utils/formatters';
+
+gsap.registerPlugin(useGSAP);
 
 export function NotificationDrawer({ open, notifications = [], onClose, onMarkDelivered, ignoreRef }) {
   const drawerRef = useRef(null);
@@ -58,6 +62,21 @@ export function NotificationDrawer({ open, notifications = [], onClose, onMarkDe
     };
   }, [open, onClose, ignoreRef]);
 
+  useGSAP(() => {
+    const drawer = drawerRef.current;
+    if (!open || !drawer || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const mobile = window.matchMedia('(max-width: 767px)').matches;
+    gsap.fromTo(drawer,
+      { autoAlpha: 0, y: mobile ? 24 : -10, scale: mobile ? 1 : 0.98, transformOrigin: 'top right' },
+      { autoAlpha: 1, y: 0, scale: 1, duration: 0.26, ease: 'power2.out', clearProps: 'transform' }
+    );
+    gsap.fromTo(drawer.querySelectorAll('[data-notification-item]'),
+      { autoAlpha: 0, y: 6 },
+      { autoAlpha: 1, y: 0, duration: 0.18, delay: 0.08, stagger: 0.035, ease: 'power1.out', clearProps: 'transform' }
+    );
+  }, { dependencies: [open], revertOnUpdate: true });
+
   if (!open || typeof document === 'undefined') return null;
 
   return createPortal(
@@ -88,7 +107,7 @@ export function NotificationDrawer({ open, notifications = [], onClose, onMarkDe
           {notifications.length === 0 ? (
             <div className="rounded-2xl bg-slate-50 p-5 text-sm font-semibold text-slate-500">No notifications for this workspace.</div>
           ) : notifications.slice(0, 12).map((note) => (
-            <div key={note.id} className="mb-2 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+            <div data-notification-item key={note.id} className="mb-2 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex min-w-0 items-start gap-3">
                   <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-clinical-50 text-clinical-700">
