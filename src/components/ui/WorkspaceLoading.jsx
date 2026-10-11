@@ -1,5 +1,4 @@
-/* Shown only while the workspace hydrates right after login, so pages never
-   flash an empty "no records" state before real data arrives. */
+/* Shown while the workspace hydrates so pages never flash an empty state. */
 function Skeleton({ className = '' }) {
   return <span className={`loading-skeleton block rounded-lg ${className}`} aria-hidden="true" />;
 }
@@ -10,6 +9,33 @@ const sidebarSections = [
   ['Core records', 2],
   ['Administration', 2]
 ];
+
+function LoadingAnimation() {
+  return (
+    <div className="workspace-loading-overlay" aria-hidden="true">
+      <div className="workspace-loading-card">
+        <div className="loading-emblem">
+          <span className="loading-emblem__ring loading-emblem__ring--outer" />
+          <span className="loading-emblem__ring loading-emblem__ring--inner" />
+          <span className="loading-emblem__dot loading-emblem__dot--one" />
+          <span className="loading-emblem__dot loading-emblem__dot--two" />
+          <svg className="loading-emblem__cross" viewBox="0 0 48 48" fill="none">
+            <rect x="19" y="7" width="10" height="34" rx="3" fill="currentColor" />
+            <rect x="7" y="19" width="34" height="10" rx="3" fill="currentColor" />
+          </svg>
+          <svg className="loading-emblem__pulse" viewBox="0 0 76 28" fill="none">
+            <path d="M2 15h17l6-10 9 20 8-16 6 6h26" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+        <div className="workspace-loading-copy">
+          <p className="workspace-loading-title">Preparing your workspace</p>
+          <p className="workspace-loading-subtitle">Securely connecting your care team</p>
+        </div>
+        <div className="loading-progress" role="presentation"><span /></div>
+      </div>
+    </div>
+  );
+}
 
 export function WorkspaceLoading() {
   return (
@@ -104,6 +130,7 @@ export function WorkspaceLoading() {
           </div>
         </main>
       </div>
+      <LoadingAnimation />
     </div>
   );
 }
