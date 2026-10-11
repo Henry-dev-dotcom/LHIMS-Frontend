@@ -77,7 +77,17 @@ function LoginPanel({ activate, token, onSuccess }) {
         : await vendorPortalService.login(email, password);
       onSuccess(user);
     } catch (requestError) {
-      setError(requestError?.message || (activate ? 'This setup link could not be used.' : 'Sign-in failed. Check your email and password.'));
+      const validationErrors = requestError?.details?.errors;
+      const hasActivationValidationErrors = activate
+        && requestError?.details?.code === 'VALIDATION_FAILED'
+        && Array.isArray(validationErrors);
+      if (hasActivationValidationErrors && validationErrors.some((item) => item.field === 'token')) {
+        setError('This invitation link looks incomplete. Open the full setup link from the administrator or ask for a new one.');
+      } else if (hasActivationValidationErrors && validationErrors.some((item) => item.field === 'password')) {
+        setError('The password could not be validated. Use 8–128 characters and follow the requirements shown above.');
+      } else {
+        setError(requestError?.message || (activate ? 'This setup link could not be used.' : 'Sign-in failed. Check your email and password.'));
+      }
     } finally {
       setBusy(false);
     }
@@ -94,7 +104,7 @@ function LoginPanel({ activate, token, onSuccess }) {
         </div>
         <form onSubmit={submit} className="space-y-4 px-7 py-6 sm:px-8">
           {activate ? (
-            !token ? <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">This invitation link is missing its setup token. Ask the CurataMed administrator for a new link.</div> : <>
+            (!token || token.length < 32 || token.length > 128) ? <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">This invitation link is missing or incomplete. Open the full setup link from the CurataMed administrator or ask for a new link.</div> : <>
               <FormField label="New password" required help="At least 8 characters, including upper/lowercase letters and a number.">
                 <input className={inputClass} type="password" autoComplete="new-password" minLength={8} maxLength={128} required value={password} onChange={(event) => setPassword(event.target.value)} />
               </FormField>
