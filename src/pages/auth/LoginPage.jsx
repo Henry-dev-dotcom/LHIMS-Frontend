@@ -140,6 +140,9 @@ export function LoginPage({ initialCode = '' }) {
               <p className="mt-3 text-xs leading-5 text-slate-300">
                 New to CurataMed? <a href="#/pricing" className="font-semibold text-clinical-700 underline">Start a free trial</a> · <a href="#/home" className="font-semibold text-clinical-700 underline">About CurataMed</a>
               </p>
+              <p className="mt-2 text-[11px] leading-5 text-slate-400">
+                Supplier partner? <a href="#/vendor" className="font-semibold text-clinical-700 underline">Vendor Portal</a>
+              </p>
             </div>
           </section>
         </main>
