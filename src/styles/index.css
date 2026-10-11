@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -1002,134 +1003,150 @@ summary:focus-visible {
   }
 }
 
-/* A calm, branded loading moment layered over the workspace skeleton. */
-.workspace-loading-overlay {
+/* CurataMed's full-screen loading experience, adapted from the supplied HTML. */
+.curata-loading-screen {
   position: fixed;
-  z-index: 50;
+  z-index: 60;
   inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 1.25rem;
-  pointer-events: none;
-  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--color-primary) 5%, transparent), color-mix(in srgb, var(--color-primary) 1%, transparent) 58%, transparent 78%);
-}
-.workspace-loading-card {
   display: flex;
-  min-width: min(21rem, calc(100vw - 2.5rem));
+  min-height: 100vh;
+  min-height: 100svh;
+  width: auto;
+  max-width: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 1.5rem;
+  background: #09101a;
+  color: #fff;
+  font-family: 'Plus Jakarta Sans', 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif;
+}
+.curata-loading-screen::before {
+  position: absolute;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(28, 231, 214, 0.075), transparent 62%);
+}
+.curata-loading-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+.curata-loading-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(100%, 28rem);
   flex-direction: column;
   align-items: center;
-  padding: 1.5rem 2rem 1.3rem;
-  border: 1px solid color-mix(in srgb, var(--color-primary) 14%, white);
-  border-radius: 1.5rem;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 20px 60px color-mix(in srgb, var(--color-primary-deep) 13%, transparent), 0 2px 8px color-mix(in srgb, var(--color-primary-deep) 6%, transparent);
-  backdrop-filter: blur(14px);
-  animation: loading-card-enter 600ms cubic-bezier(.2,.75,.25,1) both;
 }
-.loading-emblem {
-  position: relative;
-  display: grid;
-  width: 5.25rem;
-  height: 5.25rem;
-  place-items: center;
-  margin-bottom: 1rem;
-  color: var(--color-primary);
-}
-.loading-emblem__ring {
-  position: absolute;
-  inset: 0.15rem;
-  border: 1px solid color-mix(in srgb, var(--color-primary) 17%, transparent);
-  border-radius: 50%;
-  animation: loading-orbit 3.6s linear infinite;
-}
-.loading-emblem__ring--inner {
-  inset: 0.55rem;
-  border-color: color-mix(in srgb, var(--color-accent) 20%, transparent);
-  border-style: dashed;
-  animation-direction: reverse;
-  animation-duration: 8s;
-}
-.loading-emblem__dot {
-  position: absolute;
-  z-index: 2;
-  width: 0.42rem;
-  height: 0.42rem;
-  border: 2px solid white;
-  border-radius: 50%;
-  background: var(--color-accent);
-  box-shadow: 0 1px 5px color-mix(in srgb, var(--color-accent) 25%, transparent);
-  animation: loading-dot 2s ease-in-out infinite;
-}
-.loading-emblem__dot--one { top: 0.05rem; left: 2.36rem; }
-.loading-emblem__dot--two { right: 0.2rem; bottom: 1rem; animation-delay: 1s; }
-.loading-emblem__cross {
-  z-index: 1;
-  width: 2.3rem;
-  height: 2.3rem;
-  color: var(--color-primary-deep);
-  filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--color-primary) 16%, transparent));
-  animation: loading-heart 1.8s ease-in-out infinite;
-}
-.loading-emblem__pulse {
-  position: absolute;
-  z-index: 3;
-  bottom: 0.7rem;
-  left: 50%;
-  width: 3.15rem;
-  height: 1.15rem;
-  overflow: visible;
-  color: var(--color-accent);
-  transform: translateX(-50%);
-}
-.loading-emblem__pulse path {
-  stroke-dasharray: 104;
-  stroke-dashoffset: 104;
-  animation: loading-ecg 1.7s ease-in-out infinite;
-}
-.workspace-loading-copy { text-align: center; }
-.workspace-loading-title {
-  margin: 0;
-  color: var(--color-foreground);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: -0.015em;
-}
-.workspace-loading-subtitle {
-  margin: 0.35rem 0 0;
-  color: #6b8791;
-  font-size: 0.8rem;
-}
-.loading-progress {
-  position: relative;
+.curata-ekg-wrap {
+  display: flex;
   width: 100%;
-  height: 3px;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.curata-ekg {
+  width: 100%;
+  max-width: 25rem;
+  height: auto;
+  overflow: visible;
+}
+.curata-ekg-path {
+  fill: none;
+  stroke: #1ce7d6;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 5px rgba(28, 231, 214, 0.5)) drop-shadow(0 0 12px rgba(28, 231, 214, 0.24));
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: curata-draw-line 2.5s ease-in-out infinite;
+}
+.curata-loading-brand {
+  margin-bottom: 2.5rem;
+  text-align: center;
+  user-select: none;
+}
+.curata-loading-brand h1 {
+  margin: 0 0 0.25rem;
+  color: #fff;
+  font-size: clamp(2.5rem, 8vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+.curata-loading-brand h1 span {
+  color: #1ce7d6;
+  text-shadow: 0 0 15px rgba(28, 231, 214, 0.6);
+}
+.curata-loading-brand p {
+  margin: 0.35rem 0 0;
+  color: #9ca3af;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+  text-transform: uppercase;
+}
+.curata-loading-progress { width: 100%; }
+.curata-loading-label {
+  margin: 0 0 0.55rem;
+  padding: 0 0.25rem;
+  color: #9ca3af;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.curata-progress-track {
+  position: relative;
+  height: 0.65rem;
   overflow: hidden;
-  margin-top: 1.2rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-primary) 9%, white);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
 }
-.loading-progress span {
+.curata-progress-fill {
   position: absolute;
-  inset: 0 auto 0 -40%;
-  width: 40%;
+  top: 0;
+  bottom: 0;
+  left: 2%;
+  width: 42%;
+  will-change: transform;
+  overflow: hidden;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
-  animation: loading-progress 1.65s cubic-bezier(.65,.05,.35,1) infinite;
+  background: #1ce7d6;
+  box-shadow: 0 0 15px rgba(28, 231, 214, 0.8), 0 0 30px rgba(28, 231, 214, 0.4);
+  animation: curata-progress-sweep 1.5s ease-in-out infinite alternate;
 }
-@keyframes loading-card-enter {
-  from { opacity: 0; transform: translateY(9px) scale(.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+.curata-progress-fill::after {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 50%;
+  border-radius: 9999px 9999px 0 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+  content: '';
 }
-@keyframes loading-orbit { to { transform: rotate(360deg); } }
-@keyframes loading-dot { 0%, 100% { opacity: .75; transform: scale(.82); } 50% { opacity: 1; transform: scale(1.16); } }
-@keyframes loading-heart { 0%, 100% { transform: scale(1); } 8% { transform: scale(1.1); } 18% { transform: scale(1); } 27% { transform: scale(1.06); } 38% { transform: scale(1); } }
-@keyframes loading-ecg { 0% { stroke-dashoffset: 104; opacity: .5; } 55%, 100% { stroke-dashoffset: 0; opacity: 1; } }
-@keyframes loading-progress { 0% { left: -40%; } 100% { left: 110%; } }
+@keyframes curata-draw-line {
+  0% { stroke-dashoffset: 1000; }
+  70% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes curata-progress-sweep {
+  from { transform: translateX(0); }
+  to { transform: translateX(129%); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .workspace-loading-card, .loading-emblem__ring, .loading-emblem__dot,
-  .loading-emblem__cross, .loading-emblem__pulse path, .loading-progress span {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+  .curata-ekg-path, .curata-progress-fill {
+    animation: none;
   }
-  .loading-progress span { left: 0; width: 100%; }
+  .curata-ekg-path { stroke-dashoffset: 0; opacity: 1; }
+  .curata-progress-fill { left: 0; width: 100%; transform: none; }
 }
