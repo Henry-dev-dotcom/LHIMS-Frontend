@@ -86,6 +86,7 @@ const ClaimsPage = lazyPage(() => import('../pages/claims/ClaimsPage'), 'ClaimsP
 const TheatreListPage = lazyPage(() => import('../pages/theatre/TheatreListPage'), 'TheatreListPage');
 const PlatformFacilitiesPage = lazyPage(() => import('../pages/platform/PlatformFacilitiesPage'), 'PlatformFacilitiesPage');
 const PlatformBillingPage = lazyPage(() => import('../pages/platform/PlatformBillingPage'), 'PlatformBillingPage');
+const VendorPortalAdminPage = lazyPage(() => import('../pages/platform/VendorPortalAdminPage'), 'VendorPortalAdminPage');
 const SubscriptionPage = lazyPage(() => import('../pages/subscription/SubscriptionPage'), 'SubscriptionPage');
 const SetupPage = lazyPage(() => import('../pages/setup/SetupPage'), 'SetupPage');
 const PlatformDashboardPage = lazyPage(() => import('../pages/platform/PlatformDashboardPage'), 'PlatformDashboardPage');
@@ -163,6 +164,7 @@ function resolvePage(pageId, role, modules) {
   if (pageId === 'api-readiness') return <ApiReadinessPage />;
   if (pageId === 'platform-facilities') return <PlatformFacilitiesPage />;
   if (pageId === 'platform-billing') return <PlatformBillingPage />;
+  if (pageId === 'platform-vendor-portal') return <VendorPortalAdminPage />;
   if (pageId === 'subscription') return <SubscriptionPage />;
   if (pageId === 'setup') return <SetupPage />;
   if (pageId === 'platform-dashboard') return <PlatformDashboardPage />;

@@ -49,7 +49,8 @@ const freshForm = (kind) => ({
   analyzerName: '',
   serviceDescription: 'Routine preventive maintenance',
   preferredServiceDate: '',
-  notes: ''
+  notes: '',
+  confirmNoPatientData: false
 });
 
 /** Internal request tracking for the facility's Gustav Biomed partnership. */
@@ -121,6 +122,7 @@ export function GustavBiomedRequestsPage({ mode = 'supplies' }) {
         const selected = analyzers.find((device) => device.id === form.analyzerDeviceId);
         await gustavBiomedService.createMaintenanceRequest(apiClient, {
           requestingUnit: form.requestingUnit.trim(),
+          confirmNoPatientData: form.confirmNoPatientData,
           analyzerDeviceId: selected?.id || undefined,
           analyzerName: selected?.name || form.analyzerName.trim() || undefined,
           serviceDescription: form.serviceDescription.trim(),
@@ -131,6 +133,7 @@ export function GustavBiomedRequestsPage({ mode = 'supplies' }) {
       } else {
         await gustavBiomedService.createSupplyRequest(apiClient, {
           requestingUnit: form.requestingUnit.trim(),
+          confirmNoPatientData: form.confirmNoPatientData,
           supplyCategory: form.supplyCategory,
           itemDescription: form.itemDescription.trim(),
           quantity: Number(form.quantity),
@@ -149,8 +152,8 @@ export function GustavBiomedRequestsPage({ mode = 'supplies' }) {
   };
 
   const ready = maintenanceMode
-    ? form.requestingUnit.trim().length >= 2 && (form.analyzerDeviceId || form.analyzerName.trim().length >= 2) && form.serviceDescription.trim().length >= 3
-    : form.requestingUnit.trim().length >= 2 && form.itemDescription.trim().length >= 2 && Number(form.quantity) >= 1 && Boolean(form.quantityUnit.trim());
+    ? form.confirmNoPatientData && form.requestingUnit.trim().length >= 2 && (form.analyzerDeviceId || form.analyzerName.trim().length >= 2) && form.serviceDescription.trim().length >= 3
+    : form.confirmNoPatientData && form.requestingUnit.trim().length >= 2 && form.itemDescription.trim().length >= 2 && Number(form.quantity) >= 1 && Boolean(form.quantityUnit.trim());
 
   const columns = [
     {
@@ -170,7 +173,19 @@ export function GustavBiomedRequestsPage({ mode = 'supplies' }) {
     },
     {
       key: 'status', label: 'Status',
-      render: (request) => <div className="space-y-2">{pill(request.status)}{request.statusNote && <p className="max-w-48 text-xs text-slate-500">{request.statusNote}</p>}{canManage && (NEXT_STATUSES[request.status] || []).length > 0 && <select aria-label={`Update ${request.requestCode} status`} className={`${inputClass} min-w-36 py-1.5 text-xs`} value="" onChange={(event) => updateStatus(request, event.target.value)}><option value="">Update status…</option>{NEXT_STATUSES[request.status].map((status) => <option key={status} value={status}>{STATUS_LABELS[status]?.[0] || status}</option>)}</select>}</div>
+      render: (request) => (
+        <div className="space-y-2">
+          {pill(request.status)}
+          {request.statusNote && <p className="max-w-48 text-xs text-slate-500"><span className="font-semibold">Internal:</span> {request.statusNote}</p>}
+          {request.vendorStatusNote && <p className="max-w-48 text-xs text-clinical-800"><span className="font-semibold">Gustav Biomed:</span> {request.vendorStatusNote}</p>}
+          {canManage && (NEXT_STATUSES[request.status] || []).length > 0 && (
+            <select aria-label={`Update ${request.requestCode} status`} className={`${inputClass} min-w-36 py-1.5 text-xs`} value="" onChange={(event) => updateStatus(request, event.target.value)}>
+              <option value="">Update status…</option>
+              {NEXT_STATUSES[request.status].map((status) => <option key={status} value={status}>{STATUS_LABELS[status]?.[0] || status}</option>)}
+            </select>
+          )}
+        </div>
+      )
     }
   ];
 
@@ -208,6 +223,7 @@ export function GustavBiomedRequestsPage({ mode = 'supplies' }) {
         footer={<><Button variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Button><Button onClick={submit} disabled={!ready || saving}>{saving ? 'Saving…' : 'Record request'}</Button></>}
       >
         <div className="space-y-4">
+          <div role="note" className="rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-sm leading-5 text-amber-950">Equipment, supply, and service details are shared with Gustav Biomed. Do not enter patient identifiers or clinical details. Your additional follow-up notes stay within your facility.</div>
           <FormField label={maintenanceMode ? 'Department or unit' : 'Requesting unit'} required>
             <input className={inputClass} maxLength={120} value={form.requestingUnit} onChange={(event) => setForm({ ...form, requestingUnit: event.target.value })} placeholder={maintenanceMode ? 'Laboratory' : 'Stores'} />
           </FormField>
@@ -225,7 +241,8 @@ export function GustavBiomedRequestsPage({ mode = 'supplies' }) {
               <div className="grid gap-4 sm:grid-cols-2"><FormField label="Quantity" required><input type="number" min="1" step="1" className={inputClass} value={form.quantity} onChange={(event) => setForm({ ...form, quantity: event.target.value })} /></FormField><FormField label="Unit" required><input className={inputClass} maxLength={30} value={form.quantityUnit} onChange={(event) => setForm({ ...form, quantityUnit: event.target.value })} placeholder="boxes, pieces, litres…" /></FormField></div>
             </>
           )}
-          <FormField label="Additional notes"><textarea className={inputClass} rows={2} maxLength={1000} value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} placeholder="Optional details for internal follow-up" /></FormField>
+          <FormField label="Additional notes" help="Visible only to your facility; not shared with Gustav Biomed."><textarea className={inputClass} rows={2} maxLength={1000} value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} placeholder="Optional details for internal follow-up" /></FormField>
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm leading-5 text-slate-700"><input type="checkbox" className="mt-1 h-4 w-4 shrink-0 accent-teal-700" checked={form.confirmNoPatientData} onChange={(event) => setForm({ ...form, confirmNoPatientData: event.target.checked })} /><span>I confirm that the details shared with Gustav Biomed contain no patient identifiers or clinical information.</span></label>
         </div>
       </Modal>
     </div>

@@ -263,7 +263,8 @@ export const NAV_ITEMS = [
 
   { id: 'platform-dashboard', label: 'Overview', icon: LineChart, roles: ['platform'], section: 'Platform' },
   { id: 'platform-facilities', label: 'Facilities', icon: Building2, roles: ['platform'], section: 'Platform' },
-  { id: 'platform-billing', label: 'Plans & Billing', icon: CreditCard, roles: ['platform'], section: 'Platform' }
+  { id: 'platform-billing', label: 'Plans & Billing', icon: CreditCard, roles: ['platform'], section: 'Platform' },
+  { id: 'platform-vendor-portal', label: 'Vendor access', icon: Building2, roles: ['platform'], section: 'Platform' }
 ];
 
 export const ROLE_DASHBOARD_REQUIREMENTS = {

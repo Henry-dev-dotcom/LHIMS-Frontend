@@ -410,6 +410,11 @@ export const PAGE_META = {
     description: 'Platform operator console for creating, suspending and reactivating subscribing facilities.',
     requirements: ['Facility list', 'Create facility with first administrator', 'Suspend / reactivate']
   },
+  'platform-vendor-portal': {
+    title: 'Gustav Biomed portal access', section: 'Platform',
+    description: 'Issue one-time vendor setup links and manage cross-facility supplier portal access.',
+    requirements: ['Partner identity', 'Expiring account invitations', 'Account activation and revocation']
+  },
 
   'api-readiness': {
     title: 'API Readiness', section: 'System',
