@@ -1063,10 +1063,10 @@ summary:focus-visible {
   stroke-width: 3.5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 0 8px rgba(28, 231, 214, 0.7)) drop-shadow(0 0 20px rgba(28, 231, 214, 0.3));
+  filter: drop-shadow(0 0 5px rgba(28, 231, 214, 0.5)) drop-shadow(0 0 12px rgba(28, 231, 214, 0.24));
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
-  animation: curata-draw-line 2.5s ease-in-out infinite, curata-pulse-glow 2s ease-in-out infinite alternate;
+  animation: curata-draw-line 2.5s ease-in-out infinite;
 }
 .curata-loading-brand {
   margin-bottom: 2.5rem;
@@ -1119,6 +1119,7 @@ summary:focus-visible {
   bottom: 0;
   left: 2%;
   width: 42%;
+  will-change: transform;
   overflow: hidden;
   border-radius: inherit;
   background: #1ce7d6;
@@ -1138,18 +1139,14 @@ summary:focus-visible {
   70% { stroke-dashoffset: 0; }
   100% { stroke-dashoffset: 0; opacity: 0; }
 }
-@keyframes curata-pulse-glow {
-  from { filter: drop-shadow(0 0 5px rgba(28, 231, 214, 0.5)) drop-shadow(0 0 10px rgba(28, 231, 214, 0.2)); }
-  to { filter: drop-shadow(0 0 12px rgba(28, 231, 214, 0.9)) drop-shadow(0 0 25px rgba(28, 231, 214, 0.5)); }
-}
 @keyframes curata-progress-sweep {
-  from { left: 2%; }
-  to { left: 56%; }
+  from { transform: translateX(0); }
+  to { transform: translateX(129%); }
 }
 @media (prefers-reduced-motion: reduce) {
   .curata-ekg-path, .curata-progress-fill {
     animation: none;
   }
   .curata-ekg-path { stroke-dashoffset: 0; opacity: 1; }
-  .curata-progress-fill { left: 0; width: 100%; }
+  .curata-progress-fill { left: 0; width: 100%; transform: none; }
 }
