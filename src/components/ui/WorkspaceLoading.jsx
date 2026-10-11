@@ -12,20 +12,10 @@ const sidebarSections = [
 
 function LoadingAnimation() {
   return (
-    <div className="workspace-loading-overlay" aria-hidden="true">
+      <div className="workspace-loading-overlay" aria-hidden="true">
       <div className="workspace-loading-card">
-        <div className="loading-emblem">
-          <span className="loading-emblem__ring loading-emblem__ring--outer" />
-          <span className="loading-emblem__ring loading-emblem__ring--inner" />
-          <span className="loading-emblem__dot loading-emblem__dot--one" />
-          <span className="loading-emblem__dot loading-emblem__dot--two" />
-          <svg className="loading-emblem__cross" viewBox="0 0 48 48" fill="none">
-            <rect x="19" y="7" width="10" height="34" rx="3" fill="currentColor" />
-            <rect x="7" y="19" width="34" height="10" rx="3" fill="currentColor" />
-          </svg>
-          <svg className="loading-emblem__pulse" viewBox="0 0 76 28" fill="none">
-            <path d="M2 15h17l6-10 9 20 8-16 6 6h26" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+        <div className="loading-emblem loading-emblem--logo">
+          <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo.png`} alt="" />
         </div>
         <div className="workspace-loading-copy">
           <p className="workspace-loading-title">Preparing your workspace</p>
@@ -41,10 +31,6 @@ export function WorkspaceLoading() {
   return (
     <div className="min-h-[100dvh] bg-app-radial text-slate-900" aria-live="polite" role="status" aria-label="Preparing your workspace">
       <aside className="fixed inset-y-0 left-0 hidden w-[19rem] flex-col border-r border-slate-200/80 bg-white lg:flex" aria-hidden="true">
-        <div className="border-b border-slate-100 p-5">
-          <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo.png`} alt="" className="h-auto max-h-16 w-full max-w-52 object-contain object-left" />
-          <Skeleton className="mt-3 h-3 w-40" />
-        </div>
         <div className="border-b border-slate-100 px-5 py-3">
           <Skeleton className="h-2.5 w-24" />
           <Skeleton className="mt-2 h-4 w-20" />

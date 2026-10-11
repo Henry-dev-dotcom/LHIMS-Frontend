@@ -1027,64 +1027,18 @@ summary:focus-visible {
   animation: loading-card-enter 600ms cubic-bezier(.2,.75,.25,1) both;
 }
 .loading-emblem {
-  position: relative;
   display: grid;
-  width: 5.25rem;
-  height: 5.25rem;
+  width: min(12rem, 70vw);
+  min-height: 4.5rem;
   place-items: center;
-  margin-bottom: 1rem;
-  color: var(--color-primary);
+  margin-bottom: 0.55rem;
 }
-.loading-emblem__ring {
-  position: absolute;
-  inset: 0.15rem;
-  border: 1px solid color-mix(in srgb, var(--color-primary) 17%, transparent);
-  border-radius: 50%;
-  animation: loading-orbit 3.6s linear infinite;
-}
-.loading-emblem__ring--inner {
-  inset: 0.55rem;
-  border-color: color-mix(in srgb, var(--color-accent) 20%, transparent);
-  border-style: dashed;
-  animation-direction: reverse;
-  animation-duration: 8s;
-}
-.loading-emblem__dot {
-  position: absolute;
-  z-index: 2;
-  width: 0.42rem;
-  height: 0.42rem;
-  border: 2px solid white;
-  border-radius: 50%;
-  background: var(--color-accent);
-  box-shadow: 0 1px 5px color-mix(in srgb, var(--color-accent) 25%, transparent);
-  animation: loading-dot 2s ease-in-out infinite;
-}
-.loading-emblem__dot--one { top: 0.05rem; left: 2.36rem; }
-.loading-emblem__dot--two { right: 0.2rem; bottom: 1rem; animation-delay: 1s; }
-.loading-emblem__cross {
-  z-index: 1;
-  width: 2.3rem;
-  height: 2.3rem;
-  color: var(--color-primary-deep);
-  filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--color-primary) 16%, transparent));
-  animation: loading-heart 1.8s ease-in-out infinite;
-}
-.loading-emblem__pulse {
-  position: absolute;
-  z-index: 3;
-  bottom: 0.7rem;
-  left: 50%;
-  width: 3.15rem;
-  height: 1.15rem;
-  overflow: visible;
-  color: var(--color-accent);
-  transform: translateX(-50%);
-}
-.loading-emblem__pulse path {
-  stroke-dasharray: 104;
-  stroke-dashoffset: 104;
-  animation: loading-ecg 1.7s ease-in-out infinite;
+.loading-emblem img {
+  display: block;
+  width: 100%;
+  max-height: 4rem;
+  object-fit: contain;
+  animation: loading-logo-appear 650ms cubic-bezier(.2,.75,.25,1) both;
 }
 .workspace-loading-copy { text-align: center; }
 .workspace-loading-title {
@@ -1120,14 +1074,10 @@ summary:focus-visible {
   from { opacity: 0; transform: translateY(9px) scale(.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
-@keyframes loading-orbit { to { transform: rotate(360deg); } }
-@keyframes loading-dot { 0%, 100% { opacity: .75; transform: scale(.82); } 50% { opacity: 1; transform: scale(1.16); } }
-@keyframes loading-heart { 0%, 100% { transform: scale(1); } 8% { transform: scale(1.1); } 18% { transform: scale(1); } 27% { transform: scale(1.06); } 38% { transform: scale(1); } }
-@keyframes loading-ecg { 0% { stroke-dashoffset: 104; opacity: .5; } 55%, 100% { stroke-dashoffset: 0; opacity: 1; } }
+@keyframes loading-logo-appear { from { opacity: 0; transform: translateY(4px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes loading-progress { 0% { left: -40%; } 100% { left: 110%; } }
 @media (prefers-reduced-motion: reduce) {
-  .workspace-loading-card, .loading-emblem__ring, .loading-emblem__dot,
-  .loading-emblem__cross, .loading-emblem__pulse path, .loading-progress span {
+  .workspace-loading-card, .loading-emblem img, .loading-progress span {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
