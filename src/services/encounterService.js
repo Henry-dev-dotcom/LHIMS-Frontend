@@ -22,5 +22,15 @@ export const encounterService = {
   searchPatients: async (client, search) => client.request(`/patients${buildQuery({ search, limit: 10 })}`),
   addForm: async (client, id, payload) => client.request(`/encounters/${id}/forms`, { method: 'POST', body: payload }),
   patientForms: async (client, patientId, params = {}) => client.request(`/patients/${patientId}/forms${buildQuery(params)}`),
-  catalog: async (client) => client.request(`/catalog${buildQuery({ limit: 100 })}`)
+  catalog: async (client) => client.request(`/catalog${buildQuery({ limit: 100 })}`),
+  // The queue and drafts change under the user's feet, so they are never served from the 15-second GET cache.
+  // The clinician's queue: new patients, patients sent for tests, patients whose results are back.
+  queue: async (client, params = {}) => client.request(`/encounters/queue${buildQuery(params)}`, { cache: false }),
+  // Send to Lab & Suspend, and taking the visit back.
+  suspend: async (client, id) => client.request(`/encounters/${id}/suspend`, { method: 'POST', body: {} }),
+  resume: async (client, id) => client.request(`/encounters/${id}/resume`, { method: 'POST', body: {} }),
+  // Unsaved work on a visit; private to the clinician who wrote it.
+  getDraft: async (client, id) => client.request(`/encounters/${id}/draft`, { cache: false }),
+  saveDraft: async (client, id, data) => client.request(`/encounters/${id}/draft`, { method: 'PUT', body: { data } }),
+  discardDraft: async (client, id) => client.request(`/encounters/${id}/draft`, { method: 'DELETE' })
 };

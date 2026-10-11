@@ -65,6 +65,7 @@ const AccountLedgerPage = lazyPage(() => import('../pages/billing/AccountLedgerP
 const BillingAnalyticsPage = lazyPage(() => import('../pages/billing/BillingAnalyticsPage'), 'BillingAnalyticsPage');
 const ApiReadinessPage = lazyPage(() => import('../pages/system/ApiReadinessPage'), 'ApiReadinessPage');
 const RolesPage = lazyPage(() => import('../pages/admin/RolesPage'), 'RolesPage');
+const ClinicianQueuePage = lazyPage(() => import('../pages/clinician/ClinicianQueuePage'), 'ClinicianQueuePage');
 const OpdQueuePage = lazyPage(() => import('../pages/opd/OpdQueuePage'), 'OpdQueuePage');
 const EmergencyBoardPage = lazyPage(() => import('../pages/opd/OpdQueuePage'), 'EmergencyBoardPage');
 const PharmacyDispensingPage = lazyPage(() => import('../pages/pharmacy/PharmacyDispensingPage'), 'PharmacyDispensingPage');
@@ -169,6 +170,7 @@ function resolvePage(pageId, role, modules) {
   if (pageId === 'setup') return <SetupPage />;
   if (pageId === 'platform-dashboard') return <PlatformDashboardPage />;
   if (pageId === 'roles') return <RolesPage />;
+  if (pageId === 'clinician-queue') return <ClinicianQueuePage />;
   if (pageId === 'opd-queue') return <OpdQueuePage />;
   if (pageId === 'emergency-board') return <EmergencyBoardPage />;
   if (pageId === 'pharmacy-dispensing') return <PharmacyDispensingPage />;
