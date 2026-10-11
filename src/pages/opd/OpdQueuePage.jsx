@@ -41,14 +41,17 @@ export function OpdQueuePage({ mode = 'OPD', clinic, prescriptionMode = false })
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState('');
   const [newOpen, setNewOpen] = useState(false);
+  const [prescriptionSearch, setPrescriptionSearch] = useState('');
 
   const toast = useCallback((type, message) => dispatch({ type: 'SHOW_TOAST', toast: { type, message } }), [dispatch]);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const params = tab === 'COMPLETED' ? { status: 'COMPLETED', date: todayIso() } : { status: tab };
-      setRows(listItems(await encounterService.list(apiClient, { ...params, type: mode, clinic })));
+      const params = prescriptionMode
+        ? { status: 'ACTIVE', type: 'OPD' }
+        : tab === 'COMPLETED' ? { status: 'COMPLETED', date: todayIso() } : { status: tab, type: mode };
+      setRows(listItems(await encounterService.list(apiClient, { ...params, clinic })));
     } catch (error) {
       toast('error', error?.message || 'Visits could not be loaded.');
     } finally {
@@ -63,7 +66,7 @@ export function OpdQueuePage({ mode = 'OPD', clinic, prescriptionMode = false })
   if (openId) {
     return (
       <div className="space-y-4">
-        <Button variant="secondary" onClick={() => setOpenId('')}><ArrowLeft className="h-4 w-4" /> Back to visits</Button>
+        <Button variant="secondary" onClick={() => setOpenId('')}><ArrowLeft className="h-4 w-4" /> Back to {prescriptionMode ? 'prescriptions' : 'visits'}</Button>
         <EncounterWorkspace encounterId={openId} focusPrescriptions={prescriptionMode} onChanged={() => {}} />
       </div>
     );
@@ -73,39 +76,58 @@ export function OpdQueuePage({ mode = 'OPD', clinic, prescriptionMode = false })
     <div className="space-y-4">
       <PageHeader
         eyebrow={prescriptionMode ? 'Clinician' : emergency ? 'Emergency' : clinicInfo ? 'Clinics' : 'Outpatient'}
-        title={prescriptionMode ? 'Prescriptions' : emergency ? 'Emergency board' : clinicInfo ? clinicInfo.label : 'OPD visits'}
-        description={prescriptionMode ? 'Choose a patient visit to review the clinical record and issue a medication prescription.' : emergency ? 'Emergency arrivals by triage colour: red first, then longest waiting.' : clinicInfo ? `Patients booked into the ${clinicInfo.label.toLowerCase()}, by stage.` : 'Patients waiting for triage, waiting for the doctor, and in consultation, in every clinic.'}
+        title={prescriptionMode ? 'Prescribe medicines' : emergency ? 'Emergency board' : clinicInfo ? clinicInfo.label : 'OPD visits'}
+        description={prescriptionMode ? 'Select an active patient visit, review the clinical record and issue a prescription for the pharmacy.' : emergency ? 'Emergency arrivals by triage colour: red first, then longest waiting.' : clinicInfo ? `Patients booked into the ${clinicInfo.label.toLowerCase()}, by stage.` : 'Patients waiting for triage, waiting for the doctor, and in consultation, in every clinic.'}
       />
 
       <Card
-        title="Visit queue"
-        subtitle="Most urgent first, then longest waiting."
+        title={prescriptionMode ? 'Active patient visits' : 'Visit queue'}
+        subtitle={prescriptionMode ? 'Open a visit to review the patient and prescribe medicines.' : 'Most urgent first, then longest waiting.'}
         actions={(
           <>
             <Button variant="secondary" onClick={load} disabled={loading}><RefreshCw className="h-4 w-4" /> Refresh</Button>
-            {can(auth, P.CREATE) && <Button onClick={() => setNewOpen(true)}><Plus className="h-4 w-4" /> {emergency ? 'Emergency arrival' : 'New visit'}</Button>}
+            {!prescriptionMode && can(auth, P.CREATE) && <Button onClick={() => setNewOpen(true)}><Plus className="h-4 w-4" /> {emergency ? 'Emergency arrival' : 'New visit'}</Button>}
           </>
         )}
       >
-        <div role="tablist" aria-label="Visit stage" className="mb-4 flex flex-wrap gap-2">
-          {QUEUE_TABS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              aria-selected={tab === item.id}
-              onClick={() => setTab(item.id)}
-              className={`rounded-full px-4 py-2 text-sm font-semibold transition ${tab === item.id ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
+        {prescriptionMode ? (
+          <div className="mb-4">
+            <label className="sr-only" htmlFor="clinician-prescription-search">Search active patient visits</label>
+            <input
+              id="clinician-prescription-search"
+              className={inputClass}
+              placeholder="Search patient, patient number, complaint or visit code"
+              value={prescriptionSearch}
+              onChange={(event) => setPrescriptionSearch(event.target.value)}
+            />
+          </div>
+        ) : (
+          <div role="tablist" aria-label="Visit stage" className="mb-4 flex flex-wrap gap-2">
+            {QUEUE_TABS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={tab === item.id}
+                onClick={() => setTab(item.id)}
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${tab === item.id ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
         <DataTable
-          caption="Visits"
+          caption={prescriptionMode ? 'Active patient visits for prescribing' : 'Visits'}
           rowBadge={(row) => row.encounterCode}
-          emptyMessage={loading ? 'Loading visits…' : 'No patients at this stage.'}
-          rows={rows}
+          emptyMessage={loading ? 'Loading visits…' : prescriptionMode ? 'No active patient visits are ready for prescribing.' : 'No patients at this stage.'}
+          rows={prescriptionMode ? rows.filter((row) => {
+            const query = prescriptionSearch.trim().toLowerCase();
+            if (!query) return true;
+            return [row.encounterCode, row.chiefComplaint, row.patient?.patientCode, row.patient?.firstName, row.patient?.lastName]
+              .filter(Boolean)
+              .some((value) => String(value).toLowerCase().includes(query));
+          }) : rows}
           columns={[
             { key: 'patient', label: 'Patient', mobilePrimary: true, render: (row) => (
               <span>
