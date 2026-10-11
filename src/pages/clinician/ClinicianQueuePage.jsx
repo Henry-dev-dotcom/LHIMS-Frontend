@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowLeft, BellRing, FlaskConical, RefreshCw } from 'lucide-react';
+import { BellRing, RefreshCw } from 'lucide-react';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -7,7 +7,7 @@ import { DataTable } from '../../components/ui/DataTable';
 import { useAppStore } from '../../store/AppStore';
 import { apiClient } from '../../store/commands';
 import { encounterService } from '../../services/encounterService';
-import { EncounterWorkspace } from '../opd/EncounterWorkspace';
+import { ClinicianWorkspace } from './ClinicianWorkspace';
 import { P, TRIAGE, ageLabel, can, patientName, waitingSince } from '../opd/opdUtils';
 
 /*
@@ -96,7 +96,8 @@ export function ClinicianQueuePage() {
     try {
       if (row.queueState === 'NEW') await encounterService.startConsultation(apiClient, row.id);
       if (row.queueState === 'REVIEW_READY') await encounterService.resume(apiClient, row.id);
-      setOpen({ id: row.id, name: patientName(row.patient), paused: row.queueState === 'PENDING_LABS', tests: row.tests });
+      // Results are what a Review Ready doctor came for, so that is the first thing they see.
+      setOpen({ id: row.id, tab: row.queueState === 'REVIEW_READY' ? 'investigations' : 'consultation' });
     } catch (e) {
       toast('error', e?.message || 'That visit could not be opened.');
       load({ quiet: true });
@@ -107,13 +108,14 @@ export function ClinicianQueuePage() {
 
   if (open) {
     return (
-      <ClinicianVisit
-        visit={open}
+      <ClinicianWorkspace
+        key={open.id}
+        encounterId={open.id}
+        initialTab={open.tab}
         onClose={() => {
           setOpen(null);
           load({ quiet: true });
         }}
-        onResumed={() => setOpen((current) => ({ ...current, paused: false }))}
       />
     );
   }
@@ -238,45 +240,6 @@ export function ClinicianQueuePage() {
           columns={columns}
         />
       </div>
-    </div>
-  );
-}
-
-/*
-  A visit opened from the queue. This wraps the visit workspace with the one thing
-  the queue adds to it: a paused visit says so, and can be taken back.
-*/
-function ClinicianVisit({ visit, onClose, onResumed }) {
-  const { dispatch } = useAppStore();
-  const [busy, setBusy] = useState(false);
-
-  const resume = async () => {
-    setBusy(true);
-    try {
-      await encounterService.resume(apiClient, visit.id);
-      onResumed();
-    } catch (e) {
-      dispatch({ type: 'SHOW_TOAST', toast: { type: 'error', message: e?.message || 'The visit could not be resumed.' } });
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <Button variant="secondary" size="sm" onClick={onClose}><ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to queue</Button>
-      </div>
-      {visit.paused && (
-        <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-yellow-300 bg-yellow-50 px-4 py-3">
-          <p className="flex items-center gap-2 text-sm font-semibold text-yellow-900">
-            <FlaskConical className="h-4 w-4" aria-hidden="true" />
-            Paused for results{visit.tests ? ` · ${visit.tests.ready} of ${visit.tests.total} back` : ''}. You can carry on without waiting.
-          </p>
-          <Button size="sm" disabled={busy} onClick={resume}>{busy ? 'Resuming…' : 'Resume consultation'}</Button>
-        </div>
-      )}
-      <EncounterWorkspace encounterId={visit.id} />
     </div>
   );
 }

@@ -29,6 +29,8 @@ export const encounterService = {
   // Send to Lab & Suspend, and taking the visit back.
   suspend: async (client, id) => client.request(`/encounters/${id}/suspend`, { method: 'POST', body: {} }),
   resume: async (client, id) => client.request(`/encounters/${id}/resume`, { method: 'POST', body: {} }),
+  // Past (and the current) visits with diagnoses, notes, prescriptions and signed-off results.
+  clinicalHistory: async (client, patientId, limit = 5) => client.request(`/patients/${patientId}/clinical-history${buildQuery({ limit })}`, { cache: false }),
   // Unsaved work on a visit; private to the clinician who wrote it.
   getDraft: async (client, id) => client.request(`/encounters/${id}/draft`, { cache: false }),
   saveDraft: async (client, id, data) => client.request(`/encounters/${id}/draft`, { method: 'PUT', body: { data } }),
