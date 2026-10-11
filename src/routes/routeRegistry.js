@@ -49,6 +49,16 @@ export const PAGE_META = {
     description: 'Ask the store for supplies for your ward or unit and follow what was issued.',
     requirements: ['Requisition', 'Issue status']
   },
+  'gustav-supply-requests': {
+    title: 'Gustav Biomed Requests', section: 'Stores',
+    description: 'Request medical equipment, laboratory equipment and reagents from Gustav Biomed Limited.',
+    requirements: ['Supply requests', 'Internal follow-up status']
+  },
+  'lab-maintenance-requests': {
+    title: 'Analyzer Maintenance', section: 'Laboratory',
+    description: 'Request routine maintenance for laboratory analyzers from Gustav Biomed Limited.',
+    requirements: ['Analyzer selection', 'Preferred service date', 'Request status']
+  },
   'insurance-claims': {
     title: 'Insurance Claims', section: 'Claims',
     description: 'Claim completed visits from NHIS and other schemes, submit monthly batches, and record decisions and scheme payments.',
