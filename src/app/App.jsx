@@ -17,6 +17,7 @@ const FeaturesPage = lazy(() => import('../pages/site/FeaturesPage').then((m) =>
 const PricingPage = lazy(() => import('../pages/site/PricingPage').then((m) => ({ default: m.PricingPage })));
 const SignupPage = lazy(() => import('../pages/site/SignupPage').then((m) => ({ default: m.SignupPage })));
 const DemoRequestPage = lazy(() => import('../pages/site/DemoRequestPage').then((m) => ({ default: m.DemoRequestPage })));
+const VendorPortalPage = lazy(() => import('../pages/vendor/VendorPortalPage').then((m) => ({ default: m.VendorPortalPage })));
 
 const SITE_PAGES = { home: HomePage, features: FeaturesPage, pricing: PricingPage, signup: SignupPage, demo: DemoRequestPage };
 
@@ -31,7 +32,7 @@ function useHashRoute() {
 }
 
 /** Deep links that belong to a recipient, not to the workspace. */
-const PUBLIC_DEEP_LINKS = ['#/verify-report/', '#/patient/results/', '#/verify-email/'];
+const PUBLIC_DEEP_LINKS = ['#/verify-report/', '#/patient/results/', '#/verify-email/', '#/vendor'];
 
 function AppContent() {
   const { state, dispatch } = useAppStore();
@@ -87,6 +88,7 @@ function AppContent() {
     window.history.replaceState(null, '', want);
   }, [auth, currentPage, hash, dispatch]);
 
+  if (hash === '#/vendor' || hash.startsWith('#/vendor/')) return <Suspense fallback={<WorkspaceLoading />}><VendorPortalPage /></Suspense>;
   if (hash.startsWith('#/verify-report/')) return <ReportVerificationPage />;
   if (hash.startsWith('#/patient/results/')) return <PatientPortalAccessPage />;
   if (hash.startsWith('#/verify-email/')) return <VerifyEmailPage />;
