@@ -103,5 +103,8 @@ export const vendorPortalService = {
   },
   setUserStatus(apiClient, userId, status) {
     return apiClient.request(`/platform/vendor-portal-users/${encodeURIComponent(userId)}/status`, { method: 'PATCH', body: { status } });
+  },
+  deleteUser(apiClient, userId) {
+    return apiClient.request(`/platform/vendor-portal-users/${encodeURIComponent(userId)}`, { method: 'DELETE' });
   }
 };
