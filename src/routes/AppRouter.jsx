@@ -81,6 +81,7 @@ const MortuaryPage = lazyPage(() => import('../pages/mortuary/MortuaryPage'), 'M
 const BloodBankPage = lazyPage(() => import('../pages/bloodBank/BloodBankPage'), 'BloodBankPage');
 const StoresPage = lazyPage(() => import('../pages/stores/StoresPage'), 'StoresPage');
 const StoreRequestsPage = lazyPage(() => import('../pages/stores/StoresPage'), 'StoreRequestsPage');
+const GustavBiomedRequestsPage = lazyPage(() => import('../pages/stores/GustavBiomedRequestsPage'), 'GustavBiomedRequestsPage');
 const ClaimsPage = lazyPage(() => import('../pages/claims/ClaimsPage'), 'ClaimsPage');
 const TheatreListPage = lazyPage(() => import('../pages/theatre/TheatreListPage'), 'TheatreListPage');
 const PlatformFacilitiesPage = lazyPage(() => import('../pages/platform/PlatformFacilitiesPage'), 'PlatformFacilitiesPage');
@@ -179,6 +180,8 @@ function resolvePage(pageId, role, modules) {
   if (pageId === 'immunisation-due') return <ImmunizationDueListPage />;
   if (pageId === 'insurance-claims') return <ClaimsPage />;
   if (pageId === 'stores') return <StoresPage />;
+  if (pageId === 'gustav-supply-requests') return <GustavBiomedRequestsPage mode="supplies" />;
+  if (pageId === 'lab-maintenance-requests') return <GustavBiomedRequestsPage mode="maintenance" />;
   if (pageId === 'blood-bank') return <BloodBankPage />;
   if (pageId === 'mortuary') return <MortuaryPage />;
   if (pageId === 'my-hr') return <MyHrPage />;

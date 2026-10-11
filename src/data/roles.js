@@ -46,6 +46,7 @@ import {
   ListChecks,
   Warehouse,
   PackageOpen,
+  Wrench,
   Droplets,
   Archive,
   CalendarCheck,
@@ -153,6 +154,7 @@ export const NAV_ITEMS = [
   { id: 'mortuary', label: 'Mortuary', icon: Archive, roles: ['nurse','doctor','admin'], section: 'Mortuary' },
   { id: 'blood-bank', label: 'Blood Bank', icon: Droplets, roles: ['lab','doctor','nurse','admin'], section: 'Blood Bank' },
   { id: 'stores', label: 'Stores & Procurement', icon: Warehouse, roles: ['billing','admin'], section: 'Stores' },
+  { id: 'gustav-supply-requests', label: 'Gustav Biomed Requests', icon: PackageOpen, roles: ['billing','admin'], section: 'Stores' },
   { id: 'store-requests', label: 'Request Supplies', icon: PackageOpen, roles: ['nurse','doctor','pharmacist','receptionist','lab','scan','billing','admin'], section: 'Stores' },
   { id: 'insurance-claims', label: 'Insurance Claims', icon: ShieldCheck, roles: ['billing','admin'], section: 'Claims' },
   { id: 'clinic-antenatal', label: 'Antenatal Clinic', icon: HeartHandshake, roles: ['nurse','doctor','receptionist','admin'], section: 'Maternity' },
@@ -200,6 +202,7 @@ export const NAV_ITEMS = [
   { id: 'lab-review', label: 'Review & Sign-off', icon: ShieldCheck, roles: ['admin'], section: 'Laboratory', hidden: true },
   { id: 'lab-rejections', label: 'Rejected / Retest', icon: History, roles: ['lab','admin'], section: 'Laboratory', hidden: true },
   { id: 'lab-analyzers', label: 'Analyzers', icon: Cpu, roles: ['lab','admin'], section: 'Laboratory' },
+  { id: 'lab-maintenance-requests', label: 'Analyzer Maintenance', icon: Wrench, roles: ['lab','admin'], section: 'Laboratory' },
   { id: 'lab-analyzer-mapping', label: 'Test Mapping', icon: Link2, roles: ['lab','admin'], section: 'Laboratory' },
   { id: 'lab-analyzer-log', label: 'Analyzer Log', icon: Activity, roles: ['lab','admin'], section: 'Laboratory' },
 
