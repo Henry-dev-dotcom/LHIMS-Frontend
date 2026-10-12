@@ -65,6 +65,7 @@ const AccountLedgerPage = lazyPage(() => import('../pages/billing/AccountLedgerP
 const BillingAnalyticsPage = lazyPage(() => import('../pages/billing/BillingAnalyticsPage'), 'BillingAnalyticsPage');
 const ApiReadinessPage = lazyPage(() => import('../pages/system/ApiReadinessPage'), 'ApiReadinessPage');
 const RolesPage = lazyPage(() => import('../pages/admin/RolesPage'), 'RolesPage');
+const PatientsDirectoryPage = lazyPage(() => import('../pages/directory/PatientsDirectoryPage'), 'PatientsDirectoryPage');
 const ClinicianQueuePage = lazyPage(() => import('../pages/clinician/ClinicianQueuePage'), 'ClinicianQueuePage');
 const OpdQueuePage = lazyPage(() => import('../pages/opd/OpdQueuePage'), 'OpdQueuePage');
 const EmergencyBoardPage = lazyPage(() => import('../pages/opd/OpdQueuePage'), 'EmergencyBoardPage');
@@ -189,6 +190,7 @@ function resolvePage(pageId, role, modules) {
   if (pageId === 'blood-bank') return <BloodBankPage />;
   if (pageId === 'mortuary') return <MortuaryPage />;
   if (pageId === 'my-hr') return <MyHrPage />;
+  if (pageId === 'patients-directory') return <PatientsDirectoryPage />;
   if (pageId === 'medical-records') return <MedicalRecordsPage />;
   if (pageId === 'duty-rota') return <DutyRotaPage />;
   if (pageId === 'hr-admin') return <HrAdminPage />;
