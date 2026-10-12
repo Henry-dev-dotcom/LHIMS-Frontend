@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { AlertTriangle, CheckCircle2, ClipboardPlus, Gauge, RefreshCcw, ServerCog, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ClipboardPlus, Download, Gauge, RefreshCcw, ServerCog, ShieldCheck } from 'lucide-react';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -13,6 +13,15 @@ import { formatDateTime } from '../../utils/formatters';
 const BAD_STATUSES = ['UNMATCHED', 'PARTIAL', 'FAILED'];
 const asNumber = (value) => (value === '' || value == null ? null : Number(value));
 const pct = (value) => `${Math.round(value)}%`;
+const csvCell = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`;
+const downloadFile = (filename, content, type) => {
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+};
 
 export function AnalyzerPerformancePage() {
   const { state, dispatch } = useAppStore();
@@ -31,6 +40,7 @@ export function AnalyzerPerformancePage() {
   const totalValues = appliedMessages + skippedMessages;
   const passRuns = qcRuns.filter((run) => String(run.result).toUpperCase() === 'PASS').length;
   const qcRate = qcRuns.length ? (passRuns / qcRuns.length) * 100 : 0;
+  const alertNotifications = (data.notifications || []).filter((notification) => String(notification.title || '').startsWith('Analyzer '));
 
   const deviceRows = useMemo(() => devices
     .filter((device) => !query.trim() || [device.name, device.make, device.model, device.code].filter(Boolean).some((v) => String(v).toLowerCase().includes(query.trim().toLowerCase())))
@@ -60,13 +70,29 @@ export function AnalyzerPerformancePage() {
     setForm((current) => ({ ...current, parameterName: '', value: '', notes: '' }));
   };
 
+  const exportSummary = (format) => {
+    const summary = {
+      generatedAt: new Date().toISOString(),
+      rules: { qcFailure: 'Alert on every FAIL QC run', lowReliability: 'Alert below 90% across at least 5 of the latest 20 messages', cooldownHours: 6 },
+      metrics: { analyzerCount: devices.length, activeAnalyzerCount: devices.filter((d) => d.rawStatus === 'ACTIVE').length, messages: messages.length, appliedValues: appliedMessages, skippedValues: skippedMessages, valueCaptureRate: totalValues ? (appliedMessages / totalValues) * 100 : null, exceptions: attentionMessages.length, qcRuns: qcRuns.length, qcPassRate: qcRuns.length ? qcRate : null, alerts: alertNotifications.length },
+      analyzers: deviceRows.map(({ id, name, make, model, messageCount, values, exceptions, reliability, lastMessageAt }) => ({ id, name, make, model, messageCount, values, exceptions, reliability, lastMessageAt })),
+      qcObservations: qcRuns.map(({ id, parameterName, controlLevel, value, expectedMean, standardDeviation, result, notes, createdAt }) => ({ id, parameterName, controlLevel, value, expectedMean, standardDeviation, result, notes, createdAt }))
+    };
+    if (format === 'json') {
+      downloadFile(`analyzer-performance-summary-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(summary, null, 2), 'application/json');
+      return;
+    }
+    const lines = [['Analyzer', 'Make', 'Model', 'Messages', 'Values received', 'Exceptions', 'Reliability', 'Last seen'], ...deviceRows.map((row) => [row.name, row.make, row.model, row.messageCount, row.values, row.exceptions, row.reliability == null ? '' : pct(row.reliability), row.lastMessageAt]), [], ['QC parameter', 'Control level', 'Measured', 'Expected mean', 'SD', 'Outcome', 'Notes', 'Recorded'], ...qcRuns.map((run) => [run.parameterName, run.controlLevel, run.value, run.expectedMean, run.standardDeviation, run.result, run.notes, run.createdAt])];
+    downloadFile(`analyzer-performance-summary-${new Date().toISOString().slice(0, 10)}.csv`, lines.map((line) => line.map(csvCell).join(',')).join('\n'), 'text/csv;charset=utf-8');
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
         eyebrow="Laboratory · Analyzers"
         title="Analyzer Performance & QC"
         description="Collect the run, quality-control and exception data that shows whether each analyzer is reliable, accurate and ready for patient work."
-        actions={<Button variant="secondary" onClick={() => dispatch({ type: 'REFRESH_COLLECTIONS', names: ['analyzerDevices', 'analyzerMessages', 'analyzerUnmappedCodes', 'qualityControlRuns'] })}><RefreshCcw className="h-4 w-4" /> Refresh data</Button>}
+        actions={<div className="flex flex-wrap gap-2"><Button variant="secondary" onClick={() => exportSummary('csv')}><Download className="h-4 w-4" /> Export CSV</Button><Button variant="secondary" onClick={() => exportSummary('json')}><Download className="h-4 w-4" /> Export JSON</Button><Button variant="secondary" onClick={() => dispatch({ type: 'REFRESH_COLLECTIONS', names: ['analyzerDevices', 'analyzerMessages', 'analyzerUnmappedCodes', 'qualityControlRuns', 'notifications'] })}><RefreshCcw className="h-4 w-4" /> Refresh data</Button></div>}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -82,6 +108,14 @@ export function AnalyzerPerformancePage() {
           <div><p className="font-bold text-slate-900">1. Watch reliability</p><p>Compare received messages, stored values and exceptions per device.</p></div>
           <div><p className="font-bold text-slate-900">2. Record QC</p><p>Capture control level, measured value, expected mean, SD and pass/fail outcome.</p></div>
           <div><p className="font-bold text-slate-900">3. Act early</p><p>Investigate repeated failures or bias before releasing patient results.</p></div>
+        </div>
+      </Card>
+
+      <Card title="Automated alerting rules" subtitle="Alerts go in-app to active administrators and laboratory staff. Duplicate alerts are suppressed for six hours.">
+        <div className="grid gap-3 text-sm leading-6 text-slate-700 md:grid-cols-3">
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4"><p className="font-bold text-amber-900">QC failure</p><p>Alert whenever a QC observation is recorded as <strong>FAIL</strong>.</p></div>
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4"><p className="font-bold text-amber-900">Low reliability</p><p>Alert below <strong>90%</strong> across at least five of the latest twenty messages.</p></div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4"><p className="font-bold text-slate-900">Alert history</p><p><strong>{alertNotifications.length}</strong> analyzer alerts are in the loaded notification log.</p></div>
         </div>
       </Card>
 
