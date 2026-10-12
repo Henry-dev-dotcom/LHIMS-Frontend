@@ -97,6 +97,18 @@ export function DispositionTab({ encounter, auth, open, busy, draft, updateDraft
             {!canBookSurgery && !canRequestBlood && <p className="text-sm text-slate-500">Nothing else is available for this visit.</p>}
           </div>
         </Card>
+        <Card title="Additional hospital workflows" subtitle="Visible here, but not connected to the clinical record yet.">
+          <div className="space-y-3">
+            <div>
+              <Button variant="secondary" disabled aria-label="Short-stay observation (backend support required)">Short-stay observation</Button>
+              <p className="mt-1 text-xs text-slate-600">Awaiting an observation-specific backend workflow. It is not treated as an admission or discharge.</p>
+            </div>
+            <div>
+              <Button variant="secondary" disabled aria-label="Generate medical-excuse certificate (not connected)">Generate medical-excuse certificate</Button>
+              <p className="mt-1 text-xs text-slate-600">Requires an approved hospital template and a backend audit/storage flow; no certificate is generated here.</p>
+            </div>
+          </div>
+        </Card>
       </div>
 
       <div className="space-y-4">

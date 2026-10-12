@@ -10,6 +10,8 @@ import { ImmunizationCard } from '../childHealth/ImmunizationCard';
 import { ClinicalFormsCard } from '../clinics/ClinicalFormsCard';
 import { P, can } from '../opd/opdUtils';
 import { NOTE_TEMPLATES } from './clinicalContent';
+import { CurataAIAutopilotPanel } from './CurataAIAutopilotPanel';
+import { formatSoapStructureText, noteEditorTextFromSections, noteSectionsFromEditorText } from './noteEditor';
 import { acknowledgeDictation, dictationAcknowledged, dictationSupported, useDictation } from './useDictation';
 
 /*
@@ -37,16 +39,33 @@ function appendSpoken(existing, spoken) {
   return `${text} ${piece}`;
 }
 
+function overLimitField(sections) {
+  return FIELDS.find(([key]) => String(sections[key] || '').length > 5000);
+}
+
 export function ConsultationTab({ encounter, auth, open, busy, act, draft, updateDraft, saveNote, latestVitals }) {
   const canWrite = open && can(auth, P.CONSULT);
   const [acknowledged, setAcknowledged] = useState(dictationAcknowledged);
   const [activeField, setActiveField] = useState('');
+  const [editorMode, setEditorMode] = useState('single');
+  const [noteLimitError, setNoteLimitError] = useState('');
   const activeRef = useRef('');
+  const editorRef = useRef(null);
 
   const dictation = useDictation({
     onText: (spoken) => {
       const key = activeRef.current;
-      if (key) updateDraft((prev) => ({ [key]: appendSpoken(prev[key], spoken) }));
+      if (key === 'single') {
+        const currentText = editorRef.current?.value ?? noteEditorTextFromSections(draft);
+        const nextSections = noteSectionsFromEditorText(appendSpoken(currentText, spoken));
+        const over = overLimitField(nextSections);
+        if (over) {
+          setNoteLimitError(`${over[1]} has a 5,000-character limit. The dictated words were not saved.`);
+          return;
+        }
+        setNoteLimitError('');
+        updateDraft(nextSections);
+      } else if (key) updateDraft((prev) => ({ [key]: appendSpoken(prev[key], spoken) }));
     }
   });
 
@@ -62,6 +81,25 @@ export function ConsultationTab({ encounter, auth, open, busy, act, draft, updat
     dictation.start();
   }
 
+  function changeEditorMode(nextMode) {
+    if (dictation.listening) dictation.stop();
+    activeRef.current = '';
+    setActiveField('');
+    setNoteLimitError('');
+    setEditorMode(nextMode);
+  }
+
+  function updateSingleEditor(text) {
+    const nextSections = noteSectionsFromEditorText(text);
+    const over = overLimitField(nextSections);
+    if (over) {
+      setNoteLimitError(`${over[1]} has a 5,000-character limit. The excess text was not saved.`);
+      return;
+    }
+    setNoteLimitError('');
+    updateDraft(nextSections);
+  }
+
   function insertTemplate(id) {
     const template = NOTE_TEMPLATES.find((item) => item.id === id);
     if (!template) return;
@@ -70,14 +108,20 @@ export function ConsultationTab({ encounter, auth, open, busy, act, draft, updat
   }
 
   const empty = FIELDS.every(([key]) => !draft[key]?.trim());
+  const editorText = noteEditorTextFromSections(draft);
 
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
       <div className="space-y-4">
+        {canWrite && <CurataAIAutopilotPanel />}
         <Card title="Clinical notes" subtitle="Saved as you type. They join the record when you save them, send the patient for tests, or complete the visit.">
           {canWrite ? (
             <div className="space-y-3">
               <div className="flex flex-wrap items-end justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Note editor mode">
+                  <button type="button" aria-pressed={editorMode === 'single'} onClick={() => changeEditorMode('single')} className={`rounded-full px-3 py-2 text-xs font-semibold ${editorMode === 'single' ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>Single editor</button>
+                  <button type="button" aria-pressed={editorMode === 'structured'} onClick={() => changeEditorMode('structured')} className={`rounded-full px-3 py-2 text-xs font-semibold ${editorMode === 'structured' ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>SOAP fields</button>
+                </div>
                 <label className="text-sm font-semibold text-slate-700">
                   <span className="sr-only">Insert a template</span>
                   <select
@@ -106,7 +150,41 @@ export function ConsultationTab({ encounter, auth, open, busy, act, draft, updat
               )}
               {dictation.error && <p role="alert" className="text-sm font-semibold text-red-600">{dictation.error}</p>}
 
-              {FIELDS.map(([key, label, hint]) => (
+              {editorMode === 'single' ? (
+                <div>
+                  <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+                    <label htmlFor="clinical-note" className="text-sm font-semibold text-slate-700">Clinical note</label>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button type="button" onClick={() => updateDraft(noteSectionsFromEditorText(formatSoapStructureText(draft)))} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200">Format: Insert SOAP Structure</button>
+                      {dictationSupported() && (
+                        <button
+                          type="button"
+                          disabled={!acknowledged}
+                          onClick={() => toggleMic('single')}
+                          aria-pressed={dictation.listening && activeField === 'single'}
+                          aria-label={`${dictation.listening && activeField === 'single' ? 'Stop dictating' : 'Dictate'} clinical note`}
+                          title={acknowledged ? 'Dictation appends to the note' : 'Acknowledge the notice above to use dictation'}
+                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 ${dictation.listening && activeField === 'single' ? 'bg-red-600 text-white motion-safe:animate-pulse' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+                        >
+                          {dictation.listening && activeField === 'single' ? <MicOff className="h-3.5 w-3.5" aria-hidden="true" /> : <Mic className="h-3.5 w-3.5" aria-hidden="true" />}
+                          {dictation.listening && activeField === 'single' ? 'Stop' : 'Dictate'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <textarea
+                    ref={editorRef}
+                    id="clinical-note"
+                    rows={16}
+                    className={inputClass}
+                    value={editorText}
+                    placeholder="Write the history, examination, assessment and plan in your own words. Use the format button to insert editable SOAP headings."
+                    maxLength={22000}
+                    onChange={(e) => updateSingleEditor(e.target.value)}
+                  />
+                  {noteLimitError && <p role="alert" className="mt-1 text-sm font-semibold text-red-700">{noteLimitError}</p>}
+                </div>
+              ) : FIELDS.map(([key, label, hint]) => (
                 <div key={key}>
                   <div className="mb-1 flex items-center justify-between gap-2">
                     <label htmlFor={`note-${key}`} className="text-sm font-semibold text-slate-700">{label}</label>
@@ -143,6 +221,8 @@ export function ConsultationTab({ encounter, auth, open, busy, act, draft, updat
           )}
         </Card>
 
+        <DiagnosesCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
+
         <Card title="Notes on this visit" subtitle="Saved notes cannot be edited; add a new note to correct one.">
           <ul className="space-y-3">
             {encounter.notes?.length ? [...encounter.notes].reverse().map((n) => (
@@ -158,7 +238,6 @@ export function ConsultationTab({ encounter, auth, open, busy, act, draft, updat
       </div>
 
       <div className="space-y-4">
-        <DiagnosesCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
         <details className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
           <summary className="cursor-pointer text-sm font-bold text-slate-900">Record vitals</summary>
           <div className="mt-3"><VitalsCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} latest={latestVitals} /></div>

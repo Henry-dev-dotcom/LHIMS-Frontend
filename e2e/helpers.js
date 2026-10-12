@@ -24,6 +24,28 @@ export async function signIn(page, { code = '', username, password }) {
   await expect(page.locator('#main-content')).toBeVisible();
 }
 
+/** The shared DEMO seed is a clinic profile; this browser-only override targets the hospital clinician portal. */
+export async function signInAsHospitalDoctor(page) {
+  const loginUrl = '**/api/auth/login';
+  await page.route(loginUrl, async (route) => {
+    const response = await route.fetch();
+    const payload = await response.json();
+    const user = payload?.data?.user;
+    if (!user?.facility) throw new Error('The E2E login response did not include a facility profile.');
+    user.facility.facilityKind = 'HOSPITAL';
+    user.subscription = {
+      ...user.subscription,
+      plan: { ...user.subscription?.plan, facilityKind: 'HOSPITAL' }
+    };
+    await route.fulfill({ response, body: JSON.stringify(payload) });
+  });
+  try {
+    await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
+  } finally {
+    await page.unroute(loginUrl);
+  }
+}
+
 /** Opens a page from the sidebar (desktop layout). */
 export async function openFromMenu(page, label) {
   await page.getByRole('navigation').getByRole('button', { name: label, exact: true }).first().click();

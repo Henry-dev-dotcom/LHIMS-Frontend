@@ -51,6 +51,7 @@ export function ClinicianQueuePage() {
   const { state, dispatch } = useAppStore();
   const auth = state.auth;
   const canConsult = can(auth, P.CONSULT);
+  const canOrder = can(auth, P.ORDER);
   const [queue, setQueue] = useState(null);
   const [error, setError] = useState('');
   const [tab, setTab] = useState('new');
@@ -91,13 +92,14 @@ export function ClinicianQueuePage() {
   }, [load, open]);
 
   /** Opens a patient's visit, first starting the consultation or taking a paused visit back where that applies. */
-  const openVisit = useCallback(async (row) => {
+  const openVisit = useCallback(async (row, { initialTab, forceResume = false } = {}) => {
     setBusyId(row.id);
     try {
       if (row.queueState === 'NEW') await encounterService.startConsultation(apiClient, row.id);
       if (row.queueState === 'REVIEW_READY') await encounterService.resume(apiClient, row.id);
+      if (row.queueState === 'PENDING_LABS' && forceResume) await encounterService.resume(apiClient, row.id);
       // Results are what a Review Ready doctor came for, so that is the first thing they see.
-      setOpen({ id: row.id, tab: row.queueState === 'REVIEW_READY' ? 'investigations' : 'consultation' });
+      setOpen({ id: row.id, tab: initialTab || (row.queueState === 'REVIEW_READY' ? 'investigations' : 'consultation') });
     } catch (e) {
       toast('error', e?.message || 'That visit could not be opened.');
       load({ quiet: true });
@@ -177,7 +179,46 @@ export function ClinicianQueuePage() {
   columns.push({
     key: 'action',
     label: 'Action',
-    render: (row) => (
+    render: (row) => tab === 'pendingLabs' ? (
+      <div className="flex flex-wrap gap-1.5">
+        <Button
+          size="sm"
+          variant="secondary"
+          disabled={busyId === row.id || (!canConsult && tab !== 'pendingLabs')}
+          onClick={() => openVisit(row)}
+          aria-label={`Open ${patientName(row.patient)}`}
+        >
+          Open
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled={busyId === row.id || !canOrder}
+          onClick={() => openVisit(row, { initialTab: 'investigations' })}
+          aria-label={`Add tests for ${patientName(row.patient)}`}
+        >
+          Add tests
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled={busyId === row.id || !canConsult}
+          onClick={() => openVisit(row, { forceResume: true })}
+          aria-label={`Force resume ${patientName(row.patient)}`}
+        >
+          Force resume
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled
+          title="Lab messaging requires a backend endpoint that is not available yet."
+          aria-label={`Ping lab ${patientName(row.patient)} (not connected)`}
+        >
+          Ping lab
+        </Button>
+      </div>
+    ) : (
       <Button
         size="sm"
         variant={tab === 'reviewReady' ? 'primary' : 'secondary'}
@@ -230,6 +271,8 @@ export function ClinicianQueuePage() {
       </div>
 
       {error && <Card><p role="alert" className="text-sm font-semibold text-red-600">{error}</p></Card>}
+
+      {tab === 'pendingLabs' && <p role="note" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">You can add tests or resume a visit using the existing workflows. Lab messaging is not connected yet.</p>}
 
       <div id="queue-panel" role="tabpanel" aria-labelledby={`queue-tab-${tab}`} aria-live="polite">
         <DataTable

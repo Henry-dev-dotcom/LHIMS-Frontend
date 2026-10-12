@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { API, signIn, tag, watchForCrashes } from './helpers.js';
+import { API, signIn, signInAsHospitalDoctor, tag, watchForCrashes } from './helpers.js';
 
 /*
   The consultation workspace, end to end.
@@ -77,18 +77,54 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
 
   const encounterId = await startVisit(request, tokens, patientId, 'Severe headache and fever');
 
-  await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
+  const aiPosts = [];
+  page.on('request', (browserRequest) => {
+    if (browserRequest.method() === 'POST' && new URL(browserRequest.url()).pathname.toLowerCase().includes('curataai')) aiPosts.push(browserRequest.url());
+  });
+
+  await signInAsHospitalDoctor(page);
   await page.getByRole('button', { name: `Consult ${first} Patient` }).click();
+  for (const viewport of [{ width: 390, height: 844 }, { width: 768, height: 1024 }]) {
+    await page.setViewportSize(viewport);
+    await expect(page.getByRole('heading', { name: `${first} Patient` })).toBeVisible();
+    const widths = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, page: document.documentElement.scrollWidth }));
+    expect(widths.page, `the clinician workspace should not overflow at ${viewport.width}px`).toBeLessThanOrEqual(widths.viewport);
+  }
+  await page.setViewportSize({ width: 1366, height: 900 });
 
   /* ---- the patient band: identity and what must not be missed ---- */
   await expect(page.getByRole('heading', { name: `${first} Patient` })).toBeVisible();
   await expect(page.getByText('Allergy: Penicillin')).toBeVisible();
   await expect(page.getByLabel('Latest vitals')).toContainText('38.6');
+  await expect(page.getByRole('heading', { name: 'CurataAI Predictive Autopilot' })).toBeVisible();
+  await expect(page.getByText('This panel does not receive patient notes, call an AI service, or display mock clinical recommendations.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Review and auto-fill (unavailable)' })).toBeDisabled();
+  const noteEditorBox = await page.getByRole('textbox', { name: 'Clinical note' }).boundingBox();
+  const diagnosisHeading = page.getByRole('heading', { name: 'Diagnoses' });
+  await expect(diagnosisHeading).toBeVisible();
+  const diagnosisBox = await diagnosisHeading.boundingBox();
+  expect(diagnosisBox.y).toBeGreaterThan(noteEditorBox.y);
+
+  await page.getByRole('tab', { name: 'Disposition' }).click();
+  await expect(page.getByRole('button', { name: 'Short-stay observation (backend support required)' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Generate medical-excuse certificate (not connected)' })).toBeDisabled();
+  await page.getByRole('tab', { name: 'Consultation & Diagnosis' }).click();
 
   /* ---- tab 1: a template, typing, and dictation ---- */
   await page.getByLabel('Insert a template').selectOption({ label: 'Acute fever protocol' });
+  const singleNote = page.getByRole('textbox', { name: 'Clinical note' });
+  await expect(singleNote).toHaveValue(/Fever for \(days\):/);
+  await page.getByRole('button', { name: 'Format: Insert SOAP Structure' }).click();
+  await expect(singleNote).toHaveValue(/## Subjective/);
+  await expect(singleNote).toHaveValue(/## Plan/);
+  await singleNote.fill('A short free-text clinical narrative.');
+  await page.getByRole('button', { name: 'SOAP fields' }).click();
+  await expect(page.getByRole('textbox', { name: 'Subjective (history)' })).toHaveValue('A short free-text clinical narrative.');
+  await page.getByRole('button', { name: 'Single editor' }).click();
+  await singleNote.fill('## Subjective\nFever for (days): 3\nChills or rigors: yes\nRash:\n\n## Objective\nChest:\n\n## Assessment\nDifferentials considered:\n\n## Plan\nAdvice:');
+  await page.getByRole('button', { name: 'SOAP fields' }).click();
   const subjective = page.getByRole('textbox', { name: 'Subjective (history)' });
-  await expect(subjective).toHaveValue(/Fever for \(days\):/);
+  await expect(subjective).toHaveValue(/Fever for \(days\): 3/);
   await subjective.fill('Fever for (days): 3\nChills or rigors: yes\nRash:');
 
   // Dictation stays off until the clinician has read where the audio goes.
@@ -115,6 +151,7 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   await page.getByRole('button', { name: 'Back to queue' }).click();
   await page.getByRole('tab', { name: /My Consultations/ }).click();
   await page.getByRole('button', { name: `Continue ${first} Patient` }).click();
+  await page.getByRole('button', { name: 'SOAP fields' }).click();
   await expect(page.getByRole('textbox', { name: 'Subjective (history)' })).toHaveValue(/Fever for \(days\): 3/);
   await expect(page.getByRole('textbox', { name: 'Assessment' })).toHaveValue(/Differentials considered: headache since monday/);
   await page.getByRole('tab', { name: /Investigations/ }).click();
@@ -138,6 +175,19 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   await page.getByRole('tab', { name: /Pending Labs/ }).click();
   const pending = page.getByRole('row').filter({ hasText: `${first} Patient` });
   await expect(pending).toContainText('0 of 2 back');
+  await expect(pending.getByRole('button', { name: `Add tests for ${first} Patient` })).toBeVisible();
+  await expect(pending.getByRole('button', { name: `Force resume ${first} Patient` })).toBeVisible();
+  await expect(pending.getByRole('button', { name: `Ping lab ${first} Patient (not connected)` })).toBeDisabled();
+  for (const viewport of [{ width: 390, height: 844 }, { width: 768, height: 1024 }]) {
+    await page.setViewportSize(viewport);
+    const widths = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, page: document.documentElement.scrollWidth }));
+    expect(widths.page, `Pending Labs should not overflow at ${viewport.width}px`).toBeLessThanOrEqual(widths.viewport);
+  }
+  await page.setViewportSize({ width: 1366, height: 900 });
+  await pending.getByRole('button', { name: `Add tests for ${first} Patient` }).click();
+  await expect(page.getByRole('tab', { name: /Investigations/, selected: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Back to queue' }).click();
+  await page.getByRole('tab', { name: /Pending Labs/ }).click();
 
   // The note went into the record - without the prompts nobody answered.
   const record = await (await request.get(`${API}/encounters/${encounterId}`, auth(tokens.doctor))).json();
@@ -147,6 +197,7 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   expect(note.subjective, 'unanswered prompts must not reach the record').not.toContain('Rash:');
   expect(note.assessment).toContain('Differentials considered: headache since monday');
   expect(record.data.suspendedAt).not.toBeNull();
+  expect(aiPosts, 'the disabled Autopilot panel must never send patient data').toEqual([]);
 
   /* ---- the lab signs off; the doctor reviews the results where they are ---- */
   const orderId = record.data.orders[0].id;

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { API, signIn, tag, watchForCrashes } from './helpers.js';
+import { API, signIn, signInAsHospitalDoctor, tag, watchForCrashes } from './helpers.js';
 
 /*
   The clinician's queue, end to end.
@@ -38,7 +38,7 @@ test('a patient moves through the clinician queue as their tests go out and come
   expect(triaged.status(), await triaged.text()).toBe(201);
 
   // The doctor signs in and lands on their queue.
-  await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
+  await signInAsHospitalDoctor(page);
   await expect(page.getByRole('tab', { name: /New Patients/ })).toBeVisible();
   await expect(page.getByRole('row').filter({ hasText: `${first} Patient` })).toBeVisible();
 
