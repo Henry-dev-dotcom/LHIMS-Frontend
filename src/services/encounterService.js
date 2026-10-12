@@ -24,11 +24,13 @@ export const encounterService = {
   patientForms: async (client, patientId, params = {}) => client.request(`/patients/${patientId}/forms${buildQuery(params)}`),
   catalog: async (client) => client.request(`/catalog${buildQuery({ limit: 100 })}`),
   // The queue and drafts change under the user's feet, so they are never served from the 15-second GET cache.
-  // The clinician's queue: new patients, patients sent for tests, patients whose results are back.
+  // The clinician's queue: new patients, pending diagnostics, and patients whose results are back.
   queue: async (client, params = {}) => client.request(`/encounters/queue${buildQuery(params)}`, { cache: false }),
-  // Send to Lab & Suspend, and taking the visit back.
+  // Send to Diagnostics & Suspend, and taking the visit back.
   suspend: async (client, id) => client.request(`/encounters/${id}/suspend`, { method: 'POST', body: {} }),
-  pingLab: async (client, id) => client.request(`/encounters/${id}/ping-lab`, { method: 'POST', body: {} }),
+  pingDiagnostics: async (client, id) => client.request(`/encounters/${id}/ping-diagnostics`, { method: 'POST', body: {} }),
+  // Backwards-compatible alias for older pages.
+  pingLab: async (client, id) => client.request(`/encounters/${id}/ping-diagnostics`, { method: 'POST', body: {} }),
   resume: async (client, id) => client.request(`/encounters/${id}/resume`, { method: 'POST', body: {} }),
   // Past (and the current) visits with diagnoses, notes, prescriptions and signed-off results.
   clinicalHistory: async (client, patientId, limit = 5) => client.request(`/patients/${patientId}/clinical-history${buildQuery({ limit })}`, { cache: false }),

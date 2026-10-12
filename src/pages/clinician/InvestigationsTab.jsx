@@ -12,12 +12,12 @@ import { ORDER_SETS, resolveOrderSet } from './clinicalContent';
 import { ResultDetail, TestLine } from './ResultView';
 
 /*
-  Tab 2: investigations.
+  Tab 2: diagnostic tests.
 
   The left side is what the patient has had done - this visit's tests with their results
   once the lab has signed them off, then earlier visits'. The right side is the order
   builder: pick tests or tap a bundle, and they wait there (saved with the draft) until the
-  clinician sends them, either straight away or with "Send to Lab & Suspend".
+  clinician sends them, either straight away or with "Send to Diagnostics & Suspend".
 */
 
 const POLL_MS = 30_000;
@@ -25,9 +25,9 @@ const HISTORY_VISITS = 10;
 
 export function InvestigationsTab({ encounter, auth, open, busy, draft, updateDraft, sendOrdersNow }) {
   const canOrder = open && can(auth, P.ORDER);
-  const modules = auth?.modules || [];
   const [catalog, setCatalog] = useState([]);
   const [filter, setFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('ALL');
   const [history, setHistory] = useState(null);
   const [historyError, setHistoryError] = useState('');
 
@@ -60,11 +60,9 @@ export function InvestigationsTab({ encounter, auth, open, busy, draft, updateDr
   useEffect(() => {
     if (!canOrder) return;
     encounterService.catalog(apiClient)
-      .then((data) => setCatalog(listItems(data).filter((item) => item.isActive !== false && (
-        (item.type === 'LAB' && modules.includes('laboratory')) || (item.type === 'SCAN' && modules.includes('imaging'))
-      ))))
+      .then((data) => setCatalog(listItems(data).filter((item) => item.isActive !== false && (item.type === 'LAB' || item.type === 'SCAN'))))
       .catch(() => setCatalog([]));
-  }, [canOrder]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [canOrder]);
 
   // Tests already ordered on this visit and not cancelled cannot be ordered twice.
   const orderedIds = useMemo(() => new Set((encounter.orders || [])
@@ -90,8 +88,9 @@ export function InvestigationsTab({ encounter, auth, open, busy, draft, updateDr
     const q = filter.trim().toLowerCase();
     // Laboratory tests first: they are what is ordered most, and the catalogue lists scans ahead of them.
     const ordered = [...catalog].sort((a, b) => (a.type === b.type ? a.name.localeCompare(b.name) : a.type === 'LAB' ? -1 : 1));
-    return ordered.filter((item) => !q || item.name.toLowerCase().includes(q) || String(item.catalogCode).toLowerCase().includes(q)).slice(0, 40);
-  }, [catalog, filter]);
+    return ordered.filter((item) => (typeFilter === 'ALL' || item.type === typeFilter)
+      && (!q || item.name.toLowerCase().includes(q) || String(item.catalogCode).toLowerCase().includes(q) || String(item.modality || '').toLowerCase().includes(q))).slice(0, 40);
+  }, [catalog, filter, typeFilter]);
 
   const byId = useMemo(() => new Map(catalog.map((item) => [item.id, item])), [catalog]);
   const thisVisit = history?.find((e) => e.id === encounter.id);
@@ -145,7 +144,7 @@ export function InvestigationsTab({ encounter, auth, open, busy, draft, updateDr
         )}
       </Card>
 
-      <Card title="Order builder" subtitle="Choose tests, then send them now or send them while pausing the visit.">
+      <Card title="Diagnostic Tests" subtitle="Request laboratory tests and medical imaging in one place, then send them now or pause the visit while results are prepared.">
         {!canOrder ? (
           <p className="text-sm text-slate-500">{open ? 'Only clinicians who can order tests see the order builder.' : 'This visit is closed, so nothing more can be ordered.'}</p>
         ) : (
@@ -176,7 +175,14 @@ export function InvestigationsTab({ encounter, auth, open, busy, draft, updateDr
             </div>
 
             <div>
-              <input className={inputClass} placeholder="Search tests and scans" value={filter} onChange={(e) => setFilter(e.target.value)} aria-label="Search tests and scans" />
+              <div className="mb-2 flex flex-wrap gap-2" role="group" aria-label="Diagnostic test type">
+                {[['ALL', 'All diagnostics'], ['LAB', 'Laboratory'], ['SCAN', 'Imaging & X-ray']].map(([value, label]) => (
+                  <button key={value} type="button" onClick={() => setTypeFilter(value)} aria-pressed={typeFilter === value} className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${typeFilter === value ? 'border-clinical-600 bg-clinical-600 text-white' : 'border-slate-200 bg-white text-slate-700 hover:border-clinical-300 hover:bg-clinical-25'}`}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <input className={inputClass} placeholder="Search tests, scans or X-rays" value={filter} onChange={(e) => setFilter(e.target.value)} aria-label="Search diagnostic tests, scans or X-rays" />
               <div className="mt-2 max-h-64 space-y-1 overflow-y-auto rounded-2xl border border-slate-200 p-2">
                 {visible.length ? visible.map((item) => {
                   const done = orderedIds.has(item.id);
@@ -184,7 +190,7 @@ export function InvestigationsTab({ encounter, auth, open, busy, draft, updateDr
                     <label key={item.id} className={`flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm ${done ? 'opacity-50' : 'hover:bg-slate-50'}`}>
                       <input type="checkbox" className="h-4 w-4 accent-clinical-600" disabled={done} checked={done || staged.includes(item.id)} onChange={() => toggle(item.id)} />
                       <span className="flex-1">{item.name}</span>
-                      <span className="text-xs text-slate-500">{done ? 'Ordered' : item.type === 'LAB' ? 'Lab' : 'Scan'}</span>
+                      <span className="text-xs text-slate-500">{done ? 'Ordered' : item.type === 'LAB' ? 'Laboratory' : item.modality || 'Imaging'}</span>
                     </label>
                   );
                 }) : <p className="px-2 py-1.5 text-sm text-slate-500">No matching tests or scans.</p>}
@@ -213,7 +219,7 @@ export function InvestigationsTab({ encounter, auth, open, busy, draft, updateDr
                 </FormField>
                 <Button variant="secondary" disabled={busy || staged.length === 0} onClick={sendOrdersNow}><FlaskConical className="h-4 w-4" /> Send {staged.length || ''} now</Button>
               </div>
-              <p className="mt-2 text-xs text-slate-500">Sending now keeps the patient in your consultation. &ldquo;Send to Lab &amp; Suspend&rdquo; below sends them and parks the visit until the results are back.</p>
+              <p className="mt-2 text-xs text-slate-500">Sending now keeps the patient in your consultation. &ldquo;Send to Diagnostics &amp; Suspend&rdquo; below sends the requests to laboratory or imaging staff and parks the visit until results are back.</p>
             </div>
           </div>
         )}

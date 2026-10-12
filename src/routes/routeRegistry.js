@@ -142,7 +142,7 @@ export const PAGE_META = {
   'clinician-queue': {
     title: 'Clinician Queue', section: 'Clinician',
     description: 'Patients waiting for the doctor, out for tests, and ready for review, with the visit workspace opened from the queue.',
-    requirements: ['New patients', 'Pending labs', 'Review ready alert', 'My consultations', 'Open the visit workspace']
+    requirements: ['New patients', 'Pending diagnosis for labs and imaging', 'Review ready alert', 'My consultations', 'Open the visit workspace']
   },
   'opd-queue': {
     title: 'OPD Visits', section: 'Outpatient',

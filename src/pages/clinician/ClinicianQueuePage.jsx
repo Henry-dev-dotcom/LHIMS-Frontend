@@ -15,20 +15,20 @@ import { P, TRIAGE, ageLabel, can, patientName, waitingSince } from '../opd/opdU
 
   Patients do not vanish when they are sent for tests: they move between lists.
     New Patients     triaged and waiting for a doctor
-    Pending Labs     sent for tests; still in the building, not yet back
+    Pending Diagnosis sent for laboratory or imaging tests; still in the building, not yet back
     Review Ready     every test is back - the doctor can finish the visit
     My Consultations seen by this doctor and not paused
 
   Which list a patient is in is decided by the server from the state of their tests
   (see the backend's queueState), so a result being withdrawn puts the patient back
-  under Pending Labs without anything here having to notice.
+    under Pending Diagnosis without anything here having to notice.
 */
 
 const REFRESH_MS = 30_000;
 
 const TABS = [
   { id: 'new', label: 'New Patients', empty: 'No patients are waiting for a doctor.' },
-  { id: 'pendingLabs', label: 'Pending Labs', empty: 'No patients are out for tests.' },
+  { id: 'pendingDiagnosis', label: 'Pending Diagnosis', empty: 'No patients are waiting for diagnostic results.' },
   { id: 'reviewReady', label: 'Review Ready', empty: 'No results are waiting for your review.', alert: true },
   { id: 'inConsultation', label: 'My Consultations', empty: 'You have no consultations open.' }
 ];
@@ -121,13 +121,13 @@ export function ClinicianQueuePage() {
     }
   }, [load, toast]);
 
-  const pingLab = useCallback(async (row) => {
+  const pingDiagnostics = useCallback(async (row) => {
     setPingingId(row.id);
     try {
-      const result = await encounterService.pingLab(apiClient, row.id);
-      toast('info', `Lab status request sent to ${result.recipientCount} lab staff for ${result.orderCount} order${result.orderCount === 1 ? '' : 's'}.`);
+      const result = await encounterService.pingDiagnostics(apiClient, row.id);
+      toast('info', `Diagnostic status request sent to ${result.recipientCount} staff for ${result.orderCount} order${result.orderCount === 1 ? '' : 's'}.`);
     } catch (e) {
-      toast('error', e?.message || 'The lab status request could not be sent.');
+      toast('error', e?.message || 'The diagnostic status request could not be sent.');
     } finally {
       setPingingId('');
     }
@@ -148,10 +148,11 @@ export function ClinicianQueuePage() {
   }
 
   const counts = queue?.counts || {};
-  const rows = queue?.[tab] || [];
+  const queueKey = tab === 'pendingDiagnosis' ? 'pendingLabs' : tab;
+  const rows = queue?.[queueKey] || [];
   const active = TABS.find((item) => item.id === tab);
 
-  const actionLabel = { new: 'Consult', pendingLabs: 'Open', reviewReady: 'Review results', inConsultation: 'Continue' }[tab];
+  const actionLabel = { new: 'Consult', pendingDiagnosis: 'Open', reviewReady: 'Review results', inConsultation: 'Continue' }[tab];
 
   const columns = [
     {
@@ -180,7 +181,7 @@ export function ClinicianQueuePage() {
     }
   ];
 
-  if (tab === 'pendingLabs' || tab === 'reviewReady') {
+  if (tab === 'pendingDiagnosis' || tab === 'reviewReady') {
     columns.push({
       key: 'tests',
       label: 'Tests',
@@ -205,12 +206,12 @@ export function ClinicianQueuePage() {
   columns.push({
     key: 'action',
     label: 'Action',
-    render: (row) => tab === 'pendingLabs' ? (
+    render: (row) => tab === 'pendingDiagnosis' ? (
       <div className="flex flex-wrap gap-1.5">
         <Button
           size="sm"
           variant="secondary"
-          disabled={busyId === row.id || (!canConsult && tab !== 'pendingLabs')}
+          disabled={busyId === row.id || (!canConsult && tab !== 'pendingDiagnosis')}
           onClick={() => openVisit(row)}
           aria-label={`Open ${patientName(row.patient)}`}
         >
@@ -237,19 +238,19 @@ export function ClinicianQueuePage() {
         <Button
           size="sm"
           variant="ghost"
-          disabled={pingingId === row.id || !canConsult || !row.canPingLab}
-          title={row.canPingLab ? 'Send an in-app status request to active laboratory staff.' : 'No outstanding laboratory orders on this visit.'}
-          onClick={() => pingLab(row)}
-          aria-label={`Ping lab for ${patientName(row.patient)}`}
+          disabled={pingingId === row.id || !canConsult || !row.canPingDiagnostics}
+          title={row.canPingDiagnostics ? 'Send an in-app status request to active laboratory and imaging staff.' : 'No outstanding diagnostic orders on this visit.'}
+          onClick={() => pingDiagnostics(row)}
+          aria-label={`Ping diagnostics for ${patientName(row.patient)}`}
         >
-          {pingingId === row.id ? 'Sending…' : 'Ping lab'}
+          {pingingId === row.id ? 'Sending…' : 'Ping diagnostics'}
         </Button>
       </div>
     ) : (
       <Button
         size="sm"
         variant={tab === 'reviewReady' ? 'primary' : 'secondary'}
-        disabled={busyId === row.id || (!canConsult && tab !== 'pendingLabs')}
+        disabled={busyId === row.id || (!canConsult && tab !== 'pendingDiagnosis')}
         onClick={() => openVisit(row)}
         aria-label={`${actionLabel} ${patientName(row.patient)}`}
       >
@@ -299,7 +300,7 @@ export function ClinicianQueuePage() {
 
       {error && <Card><p role="alert" className="text-sm font-semibold text-red-600">{error}</p></Card>}
 
-      {tab === 'pendingLabs' && <p role="note" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">Ping Lab sends an in-app status request to active laboratory staff. Results still require laboratory review and sign-off.</p>}
+      {tab === 'pendingDiagnosis' && <p role="note" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">Pending Diagnosis includes laboratory tests and medical imaging. Ping diagnostics sends an in-app status request to the relevant active team; results still require review and sign-off.</p>}
 
       <div id="queue-panel" role="tabpanel" aria-labelledby={`queue-tab-${tab}`} aria-live="polite">
         <DataTable

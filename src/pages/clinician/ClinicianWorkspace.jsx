@@ -29,13 +29,13 @@ import { AllergyOverrideModal, CompleteConfirmModal, DispositionTab, buildSummar
 
   The bottom bar is the routing: it decides where the patient goes next.
     Save Draft            keeps the patient where they are and keeps the work
-    Send to Lab & Suspend sends the staged tests, parks the visit, and returns to the queue
+    Send to Diagnostics & Suspend sends the staged laboratory or imaging tests, parks the visit, and returns to the queue
     Complete & Discharge  closes the visit
 */
 
 const TABS = [
   { id: 'consultation', label: 'Consultation & Diagnosis' },
-  { id: 'investigations', label: 'Investigations' },
+  { id: 'investigations', label: 'Diagnostic Tests' },
   { id: 'prescriptions', label: 'Prescriptions' },
   { id: 'disposition', label: 'Disposition' }
 ];
@@ -196,13 +196,13 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
     if (ids.length === 0) return true;
     const ok = await act(
       () => encounterService.order(apiClient, encounterId, { items: ids.map((id) => ({ catalogItemId: id })), urgency: draftRef.current.urgency || 'ROUTINE' }),
-      'Sent to the lab and imaging queues.'
+      'Sent to the laboratory and imaging queues.'
     );
     if (ok) updateDraft({ stagedTestIds: [] });
     return ok;
   }, [act, encounterId, updateDraft]);
 
-  /** Send to Lab & Suspend: save the note, send the staged tests, park the visit and go back to the queue. */
+  /** Send to Diagnostics & Suspend: save the note, send staged tests, park the visit and go back to the queue. */
   const sendToLab = useCallback(async () => {
     setFlow(true);
     try {
@@ -217,7 +217,7 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
       }
       setSuspendOpen(false);
       await saveDraftNow();
-      toast('success', `${patientName(encounter.patient)} has been sent for tests and is under Pending Labs.`);
+      toast('success', `${patientName(encounter.patient)} has been sent for diagnostic tests and is under Pending Diagnosis.`);
       onClose();
     } finally {
       setFlow(false);
@@ -420,7 +420,7 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
           </div>
           <div className="flex flex-wrap gap-2">
             {inConsult && !paused && (
-              <Button variant="secondary" disabled={busy || flow} onClick={() => setSuspendOpen(true)}><FlaskConical className="h-4 w-4" /> Send to Lab &amp; Suspend</Button>
+              <Button variant="secondary" disabled={busy || flow} onClick={() => setSuspendOpen(true)}><FlaskConical className="h-4 w-4" /> Send to Diagnostics &amp; Suspend</Button>
             )}
             {inConsult && disposition === 'ADMITTED' && (
               <Button variant="success" disabled={busy || flow || !canAdmit} onClick={openAdmit}><BedDouble className="h-4 w-4" /> Admit to Ward</Button>
@@ -436,8 +436,8 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
 
       <Modal
         open={suspendOpen}
-        title="Send to Lab & Suspend"
-        description="The tests go to the lab and imaging queues and this visit is parked under Pending Labs. It comes back to you as Review Ready when the results are in."
+        title="Send to Diagnostics & Suspend"
+        description="The laboratory and imaging requests go to their queues and this visit is parked under Pending Diagnosis. It comes back to you as Review Ready when the results are in."
         onClose={() => setSuspendOpen(false)}
         footer={(
           <>
@@ -451,7 +451,7 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
           {outstanding > 0 && <li>{outstanding} already sent {outstanding === 1 ? 'is' : 'are'} still outstanding.</li>}
           {hasNoteText && <li>Your notes will be saved to the record.</li>}
         </ul>
-        {stagedCount === 0 && outstanding === 0 && <p role="alert" className="mt-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">Choose at least one test or scan in Investigations first.</p>}
+        {stagedCount === 0 && outstanding === 0 && <p role="alert" className="mt-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">Choose at least one laboratory test or imaging scan in Diagnostic Tests first.</p>}
       </Modal>
 
       <CompleteConfirmModal
