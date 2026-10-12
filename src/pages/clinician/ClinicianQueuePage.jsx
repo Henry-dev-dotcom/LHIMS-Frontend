@@ -47,14 +47,28 @@ function TriageDot({ level }) {
   return <span className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-bold ${TRIAGE[level]?.className}`}>{TRIAGE[level]?.short}</span>;
 }
 
+function ResultPriorityBadge({ priority }) {
+  const options = {
+    CRITICAL: { label: 'Critical result', className: 'bg-red-700 text-white motion-safe:animate-pulse' },
+    ABNORMAL: { label: 'Abnormal result', className: 'bg-amber-100 text-amber-900 ring-1 ring-amber-300' },
+    NORMAL: { label: 'Normal results', className: 'bg-emerald-100 text-emerald-900 ring-1 ring-emerald-300' },
+    UNCLASSIFIED: { label: 'Result severity unavailable', className: 'bg-slate-100 text-slate-700 ring-1 ring-slate-300' }
+  };
+  const option = options[priority];
+  if (!option) return null;
+  return <span className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-bold ${option.className}`}>{option.label}</span>;
+}
+
 export function ClinicianQueuePage() {
   const { state, dispatch } = useAppStore();
   const auth = state.auth;
   const canConsult = can(auth, P.CONSULT);
+  const canOrder = can(auth, P.ORDER);
   const [queue, setQueue] = useState(null);
   const [error, setError] = useState('');
   const [tab, setTab] = useState('new');
   const [busyId, setBusyId] = useState('');
+  const [pingingId, setPingingId] = useState('');
   const [open, setOpen] = useState(null);
   const readyIds = useRef(null);
 
@@ -91,13 +105,14 @@ export function ClinicianQueuePage() {
   }, [load, open]);
 
   /** Opens a patient's visit, first starting the consultation or taking a paused visit back where that applies. */
-  const openVisit = useCallback(async (row) => {
+  const openVisit = useCallback(async (row, { initialTab, forceResume = false } = {}) => {
     setBusyId(row.id);
     try {
       if (row.queueState === 'NEW') await encounterService.startConsultation(apiClient, row.id);
       if (row.queueState === 'REVIEW_READY') await encounterService.resume(apiClient, row.id);
+      if (row.queueState === 'PENDING_LABS' && forceResume) await encounterService.resume(apiClient, row.id);
       // Results are what a Review Ready doctor came for, so that is the first thing they see.
-      setOpen({ id: row.id, tab: row.queueState === 'REVIEW_READY' ? 'investigations' : 'consultation' });
+      setOpen({ id: row.id, tab: initialTab || (row.queueState === 'REVIEW_READY' ? 'investigations' : 'consultation') });
     } catch (e) {
       toast('error', e?.message || 'That visit could not be opened.');
       load({ quiet: true });
@@ -105,6 +120,18 @@ export function ClinicianQueuePage() {
       setBusyId('');
     }
   }, [load, toast]);
+
+  const pingLab = useCallback(async (row) => {
+    setPingingId(row.id);
+    try {
+      const result = await encounterService.pingLab(apiClient, row.id);
+      toast('info', `Lab status request sent to ${result.recipientCount} lab staff for ${result.orderCount} order${result.orderCount === 1 ? '' : 's'}.`);
+    } catch (e) {
+      toast('error', e?.message || 'The lab status request could not be sent.');
+    } finally {
+      setPingingId('');
+    }
+  }, [toast]);
 
   if (open) {
     return (
@@ -147,6 +174,7 @@ export function ClinicianQueuePage() {
         <span className="flex flex-wrap items-center gap-2">
           <span className="text-sm text-slate-800">{row.chiefComplaint || 'No complaint recorded'}</span>
           <TriageDot level={row.triageLevel} />
+          {tab === 'reviewReady' && <ResultPriorityBadge priority={row.resultPriority} />}
         </span>
       )
     }
@@ -177,7 +205,47 @@ export function ClinicianQueuePage() {
   columns.push({
     key: 'action',
     label: 'Action',
-    render: (row) => (
+    render: (row) => tab === 'pendingLabs' ? (
+      <div className="flex flex-wrap gap-1.5">
+        <Button
+          size="sm"
+          variant="secondary"
+          disabled={busyId === row.id || (!canConsult && tab !== 'pendingLabs')}
+          onClick={() => openVisit(row)}
+          aria-label={`Open ${patientName(row.patient)}`}
+        >
+          Open
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled={busyId === row.id || !canOrder}
+          onClick={() => openVisit(row, { initialTab: 'investigations' })}
+          aria-label={`Add tests for ${patientName(row.patient)}`}
+        >
+          Add tests
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled={busyId === row.id || !canConsult}
+          onClick={() => openVisit(row, { forceResume: true })}
+          aria-label={`Force resume ${patientName(row.patient)}`}
+        >
+          Force resume
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled={pingingId === row.id || !canConsult || !row.canPingLab}
+          title={row.canPingLab ? 'Send an in-app status request to active laboratory staff.' : 'No outstanding laboratory orders on this visit.'}
+          onClick={() => pingLab(row)}
+          aria-label={`Ping lab for ${patientName(row.patient)}`}
+        >
+          {pingingId === row.id ? 'Sending…' : 'Ping lab'}
+        </Button>
+      </div>
+    ) : (
       <Button
         size="sm"
         variant={tab === 'reviewReady' ? 'primary' : 'secondary'}
@@ -230,6 +298,8 @@ export function ClinicianQueuePage() {
       </div>
 
       {error && <Card><p role="alert" className="text-sm font-semibold text-red-600">{error}</p></Card>}
+
+      {tab === 'pendingLabs' && <p role="note" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">Ping Lab sends an in-app status request to active laboratory staff. Results still require laboratory review and sign-off.</p>}
 
       <div id="queue-panel" role="tabpanel" aria-labelledby={`queue-tab-${tab}`} aria-live="polite">
         <DataTable

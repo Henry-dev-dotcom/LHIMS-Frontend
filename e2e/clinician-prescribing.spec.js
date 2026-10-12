@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { API, signIn, tag, watchForCrashes } from './helpers.js';
+import { API, signInAsHospitalDoctor, tag, watchForCrashes } from './helpers.js';
 
 /*
   Prescribing and finishing a visit.
@@ -44,7 +44,7 @@ async function consultingPatient(request, tokens, { first, dateOfBirth, allergy,
 }
 
 async function openMyConsultation(page, first) {
-  await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
+  await signInAsHospitalDoctor(page);
   await page.getByRole('tab', { name: /My Consultations/ }).click();
   await page.getByRole('button', { name: `Continue ${first} Patient` }).click();
 }

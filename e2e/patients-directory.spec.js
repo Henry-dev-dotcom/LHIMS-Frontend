@@ -85,6 +85,16 @@ test('a doctor finds a patient, opens their record for a reason, and files a doc
   await expect(summary).toContainText('Hypertension');
   await expect(summary).toContainText('Amlodipine');
 
+  for (const viewport of [{ width: 390, height: 844 }, { width: 768, height: 1024 }]) {
+    await page.setViewportSize(viewport);
+    const widths = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, page: document.documentElement.scrollWidth }));
+    expect(widths.page, `Patient profile should not overflow at ${viewport.width}px`).toBeLessThanOrEqual(widths.viewport + 1);
+    await expect(page.getByRole('heading', { name: `${first} Mensah` })).toBeVisible();
+    await expect(summary).toBeVisible();
+    await expect(page.getByRole('tab', { name: /Documents/ })).toBeVisible();
+  }
+  await page.setViewportSize({ width: 1366, height: 900 });
+
   await page.getByRole('button', { name: /Open the visit of/ }).click();
   const visitDialog = page.getByRole('dialog');
   await expect(visitDialog).toContainText('Morning headaches for two weeks');

@@ -28,6 +28,7 @@ export const encounterService = {
   queue: async (client, params = {}) => client.request(`/encounters/queue${buildQuery(params)}`, { cache: false }),
   // Send to Lab & Suspend, and taking the visit back.
   suspend: async (client, id) => client.request(`/encounters/${id}/suspend`, { method: 'POST', body: {} }),
+  pingLab: async (client, id) => client.request(`/encounters/${id}/ping-lab`, { method: 'POST', body: {} }),
   resume: async (client, id) => client.request(`/encounters/${id}/resume`, { method: 'POST', body: {} }),
   // Past (and the current) visits with diagnoses, notes, prescriptions and signed-off results.
   clinicalHistory: async (client, patientId, limit = 5) => client.request(`/patients/${patientId}/clinical-history${buildQuery({ limit })}`, { cache: false }),
