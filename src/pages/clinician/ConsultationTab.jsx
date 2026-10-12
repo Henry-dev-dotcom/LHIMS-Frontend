@@ -11,6 +11,7 @@ import { ClinicalFormsCard } from '../clinics/ClinicalFormsCard';
 import { P, can } from '../opd/opdUtils';
 import { NOTE_TEMPLATES } from './clinicalContent';
 import { acknowledgeDictation, dictationAcknowledged, dictationSupported, useDictation } from './useDictation';
+import { CurataAINoteFormattingStatus } from './CurataAINoteFormattingStatus';
 
 /*
   Tab 1: consultation and diagnosis.
@@ -74,6 +75,7 @@ export function ConsultationTab({ encounter, auth, open, busy, act, draft, updat
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
       <div className="space-y-4">
+        {canWrite && <CurataAINoteFormattingStatus encounterId={encounter.id} />}
         <Card title="Clinical notes" subtitle="Saved as you type. They join the record when you save them, send the patient for tests, or complete the visit.">
           {canWrite ? (
             <div className="space-y-3">

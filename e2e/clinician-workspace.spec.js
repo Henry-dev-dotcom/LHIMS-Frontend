@@ -18,6 +18,24 @@ async function loginToken(request, username, password) {
 }
 const auth = (token) => ({ headers: { authorization: `Bearer ${token}` } });
 
+/** The shared DEMO seed is a clinic/diagnostic-centre profile; this workflow targets the hospital clinician portal. */
+async function signInAsHospitalDoctor(page) {
+  await page.route('**/api/auth/login', async (route) => {
+    const response = await route.fetch();
+    const payload = await response.json();
+    const user = payload?.data?.user;
+    if (!user?.facility) throw new Error('The E2E login response did not include a facility profile.');
+    user.facility.facilityKind = 'HOSPITAL';
+    user.subscription = {
+      ...user.subscription,
+      plan: { ...user.subscription?.plan, facilityKind: 'HOSPITAL' }
+    };
+    await route.fulfill({ response, body: JSON.stringify(payload) });
+  });
+  await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
+  await page.unroute('**/api/auth/login');
+}
+
 async function startVisit(request, tokens, patientId, complaint) {
   const visit = await request.post(`${API}/encounters`, { ...auth(tokens.reception), data: { patientId, type: 'OPD', chiefComplaint: complaint } });
   expect(visit.status(), await visit.text()).toBe(201);
@@ -77,8 +95,19 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
 
   const encounterId = await startVisit(request, tokens, patientId, 'Severe headache and fever');
 
-  await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
+  const curataAiPostBodies = [];
+  page.on('request', (browserRequest) => {
+    const path = new URL(browserRequest.url()).pathname;
+    if (browserRequest.method() === 'POST' && path.endsWith('/curataai/note-formatting')) {
+      curataAiPostBodies.push(browserRequest.postData() || '');
+    }
+  });
+
+  await signInAsHospitalDoctor(page);
   await page.getByRole('button', { name: `Consult ${first} Patient` }).click();
+  const curataAiStatus = page.getByRole('status').filter({ hasText: 'CurataAI note formatting · unavailable' });
+  await expect(curataAiStatus).toContainText('turned off');
+  await expect(page.getByRole('button', { name: 'Format note with CurataAI (unavailable)' })).toBeDisabled();
 
   /* ---- the patient band: identity and what must not be missed ---- */
   await expect(page.getByRole('heading', { name: `${first} Patient` })).toBeVisible();
@@ -147,6 +176,7 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   expect(note.subjective, 'unanswered prompts must not reach the record').not.toContain('Rash:');
   expect(note.assessment).toContain('Differentials considered: headache since monday');
   expect(record.data.suspendedAt).not.toBeNull();
+  expect(curataAiPostBodies, 'typing and saving a note must not send it to CurataAI while disabled').toEqual([]);
 
   /* ---- the lab signs off; the doctor reviews the results where they are ---- */
   const orderId = record.data.orders[0].id;
