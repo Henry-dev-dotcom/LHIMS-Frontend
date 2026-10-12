@@ -177,7 +177,7 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   await expect(pending).toContainText('0 of 2 back');
   await expect(pending.getByRole('button', { name: `Add tests for ${first} Patient` })).toBeVisible();
   await expect(pending.getByRole('button', { name: `Force resume ${first} Patient` })).toBeVisible();
-  await expect(pending.getByRole('button', { name: `Ping lab ${first} Patient (not connected)` })).toBeDisabled();
+  await expect(pending.getByRole('button', { name: `Ping lab for ${first} Patient` })).toBeEnabled();
   for (const viewport of [{ width: 390, height: 844 }, { width: 768, height: 1024 }]) {
     await page.setViewportSize(viewport);
     const widths = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, page: document.documentElement.scrollWidth }));

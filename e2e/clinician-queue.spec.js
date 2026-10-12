@@ -57,11 +57,34 @@ test('a patient moves through the clinician queue as their tests go out and come
   const orderId = (await ordered.json()).data.orders[0].id;
   expect((await request.post(`${API}/encounters/${encounterId}/suspend`, { ...auth(doctor), data: {} })).status()).toBe(200);
 
+  // The demo API may not yet include the additive queue flag or priority summary.
+  // Keep this UI regression deterministic while exercising the real row actions.
+  await page.route('**/encounters/queue*', async (route) => {
+    const response = await route.fetch();
+    const payload = await response.json();
+    const pending = payload.data.pendingLabs?.find((item) => item.id === encounterId);
+    if (pending) pending.canPingLab = true;
+    const ready = payload.data.reviewReady?.find((item) => item.id === encounterId);
+    if (ready) ready.resultPriority = 'CRITICAL';
+    await route.fulfill({ response, body: JSON.stringify(payload) });
+  });
+  await page.route(`**/encounters/${encounterId}/ping-lab`, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: true, message: 'Lab status request sent', data: { status: 'DELIVERED', requestedAt: new Date().toISOString(), orderCount: 1, recipientCount: 1, notificationCount: 1 } })
+    });
+  });
+
   await page.getByRole('button', { name: 'Refresh the queue' }).click();
   await page.getByRole('tab', { name: /Pending Labs/ }).click();
   const pendingRow = page.getByRole('row').filter({ hasText: `${first} Patient` });
   await expect(pendingRow).toContainText('0 of 1 back');
   await expect(pendingRow).toContainText('Full Blood Count');
+  const pingButton = pendingRow.getByRole('button', { name: `Ping lab for ${first} Patient` });
+  await expect(pingButton).toBeEnabled();
+  await pingButton.click();
+  await expect(page.getByText('Lab status request sent to 1 lab staff for 1 order.')).toBeVisible();
 
   // The lab signs the result off. Nothing on the doctor's side is told except by the server.
   const accepted = await request.post(`${API}/lab/samples/accept`, { ...auth(lab), data: { orderId } });
@@ -73,14 +96,6 @@ test('a patient moves through the clinician queue as their tests go out and come
   await request.post(`${API}/lab/results/submit-review`, { ...auth(lab), data: { resultId } });
   const signed = await request.post(`${API}/lab/results/${resultId}/sign-off`, { ...auth(lab), data: { decision: 'SIGNED_OFF' } });
   expect(signed.status(), await signed.text()).toBe(200);
-
-  await page.route('**/encounters/queue*', async (route) => {
-    const response = await route.fetch();
-    const payload = await response.json();
-    const row = payload.data.reviewReady?.find((item) => item.id === encounterId);
-    if (row) row.resultPriority = 'CRITICAL';
-    await route.fulfill({ response, body: JSON.stringify(payload) });
-  });
 
   // The queue picks it up: a glowing badge on Review Ready, and the doctor is told who.
   await page.getByRole('button', { name: 'Refresh the queue' }).click();

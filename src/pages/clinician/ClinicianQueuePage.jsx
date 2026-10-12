@@ -68,6 +68,7 @@ export function ClinicianQueuePage() {
   const [error, setError] = useState('');
   const [tab, setTab] = useState('new');
   const [busyId, setBusyId] = useState('');
+  const [pingingId, setPingingId] = useState('');
   const [open, setOpen] = useState(null);
   const readyIds = useRef(null);
 
@@ -119,6 +120,18 @@ export function ClinicianQueuePage() {
       setBusyId('');
     }
   }, [load, toast]);
+
+  const pingLab = useCallback(async (row) => {
+    setPingingId(row.id);
+    try {
+      const result = await encounterService.pingLab(apiClient, row.id);
+      toast('info', `Lab status request sent to ${result.recipientCount} lab staff for ${result.orderCount} order${result.orderCount === 1 ? '' : 's'}.`);
+    } catch (e) {
+      toast('error', e?.message || 'The lab status request could not be sent.');
+    } finally {
+      setPingingId('');
+    }
+  }, [toast]);
 
   if (open) {
     return (
@@ -224,11 +237,12 @@ export function ClinicianQueuePage() {
         <Button
           size="sm"
           variant="ghost"
-          disabled
-          title="Lab messaging requires a backend endpoint that is not available yet."
-          aria-label={`Ping lab ${patientName(row.patient)} (not connected)`}
+          disabled={pingingId === row.id || !canConsult || !row.canPingLab}
+          title={row.canPingLab ? 'Send an in-app status request to active laboratory staff.' : 'No outstanding laboratory orders on this visit.'}
+          onClick={() => pingLab(row)}
+          aria-label={`Ping lab for ${patientName(row.patient)}`}
         >
-          Ping lab
+          {pingingId === row.id ? 'Sending…' : 'Ping lab'}
         </Button>
       </div>
     ) : (
@@ -285,7 +299,7 @@ export function ClinicianQueuePage() {
 
       {error && <Card><p role="alert" className="text-sm font-semibold text-red-600">{error}</p></Card>}
 
-      {tab === 'pendingLabs' && <p role="note" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">You can add tests or resume a visit using the existing workflows. Lab messaging is not connected yet.</p>}
+      {tab === 'pendingLabs' && <p role="note" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">Ping Lab sends an in-app status request to active laboratory staff. Results still require laboratory review and sign-off.</p>}
 
       <div id="queue-panel" role="tabpanel" aria-labelledby={`queue-tab-${tab}`} aria-live="polite">
         <DataTable
