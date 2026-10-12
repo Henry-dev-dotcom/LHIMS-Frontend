@@ -155,3 +155,24 @@ npm run test:e2e:report           # open the last report (screenshots and traces
 The run resets and seeds a separate database — the backend's `DATABASE_URL` with the database
 renamed `lhims_e2e` (or `E2E_DATABASE_URL`) — so development data is never touched. The backend
 is expected at `../diagnosis-center-backend` (or `E2E_BACKEND_DIR`).
+
+## Phase 7 — Clinician portal hardening
+
+Phases 1–6 are merged and live. Phase 7 hardening is verified in the current checkout:
+
+- Complete desktop Playwright suite: **54/54 passed**.
+- Ward-chart journey: admission, medication chart, held/given doses, intake/output, rounds, result review, transfer and discharge controls.
+- Exact **375 × 844** phone and **768 × 1024** tablet ward-board checks: no document-level horizontal overflow and keyboard-reachable controls.
+- Role regression: doctor, nurse, reception, lab, scan, billing, pharmacist and admin screens opened without crashes; direct ward-board access was refused for reception and billing.
+- Flake probe: `scan.spec.js` and `ward-chart.spec.js` passed twice consecutively (**4/4**) after the full suite.
+- Existing route, auth, UI, workflow, and mobile hardening scripts passed.
+
+Run the focused Phase 7 checks with an isolated PostgreSQL database:
+
+```bash
+E2E_DATABASE_URL='postgresql://postgres:postgres@127.0.0.1:5432/lhims_e2e?schema=public' \
+E2E_BACKEND_DIR='../diagnosis-center-backend' \
+npx playwright test e2e/phase7-hardening.spec.js e2e/roles.spec.js --project=desktop
+```
+
+The durable hardening checks are in `e2e/phase7-hardening.spec.js` and the explicit reception/billing ward-board guards are in `e2e/roles.spec.js`. The source-of-truth checklist and evidence are recorded in `docs/CLINICIAN_PORTAL_PLAN.md`.

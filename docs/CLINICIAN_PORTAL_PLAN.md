@@ -88,6 +88,15 @@ This file is how that spec is built, in order, on top of what already exists.
 ### Phase 7: Hardening
 * Full browser journeys, accessibility, phone layout, role regression, docs.
 
+#### Phase 7 verification — completed 2026-10-12
+
+* **Full journeys:** the complete desktop Playwright suite passed **54/54**. This includes the clinician queue/workspace, reception, nurse, lab, scan, billing, pharmacy, directory, messaging, records, and ward-chart journeys. The ward-chart story covers admission, medication administration, fluids, rounds, results review, transfer and discharge controls.
+* **Accessibility:** the ward-board hardening check verifies the page landmark, keyboard focus order, the mobile navigation accessible name, and keyboard-reachable controls. Existing screen-reader labels remain in place for bed tiles, medication dose slots, trend graphs, tabs, dialogs, alerts, skip link and mobile navigation.
+* **Phone/tablet layout:** exact viewport checks passed at **375 × 844** and **768 × 1024** with no document-level horizontal overflow on the ward whiteboard. The medication chart keeps its deliberate horizontal table scroll at narrow widths rather than compressing dose columns into unreadable controls; the whiteboard tiles remain within the viewport.
+* **Role regression:** all eight demo roles opened their permitted menu screens without crashes. Explicit direct-address checks passed: receptionist and billing are redirected away from `#/app/ward-board` to their own landing pages and do not see the Ward Board menu item. Doctor, nurse and admin ward access is covered by the ward journey and role suite.
+* **Flaky test probe:** `scan.spec.js` and `ward-chart.spec.js` each passed twice consecutively in a late-run probe (**4/4**). The full 54-test desktop run also passed without reproducing the reported late-run failure.
+* **Static QA:** route, auth, UI polish, workflow integrity, and all Phase 6–9 mobile hardening scripts passed. The durable checks live in `e2e/phase7-hardening.spec.js`; direct ward-board role refusal checks live in `e2e/roles.spec.js`.
+
 ## Out of scope unless asked
 Speech recognition servers (dictation uses the browser's own), automatic billing rules beyond
 what the existing visit-completion already does, and any change to other roles' screens.

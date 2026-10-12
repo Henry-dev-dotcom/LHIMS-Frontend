@@ -30,3 +30,15 @@ for (const role of ROLES) {
     crashes.assertNone();
   });
 }
+
+for (const role of [
+  { username: 'reception', password: 'reception123', landing: 'reception-dashboard' },
+  { username: 'billing', password: 'billing123', landing: 'billing-dashboard' }
+]) {
+  test(`${role.username}: cannot open the ward board directly`, async ({ page }) => {
+    await signIn(page, { code: 'DEMO', username: role.username, password: role.password });
+    await page.goto('/#/app/ward-board');
+    await expect.poll(() => page.url(), { timeout: 10_000 }).toContain(`#/app/${role.landing}`);
+    await expect(page.getByRole('navigation').getByRole('button', { name: 'Ward Board', exact: true })).toHaveCount(0);
+  });
+}
