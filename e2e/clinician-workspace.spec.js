@@ -95,6 +95,14 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
 
   const encounterId = await startVisit(request, tokens, patientId, 'Severe headache and fever');
 
+  const curataAiPostBodies = [];
+  page.on('request', (browserRequest) => {
+    const path = new URL(browserRequest.url()).pathname;
+    if (browserRequest.method() === 'POST' && path.endsWith('/curataai/note-formatting')) {
+      curataAiPostBodies.push(browserRequest.postData() || '');
+    }
+  });
+
   await signInAsHospitalDoctor(page);
   await page.getByRole('button', { name: `Consult ${first} Patient` }).click();
   const curataAiStatus = page.getByRole('status').filter({ hasText: 'CurataAI note formatting · unavailable' });
@@ -168,6 +176,7 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   expect(note.subjective, 'unanswered prompts must not reach the record').not.toContain('Rash:');
   expect(note.assessment).toContain('Differentials considered: headache since monday');
   expect(record.data.suspendedAt).not.toBeNull();
+  expect(curataAiPostBodies, 'typing and saving a note must not send it to CurataAI while disabled').toEqual([]);
 
   /* ---- the lab signs off; the doctor reviews the results where they are ---- */
   const orderId = record.data.orders[0].id;
