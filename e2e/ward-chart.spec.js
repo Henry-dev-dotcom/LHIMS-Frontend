@@ -58,6 +58,16 @@ test('a ward round: red dot, tick the doses, fluids, rounds note, results review
   for (const name of ['Vitals & flowsheet', "Doctor's rounds", 'Medication chart', 'Orders & results']) await expect(page.getByRole('tab', { name })).toBeVisible();
   await expect(page.getByRole('group', { name: 'Ward actions' })).toBeVisible();
 
+  for (const viewport of [{ width: 390, height: 844 }, { width: 768, height: 1024 }]) {
+    await page.setViewportSize(viewport);
+    const widths = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, page: document.documentElement.scrollWidth }));
+    expect(widths.page, `Inpatient chart should not overflow at ${viewport.width}px`).toBeLessThanOrEqual(widths.viewport + 1);
+    await expect(page.getByRole('heading', { name: `${first} Ward` })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Vitals & flowsheet' })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Ward actions' })).toBeVisible();
+  }
+  await page.setViewportSize({ width: 1366, height: 900 });
+
   // Fluid balance: in 500 + 250, out 300.
   const volume = page.getByLabel('Volume (mL)');
   await volume.fill('500');

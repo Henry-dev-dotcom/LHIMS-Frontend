@@ -15,7 +15,7 @@ The frontend implementation phases in this roadmap are complete. Existing hospit
 | **B — Queue and results presentation** | Complete for available API data | Pending-lab rows offer supported **Open**, **Add tests**, and **Force resume** actions. **Ping lab** is present but disabled and labelled as awaiting backend support. No critical/abnormal queue badge is fabricated because the queue payload does not currently provide result severity flags. |
 | **C — Disposition coverage** | UI-only; awaiting backend | Short-stay observation and medical-excuse certificate options are visible but disabled. No unsupported outcome is saved and no official certificate is generated. Existing discharge, admission, referral, and death pathways are preserved. |
 | **D — CurataAI presentation** | UI-only; unavailable | The three-area Predictive Autopilot shell is display-only. It receives no patient or note data, makes no provider request, shows no mock recommendation, and keeps review/auto-fill unavailable. This does not change the separate CurataAI backend approval gates. |
-| **E — Consistency and verification** | Complete for frontend-only scope | Directory and inpatient surfaces were compared with the supplied brief. The consultation and queue journeys include phone/tablet overflow assertions at 390px and 768px. No unsupported clinical thresholds or inferred result severities were added. |
+| **E — Consistency and verification** | Complete for frontend-only scope | Directory and inpatient surfaces were compared with the supplied brief. Consultation, queue, patient-profile, and inpatient-chart journeys include phone/tablet overflow assertions at 390px and 768px; the ward board already has separate 375px/768px hardening checks. No unsupported clinical thresholds or inferred result severities were added. |
 
 ## Verified remaining gaps and backend handoff
 
@@ -37,7 +37,8 @@ These are not hidden behind mock data. They should be handled as explicit backen
 - Static checks passed: route registry, auth, UI polish, workflow integrity, PRD coverage, mobile hardening, and Tailwind classes.
 - Focused clinician E2E: **7/7 passed** after the test fixture was corrected to use a browser-only hospital profile.
 - The first full desktop E2E run reported **54/58 passed**. The four failures were three prescribing journeys and one queue journey; each landed on the permission guard because those older tests used the seeded clinic profile for a hospital-only clinician route. A shared E2E helper now overlays only the browser login response with a hospital facility profile; it does not modify the API fixture, database, or backend. The clinician queue/prescribing/workspace subset passed **7/7**, followed by a full desktop rerun with **58/58 passed** in 4.9 minutes.
-- `git diff --check` passed after the E2E helper changes.
+- Added 390px/768px no-overflow and key-element visibility checks to the patient-profile and inpatient-chart journeys; those focused browser tests passed **3/3**. The full 58-test suite has not been rerun after these additional viewport assertions.
+- `git diff --check` passed after the latest E2E additions.
 
 ## Repository state and next step
 
