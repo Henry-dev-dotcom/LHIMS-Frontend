@@ -18,7 +18,7 @@ export function pageFromAddress(auth, hash = typeof window === 'undefined' ? '' 
     const path = (hash || '').replace(/^#\/?/, '').split('?')[0];
     const [section, pageId] = path.split('/').filter(Boolean);
     if (section !== 'app' || !pageId) return null;
-    return canAccessPage(auth.role, pageId, auth.modules) ? pageId : null;
+    return canAccessPage(auth.role, pageId, auth.modules, auth) ? pageId : null;
   } catch {
     return null;
   }

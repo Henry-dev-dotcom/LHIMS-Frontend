@@ -106,8 +106,8 @@ function PageFallback() {
   return <PageSkeleton />;
 }
 
-function resolvePage(pageId, role, modules) {
-  if (!canAccessPage(role, pageId, modules)) {
+function resolvePage(pageId, role, modules, auth) {
+  if (!canAccessPage(role, pageId, modules, auth)) {
     return <AccessRestrictedPage pageId={pageId} />;
   }
 
@@ -228,5 +228,5 @@ export function AppRouter() {
     }
   }, [pageId]);
 
-  return <Suspense fallback={<PageFallback />}>{resolvePage(pageId, role, state.auth?.modules)}</Suspense>;
+  return <Suspense fallback={<PageFallback />}>{resolvePage(pageId, role, state.auth?.modules, state.auth)}</Suspense>;
 }

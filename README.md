@@ -176,3 +176,12 @@ npx playwright test e2e/phase7-hardening.spec.js e2e/roles.spec.js --project=des
 ```
 
 The durable hardening checks are in `e2e/phase7-hardening.spec.js` and the explicit reception/billing ward-board guards are in `e2e/roles.spec.js`. The source-of-truth checklist and evidence are recorded in `docs/CLINICIAN_PORTAL_PLAN.md`.
+
+## Subscription-specific clinician portals
+
+The clinician experience now follows the facility's subscribed plan:
+
+- **Hospital subscription (`HOSPITAL`)**: opens the unified clinician queue and patient workspace. Doctors work from the new-patient, pending-lab and review-ready queues, then open the consultation workspace for clinical notes, investigations, prescriptions, admission/disposition and inpatient follow-up. The legacy **Clinician Dashboard**, **New Order**, **Active Orders** and **Completed Orders** entries are hidden and blocked for hospital doctors.
+- **Diagnostic-centre subscription (`DIAGNOSTIC_CENTRE`)**: keeps the established external-ordering clinician dashboard, including **New Order**, **Active Orders**, **Completed Orders** and released-results workflows. The hospital queue is not shown for this plan.
+
+The plan discriminator is read from `auth.subscription.plan.facilityKind` (with the normalized facility value retained as `auth.facility.facilityKind`). Both sidebar navigation and direct `#/app/...` links use the same subscription-aware authorization rule.

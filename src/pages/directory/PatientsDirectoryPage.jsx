@@ -40,7 +40,7 @@ export function PatientsDirectoryPage() {
   const [opened, setOpened] = useState(null);
 
   const toast = useCallback((type, message) => dispatch({ type: 'SHOW_TOAST', toast: { type, message } }), [dispatch]);
-  const canRegister = canAccessPage(auth?.role, 'patients', auth?.modules);
+  const canRegister = canAccessPage(auth?.role, 'patients', auth?.modules, auth);
 
   // Wait for a pause in typing before asking the server.
   useEffect(() => {

@@ -55,15 +55,18 @@ export function normalizeAuthUser(apiUser) {
         onboardingCompletedAt: apiUser.facility.onboardingCompletedAt,
         // Whether a clinician's order waits for reception before the lab can see
         // it. True in a diagnostic centre, false in a hospital or clinic.
-        receptionConfirmsOrders: Boolean(apiUser.facility.receptionConfirmsOrders)
+        receptionConfirmsOrders: Boolean(apiUser.facility.receptionConfirmsOrders),
+        facilityKind: apiUser.facility.facilityKind || apiUser.facility.kind || apiUser.subscription?.plan?.facilityKind || null
       }
       : null,
     // A new facility's administrator starts on the setup checklist.
     landing: role === 'admin' && apiUser.facility?.onboardingCompletedAt === null && !apiUser.support
       ? 'setup'
-      // A doctor at a facility that runs outpatient visits starts on their queue; one who only orders
-      // tests from outside (a diagnostic centre's clinician) keeps the order dashboard.
-      : role === 'doctor' && Array.isArray(apiUser.modules) && apiUser.modules.includes('opd') ? 'clinician-queue' : roleInfo?.landing || 'overview',
+      // Hospital clinicians use the unified queue/workspace. Diagnostic-centre clinicians
+      // retain the established external-ordering dashboard, even if OPD is enabled as an add-on.
+      : role === 'doctor' && (apiUser.subscription?.plan?.facilityKind === 'HOSPITAL' || (Array.isArray(apiUser.modules) && apiUser.modules.includes('opd') && apiUser.subscription?.plan?.facilityKind !== 'DIAGNOSTIC_CENTRE'))
+        ? 'clinician-queue'
+        : roleInfo?.landing || 'overview',
     // { operatorName, reason, expiresAt } during a platform operator's read-only support session.
     support: apiUser.support || null,
     linkedDoctorId: apiUser.doctorProfileId || apiUser.doctorProfile?.id || '',

@@ -44,6 +44,26 @@ const PAGE_MODULE_OVERRIDES = {
   'clinic-dietetics': 'dietetics'
 };
 
+const HOSPITAL_LEGACY_CLINICIAN_PAGES = new Set([
+  'doctor-dashboard',
+  'doctor-new-order',
+  'doctor-active-orders',
+  'doctor-completed-orders'
+]);
+
+/** The subscription plan is the source of truth for the clinician experience. */
+export function isHospitalSubscription(auth) {
+  return auth?.facility?.facilityKind === 'HOSPITAL'
+    || auth?.subscription?.plan?.facilityKind === 'HOSPITAL';
+}
+
+function clinicianPortalAllows(role, pageId, auth) {
+  if (role !== 'doctor') return true;
+  if (isHospitalSubscription(auth)) return !HOSPITAL_LEGACY_CLINICIAN_PAGES.has(pageId);
+  // Diagnostic-centre clinicians keep the established external-ordering portal.
+  return pageId !== 'clinician-queue';
+}
+
 export function moduleForPage(pageId) {
   if (pageId in PAGE_MODULE_OVERRIDES) return PAGE_MODULE_OVERRIDES[pageId];
   const page = NAV_ITEMS.find((item) => item.id === pageId);
@@ -56,12 +76,12 @@ function moduleAllows(pageId, modules) {
   return !module || modules.includes(module);
 }
 
-export function canAccessPage(role, pageId, modules) {
+export function canAccessPage(role, pageId, modules, auth) {
   // Overview is a facility workspace page; the platform operator has none.
   if (pageId === 'overview') return role !== 'platform';
   const page = NAV_ITEMS.find((item) => item.id === pageId);
   if (!page) return false;
-  return page.roles.includes(role) && moduleAllows(pageId, modules);
+  return page.roles.includes(role) && moduleAllows(pageId, modules) && clinicianPortalAllows(role, pageId, auth);
 }
 
 export function getAllowedRolesForPage(pageId) {
@@ -81,8 +101,8 @@ export function getAllowedRolesForPage(pageId) {
   So `hidden` keeps a page out of the menu while canAccessPage still allows it,
   which is what lets an address or an in-page button open it.
 */
-export function getNavForRole(role, modules) {
-  return NAV_ITEMS.filter((item) => !item.hidden && item.roles.includes(role) && moduleAllows(item.id, modules));
+export function getNavForRole(role, modules, auth) {
+  return NAV_ITEMS.filter((item) => !item.hidden && item.roles.includes(role) && moduleAllows(item.id, modules) && clinicianPortalAllows(role, item.id, auth));
 }
 
 export function groupNavItems(items) {
