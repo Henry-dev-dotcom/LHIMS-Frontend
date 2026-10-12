@@ -9,6 +9,11 @@ export const PAGE_META = {
     description: 'The records desk: find a patient, register a new one, capture membership details from the card, and check somebody in for today’s visit.',
     requirements: ['Search by name, hospital number, phone or membership', 'Register a new patient', 'Capture NHIS membership and expiry', 'Check in with a visit type', 'Record whether the visit is on the scheme', 'Recent check-ins']
   },
+  'patients-directory': {
+    title: 'Patients Directory', section: 'Medical Records',
+    description: 'Every registered patient: deep search by name, phone, date of birth, Ghana Card or NHIS number, group filters, and a logged way into the full record, visit history and document vault.',
+    requirements: ['Deep search', 'Group filters', 'Logged record opening', 'Visit history', 'Document vault']
+  },
   'medical-records': {
     title: 'Medical Records', section: 'Medical Records',
     description: 'The full patient chart across departments, a log of who opened it, and release-of-information requests.',

@@ -148,6 +148,7 @@ export const NAV_ITEMS = [
   /* Every department talks to the others, so this belongs to all of them. */
   { id: 'messages', label: 'Messages', icon: MessagesSquare, roles: ['doctor','nurse','receptionist','lab','scan','billing','pharmacist','admin'], section: 'Messages' },
   { id: 'records-desk', label: 'Registration & Check-in', icon: ClipboardCheck, roles: ['receptionist','admin'], section: 'Records' },
+  { id: 'patients-directory', label: 'Patients Directory', icon: UsersRound, roles: ['doctor','nurse','receptionist','admin'], section: 'Medical Records' },
   { id: 'medical-records', label: 'Medical Records', icon: FolderLock, roles: ['doctor','nurse','receptionist','admin'], section: 'Medical Records' },
   { id: 'my-hr', label: 'My Rota & Leave', icon: CalendarCheck, roles: ['doctor','nurse','pharmacist','receptionist','lab','scan','billing','admin'], section: 'HR' },
   { id: 'duty-rota', label: 'Duty Rota', icon: CalendarDays, roles: ['doctor','nurse','pharmacist','receptionist','lab','scan','billing','admin'], section: 'HR' },
