@@ -267,7 +267,7 @@ export function ClinicianQueuePage() {
         <div role="tablist" aria-label="Queue" className="-mb-px flex flex-wrap gap-x-2">
           {TABS.map((item) => {
             const selected = tab === item.id;
-            const count = counts[item.id] ?? 0;
+            const count = counts[item.id === 'pendingDiagnosis' ? 'pendingLabs' : item.id] ?? 0;
             const glowing = item.alert && count > 0;
             return (
               <button
