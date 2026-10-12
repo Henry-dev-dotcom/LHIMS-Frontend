@@ -74,6 +74,14 @@ test('a patient moves through the clinician queue as their tests go out and come
   const signed = await request.post(`${API}/lab/results/${resultId}/sign-off`, { ...auth(lab), data: { decision: 'SIGNED_OFF' } });
   expect(signed.status(), await signed.text()).toBe(200);
 
+  await page.route('**/encounters/queue*', async (route) => {
+    const response = await route.fetch();
+    const payload = await response.json();
+    const row = payload.data.reviewReady?.find((item) => item.id === encounterId);
+    if (row) row.resultPriority = 'CRITICAL';
+    await route.fulfill({ response, body: JSON.stringify(payload) });
+  });
+
   // The queue picks it up: a glowing badge on Review Ready, and the doctor is told who.
   await page.getByRole('button', { name: 'Refresh the queue' }).click();
   await expect(page.getByText(`Results are back for ${first} Patient.`)).toBeVisible();
@@ -82,6 +90,7 @@ test('a patient moves through the clinician queue as their tests go out and come
   await reviewTab.click();
   const readyRow = page.getByRole('row').filter({ hasText: `${first} Patient` });
   await expect(readyRow).toContainText('1 of 1 back');
+  await expect(readyRow.getByText('Critical result', { exact: true })).toBeVisible();
 
   // Reviewing the results takes the visit back: they are in consultation again.
   await page.getByRole('button', { name: `Review results ${first} Patient` }).click();
