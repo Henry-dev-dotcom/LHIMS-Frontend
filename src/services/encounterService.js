@@ -34,5 +34,8 @@ export const encounterService = {
   // Unsaved work on a visit; private to the clinician who wrote it.
   getDraft: async (client, id) => client.request(`/encounters/${id}/draft`, { cache: false }),
   saveDraft: async (client, id, data) => client.request(`/encounters/${id}/draft`, { method: 'PUT', body: { data } }),
-  discardDraft: async (client, id) => client.request(`/encounters/${id}/draft`, { method: 'DELETE' })
+  discardDraft: async (client, id) => client.request(`/encounters/${id}/draft`, { method: 'DELETE' }),
+  // Foundation only: status contains no patient data; note content is never sent while disabled.
+  noteFormattingStatus: async (client, id) => client.request(`/encounters/${id}/curataai/note-formatting`, { cache: false }),
+  formatNote: async (client, id, sections) => client.request(`/encounters/${id}/curataai/note-formatting`, { method: 'POST', body: { sections } })
 };
