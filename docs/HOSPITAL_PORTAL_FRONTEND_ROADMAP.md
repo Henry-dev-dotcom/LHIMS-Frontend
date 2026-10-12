@@ -36,7 +36,7 @@ These are not hidden behind mock data. They should be handled as explicit backen
 - Production frontend build passed.
 - Static checks passed: route registry, auth, UI polish, workflow integrity, PRD coverage, mobile hardening, and Tailwind classes.
 - Focused clinician E2E: **7/7 passed** after the test fixture was corrected to use a browser-only hospital profile.
-- The first full desktop E2E run reported **54/58 passed**. The four failures were three prescribing journeys and one queue journey; each landed on the permission guard because those older tests used the seeded clinic profile for a hospital-only clinician route. A shared E2E helper now overlays only the browser login response with a hospital facility profile; it does not modify the API fixture, database, or backend. The clinician queue/prescribing/workspace subset then passed **7/7**. The full 58-test suite has **not** been rerun after that test-fixture correction, so this record does not claim 58/58.
+- The first full desktop E2E run reported **54/58 passed**. The four failures were three prescribing journeys and one queue journey; each landed on the permission guard because those older tests used the seeded clinic profile for a hospital-only clinician route. A shared E2E helper now overlays only the browser login response with a hospital facility profile; it does not modify the API fixture, database, or backend. The clinician queue/prescribing/workspace subset passed **7/7**, followed by a full desktop rerun with **58/58 passed** in 4.9 minutes.
 - `git diff --check` passed after the E2E helper changes.
 
 ## Repository state and next step
