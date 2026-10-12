@@ -64,6 +64,11 @@ export const PAGE_META = {
     description: 'Request routine maintenance for laboratory analyzers from Gustav Biomed Limited.',
     requirements: ['Analyzer selection', 'Preferred service date', 'Request status']
   },
+  'lab-analyzer-performance': {
+    title: 'Analyzer Performance & QC', section: 'Laboratory',
+    description: 'Collect analyzer message reliability, processing exceptions and quality-control observations to identify drift, interface and device-performance problems early.',
+    requirements: ['Device reliability summary', 'Message and value capture rate', 'Quality-control observations', 'Exception investigation list']
+  },
   'insurance-claims': {
     title: 'Insurance Claims', section: 'Claims',
     description: 'Claim completed visits from NHIS and other schemes, submit monthly batches, and record decisions and scheme payments.',

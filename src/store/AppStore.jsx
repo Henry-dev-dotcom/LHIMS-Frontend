@@ -40,6 +40,7 @@ const emptyData = {
   financeShifts: [],
   auditLogs: [],
   notifications: [],
+  qualityControlRuns: [],
   securityEvents: [],
   backupExports: [],
   deliveryLogs: [],

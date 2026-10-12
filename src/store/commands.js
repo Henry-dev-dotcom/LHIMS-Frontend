@@ -1193,6 +1193,12 @@ const commands = {
     dispatch(toastAction('success', 'Analyzer message discarded'));
   },
 
+  CREATE_ANALYZER_QC_RUN: async (action, dispatch, getState) => {
+    await labService.createQc(apiClient, action.payload || {});
+    await refresh(dispatch, getState, ['qualityControlRuns']);
+    dispatch(toastAction('success', 'Analyzer QC run recorded'));
+  },
+
   ADMIN_UPDATE_NOTIFICATION_SETTINGS: async (action, dispatch, getState) => {
     await notificationService.updateSettings(apiClient, action.payload || {});
     dispatch({ type: 'SET_COLLECTIONS', collections: { notificationSettings: { ...getState().data.notificationSettings, ...(action.payload || {}) } } });

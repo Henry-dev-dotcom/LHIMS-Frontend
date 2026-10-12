@@ -192,7 +192,8 @@ export async function loadCollections(client, auth, dispatch, only = null) {
       load('analyzerDevices', () => analyzerService.devices(client, LIST_PARAMS), normalizeAnalyzerDevice),
       load('analyzerTestMaps', () => analyzerService.testMaps(client, LIST_PARAMS), normalizeAnalyzerTestMap),
       load('analyzerMessages', () => analyzerService.messages(client, LIST_PARAMS), normalizeAnalyzerMessage),
-      load('analyzerUnmappedCodes', () => analyzerService.unmappedCodes(client), normalizeAnalyzerUnmappedCode)
+      load('analyzerUnmappedCodes', () => analyzerService.unmappedCodes(client), normalizeAnalyzerUnmappedCode),
+      load('qualityControlRuns', () => labService.qc(client, LIST_PARAMS), null)
     );
   }
 
