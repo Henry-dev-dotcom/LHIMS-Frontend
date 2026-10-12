@@ -31,11 +31,11 @@ The formatter must not receive or use patient identity, encounter IDs, chart his
 1. Keep the original note visible and unchanged while preparing a separate proposed draft.
 2. Label the proposal as AI-formatted text derived only from clinician-entered text.
 3. Let the clinician compare the original and proposed sections, then explicitly apply or discard the proposal.
-4. Applying a proposal must only update the editable draft. It must not save the clinical note; the existing explicit save action remains separate.
+4. Applying a proposal must only update the editable draft. The current workspace autosaves changed drafts privately after approximately 1.2 seconds; the permanent clinical note remains a separate explicit action. The generated preview must not enter the autosaved draft before the clinician explicitly applies it.
 5. Preserve an immediate way to undo/revert to the pre-format draft.
 6. Never silently accept a proposal, auto-save it, or use it to trigger orders, prescriptions, diagnoses, or encounter completion.
 
-The exact comparison and apply/revert interaction needs product-owner and clinician review before implementation.
+The exact comparison and apply/revert interaction needs product-owner and clinician review before implementation. See the pending [Clinical and Product Review Checklist](./CURATAAI_PHASE3_REVIEW_CHECKLIST.md).
 
 ## Decisions still needed before provider integration
 
