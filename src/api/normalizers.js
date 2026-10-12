@@ -59,7 +59,11 @@ export function normalizeAuthUser(apiUser) {
       }
       : null,
     // A new facility's administrator starts on the setup checklist.
-    landing: role === 'admin' && apiUser.facility?.onboardingCompletedAt === null && !apiUser.support ? 'setup' : roleInfo?.landing || 'overview',
+    landing: role === 'admin' && apiUser.facility?.onboardingCompletedAt === null && !apiUser.support
+      ? 'setup'
+      // A doctor at a facility that runs outpatient visits starts on their queue; one who only orders
+      // tests from outside (a diagnostic centre's clinician) keeps the order dashboard.
+      : role === 'doctor' && Array.isArray(apiUser.modules) && apiUser.modules.includes('opd') ? 'clinician-queue' : roleInfo?.landing || 'overview',
     // { operatorName, reason, expiresAt } during a platform operator's read-only support session.
     support: apiUser.support || null,
     linkedDoctorId: apiUser.doctorProfileId || apiUser.doctorProfile?.id || '',

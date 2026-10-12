@@ -39,13 +39,13 @@ const VITAL_FIELDS = [
 
 const EMPTY_RX_LINE = { drugId: '', drugName: '', strength: '', dosageForm: '', dose: '', route: 'Oral', frequency: '', durationDays: '', quantity: '', instructions: '' };
 
-function numbersOnly(values) {
+export function numbersOnly(values) {
   const out = {};
   for (const [key, value] of Object.entries(values)) if (value !== '' && value !== undefined) out[key] = Number(value);
   return out;
 }
 
-function vitalsSummary(v) {
+export function vitalsSummary(v) {
   if (!v) return 'No vitals recorded yet.';
   const parts = [];
   if (v.temperatureC != null) parts.push(`T ${Number(v.temperatureC)}°C`);
@@ -254,7 +254,7 @@ export function EncounterWorkspace({ encounterId, focusPrescriptions = false }) 
   );
 }
 
-function VitalsCard({ encounter, auth, open, busy, act, latest }) {
+export function VitalsCard({ encounter, auth, open, busy, act, latest }) {
   const [values, setValues] = useState({});
   const [triageLevel, setTriageLevel] = useState(encounter.triageLevel || '');
   const [notes, setNotes] = useState('');
@@ -314,7 +314,7 @@ function VitalsCard({ encounter, auth, open, busy, act, latest }) {
   );
 }
 
-function AllergiesCard({ encounter, auth, busy, act }) {
+export function AllergiesCard({ encounter, auth, busy, act }) {
   const [substance, setSubstance] = useState('');
   const [reaction, setReaction] = useState('');
   const [severity, setSeverity] = useState('MODERATE');
@@ -353,7 +353,7 @@ function AllergiesCard({ encounter, auth, busy, act }) {
   );
 }
 
-function NotesCard({ encounter, auth, open, busy, act }) {
+export function NotesCard({ encounter, auth, open, busy, act }) {
   const [note, setNote] = useState({ subjective: '', objective: '', assessment: '', plan: '' });
   const canWrite = open && (can(auth, P.CONSULT) || can(auth, P.TRIAGE));
   const empty = !Object.values(note).some((v) => v.trim());
@@ -391,7 +391,7 @@ function NotesCard({ encounter, auth, open, busy, act }) {
   );
 }
 
-function DiagnosesCard({ encounter, auth, open, busy, act }) {
+export function DiagnosesCard({ encounter, auth, open, busy, act }) {
   const [query, setQuery] = useState('');
   const [matches, setMatches] = useState([]);
   const [chosen, setChosen] = useState(null);
@@ -481,7 +481,7 @@ function DiagnosesCard({ encounter, auth, open, busy, act }) {
   );
 }
 
-function OrdersCard({ encounter, auth, open, busy, act }) {
+export function OrdersCard({ encounter, auth, open, busy, act }) {
   const [catalog, setCatalog] = useState([]);
   const [filter, setFilter] = useState('');
   const [selected, setSelected] = useState([]);
@@ -546,7 +546,7 @@ function OrdersCard({ encounter, auth, open, busy, act }) {
   );
 }
 
-function PrescriptionsCard({ encounter, auth, open, busy, act }) {
+export function PrescriptionsCard({ encounter, auth, open, busy, act }) {
   const [lines, setLines] = useState([{ ...EMPTY_RX_LINE }]);
   const canWrite = open && can(auth, P.PRESCRIBE);
   const valid = lines.every((l) => l.drugName.trim().length >= 2 && l.dose.trim() && l.route.trim() && l.frequency.trim());
@@ -635,7 +635,7 @@ function PrescriptionsCard({ encounter, auth, open, busy, act }) {
 }
 
 /** Medicine field with suggestions from the pharmacy's drug list; free text is still allowed. */
-function DrugPicker({ line, onText, onPick }) {
+export function DrugPicker({ line, onText, onPick }) {
   const [matches, setMatches] = useState([]);
   const [focused, setFocused] = useState(false);
 
@@ -680,7 +680,7 @@ function DrugPicker({ line, onText, onPick }) {
   );
 }
 
-function ChargesCard({ encounter }) {
+export function ChargesCard({ encounter }) {
   // Encounter charges (e.g. consultation fee); investigation bills belong to their orders.
   const orderInvoices = encounter.orders?.length || 0;
   return (
@@ -704,7 +704,7 @@ function ChargesCard({ encounter }) {
 }
 
 /** The decision to admit: choose a ward and bed; the visit closes as ADMITTED. */
-function AdmitFromVisitModal({ open, encounter, onClose, onAdmitted }) {
+export function AdmitFromVisitModal({ open, encounter, onClose, onAdmitted }) {
   const [wards, setWards] = useState([]);
   const [target, setTarget] = useState({ wardId: '', bedId: '' });
   const [reason, setReason] = useState('');
@@ -741,7 +741,7 @@ function AdmitFromVisitModal({ open, encounter, onClose, onAdmitted }) {
   );
 }
 
-function CompleteModal({ open, hasDiagnosis, onClose, onComplete, busy }) {
+export function CompleteModal({ open, hasDiagnosis, onClose, onComplete, busy }) {
   const [outcome, setOutcome] = useState('DISCHARGED');
   const [summary, setSummary] = useState('');
   useEffect(() => {

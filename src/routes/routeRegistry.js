@@ -134,6 +134,11 @@ export const PAGE_META = {
     description: 'Drug list, stock by batch and expiry, receiving, adjustments and the stock ledger.',
     requirements: ['Drug list', 'Receive batches', 'Adjust and write off', 'Stock history', 'Reorder and expiry alerts']
   },
+  'clinician-queue': {
+    title: 'Clinician Queue', section: 'Clinician',
+    description: 'Patients waiting for the doctor, out for tests, and ready for review, with the visit workspace opened from the queue.',
+    requirements: ['New patients', 'Pending labs', 'Review ready alert', 'My consultations', 'Open the visit workspace']
+  },
   'opd-queue': {
     title: 'OPD Visits', section: 'Outpatient',
     description: 'Outpatient visit queue and encounter workspace: triage, vitals, notes, diagnoses, investigations, prescriptions and charges.',

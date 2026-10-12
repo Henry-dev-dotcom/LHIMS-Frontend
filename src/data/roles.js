@@ -130,6 +130,7 @@ export const ALL_ROLES = [PLATFORM_ROLE, ...ROLES];
 export const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard, roles: ['doctor','receptionist','lab','scan','billing','admin'], section: 'Overview' },
 
+  { id: 'clinician-queue', label: 'Clinician Queue', icon: ListChecks, roles: ['doctor','admin'], section: 'Clinician' },
   { id: 'doctor-dashboard', label: 'Clinician Dashboard', icon: UserRound, roles: ['doctor','admin'], section: 'Clinician' },
   { id: 'doctor-prescriptions', label: 'Prescriptions', icon: Pill, roles: ['doctor','admin'], section: 'Clinician' },
   { id: 'doctor-new-order', label: 'New Order', icon: ClipboardList, roles: ['doctor','admin'], section: 'Clinician' },

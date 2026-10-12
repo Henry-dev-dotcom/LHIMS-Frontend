@@ -87,9 +87,10 @@ test('the lab accepts one of two tests, reports it, and can take the result back
 
   /* ---- Results: it is there, and it can be taken back ---- */
   await openFromMenu(page, 'Results');
-  const sent = page.getByRole('article').filter({ hasText: 'Liver Function Test (LFT)' }).first();
+  // The sent results are a table of rows (compacted from cards), each with a View Result button.
+  const sent = page.getByRole('row').filter({ hasText: 'Liver Function Test (LFT)' }).first();
   await expect(sent).toBeVisible();
-  await sent.getByRole('button', { name: /View Stored Result/i }).click();
+  await sent.getByRole('button', { name: /View Result/i }).click();
 
   await page.getByRole('button', { name: /Reverse Result/i }).click();
   const reverse = page.getByRole('dialog').filter({ hasText: 'Reverse this result' });
