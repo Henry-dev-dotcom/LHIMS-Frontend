@@ -635,7 +635,7 @@ export function PrescriptionsCard({ encounter, auth, open, busy, act }) {
 }
 
 /** Medicine field with suggestions from the pharmacy's drug list; free text is still allowed. */
-function DrugPicker({ line, onText, onPick }) {
+export function DrugPicker({ line, onText, onPick }) {
   const [matches, setMatches] = useState([]);
   const [focused, setFocused] = useState(false);
 

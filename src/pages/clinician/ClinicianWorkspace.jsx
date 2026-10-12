@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AlertTriangle, ArrowLeft, BedDouble, CheckCircle2, Droplets, FlaskConical, History, PauseCircle, Save, Scissors, Stethoscope } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, BedDouble, CheckCircle2, FlaskConical, History, PauseCircle, Save, Stethoscope } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { useAppStore } from '../../store/AppStore';
 import { apiClient } from '../../store/commands';
 import { encounterService } from '../../services/encounterService';
-import { AdmitFromVisitModal, ChargesCard, CompleteModal, PrescriptionsCard, vitalsSummary } from '../opd/EncounterWorkspace';
-import { MembershipCard } from '../claims/MembershipCard';
+import { AdmitFromVisitModal, vitalsSummary } from '../opd/EncounterWorkspace';
+import { isAllergyConflict } from '../../services/pharmacyService';
 import { RequestBloodModal } from '../bloodBank/BloodBankPage';
 import { BookSurgeryModal } from '../theatre/BookSurgeryModal';
 import { P, STATUS, TRIAGE, ageLabel, can, patientName } from '../opd/opdUtils';
@@ -16,6 +16,8 @@ import { cleanNoteText } from './clinicalContent';
 import { ConsultationTab } from './ConsultationTab';
 import { InvestigationsTab } from './InvestigationsTab';
 import { QuickPeek } from './QuickPeek';
+import { PrescriptionsTab, lineIsBlank, lineIsComplete, toPrescriptionItem } from './PrescriptionsTab';
+import { AllergyOverrideModal, CompleteConfirmModal, DispositionTab, buildSummary } from './DispositionTab';
 
 /*
   The consultation workspace: one screen for a visit, in four tabs.
@@ -38,7 +40,19 @@ const TABS = [
   { id: 'disposition', label: 'Disposition' }
 ];
 
-const EMPTY_DRAFT = { subjective: '', objective: '', assessment: '', plan: '', stagedTestIds: [], urgency: 'ROUTINE' };
+const EMPTY_DRAFT = {
+  subjective: '',
+  objective: '',
+  assessment: '',
+  plan: '',
+  stagedTestIds: [],
+  urgency: 'ROUTINE',
+  rxLines: [],
+  disposition: 'DISCHARGED',
+  followUp: '',
+  referralTo: '',
+  referralReason: ''
+};
 const AUTOSAVE_MS = 1200;
 const NOTE_KEYS = ['subjective', 'objective', 'assessment', 'plan'];
 
@@ -56,6 +70,8 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
   const [admitOpen, setAdmitOpen] = useState(false);
   const [surgeryOpen, setSurgeryOpen] = useState(false);
   const [bloodOpen, setBloodOpen] = useState(false);
+  const [overridePrompt, setOverridePrompt] = useState(null);
+  const overrideResolver = useRef(null);
 
   const [draft, setDraft] = useState(EMPTY_DRAFT);
   const [draftReady, setDraftReady] = useState(false);
@@ -208,6 +224,53 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
     }
   }, [encounter, encounterId, load, onClose, saveDraftNow, saveNote, sendOrdersNow, toast]);
 
+  /** Asks, in a dialog, why a medicine is going ahead despite a recorded allergy. Resolves with the reason, or null. */
+  const askOverride = useCallback((message) => new Promise((resolve) => {
+    overrideResolver.current = resolve;
+    setOverridePrompt({ message });
+  }), []);
+  const resolveOverride = useCallback((reason) => {
+    setOverridePrompt(null);
+    overrideResolver.current?.(reason);
+    overrideResolver.current = null;
+  }, []);
+
+  /** Sends the medicines waiting on the Prescriptions tab to the pharmacy. Resolves true when there was nothing to send, or it sent. */
+  const issuePrescription = useCallback(async () => {
+    const lines = (draftRef.current.rxLines || []).filter((l) => !lineIsBlank(l));
+    if (lines.length === 0) return true;
+    if (!lines.every(lineIsComplete)) {
+      toast('error', 'Finish every medicine (name, dose, route and how often) or remove it before sending.');
+      return false;
+    }
+    const items = lines.map(toPrescriptionItem);
+    const ok = await act(async () => {
+      try {
+        return await encounterService.prescribe(apiClient, encounterId, { items });
+      } catch (error) {
+        // A recorded allergy blocks the prescription unless the prescriber gives a reason.
+        if (!isAllergyConflict(error)) throw error;
+        const reason = await askOverride(error.message);
+        if (!reason) throw new Error('Prescription not issued: an allergy needs a reason to go ahead, or the medicine has to change.');
+        return encounterService.prescribe(apiClient, encounterId, { items, allergyOverrideReason: reason });
+      }
+    }, 'Prescription sent to the pharmacy.');
+    if (ok) updateDraft({ rxLines: [] });
+    return ok;
+  }, [act, askOverride, encounterId, toast, updateDraft]);
+
+  /** Admitting closes the visit, so the note goes in first and nothing may be left half-sent. */
+  const openAdmit = useCallback(async () => {
+    const staged = (draftRef.current.stagedTestIds || []).length;
+    if (staged > 0) {
+      toast('error', `${staged} test${staged === 1 ? ' is' : 's are'} waiting to be sent. Send ${staged === 1 ? 'it' : 'them'} from Investigations, or remove ${staged === 1 ? 'it' : 'them'}, before admitting.`);
+      return;
+    }
+    if (!(await saveNote())) return;
+    if (!(await issuePrescription())) return;
+    setAdmitOpen(true);
+  }, [issuePrescription, saveNote, toast]);
+
   const resume = useCallback(() => act(() => encounterService.resume(apiClient, encounterId), 'Consultation resumed.'), [act, encounterId]);
 
   if (error) return <Card><p role="alert" className="text-sm font-semibold text-red-600">{error}</p><Button className="mt-3" variant="secondary" onClick={onClose}>Back to queue</Button></Card>;
@@ -225,6 +288,15 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
   const canRequestBlood = open && can(auth, 'bloodbank:request') && (!Array.isArray(modules) || modules.includes('blood_bank'));
   const canBookSurgery = open && can(auth, 'theatre:schedule') && modules.includes('theatre');
   const hasNoteText = NOTE_KEYS.some((key) => cleanNoteText(draft[key]));
+  const disposition = draft.disposition || 'DISCHARGED';
+  const medicineLines = (draft.rxLines || []).filter((l) => !lineIsBlank(l));
+  const readyMedicines = medicineLines.length;
+  // Anything that would be silently lost or half-sent stops the visit being closed, and says why.
+  const completeBlocker = stagedCount > 0
+    ? `${stagedCount} test${stagedCount === 1 ? ' is' : 's are'} waiting to be sent. Send ${stagedCount === 1 ? 'it' : 'them'} from Investigations, or remove ${stagedCount === 1 ? 'it' : 'them'}, first.`
+    : medicineLines.some((l) => !lineIsComplete(l))
+      ? 'A medicine on the Prescriptions tab is unfinished. Complete it or remove it first.'
+      : '';
 
   const commonTabProps = { encounter, auth, open, busy: busy || flow, act, draft, updateDraft };
 
@@ -320,20 +392,18 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
           <div id="workspace-panel" role="tabpanel" aria-labelledby={`workspace-tab-${tab}`}>
             {tab === 'consultation' && <ConsultationTab {...commonTabProps} saveNote={saveNote} latestVitals={latest} />}
             {tab === 'investigations' && <InvestigationsTab {...commonTabProps} sendOrdersNow={sendOrdersNow} />}
-            {tab === 'prescriptions' && <PrescriptionsCard encounter={encounter} auth={auth} open={open} busy={busy || flow} act={act} />}
+            {tab === 'prescriptions' && <PrescriptionsTab {...commonTabProps} issuePrescription={issuePrescription} />}
             {tab === 'disposition' && (
-              <div className="space-y-4">
-                <Card title="What happens next" subtitle="Finish the visit from the bar below, or choose another route here.">
-                  <div className="flex flex-wrap gap-2">
-                    {canAdmit && <Button variant="secondary" disabled={busy || flow} onClick={() => setAdmitOpen(true)}><BedDouble className="h-4 w-4" /> Admit to ward</Button>}
-                    {canBookSurgery && <Button variant="secondary" disabled={busy || flow} onClick={() => setSurgeryOpen(true)}><Scissors className="h-4 w-4" /> Book operation</Button>}
-                    {canRequestBlood && <Button variant="secondary" disabled={busy || flow} onClick={() => setBloodOpen(true)}><Droplets className="h-4 w-4" /> Request blood</Button>}
-                    {!canAdmit && !canBookSurgery && !canRequestBlood && <p className="text-sm text-slate-500">Complete the visit from the bar below.</p>}
-                  </div>
-                </Card>
-                <MembershipCard patient={patient} auth={auth} />
-                <ChargesCard encounter={encounter} />
-              </div>
+              <DispositionTab
+                {...commonTabProps}
+                canAdmit={canAdmit}
+                canBookSurgery={canBookSurgery}
+                canRequestBlood={canRequestBlood}
+                onAdmit={openAdmit}
+                onSurgery={() => setSurgeryOpen(true)}
+                onBlood={() => setBloodOpen(true)}
+                readyMedicines={readyMedicines}
+              />
             )}
           </div>
         </div>
@@ -352,8 +422,13 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
             {inConsult && !paused && (
               <Button variant="secondary" disabled={busy || flow} onClick={() => setSuspendOpen(true)}><FlaskConical className="h-4 w-4" /> Send to Lab &amp; Suspend</Button>
             )}
-            {inConsult && can(auth, P.COMPLETE) && (
-              <Button variant="success" disabled={busy || flow} onClick={() => setCompleteOpen(true)}><CheckCircle2 className="h-4 w-4" /> Complete &amp; Discharge</Button>
+            {inConsult && disposition === 'ADMITTED' && (
+              <Button variant="success" disabled={busy || flow || !canAdmit} onClick={openAdmit}><BedDouble className="h-4 w-4" /> Admit to Ward</Button>
+            )}
+            {inConsult && disposition !== 'ADMITTED' && can(auth, P.COMPLETE) && (
+              <Button variant="success" disabled={busy || flow} onClick={() => setCompleteOpen(true)}>
+                <CheckCircle2 className="h-4 w-4" /> {disposition === 'REFERRED' ? 'Complete & Refer' : disposition === 'DECEASED' ? 'Complete visit' : 'Complete & Discharge'}
+              </Button>
             )}
           </div>
         </div>
@@ -379,20 +454,25 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
         {stagedCount === 0 && outstanding === 0 && <p role="alert" className="mt-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">Choose at least one test or scan in Investigations first.</p>}
       </Modal>
 
-      <CompleteModal
+      <CompleteConfirmModal
         open={completeOpen}
-        hasDiagnosis={encounter.diagnoses?.length > 0}
         onClose={() => setCompleteOpen(false)}
         busy={busy || flow}
-        onComplete={async (payload) => {
-          if (stagedCount > 0) {
-            toast('error', `${stagedCount} test${stagedCount === 1 ? ' is' : 's are'} waiting to be sent. Send them from Investigations, or remove them, before completing the visit.`);
-            return;
-          }
+        disposition={disposition}
+        summary={buildSummary(draft)}
+        readyMedicines={readyMedicines}
+        hasDiagnosis={encounter.diagnoses?.length > 0}
+        blocker={completeBlocker}
+        onConfirm={async () => {
           setFlow(true);
           try {
+            // In the order a clinician would do it by hand: the note, the medicines, then close.
             if (!(await saveNote())) return;
-            const ok = await act(() => encounterService.complete(apiClient, encounter.id, payload), 'Visit completed.');
+            if (!(await issuePrescription())) return;
+            const ok = await act(
+              () => encounterService.complete(apiClient, encounter.id, { outcome: disposition, summary: buildSummary(draftRef.current) || undefined }),
+              'Visit completed.'
+            );
             if (ok) {
               setCompleteOpen(false);
               onClose();
@@ -402,6 +482,7 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
           }
         }}
       />
+      <AllergyOverrideModal prompt={overridePrompt} onResolve={resolveOverride} />
 
       <RequestBloodModal
         open={bloodOpen}
