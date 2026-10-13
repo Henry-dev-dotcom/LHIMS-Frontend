@@ -14,10 +14,9 @@ import { P, TRIAGE, ageLabel, can, patientName, waitingSince } from '../opd/opdU
   The clinician's queue.
 
   Patients do not vanish when they are sent for tests: they move between lists.
-    New Patients     triaged and waiting for a doctor
-    Pending Diagnosis sent for laboratory or imaging tests; still in the building, not yet back
-    Review Ready     every test is back - the doctor can finish the visit
-    My Consultations seen by this doctor and not paused
+  Needs attention: patients waiting for a doctor and consultations in progress
+  Awaiting results: visits sent for diagnostic tests
+  Ready to review: all results are back and need clinician review
 
   Which list a patient is in is decided by the server from the state of their tests
   (see the backend's queueState), so a result being withdrawn puts the patient back
@@ -27,10 +26,9 @@ import { P, TRIAGE, ageLabel, can, patientName, waitingSince } from '../opd/opdU
 const REFRESH_MS = 30_000;
 
 const TABS = [
-  { id: 'new', label: 'New Patients', empty: 'No patients are waiting for a doctor.' },
-  { id: 'pendingDiagnosis', label: 'Pending Diagnosis', empty: 'No patients are waiting for diagnostic results.' },
-  { id: 'reviewReady', label: 'Review Ready', empty: 'No results are waiting for your review.', alert: true },
-  { id: 'inConsultation', label: 'My Consultations', empty: 'You have no consultations open.' }
+  { id: 'needsAttention', label: 'Needs attention', empty: 'No patients are waiting and no consultations are in progress.' },
+  { id: 'awaitingResults', label: 'Awaiting results', empty: 'No patients are waiting for diagnostic results.' },
+  { id: 'reviewReady', label: 'Ready to review', empty: 'No results are waiting for your review.', alert: true }
 ];
 
 const minutesSince = (value) => (value ? Math.max(0, Math.round((Date.now() - new Date(value).getTime()) / 60000)) : 0);
@@ -152,12 +150,12 @@ export function ClinicianQueuePage() {
   }
 
   const counts = queue?.counts || {};
-  const queueKey = tab === 'pendingDiagnosis' ? 'pendingLabs' : tab;
-  const rows = queue?.[queueKey] || [];
+  const rows = tab === 'needsAttention'
+    ? [...(queue?.new || []).map((row) => ({ ...row, _queueBucket: 'NEW' })), ...(queue?.inConsultation || []).map((row) => ({ ...row, _queueBucket: 'IN_CONSULTATION' }))]
+    : queue?.[tab === 'awaitingResults' ? 'pendingLabs' : tab] || [];
   const active = TABS.find((item) => item.id === tab);
 
-  const actionLabel = { new: 'Consult', pendingDiagnosis: 'Open', reviewReady: 'Review results', inConsultation: 'Continue' }[tab];
-  const diagnosticTable = tab === 'pendingDiagnosis' || tab === 'reviewReady';
+  const diagnosticTable = tab === 'awaitingResults' || tab === 'reviewReady';
 
   const columns = [
     {
@@ -188,7 +186,7 @@ export function ClinicianQueuePage() {
     }
   ];
 
-  if (tab === 'pendingDiagnosis' || tab === 'reviewReady') {
+  if (tab === 'awaitingResults' || tab === 'reviewReady') {
     columns.push({
       key: 'tests',
       label: 'Tests',
@@ -204,11 +202,13 @@ export function ClinicianQueuePage() {
 
   columns.push({
     key: 'wait',
-    label: tab === 'new' ? 'Wait time' : tab === 'inConsultation' ? 'Seen for' : 'Sent for tests',
+    label: tab === 'needsAttention' ? 'Waiting / in care' : 'Sent for tests',
     width: diagnosticTable ? '14%' : '18%',
     render: (row) => {
-      const since = tab === 'new' ? row.triagedAt || row.startedAt : tab === 'inConsultation' ? row.consultationStartedAt || row.startedAt : row.suspendedAt;
-      return <span className={`text-sm font-medium ${tab === 'new' ? waitClass(minutesSince(since)) : 'text-slate-600'}`}>{waitingSince(since)}</span>;
+      const bucket = row._queueBucket || row.queueState;
+      const since = bucket === 'NEW' ? row.triagedAt || row.startedAt : bucket === 'IN_CONSULTATION' ? row.consultationStartedAt || row.startedAt : row.suspendedAt;
+      const detail = bucket === 'NEW' ? `Waiting ${waitingSince(since)}` : bucket === 'IN_CONSULTATION' ? `In care ${waitingSince(since)}` : waitingSince(since);
+      return <span className={`text-sm font-medium ${bucket === 'NEW' ? waitClass(minutesSince(since)) : 'text-slate-600'}`}>{detail}</span>;
     }
   });
 
@@ -216,12 +216,12 @@ export function ClinicianQueuePage() {
     key: 'action',
     label: 'Action',
     width: diagnosticTable ? '19%' : '20%',
-    render: (row) => tab === 'pendingDiagnosis' ? (
+    render: (row) => tab === 'awaitingResults' ? (
       <div className="flex flex-wrap gap-1.5">
         <Button
           size="sm"
           variant="secondary"
-          disabled={busyId === row.id || (!canConsult && tab !== 'pendingDiagnosis')}
+          disabled={busyId === row.id || !canConsult}
           onClick={() => openVisit(row)}
           aria-label={`Open ${patientName(row.patient)}`}
         >
@@ -257,14 +257,14 @@ export function ClinicianQueuePage() {
         </Button>
       </div>
     ) : (
-      <Button
-        size="sm"
-        variant={tab === 'reviewReady' ? 'primary' : 'secondary'}
-        disabled={busyId === row.id || (!canConsult && tab !== 'pendingDiagnosis')}
-        onClick={() => openVisit(row)}
-        aria-label={`${actionLabel} ${patientName(row.patient)}`}
-      >
-        {busyId === row.id ? 'Opening…' : actionLabel}
+        <Button
+          size="sm"
+          variant={tab === 'reviewReady' ? 'primary' : 'secondary'}
+          disabled={busyId === row.id || !canConsult}
+          onClick={() => openVisit(row)}
+          aria-label={`${tab === 'reviewReady' ? 'Review results' : (row._queueBucket || row.queueState) === 'NEW' ? 'Consult' : 'Continue consultation'} for ${patientName(row.patient)}`}
+        >
+          {busyId === row.id ? 'Opening…' : tab === 'reviewReady' ? 'Review results' : (row._queueBucket || row.queueState) === 'NEW' ? 'Consult' : 'Continue'}
       </Button>
     )
   });
@@ -277,7 +277,9 @@ export function ClinicianQueuePage() {
         <div role="tablist" aria-label="Queue" className="-mb-px flex flex-wrap gap-x-2">
           {TABS.map((item) => {
             const selected = tab === item.id;
-            const count = counts[item.id === 'pendingDiagnosis' ? 'pendingLabs' : item.id] ?? 0;
+            const count = item.id === 'needsAttention'
+              ? (counts.new || 0) + (counts.inConsultation || 0)
+              : counts[item.id === 'awaitingResults' ? 'pendingLabs' : item.id] || 0;
             const glowing = item.alert && count > 0;
             return (
               <button
@@ -297,7 +299,7 @@ export function ClinicianQueuePage() {
                     <span aria-label={`${count} ready for review`}>{count}</span>
                   </span>
                 ) : (
-                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600">{queue ? count : '–'}</span>
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-600">{queue ? (item.id === 'needsAttention' ? (counts.new || 0) + (counts.inConsultation || 0) : counts[item.id === 'awaitingResults' ? 'pendingLabs' : item.id] || 0) : '–'}</span>
                 )}
               </button>
             );
@@ -310,7 +312,7 @@ export function ClinicianQueuePage() {
 
       {error && <Card><p role="alert" className="text-sm font-semibold text-red-600">{error}</p></Card>}
 
-      {tab === 'pendingDiagnosis' && <p role="note" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">Pending Diagnosis includes laboratory tests and medical imaging. Ping diagnostics sends an in-app status request to the relevant active team; results still require review and sign-off.</p>}
+      {tab === 'awaitingResults' && <p role="note" className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">These visits are waiting on laboratory or imaging work. Results must still be reviewed and signed off by a clinician.</p>}
 
       <div id="queue-panel" role="tabpanel" aria-labelledby={`queue-tab-${tab}`} aria-live="polite">
         <DataTable

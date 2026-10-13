@@ -39,7 +39,7 @@ test('a patient moves through the clinician queue as their tests go out and come
 
   // The doctor signs in and lands on their queue.
   await signInAsHospitalDoctor(page);
-  await expect(page.getByRole('tab', { name: /New Patients/ })).toBeVisible();
+  await expect(page.getByRole('tab', { name: /Needs attention/ })).toBeVisible();
   await expect(page.getByRole('row').filter({ hasText: `${first} Patient` })).toBeVisible();
 
   // Consult: the consultation starts and the visit workspace opens.
@@ -47,8 +47,8 @@ test('a patient moves through the clinician queue as their tests go out and come
   await expect(page.getByRole('heading', { name: `${first} Patient` })).toBeVisible();
   await page.getByRole('button', { name: /Back to queue/ }).click();
 
-  // Now they are "my consultation", and not waiting any more.
-  await page.getByRole('tab', { name: /My Consultations/ }).click();
+  // In-progress consultations stay visible in Needs attention, alongside new patients.
+  await page.getByRole('tab', { name: /Needs attention/ }).click();
   await expect(page.getByRole('row').filter({ hasText: `${first} Patient` })).toBeVisible();
 
   // Sent for a test and paused: they appear under Pending Labs, with progress.
@@ -77,7 +77,7 @@ test('a patient moves through the clinician queue as their tests go out and come
   });
 
   await page.getByRole('button', { name: 'Refresh the queue' }).click();
-  await page.getByRole('tab', { name: /Pending Labs/ }).click();
+  await page.getByRole('tab', { name: /Awaiting results/ }).click();
   const pendingRow = page.getByRole('row').filter({ hasText: `${first} Patient` });
   await expect(pendingRow).toContainText('0 of 1 back');
   await expect(pendingRow).toContainText('Full Blood Count');
@@ -97,10 +97,10 @@ test('a patient moves through the clinician queue as their tests go out and come
   const signed = await request.post(`${API}/lab/results/${resultId}/sign-off`, { ...auth(lab), data: { decision: 'SIGNED_OFF' } });
   expect(signed.status(), await signed.text()).toBe(200);
 
-  // The queue picks it up: a glowing badge on Review Ready, and the doctor is told who.
+  // The queue picks it up: a glowing badge on Ready to review, and the doctor is told who.
   await page.getByRole('button', { name: 'Refresh the queue' }).click();
   await expect(page.getByText(`Results are back for ${first} Patient.`)).toBeVisible();
-  const reviewTab = page.getByRole('tab', { name: /Review Ready/ });
+  const reviewTab = page.getByRole('tab', { name: /Ready to review/ });
   await expect(reviewTab.getByLabel(/ready for review/)).toBeVisible();
   await reviewTab.click();
   const readyRow = page.getByRole('row').filter({ hasText: `${first} Patient` });
@@ -111,9 +111,9 @@ test('a patient moves through the clinician queue as their tests go out and come
   await page.getByRole('button', { name: `Review results ${first} Patient` }).click();
   await expect(page.getByRole('heading', { name: `${first} Patient` })).toBeVisible();
   await page.getByRole('button', { name: /Back to queue/ }).click();
-  await page.getByRole('tab', { name: /My Consultations/ }).click();
+  await page.getByRole('tab', { name: /Needs attention/ }).click();
   await expect(page.getByRole('row').filter({ hasText: `${first} Patient` })).toBeVisible();
-  await page.getByRole('tab', { name: /Review Ready/ }).click();
+  await page.getByRole('tab', { name: /Ready to review/ }).click();
   await expect(page.getByRole('row').filter({ hasText: `${first} Patient` })).toHaveCount(0);
 
   crashes.assertNone();
