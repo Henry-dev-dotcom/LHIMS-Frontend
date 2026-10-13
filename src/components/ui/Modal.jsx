@@ -17,6 +17,11 @@ export function Modal({ open, title, description, onClose, children, footer }) {
   const descriptionId = useId();
   const dialogRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -25,7 +30,7 @@ export function Modal({ open, title, description, onClose, children, footer }) {
 
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
-        onClose?.();
+        onCloseRef.current?.();
         return;
       }
 
@@ -36,6 +41,11 @@ export function Modal({ open, title, description, onClose, children, footer }) {
 
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
+      if (!dialogRef.current?.contains(document.activeElement)) {
+        event.preventDefault();
+        first.focus();
+        return;
+      }
       if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last.focus();
@@ -47,16 +57,17 @@ export function Modal({ open, title, description, onClose, children, footer }) {
 
     document.body.style.overflow = 'hidden';
     document.addEventListener('keydown', handleKeyDown);
-    window.setTimeout(() => closeButtonRef.current?.focus({ preventScroll: true }), 0);
+    const focusTimer = window.setTimeout(() => closeButtonRef.current?.focus({ preventScroll: true }), 0);
 
     return () => {
+      window.clearTimeout(focusTimer);
       document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', handleKeyDown);
       if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
         previouslyFocused.focus({ preventScroll: true });
       }
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open || typeof document === 'undefined') return null;
 
@@ -71,6 +82,7 @@ export function Modal({ open, title, description, onClose, children, footer }) {
       <div
         ref={dialogRef}
         className="grid max-h-[calc(100dvh-0.75rem)] w-full min-w-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-t-[1.65rem] border border-white/70 bg-white shadow-panel sm:max-h-[calc(100dvh-2rem)] sm:max-w-4xl sm:rounded-[2rem]"
+        tabIndex={-1}
         onMouseDown={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"

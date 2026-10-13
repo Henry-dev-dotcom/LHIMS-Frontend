@@ -29,7 +29,6 @@
 
 html {
   width: 100%;
-  overflow-x: hidden;
   scroll-behavior: smooth;
 }
 
@@ -37,7 +36,6 @@ body {
   margin: 0;
   width: 100%;
   min-width: 320px;
-  overflow-x: hidden;
   background:
     radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.14), transparent 32%),
     radial-gradient(circle at 100% 0%, rgba(5, 150, 105, 0.06), transparent 28%),
@@ -70,7 +68,17 @@ img, svg, video, canvas {
 #root {
   min-height: 100vh;
   width: 100%;
-  overflow-x: hidden;
+  min-width: 0;
+}
+
+/* Intrinsic sizing guardrails: prevent long content from forcing grid/flex tracks wider than their portal. */
+#root :is(.grid, .flex) > *,
+#root :is(.grid, .flex) > * > * {
+  min-width: 0;
+}
+
+#root :is(p, span, dd, dt, li, h1, h2, h3, h4, label, a, button, th, td) {
+  overflow-wrap: anywhere;
 }
 .public-ambient {
   position: relative;

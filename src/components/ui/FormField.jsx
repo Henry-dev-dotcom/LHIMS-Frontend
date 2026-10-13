@@ -13,7 +13,8 @@ export function FormField({ label, help, error, required = false, children, clas
     ? cloneElement(children, {
         'aria-describedby': [children.props['aria-describedby'], describedBy].filter(Boolean).join(' ') || undefined,
         'aria-invalid': error ? true : children.props['aria-invalid'],
-        'aria-required': required || children.props['aria-required'] || undefined
+        'aria-required': required || children.props['aria-required'] || undefined,
+        required: required || children.props.required || undefined
       })
     : children;
 

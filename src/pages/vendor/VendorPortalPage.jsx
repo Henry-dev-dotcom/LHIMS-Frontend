@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Activity, ArrowRight, Building2, CalendarClock, Check, FlaskConical, LogOut, PackageOpen, Phone, RefreshCw, Search, ShieldCheck, Wrench, X } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { FormField, inputClass } from '../../components/ui/FormField';
+import { Modal } from '../../components/ui/Modal';
 import { vendorPortalService } from '../../services/vendorPortalService';
 
 const STATUS_META = {
@@ -313,7 +314,28 @@ export function VendorPortalPage() {
         <footer className="flex flex-col gap-2 border-t border-slate-200 pt-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between"><span>Gustav Biomed requests only · Patient records are not available in this workspace.</span><a href="tel:+233595365391" className="inline-flex items-center gap-1.5 font-semibold text-clinical-800 hover:text-clinical-950"><Phone className="h-3.5 w-3.5" /> +233 59 536 5391</a></footer>
       </main>
 
-      {action && <div className="fixed inset-0 z-[200] grid place-items-center bg-slate-950/45 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setAction(null); }}><section role="dialog" aria-modal="true" aria-labelledby="vendor-status-title" className="w-full max-w-lg rounded-3xl bg-white p-5 shadow-2xl sm:p-6"><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wide text-clinical-700">{action.request.requestCode}</p><h2 id="vendor-status-title" className="mt-1 text-xl font-extrabold text-slate-950">{ACTION_LABELS[action.status]}?</h2></div><button type="button" className="rounded-xl p-2 text-slate-500 hover:bg-slate-100" aria-label="Close" onClick={() => setAction(null)}><X className="h-5 w-5" /></button></div><p className="mt-3 text-sm leading-6 text-slate-600">This update will be visible to the requesting LHIMS facility.</p><form onSubmit={submitStatus} className="mt-4 space-y-4">{(action.status === 'SCHEDULED' || action.status === 'DECLINED') && <FormField label={action.status === 'SCHEDULED' ? 'Scheduling details' : 'Reason for declining'} required help={action.status === 'SCHEDULED' ? 'Include the confirmed date/time or next scheduling step.' : 'Give the facility a brief, useful reason.'}><textarea className={inputClass} rows={3} maxLength={1000} value={actionNote} onChange={(event) => setActionNote(event.target.value)} required minLength={5} /></FormField>}{action.status !== 'SCHEDULED' && action.status !== 'DECLINED' && <FormField label="Update note (optional)"><textarea className={inputClass} rows={3} maxLength={1000} value={actionNote} onChange={(event) => setActionNote(event.target.value)} placeholder="Add a short note for the requesting team" /></FormField>}<div className="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end"><Button variant="secondary" onClick={() => setAction(null)} disabled={saving}>Cancel</Button><Button type="submit" disabled={saving || ((action.status === 'SCHEDULED' || action.status === 'DECLINED') && actionNote.trim().length < 5)}>{saving ? 'Saving…' : ACTION_LABELS[action.status]}<ArrowRight className="h-4 w-4" /></Button></div></form></section></div>}
+      <Modal
+        open={Boolean(action)}
+        title={action ? `${ACTION_LABELS[action.status]}?` : ''}
+        description="This update will be visible to the requesting LHIMS facility."
+        onClose={() => { if (!saving) setAction(null); }}
+        footer={action && <>
+          <Button variant="secondary" onClick={() => setAction(null)} disabled={saving}>Cancel</Button>
+          <Button type="submit" form="vendor-status-update-form" disabled={saving || ((action.status === 'SCHEDULED' || action.status === 'DECLINED') && actionNote.trim().length < 5)}>
+            {saving ? 'Saving…' : ACTION_LABELS[action.status]}<ArrowRight className="h-4 w-4" />
+          </Button>
+        </>}
+      >
+        {action && <div className="mb-4 rounded-xl bg-clinical-50 px-3 py-2 text-xs font-bold uppercase tracking-wide text-clinical-800">Request {action.request.requestCode}</div>}
+        {action && <form id="vendor-status-update-form" onSubmit={submitStatus} className="space-y-4">
+          {(action.status === 'SCHEDULED' || action.status === 'DECLINED') && <FormField label={action.status === 'SCHEDULED' ? 'Scheduling details' : 'Reason for declining'} required help={action.status === 'SCHEDULED' ? 'Include the confirmed date/time or next scheduling step.' : 'Give the facility a brief, useful reason.'}>
+            <textarea className={inputClass} rows={3} maxLength={1000} value={actionNote} onChange={(event) => setActionNote(event.target.value)} required minLength={5} />
+          </FormField>}
+          {action.status !== 'SCHEDULED' && action.status !== 'DECLINED' && <FormField label="Update note (optional)">
+            <textarea className={inputClass} rows={3} maxLength={1000} value={actionNote} onChange={(event) => setActionNote(event.target.value)} placeholder="Add a short note for the requesting team" />
+          </FormField>}
+        </form>}
+      </Modal>
     </div>
   );
 }

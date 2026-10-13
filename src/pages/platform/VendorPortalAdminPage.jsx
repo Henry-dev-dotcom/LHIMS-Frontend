@@ -4,6 +4,7 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { FormField, inputClass } from '../../components/ui/FormField';
+import { Modal } from '../../components/ui/Modal';
 import { useAppStore } from '../../store/AppStore';
 import { apiClient } from '../../store/commands';
 import { vendorPortalService } from '../../services/vendorPortalService';
@@ -190,28 +191,26 @@ export function VendorPortalAdminPage() {
         )}
       </Card>
 
-      {pendingDelete && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/50 p-4 backdrop-blur-sm">
-          <section role="dialog" aria-modal="true" aria-labelledby="delete-vendor-title" className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-6">
-            <div className="flex items-start gap-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-rose-50 text-rose-700"><Trash2 className="h-5 w-5" /></span>
-              <div>
-                <h2 id="delete-vendor-title" className="text-lg font-extrabold text-slate-950">Delete vendor account?</h2>
-                <p className="mt-1 text-sm leading-6 text-slate-600">This permanently removes the sign-in for <strong>{pendingDelete.fullName}</strong>. Active sessions are revoked and unused setup links are expired. Existing request records and audit history are retained.</p>
-              </div>
-            </div>
-            <form onSubmit={deleteUser} className="mt-5 space-y-4">
-              <FormField label="Type the account email to confirm" help={<span>Enter <span className="font-mono font-semibold text-slate-800">{pendingDelete.email}</span> exactly.</span>}>
-                <input className={inputClass} type="email" autoComplete="off" spellCheck={false} value={deleteConfirmation} onChange={(event) => setDeleteConfirmation(event.target.value)} />
-              </FormField>
-              <div className="flex flex-col-reverse justify-end gap-2 sm:flex-row">
-                <Button variant="secondary" type="button" onClick={() => { setPendingDelete(null); setDeleteConfirmation(''); }} disabled={deleting}>Cancel</Button>
-                <Button variant="danger" type="submit" disabled={!deleteMatches || deleting}><Trash2 className="h-4 w-4" />{deleting ? 'Deleting…' : 'Delete account permanently'}</Button>
-              </div>
-            </form>
-          </section>
-        </div>
-      )}
+      <Modal
+        open={Boolean(pendingDelete)}
+        title="Delete vendor account?"
+        description={pendingDelete ? `This permanently removes the sign-in for ${pendingDelete.fullName}. Active sessions are revoked and unused setup links are expired. Existing request records and audit history are retained.` : undefined}
+        onClose={() => { if (!deleting) { setPendingDelete(null); setDeleteConfirmation(''); } }}
+        footer={pendingDelete && <>
+          <Button variant="secondary" onClick={() => { setPendingDelete(null); setDeleteConfirmation(''); }} disabled={deleting}>Cancel</Button>
+          <Button variant="danger" type="submit" form="delete-vendor-account-form" disabled={!deleteMatches || deleting}><Trash2 className="h-4 w-4" />{deleting ? 'Deleting…' : 'Delete account permanently'}</Button>
+        </>}
+      >
+        {pendingDelete && <form id="delete-vendor-account-form" onSubmit={deleteUser} className="space-y-4">
+          <div className="flex items-start gap-3 rounded-2xl border border-rose-100 bg-rose-50/70 p-3 text-sm leading-6 text-rose-950">
+            <Trash2 className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+            <p>Type the account email exactly to confirm: <strong className="break-all">{pendingDelete.email}</strong></p>
+          </div>
+          <FormField label="Account email confirmation" required help="This step prevents accidental removal of the vendor login.">
+            <input className={inputClass} type="email" autoComplete="off" spellCheck={false} required value={deleteConfirmation} onChange={(event) => setDeleteConfirmation(event.target.value)} />
+          </FormField>
+        </form>}
+      </Modal>
     </div>
   );
 }

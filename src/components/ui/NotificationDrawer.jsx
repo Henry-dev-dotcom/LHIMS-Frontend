@@ -6,12 +6,20 @@ import { BellRing, CheckCheck, Mail, MessageSquareText, X } from 'lucide-react';
 import { Button } from './Button';
 import { StatusBadge } from './StatusBadge';
 import { formatDateTime } from '../../utils/formatters';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 
 gsap.registerPlugin(useGSAP);
 
 export function NotificationDrawer({ open, notifications = [], onClose, onMarkDelivered, ignoreRef }) {
   const drawerRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const onCloseRef = useRef(onClose);
   const [drawerPosition, setDrawerPosition] = useState({ top: 72, right: 20 });
+  useFocusTrap(drawerRef, open);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -41,26 +49,32 @@ export function NotificationDrawer({ open, notifications = [], onClose, onMarkDe
   useEffect(() => {
     if (!open) return undefined;
     const previousOverflow = document.body.style.overflow;
+    const previouslyFocused = document.activeElement;
+    const focusTimer = window.setTimeout(() => closeButtonRef.current?.focus({ preventScroll: true }), 0);
     document.body.style.overflow = 'hidden';
     const handlePointerDown = (event) => {
       const target = event.target;
       const clickedDrawer = drawerRef.current && drawerRef.current.contains(target);
       const clickedIgnoredElement = ignoreRef?.current && ignoreRef.current.contains(target);
       if (!clickedDrawer && !clickedIgnoredElement) {
-        onClose?.();
+        onCloseRef.current?.();
       }
     };
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape') onClose?.();
+      if (event.key === 'Escape') onCloseRef.current?.();
     };
     document.addEventListener('pointerdown', handlePointerDown);
     document.addEventListener('keydown', handleKeyDown);
     return () => {
+      window.clearTimeout(focusTimer);
       document.body.style.overflow = previousOverflow;
       document.removeEventListener('pointerdown', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
+      if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
+        previouslyFocused.focus({ preventScroll: true });
+      }
     };
-  }, [open, onClose, ignoreRef]);
+  }, [open, ignoreRef]);
 
   useGSAP(() => {
     const drawer = drawerRef.current;
@@ -86,7 +100,8 @@ export function NotificationDrawer({ open, notifications = [], onClose, onMarkDe
         ref={drawerRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Notifications"
+        aria-labelledby="notification-drawer-title"
+        tabIndex={-1}
         className="pointer-events-auto fixed inset-x-0 bottom-0 grid max-h-[calc(88dvh-env(safe-area-inset-bottom))] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-t-[1.65rem] border border-slate-200 bg-white shadow-panel ring-1 ring-slate-950/5 md:inset-x-auto md:bottom-auto md:right-[var(--drawer-right)] md:top-[var(--drawer-top)] md:w-[calc(100vw-1.5rem)] md:max-w-[26rem] md:rounded-[1.75rem]"
         style={{ '--drawer-top': `${drawerPosition.top}px`, '--drawer-right': `${drawerPosition.right}px` }}
       >
@@ -94,11 +109,10 @@ export function NotificationDrawer({ open, notifications = [], onClose, onMarkDe
           <div className="mx-auto mb-2 h-1.5 w-12 rounded-full bg-slate-200 md:hidden" aria-hidden="true" />
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <p className="flex items-center gap-2 text-sm font-semibold text-slate-950"><BellRing className="h-4 w-4 text-clinical-600" /> Delivery & role notifications</p>
+              <p id="notification-drawer-title" className="flex items-center gap-2 text-sm font-semibold text-slate-950"><BellRing className="h-4 w-4 text-clinical-600" /> Delivery & role notifications</p>
               <p className="mt-1 text-xs leading-5 text-slate-500">In-platform, email and SMS delivery events for this workspace.</p>
             </div>
-            <Button variant="ghost" size="sm" className="hidden md:inline-flex" onClick={onClose}>Close</Button>
-            <Button variant="subtle" size="sm" className="h-9 w-9 shrink-0 p-0 md:hidden" onClick={onClose} aria-label="Close notifications">
+            <Button ref={closeButtonRef} variant="subtle" size="sm" className="h-9 w-9 shrink-0 p-0" onClick={() => onCloseRef.current?.()} aria-label="Close notifications">
               <X className="h-4 w-4" />
             </Button>
           </div>

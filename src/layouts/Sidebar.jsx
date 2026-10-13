@@ -20,6 +20,7 @@ export function Sidebar() {
   useEffect(() => {
     if (!state.ui.sidebarOpen) return undefined;
     const previousOverflow = document.body.style.overflow;
+    const previouslyFocused = document.activeElement;
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') dispatch({ type: 'CLOSE_SIDEBAR' });
     };
@@ -29,12 +30,16 @@ export function Sidebar() {
     };
     document.body.style.overflow = 'hidden';
     document.addEventListener('keydown', handleKeyDown);
-    window.setTimeout(() => closeButtonRef.current?.focus({ preventScroll: true }), 0);
+    const focusTimer = window.setTimeout(() => closeButtonRef.current?.focus({ preventScroll: true }), 0);
     mediaQuery.addEventListener?.('change', handleViewportChange);
     return () => {
+      window.clearTimeout(focusTimer);
       document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', handleKeyDown);
       mediaQuery.removeEventListener?.('change', handleViewportChange);
+      if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
+        previouslyFocused.focus({ preventScroll: true });
+      }
     };
   }, [dispatch, state.ui.sidebarOpen]);
 
@@ -113,6 +118,7 @@ export function Sidebar() {
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation"
+          tabIndex={-1}
         >
           <button
             ref={closeButtonRef}
