@@ -71,14 +71,16 @@ img, svg, video, canvas {
   min-width: 0;
 }
 
-/* Intrinsic sizing guardrails: prevent long content from forcing grid/flex tracks wider than their portal. */
-#root :is(.grid, .flex) > *,
-#root :is(.grid, .flex) > * > * {
-  min-width: 0;
-}
+/* Base-layer sizing defaults; component utility classes must be able to override them. */
+@layer base {
+  /* Intrinsic sizing guardrails: prevent long content from forcing grid/flex tracks wider than their portal. */
+  :where(#root :is(.grid, .flex) > *, #root :is(.grid, .flex) > * > *) {
+    min-width: 0;
+  }
 
-#root :is(p, span, dd, dt, li, h1, h2, h3, h4, label, a, button, th, td) {
-  overflow-wrap: anywhere;
+  :where(#root :is(p, span, dd, dt, li, h1, h2, h3, h4, label, a, button, th, td)) {
+    overflow-wrap: anywhere;
+  }
 }
 .public-ambient {
   position: relative;
@@ -527,8 +529,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 
 /* Phase 6 mobile hardening: final overflow, wrapping and tap-behavior guardrails. */
 @media (max-width: 1023px) {
-  #main-content,
-  #main-content * {
+  #main-content {
+    min-width: 0;
+  }
+
+  :where(#main-content *) {
     min-width: 0;
   }
 
