@@ -68,7 +68,7 @@ export function ClinicianQueuePage() {
   const canOrder = can(auth, P.ORDER);
   const [queue, setQueue] = useState(null);
   const [error, setError] = useState('');
-  const [tab, setTab] = useState('new');
+  const [tab, setTab] = useState('needsAttention');
   const [busyId, setBusyId] = useState('');
   const [pingingId, setPingingId] = useState('');
   const [open, setOpen] = useState(null);
@@ -153,7 +153,7 @@ export function ClinicianQueuePage() {
   const rows = tab === 'needsAttention'
     ? [...(queue?.new || []).map((row) => ({ ...row, _queueBucket: 'NEW' })), ...(queue?.inConsultation || []).map((row) => ({ ...row, _queueBucket: 'IN_CONSULTATION' }))]
     : queue?.[tab === 'awaitingResults' ? 'pendingLabs' : tab] || [];
-  const active = TABS.find((item) => item.id === tab);
+  const active = TABS.find((item) => item.id === tab) || TABS[0];
 
   const diagnosticTable = tab === 'awaitingResults' || tab === 'reviewReady';
 
