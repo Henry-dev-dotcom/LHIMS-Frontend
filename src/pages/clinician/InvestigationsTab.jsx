@@ -187,10 +187,10 @@ export function InvestigationsTab({ encounter, auth, open, busy, draft, updateDr
                 {visible.length ? visible.map((item) => {
                   const done = orderedIds.has(item.id);
                   return (
-                    <label key={item.id} className={`flex items-center gap-2 rounded-xl px-2 py-1.5 text-sm ${done ? 'opacity-50' : 'hover:bg-slate-50'}`}>
-                      <input type="checkbox" className="h-4 w-4 accent-clinical-600" disabled={done} checked={done || staged.includes(item.id)} onChange={() => toggle(item.id)} />
-                      <span className="flex-1">{item.name}</span>
-                      <span className="text-xs text-slate-500">{done ? 'Ordered' : item.type === 'LAB' ? 'Laboratory' : item.modality || 'Imaging'}</span>
+                    <label key={item.id} className={`flex min-w-0 items-start gap-2 rounded-xl px-2 py-1.5 text-sm ${done ? 'opacity-50' : 'hover:bg-slate-50'}`}>
+                      <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 accent-clinical-600" disabled={done} checked={done || staged.includes(item.id)} onChange={() => toggle(item.id)} />
+                      <span className="min-w-0 flex-1 break-words">{item.name}</span>
+                      <span className="max-w-[35%] shrink-0 break-words text-right text-xs text-slate-500">{done ? 'Ordered' : item.type === 'LAB' ? 'Laboratory' : item.modality || 'Imaging'}</span>
                     </label>
                   );
                 }) : <p className="px-2 py-1.5 text-sm text-slate-500">No matching tests or scans.</p>}
@@ -202,9 +202,9 @@ export function InvestigationsTab({ encounter, auth, open, busy, draft, updateDr
               {staged.length > 0 && (
                 <ul className="mt-2 flex flex-wrap gap-2" aria-label="Tests waiting to be sent">
                   {staged.map((id) => (
-                    <li key={id} className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-slate-800 shadow-sm">
-                      {byId.get(id)?.name || 'Test'}
-                      <button type="button" aria-label={`Remove ${byId.get(id)?.name || 'test'}`} onClick={() => toggle(id)} className="rounded-full p-0.5 text-slate-500 hover:bg-slate-100"><X className="h-3 w-3" /></button>
+                    <li key={id} className="inline-flex min-w-0 max-w-full items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-slate-800 shadow-sm">
+                      <span className="min-w-0 break-words">{byId.get(id)?.name || 'Test'}</span>
+                      <button type="button" aria-label={`Remove ${byId.get(id)?.name || 'test'}`} onClick={() => toggle(id)} className="shrink-0 rounded-full p-0.5 text-slate-500 hover:bg-slate-100"><X className="h-3 w-3" /></button>
                     </li>
                   ))}
                 </ul>

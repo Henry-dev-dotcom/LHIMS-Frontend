@@ -83,14 +83,14 @@ export function Modal({ open, title, description, onClose, children, footer }) {
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
               <h2 id={titleId} className="break-words text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">{title}</h2>
-              {description && <p id={descriptionId} className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">{description}</p>}
+              {description && <p id={descriptionId} className="mt-1 max-w-2xl break-words text-sm leading-6 text-slate-500">{description}</p>}
             </div>
             <Button ref={closeButtonRef} variant="subtle" className="h-10 w-10 shrink-0 p-0" onClick={onClose} aria-label="Close modal">
               <X className="h-4 w-4" />
             </Button>
           </div>
         </div>
-        <div className="min-h-0 min-w-0 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6 sm:py-5 [&_*]:min-w-0">{children}</div>
+        <div className="min-h-0 min-w-0 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6 sm:py-5 [overflow-wrap:anywhere] [&_*]:min-w-0">{children}</div>
         {footer && (
           <div className="border-t border-slate-100 bg-slate-50/95 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:flex sm:flex-wrap sm:justify-end sm:gap-2 sm:px-6 sm:py-4 [&_button]:w-full sm:[&_button]:w-auto">
             <div className="grid min-w-0 gap-2 sm:flex sm:flex-wrap sm:justify-end">{footer}</div>

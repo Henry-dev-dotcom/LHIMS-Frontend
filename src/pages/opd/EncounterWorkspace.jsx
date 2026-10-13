@@ -668,9 +668,9 @@ export function DrugPicker({ line, onText, onPick }) {
         <ul role="listbox" className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-lg">
           {matches.map((drug) => (
             <li key={drug.id}>
-              <button type="button" className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm hover:bg-slate-50" onMouseDown={(e) => e.preventDefault()} onClick={() => { onPick(drug); setMatches([]); }}>
-                <span>{[drug.genericName, drug.strength, drug.dosageForm].filter(Boolean).join(' ')}{drug.brandName ? ` (${drug.brandName})` : ''}</span>
-                <span className={`text-xs font-semibold ${drug.onHand > 0 ? 'text-emerald-700' : 'text-red-600'}`}>{drug.onHand > 0 ? `${drug.onHand} in stock` : 'Out of stock'}</span>
+              <button type="button" className="flex min-w-0 w-full items-start justify-between gap-2 px-3 py-2 text-left text-sm hover:bg-slate-50" onMouseDown={(e) => e.preventDefault()} onClick={() => { onPick(drug); setMatches([]); }}>
+                <span className="min-w-0 break-words">{[drug.genericName, drug.strength, drug.dosageForm].filter(Boolean).join(' ')}{drug.brandName ? ` (${drug.brandName})` : ''}</span>
+                <span className={`shrink-0 text-xs font-semibold ${drug.onHand > 0 ? 'text-emerald-700' : 'text-red-600'}`}>{drug.onHand > 0 ? `${drug.onHand} in stock` : 'Out of stock'}</span>
               </button>
             </li>
           ))}

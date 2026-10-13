@@ -368,7 +368,7 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
         <div className="min-w-0 flex-1 space-y-4">
-          <div role="tablist" aria-label="Consultation" className="flex gap-1 overflow-x-auto border-b border-slate-200">
+          <div role="tablist" aria-label="Consultation" className="flex flex-wrap gap-1 border-b border-slate-200">
             {TABS.map((item) => {
               const selected = tab === item.id;
               return (
@@ -380,7 +380,7 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
                   aria-selected={selected}
                   aria-controls="workspace-panel"
                   onClick={() => setTab(item.id)}
-                  className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition ${selected ? 'border-clinical-500 text-clinical-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+                  className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition ${selected ? 'border-clinical-500 text-clinical-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
                 >
                   {item.label}
                   {item.id === 'investigations' && stagedCount > 0 && <span className="rounded-full bg-clinical-600 px-2 py-0.5 text-xs font-bold text-white" aria-label={`${stagedCount} waiting to be sent`}>{stagedCount}</span>}

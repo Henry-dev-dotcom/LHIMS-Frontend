@@ -106,7 +106,7 @@ export const DataTable = memo(function DataTable({ columns, rows, emptyMessage =
           <thead className="bg-slate-50/90">
             <tr>
               {columns.map((column) => (
-                <th key={column.key} scope="col" className={clsx('whitespace-nowrap px-4 py-3.5 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500', fixedLayout && 'overflow-hidden')}>
+                <th key={column.key} scope="col" title={column.label} className={clsx('whitespace-nowrap px-4 py-3.5 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500', fixedLayout && 'overflow-hidden text-ellipsis')}>
                   {column.label}
                 </th>
               ))}

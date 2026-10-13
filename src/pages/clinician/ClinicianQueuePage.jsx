@@ -34,6 +34,10 @@ const TABS = [
 ];
 
 const minutesSince = (value) => (value ? Math.max(0, Math.round((Date.now() - new Date(value).getTime()) / 60000)) : 0);
+const compactTestCount = (value) => {
+  const count = Number(value) || 0;
+  return count > 999 ? `${(count / 1000).toFixed(count >= 10_000 ? 0 : 1).replace(/\.0$/, '')}k` : String(count);
+};
 
 /** The longer someone has waited, the louder the number: it is a queue, and the oldest should be seen. */
 function waitClass(minutes) {
@@ -159,7 +163,7 @@ export function ClinicianQueuePage() {
     {
       key: 'patient',
       label: 'Patient',
-      width: diagnosticTable ? '22%' : '28%',
+      width: diagnosticTable ? '20%' : '26%',
       mobilePrimary: true,
       render: (row) => (
         <span className="block min-w-0">
@@ -173,7 +177,7 @@ export function ClinicianQueuePage() {
     {
       key: 'chiefComplaint',
       label: 'Complaint',
-      width: diagnosticTable ? '27%' : '38%',
+      width: diagnosticTable ? '24%' : '36%',
       render: (row) => (
         <span className="flex min-w-0 flex-wrap items-center gap-2">
           <span className="min-w-0 max-w-full truncate text-sm text-slate-800" title={row.chiefComplaint || 'No complaint recorded'}>{row.chiefComplaint || 'No complaint recorded'}</span>
@@ -188,11 +192,11 @@ export function ClinicianQueuePage() {
     columns.push({
       key: 'tests',
       label: 'Tests',
-      width: '27%',
+      width: '23%',
       render: (row) => (
         <span className="block min-w-0 text-sm">
-          <span className="block truncate font-semibold text-slate-900">{row.tests.ready} of {row.tests.total} back</span>
-          {row.tests.outstanding.length > 0 && <span className="block truncate text-xs text-slate-500" title={`Waiting on ${row.tests.outstanding.join(', ')}`}>Waiting on {row.tests.outstanding.slice(0, 2).join(', ')}{row.tests.outstanding.length > 2 ? ' …' : ''}</span>}
+          <span className="block truncate font-semibold text-slate-900" title={`${row.tests.ready} of ${row.tests.total} back`} aria-label={`${row.tests.ready} of ${row.tests.total} tests back`}>{compactTestCount(row.tests.ready)} of {compactTestCount(row.tests.total)} back</span>
+          {row.tests.outstanding.length > 0 && <span className="block truncate text-xs text-slate-500" title={`Waiting on ${row.tests.outstanding.join(', ')}`}>Waiting on {row.tests.outstanding.slice(0, 2).join(', ')}{row.tests.outstanding.length > 2 ? '...' : ''}</span>}
         </span>
       )
     });
@@ -201,7 +205,7 @@ export function ClinicianQueuePage() {
   columns.push({
     key: 'wait',
     label: tab === 'new' ? 'Wait time' : tab === 'inConsultation' ? 'Seen for' : 'Sent for tests',
-    width: diagnosticTable ? '12%' : '16%',
+    width: diagnosticTable ? '14%' : '18%',
     render: (row) => {
       const since = tab === 'new' ? row.triagedAt || row.startedAt : tab === 'inConsultation' ? row.consultationStartedAt || row.startedAt : row.suspendedAt;
       return <span className={`text-sm font-medium ${tab === 'new' ? waitClass(minutesSince(since)) : 'text-slate-600'}`}>{waitingSince(since)}</span>;
@@ -211,7 +215,7 @@ export function ClinicianQueuePage() {
   columns.push({
     key: 'action',
     label: 'Action',
-    width: diagnosticTable ? '12%' : '18%',
+    width: diagnosticTable ? '19%' : '20%',
     render: (row) => tab === 'pendingDiagnosis' ? (
       <div className="flex flex-wrap gap-1.5">
         <Button

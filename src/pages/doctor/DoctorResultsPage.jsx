@@ -38,12 +38,13 @@ function DetailedResultModal({ order, data, dispatch, onClose }) {
             {result.parameters?.length ? (
               <DataTable
                 columns={[
-                  { key: 'name', label: 'Parameter' },
-                  { key: 'value', label: 'Value', render: (row) => <span className="font-bold text-slate-900">{row.value} {row.unit}</span> },
-                  { key: 'referenceRange', label: 'Reference Range' },
-                  { key: 'flag', label: 'Flag', render: (row) => <StatusBadge status={row.flag} /> }
+                  { key: 'name', label: 'Parameter', width: '32%' },
+                  { key: 'value', label: 'Value', width: '18%', render: (row) => <span className="break-words font-bold text-slate-900">{row.value} {row.unit}</span> },
+                  { key: 'referenceRange', label: 'Reference Range', width: '32%' },
+                  { key: 'flag', label: 'Flag', width: '18%', render: (row) => <StatusBadge status={row.flag} /> }
                 ]}
                 rows={result.parameters.map((row, index) => ({ ...row, id: `${result.id}-${index}` }))}
+                fixedLayout
               />
             ) : <div className="rounded-2xl bg-slate-50 p-3 text-sm leading-6 text-slate-700">{result.reportText}</div>}
           </Card>
@@ -89,15 +90,16 @@ export function DoctorResultsPage() {
       >
         <DataTable
           columns={[
-            { key: 'id', label: 'Order ID', render: (order) => <span className="font-bold text-slate-900">{order.id}</span> },
-            { key: 'patient', label: 'Patient', render: (order) => <div><p className="font-bold">{order.patient?.fullName}</p><p className="text-xs text-slate-500">{order.patient?.id}</p></div> },
-            { key: 'items', label: 'Tests / Scans', render: (order) => <ClippedList items={order.items} /> },
-            { key: 'status', label: 'Status', render: (order) => <StatusBadge status={order.status} /> },
-            { key: 'released', label: 'Released', render: (order) => formatDateTime(order.updatedAt) },
-            { key: 'actions', label: 'Actions', render: (order) => <div className="flex gap-2"><Button variant="secondary" onClick={() => setSelectedOrder(order)}><Eye className="h-4 w-4" /> View</Button><Button onClick={() => { const report = getReportForOrder(data, order.id); if (report) dispatch({ type: 'MARK_REPORT_DOWNLOADED', reportId: report.id }); openReportPrintWindow({ ...order, resultReport: report }); }}><Download className="h-4 w-4" /> PDF</Button></div> }
+            { key: 'id', label: 'Order ID', width: '14%', render: (order) => <span className="break-all font-bold text-slate-900" title={order.id}>{order.id}</span> },
+            { key: 'patient', label: 'Patient', width: '19%', render: (order) => <div className="min-w-0"><p className="break-words font-bold" title={order.patient?.fullName}>{order.patient?.fullName}</p><p className="break-all text-xs text-slate-500">{order.patient?.id}</p></div> },
+            { key: 'items', label: 'Tests / Scans', width: '21%', render: (order) => <ClippedList items={order.items} limit={2} /> },
+            { key: 'status', label: 'Status', width: '14%', render: (order) => <StatusBadge status={order.status} /> },
+            { key: 'released', label: 'Released', width: '17%', render: (order) => <span className="break-words">{formatDateTime(order.updatedAt)}</span> },
+            { key: 'actions', label: 'Actions', width: '15%', render: (order) => <div className="grid min-w-0 gap-2 [&_button]:w-full [&_button]:justify-center"><Button variant="secondary" onClick={() => setSelectedOrder(order)}><Eye className="h-4 w-4" /> View</Button><Button onClick={() => { const report = getReportForOrder(data, order.id); if (report) dispatch({ type: 'MARK_REPORT_DOWNLOADED', reportId: report.id }); openReportPrintWindow({ ...order, resultReport: report }); }}><Download className="h-4 w-4" /> PDF</Button></div> }
           ]}
           rows={orders}
           emptyMessage="No results are available yet."
+          fixedLayout
         />
       </Card>
       <DetailedResultModal order={selectedOrder} data={data} dispatch={dispatch} onClose={() => setSelectedOrder(null)} />
