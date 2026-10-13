@@ -89,10 +89,13 @@ export async function loadCollections(client, auth, dispatch, only = null) {
   const needsOrders = wants('orders') || ['invoices', 'results', 'sampleLogs', 'resultReports', 'deliveryLogs', 'notifications', 'appointments', 'dailyVisits', 'scanBookings'].some(wants);
   let orderCodeById = {};
   if (needsOrders) {
-    await load('orders', () => orderService.list(client, LIST_PARAMS), null);
+    // Orders are the first critical collection and are dispatched progressively.
+    // Normalize them before that dispatch so dashboards never see a raw API row
+    // without the arrays they use for item-level metrics.
+    await load('orders', () => orderService.list(client, LIST_PARAMS), normalizeOrder);
     const rawOrders = collections.orders || [];
     orderCodeById = Object.fromEntries(rawOrders.map((order) => [order.id, order.orderCode || order.id]));
-    if (wants('orders')) collections.orders = rawOrders.map(normalizeOrder).filter(Boolean);
+    if (wants('orders')) collections.orders = rawOrders;
     else delete collections.orders;
   }
 
