@@ -153,12 +153,13 @@ export function ClinicianQueuePage() {
   const active = TABS.find((item) => item.id === tab);
 
   const actionLabel = { new: 'Consult', pendingDiagnosis: 'Open', reviewReady: 'Review results', inConsultation: 'Continue' }[tab];
+  const diagnosticTable = tab === 'pendingDiagnosis' || tab === 'reviewReady';
 
   const columns = [
     {
       key: 'patient',
       label: 'Patient',
-      width: '22%',
+      width: diagnosticTable ? '22%' : '28%',
       mobilePrimary: true,
       render: (row) => (
         <span className="block min-w-0">
@@ -172,7 +173,7 @@ export function ClinicianQueuePage() {
     {
       key: 'chiefComplaint',
       label: 'Complaint',
-      width: '27%',
+      width: diagnosticTable ? '27%' : '38%',
       render: (row) => (
         <span className="flex min-w-0 flex-wrap items-center gap-2">
           <span className="min-w-0 max-w-full truncate text-sm text-slate-800" title={row.chiefComplaint || 'No complaint recorded'}>{row.chiefComplaint || 'No complaint recorded'}</span>
@@ -200,7 +201,7 @@ export function ClinicianQueuePage() {
   columns.push({
     key: 'wait',
     label: tab === 'new' ? 'Wait time' : tab === 'inConsultation' ? 'Seen for' : 'Sent for tests',
-    width: '12%',
+    width: diagnosticTable ? '12%' : '16%',
     render: (row) => {
       const since = tab === 'new' ? row.triagedAt || row.startedAt : tab === 'inConsultation' ? row.consultationStartedAt || row.startedAt : row.suspendedAt;
       return <span className={`text-sm font-medium ${tab === 'new' ? waitClass(minutesSince(since)) : 'text-slate-600'}`}>{waitingSince(since)}</span>;
@@ -210,7 +211,7 @@ export function ClinicianQueuePage() {
   columns.push({
     key: 'action',
     label: 'Action',
-    width: '12%',
+    width: diagnosticTable ? '12%' : '18%',
     render: (row) => tab === 'pendingDiagnosis' ? (
       <div className="flex flex-wrap gap-1.5">
         <Button
@@ -314,7 +315,7 @@ export function ClinicianQueuePage() {
           emptyMessage={queue ? active.empty : 'Loading the queue…'}
         rows={rows}
         columns={columns}
-        fixedLayout={tab === 'pendingDiagnosis'}
+        fixedLayout
       />
       </div>
     </div>
