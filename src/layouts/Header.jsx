@@ -183,12 +183,12 @@ export function Header() {
     if (!userMenuOpen || !menu || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     gsap.fromTo(menu,
-      { autoAlpha: 0, y: -10, scale: 0.97, transformOrigin: 'top right' },
-      { autoAlpha: 1, y: 0, scale: 1, duration: 0.24, ease: 'power2.out', clearProps: 'transform' }
+      { autoAlpha: 0, y: -6, scale: 0.985, transformOrigin: 'top right' },
+      { autoAlpha: 1, y: 0, scale: 1, duration: 0.18, ease: 'power1.out', clearProps: 'transform' }
     );
     gsap.fromTo(menu.querySelectorAll('[data-menu-item]'),
-      { autoAlpha: 0, y: -5 },
-      { autoAlpha: 1, y: 0, duration: 0.18, delay: 0.06, stagger: 0.035, ease: 'power1.out', clearProps: 'transform' }
+      { autoAlpha: 0, y: -3 },
+      { autoAlpha: 1, y: 0, duration: 0.14, delay: 0.035, stagger: 0.02, ease: 'power1.out', clearProps: 'transform' }
     );
   }, { dependencies: [userMenuOpen], revertOnUpdate: true });
 

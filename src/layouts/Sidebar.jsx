@@ -40,9 +40,12 @@ export function Sidebar() {
 
   const content = (
     <>
-      <div className="border-b border-slate-100 p-5 pr-14">
+      <div className="curata-sidebar-brand border-b border-slate-100 p-5 pr-14">
         <div className="flex flex-col items-start gap-2">
-          <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo.png`} alt="CurataMed — Hospital Management System" className="h-auto max-h-16 w-full max-w-52 object-contain object-left" />
+          <picture className="block w-full max-w-52">
+            <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo.png`} alt="CurataMed — Hospital Management System" className="curata-logo-light h-auto max-h-16 w-full object-contain object-left" />
+            <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo-on-dark.png`} alt="" aria-hidden="true" className="curata-logo-dark h-auto max-h-16 w-full object-contain object-left" />
+          </picture>
           <div className="min-w-0 w-full">
             <div className="truncate text-xs font-medium text-slate-500">{facility ? `${facility.name} · ${facility.code}` : role === 'platform' ? 'Platform' : 'Hospital management system'}</div>
           </div>
@@ -93,7 +96,7 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="fixed inset-y-0 left-0 z-40 hidden h-screen w-[19rem] flex-col border-r border-slate-200/80 bg-white print:hidden lg:flex">{content}</aside>
+      <aside className="curata-sidebar fixed inset-y-0 left-0 z-40 hidden h-screen w-[19rem] flex-col border-r border-slate-200/80 bg-white print:hidden lg:flex">{content}</aside>
       <div
         className={clsx('fixed inset-0 z-[120] bg-slate-950/55 backdrop-blur-sm transition-opacity print:hidden lg:hidden', state.ui.sidebarOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0')}
         role="presentation"
@@ -103,7 +106,7 @@ export function Sidebar() {
         <aside
           ref={drawerRef}
           className={clsx(
-            'flex h-full w-[19rem] max-w-[88vw] transform flex-col bg-white shadow-2xl transition-transform duration-200 ease-out',
+            'curata-sidebar flex h-full w-[19rem] max-w-[88vw] transform flex-col bg-white shadow-2xl transition-transform duration-200 ease-out',
             state.ui.sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           )}
           onClick={(event) => event.stopPropagation()}

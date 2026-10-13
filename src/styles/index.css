@@ -1294,6 +1294,25 @@ html[data-theme='dark'] .curata-loading-screen {
   background: #07111e;
 }
 
+/* Brand lockup: keep the transparent light-on-dark asset on the same surface as
+   the navigation so the logo does not sit inside a bright rectangular tile. */
+.curata-logo-dark { display: none; }
+html[data-theme='dark'] .curata-sidebar,
+html[data-theme='dark'] .curata-sidebar-brand {
+  background: #0b1625 !important;
+  border-color: #23405a !important;
+}
+html[data-theme='dark'] .curata-logo-light { display: none; }
+html[data-theme='dark'] .curata-logo-dark { display: block; }
+
+@media (prefers-reduced-motion: reduce) {
+  .curata-sidebar *,
+  .curata-sidebar *::before,
+  .curata-sidebar *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html[data-theme='dark'] *,
   html[data-theme='dark'] *::before,

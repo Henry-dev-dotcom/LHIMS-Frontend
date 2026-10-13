@@ -68,12 +68,12 @@ export function NotificationDrawer({ open, notifications = [], onClose, onMarkDe
 
     const mobile = window.matchMedia('(max-width: 767px)').matches;
     gsap.fromTo(drawer,
-      { autoAlpha: 0, y: mobile ? 24 : -10, scale: mobile ? 1 : 0.98, transformOrigin: 'top right' },
-      { autoAlpha: 1, y: 0, scale: 1, duration: 0.26, ease: 'power2.out', clearProps: 'transform' }
+      { autoAlpha: 0, y: mobile ? 18 : -6, scale: mobile ? 1 : 0.985, transformOrigin: 'top right' },
+      { autoAlpha: 1, y: 0, scale: 1, duration: 0.2, ease: 'power1.out', clearProps: 'transform' }
     );
     gsap.fromTo(drawer.querySelectorAll('[data-notification-item]'),
-      { autoAlpha: 0, y: 6 },
-      { autoAlpha: 1, y: 0, duration: 0.18, delay: 0.08, stagger: 0.035, ease: 'power1.out', clearProps: 'transform' }
+      { autoAlpha: 0, y: 3 },
+      { autoAlpha: 1, y: 0, duration: 0.14, delay: 0.04, stagger: 0.02, ease: 'power1.out', clearProps: 'transform' }
     );
   }, { dependencies: [open], revertOnUpdate: true });
 
