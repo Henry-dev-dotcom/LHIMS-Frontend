@@ -10,6 +10,7 @@ import { WorkspaceLoading } from '../components/ui/WorkspaceLoading';
 import { useMobileViewportMetrics } from '../hooks/useMobileViewportMetrics';
 import { readSiteRoute } from '../services/publicService';
 import { pageFromAddress, workspaceHash } from '../utils/workspaceAddress';
+import { applyTheme, getPreferredTheme } from '../utils/theme';
 
 // The public website loads only for visitors who are not signed in.
 const HomePage = lazy(() => import('../pages/site/HomePage').then((m) => ({ default: m.HomePage })));
@@ -115,12 +116,26 @@ function AppContent() {
     }
     return <LoginPage />;
   }
-  if (state.hydrating) return <WorkspaceLoading />;
   return <AppShell />;
 }
 
 export default function App() {
   useMobileViewportMetrics();
+
+  useEffect(() => {
+    const syncTheme = () => applyTheme(getPreferredTheme());
+    syncTheme();
+    const media = window.matchMedia?.('(prefers-color-scheme: dark)');
+    const onSystemThemeChange = () => {
+      try {
+        if (!window.localStorage.getItem('curatamed-theme')) syncTheme();
+      } catch {
+        syncTheme();
+      }
+    };
+    media?.addEventListener?.('change', onSystemThemeChange);
+    return () => media?.removeEventListener?.('change', onSystemThemeChange);
+  }, []);
 
   return (
     <ErrorBoundary>

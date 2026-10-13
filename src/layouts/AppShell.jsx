@@ -6,6 +6,7 @@ import { NetworkStatusBanner } from '../components/ui/NetworkStatusBanner';
 import { ServiceWorkerUpdateBanner } from '../components/ui/ServiceWorkerUpdateBanner';
 import { SubscriptionBanner } from '../components/ui/SubscriptionBanner';
 import { SupportSessionBanner } from '../components/ui/SupportSessionBanner';
+import { WorkspaceHydrationBanner } from '../components/ui/WorkspaceHydrationBanner';
 import { AppRouter } from '../routes/AppRouter';
 import { ErrorBoundary } from '../components/ui/ErrorBoundary';
 import { useAppStore } from '../store/AppStore';
@@ -18,6 +19,7 @@ export function AppShell() {
       <Sidebar />
       <div className="flex min-h-screen min-w-0 flex-col overflow-x-hidden lg:ml-[19rem]">
         <Header />
+        <WorkspaceHydrationBanner />
         <SupportSessionBanner />
         <SubscriptionBanner />
         <NetworkStatusBanner />

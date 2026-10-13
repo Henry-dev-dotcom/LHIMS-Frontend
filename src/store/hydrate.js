@@ -71,13 +71,16 @@ export async function loadCollections(client, auth, dispatch, only = null) {
 
   async function load(name, loader, normalizer) {
     if (!wants(name)) return;
+    if (!only) dispatch({ type: 'SET_HYDRATION_STATUS', status: 'loading', phase: `Loading ${name}` });
     try {
       const payload = await loader();
       const items = listItems(payload);
       collections[name] = normalizer ? items.map(normalizer).filter(Boolean) : items;
+      dispatch({ type: 'SET_COLLECTIONS', collections: { [name]: collections[name] } });
     } catch (error) {
       if (error?.status !== 403) failures.push(name);
       if (!only) collections[name] = [];
+      if (!only) dispatch({ type: 'SET_COLLECTIONS', collections: { [name]: [] } });
     }
   }
 
@@ -149,6 +152,7 @@ export async function loadCollections(client, auth, dispatch, only = null) {
             .filter(Boolean);
           collections.results = [...labResults, ...scanResults];
         }
+        dispatch({ type: 'SET_COLLECTIONS', collections: { results: collections.results || [] } });
       }
     })(),
     on('results_delivery') && load('resultReports', () => resultService.list(client, LIST_PARAMS), (item) => normalizeReport(item, orderCodeById)),

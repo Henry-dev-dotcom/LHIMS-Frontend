@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import { gsap } from 'gsap/gsap-core';
 import { useGSAP } from '@gsap/react';
-import { Bell, ChevronDown, Home, LogOut, Menu, Sparkles, UserRound } from 'lucide-react';
+import { Bell, ChevronDown, Home, LogOut, Menu, Moon, Sparkles, Sun, UserRound } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { NotificationDrawer } from '../components/ui/NotificationDrawer';
 import { MobileActionBar } from '../components/ui/MobileActionBar';
@@ -12,6 +12,7 @@ import { useAppStore } from '../store/AppStore';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { PAGE_META } from '../routes/routeRegistry';
 import { ALL_ROLES } from '../data/roles';
+import { getPreferredTheme, setThemePreference } from '../utils/theme';
 import '../styles/getlabs-theme.css';
 
 gsap.registerPlugin(useGSAP);
@@ -72,10 +73,12 @@ export function Header() {
   const screenGuideRef = useRef(null);
   const [userMenuPosition, setUserMenuPosition] = useState({ top: 0, right: 16 });
   const [screenGuideOpen, setScreenGuideOpen] = useState(false);
+  const [theme, setTheme] = useState(() => getPreferredTheme());
   const [compactViewport, setCompactViewport] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches);
   const role = state.auth?.role;
   const roleInfo = ALL_ROLES.find((item) => item.id === role);
   const userInitial = (state.auth?.userName || roleInfo?.label || 'U').charAt(0);
+  const toggleTheme = () => setTheme(setThemePreference(theme === 'dark' ? 'light' : 'dark'));
 
   useEffect(() => {
     setPageHeader(fallbackPageHeader(state.currentPage, role));
@@ -397,10 +400,20 @@ export function Header() {
                 setUserMenuOpen(false);
                 dispatch({ type: 'LOGOUT' });
               }}
-            >
-              <LogOut className="h-4 w-4" /> Sign Out
-            </Button>
-          </div>
+              >
+                <LogOut className="h-4 w-4" /> Sign Out
+              </Button>
+              <Button
+                data-menu-item
+                variant="secondary"
+                className="w-full"
+                onClick={toggleTheme}
+                aria-label={`Use ${theme === 'dark' ? 'light' : 'dark'} appearance`}
+              >
+                {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                Use {theme === 'dark' ? 'light' : 'dark'} appearance
+              </Button>
+            </div>
         </div>
         </>,
         document.body

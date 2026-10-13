@@ -1150,3 +1150,143 @@ summary:focus-visible {
   .curata-ekg-path { stroke-dashoffset: 0; opacity: 1; }
   .curata-progress-fill { left: 0; width: 100%; transform: none; }
 }
+
+/* CurataMed semantic dark appearance. The theme is selected from the system preference
+   on first paint and can be overridden from the session menu. */
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --color-primary: #22d3ee;
+  --color-primary-deep: #67e8f9;
+  --color-accent: #34d399;
+  --color-background: #0b1220;
+  --color-foreground: #e5eef7;
+  --color-muted: #172337;
+  --color-border: #23405a;
+  --shadow-clinical: 0 8px 24px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-clinical-hover: 0 14px 32px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --clinical-grid: rgba(148, 197, 255, 0.06);
+}
+
+html[data-theme='dark'] body {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.10), transparent 32%),
+    radial-gradient(circle at 100% 0%, rgba(52, 211, 153, 0.06), transparent 28%),
+    #0b1220;
+  color: #e5eef7;
+}
+
+html[data-theme='dark'] .bg-app-radial,
+html[data-theme='dark'] .bg-white\/95,
+html[data-theme='dark'] .bg-white\/90,
+html[data-theme='dark'] .bg-white\/85,
+html[data-theme='dark'] .bg-white {
+  background-color: #111c2c !important;
+  color: #e5eef7;
+}
+
+html[data-theme='dark'] .clinical-panel {
+  background: #111c2c !important;
+  border-color: #23405a !important;
+  color: #e5eef7;
+}
+
+html[data-theme='dark'] .clinical-input,
+html[data-theme='dark'] input,
+html[data-theme='dark'] select,
+html[data-theme='dark'] textarea {
+  background-color: #0f1a2a !important;
+  border-color: #2b4964 !important;
+  color: #e5eef7 !important;
+}
+
+html[data-theme='dark'] input::placeholder,
+html[data-theme='dark'] textarea::placeholder {
+  color: #9fb2c7 !important;
+}
+
+html[data-theme='dark'] .bg-slate-50,
+html[data-theme='dark'] .bg-slate-50\/80,
+html[data-theme='dark'] .bg-slate-50\/90,
+html[data-theme='dark'] .bg-slate-100 {
+  background-color: #172337 !important;
+  color: #cbd8e6 !important;
+}
+
+html[data-theme='dark'] .text-slate-950,
+html[data-theme='dark'] .text-slate-900,
+html[data-theme='dark'] .text-slate-800 {
+  color: #f4f8fc !important;
+}
+
+html[data-theme='dark'] .text-slate-700,
+html[data-theme='dark'] .text-slate-600,
+html[data-theme='dark'] .text-slate-500 {
+  color: #c0cedd !important;
+}
+
+html[data-theme='dark'] .text-slate-400 {
+  color: #9fb2c7 !important;
+}
+
+html[data-theme='dark'] .border-slate-100,
+html[data-theme='dark'] .border-slate-200,
+html[data-theme='dark'] .border-slate-200\/70,
+html[data-theme='dark'] .border-slate-200\/80 {
+  border-color: #23405a !important;
+}
+
+html[data-theme='dark'] .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+html[data-theme='dark'] .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #23405a !important;
+}
+
+html[data-theme='dark'] table thead,
+html[data-theme='dark'] thead.bg-slate-50\/90 {
+  background-color: #172337 !important;
+}
+
+html[data-theme='dark'] .shadow-sm,
+html[data-theme='dark'] .shadow-card,
+html[data-theme='dark'] .shadow-panel,
+html[data-theme='dark'] .shadow-soft {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24) !important;
+}
+
+html[data-theme='dark'] .ring-white {
+  --tw-ring-color: #111c2c !important;
+}
+
+html[data-theme='dark'] .text-clinical-700,
+html[data-theme='dark'] .text-clinical-800 {
+  color: #67e8f9 !important;
+}
+
+html[data-theme='dark'] .bg-clinical-50,
+html[data-theme='dark'] .bg-clinical-50\/80,
+html[data-theme='dark'] .bg-clinical-50\/90 {
+  background-color: #123044 !important;
+  color: #d7f7fb !important;
+}
+
+html[data-theme='dark'] .border-clinical-100,
+html[data-theme='dark'] .border-clinical-200 {
+  border-color: #24526b !important;
+}
+
+html[data-theme='dark'] .hover\:bg-clinical-50:hover,
+html[data-theme='dark'] .hover\:bg-slate-100:hover,
+html[data-theme='dark'] .hover\:bg-white:hover {
+  background-color: #1b3449 !important;
+}
+
+html[data-theme='dark'] .curata-loading-screen {
+  background: #07111e;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme='dark'] *,
+  html[data-theme='dark'] *::before,
+  html[data-theme='dark'] *::after {
+    scroll-behavior: auto !important;
+  }
+}

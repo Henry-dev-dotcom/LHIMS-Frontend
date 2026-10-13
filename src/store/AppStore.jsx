@@ -53,6 +53,9 @@ const initialState = {
   currentPage: 'login',
   data: emptyData,
   hydrating: false,
+  hydrationPhase: '',
+  hydrationError: '',
+  hydrationRetryKey: 0,
   ui: {
     sidebarOpen: false,
     toast: null,
@@ -264,7 +267,23 @@ function reducer(state, action) {
       };
     }
     case 'SET_HYDRATING': {
-      return { ...state, hydrating: action.hydrating };
+      return {
+        ...state,
+        hydrating: action.hydrating,
+        hydrationPhase: action.hydrating ? (action.phase || state.hydrationPhase || 'Loading workspace data') : '',
+        hydrationError: action.hydrating ? '' : state.hydrationError
+      };
+    }
+    case 'SET_HYDRATION_STATUS': {
+      return {
+        ...state,
+        hydrating: action.status === 'loading',
+        hydrationPhase: action.phase || (action.status === 'loading' ? 'Loading workspace data' : ''),
+        hydrationError: action.status === 'error' ? (action.message || 'Some workspace data could not be loaded.') : ''
+      };
+    }
+    case 'RETRY_HYDRATION': {
+      return { ...state, hydrationRetryKey: state.hydrationRetryKey + 1, hydrating: true, hydrationPhase: 'Retrying workspace data', hydrationError: '' };
     }
     case 'SET_COLLECTIONS': {
       return { ...state, data: { ...state.data, ...action.collections } };
@@ -670,13 +689,27 @@ export function AppStoreProvider({ children }) {
   useEffect(() => {
     if (!authUserId) return;
     let cancelled = false;
-    rawDispatch({ type: 'SET_HYDRATING', hydrating: true });
+    let timedOut = false;
+    rawDispatch({ type: 'SET_HYDRATION_STATUS', status: 'loading', phase: 'Loading workspace data' });
+    const timeoutId = window.setTimeout(() => {
+      if (!cancelled) {
+        timedOut = true;
+        rawDispatch({ type: 'SET_HYDRATION_STATUS', status: 'error', message: 'Workspace data is taking longer than expected.' });
+      }
+    }, 10000);
     hydrateWorkspace(apiClient, stateRef.current.auth, rawDispatch)
+      .then(() => {
+        if (!cancelled) rawDispatch({ type: 'SET_HYDRATION_STATUS', status: 'ready' });
+      })
+      .catch(() => {
+        if (!cancelled) rawDispatch({ type: 'SET_HYDRATION_STATUS', status: 'error', message: 'Some workspace data could not be loaded.' });
+      })
       .finally(() => {
-        if (!cancelled) rawDispatch({ type: 'SET_HYDRATING', hydrating: false });
+        window.clearTimeout(timeoutId);
+        if (!cancelled && timedOut) rawDispatch({ type: 'SET_HYDRATION_STATUS', status: 'ready' });
       });
     return () => { cancelled = true; };
-  }, [authUserId]);
+  }, [authUserId, state.hydrationRetryKey]);
 
   const value = useMemo(() => ({ state, dispatch }), [state, dispatch]);
   return <AppStoreContext.Provider value={value}>{children}</AppStoreContext.Provider>;
