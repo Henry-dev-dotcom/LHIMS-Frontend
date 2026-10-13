@@ -10,7 +10,6 @@ import { ImmunizationCard } from '../childHealth/ImmunizationCard';
 import { ClinicalFormsCard } from '../clinics/ClinicalFormsCard';
 import { P, can } from '../opd/opdUtils';
 import { NOTE_TEMPLATES } from './clinicalContent';
-import { CurataAIAutopilotPanel } from './CurataAIAutopilotPanel';
 import { formatSoapStructureText, noteEditorTextFromSections, noteSectionsFromEditorText } from './noteEditor';
 import { acknowledgeDictation, dictationAcknowledged, dictationSupported, useDictation } from './useDictation';
 
@@ -109,11 +108,11 @@ export function ConsultationTab({ encounter, auth, open, busy, act, draft, updat
 
   const empty = FIELDS.every(([key]) => !draft[key]?.trim());
   const editorText = noteEditorTextFromSections(draft);
+  const savedNotes = [...(encounter.notes || [])].reverse();
 
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
       <div className="space-y-4">
-        {canWrite && <CurataAIAutopilotPanel />}
         <Card title="Clinical notes" subtitle="Saved as you type. They join the record when you save them, send the patient for tests, or complete the visit.">
           {canWrite ? (
             <div className="space-y-3">
@@ -175,8 +174,8 @@ export function ConsultationTab({ encounter, auth, open, busy, act, draft, updat
                   <textarea
                     ref={editorRef}
                     id="clinical-note"
-                    rows={16}
-                    className={inputClass}
+                    rows={10}
+                    className={`${inputClass} min-h-48 resize-y`}
                     value={editorText}
                     placeholder="Write the history, examination, assessment and plan in your own words. Use the format button to insert editable SOAP headings."
                     maxLength={22000}
@@ -223,18 +222,24 @@ export function ConsultationTab({ encounter, auth, open, busy, act, draft, updat
 
         <DiagnosesCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
 
-        <Card title="Notes on this visit" subtitle="Saved notes cannot be edited; add a new note to correct one.">
-          <ul className="space-y-3">
-            {encounter.notes?.length ? [...encounter.notes].reverse().map((n) => (
-              <li key={n.id} className="rounded-2xl border border-slate-200 p-3 text-sm">
-                <p className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">{n.type.toLowerCase()} · {n.author?.name || 'Unknown'} · {formatDateTime(n.createdAt)}{n.amendsId ? ' · correction' : ''}</p>
-                {[['S', n.subjective], ['O', n.objective], ['A', n.assessment], ['P', n.plan]].filter(([, v]) => v).map(([k, v]) => (
-                  <p key={k} className="mt-1 whitespace-pre-wrap text-slate-800"><span className="font-bold">{k}:</span> {v}</p>
-                ))}
-              </li>
-            )) : <li className="text-sm text-slate-500">No notes saved yet.</li>}
-          </ul>
-        </Card>
+        {savedNotes.length > 0 && (
+          <details className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+            <summary className="cursor-pointer list-none rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clinical-600">
+              <span className="block text-sm font-bold text-slate-900">Saved notes ({savedNotes.length})</span>
+              <span className="mt-1 block text-xs text-slate-600">Latest: {formatDateTime(savedNotes[0].createdAt)} · expand to review or correct with a new note</span>
+            </summary>
+            <ul className="mt-3 space-y-3">
+              {savedNotes.map((n) => (
+                <li key={n.id} className="rounded-2xl border border-slate-200 p-3 text-sm">
+                  <p className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-500">{n.type.toLowerCase()} · {n.author?.name || 'Unknown'} · {formatDateTime(n.createdAt)}{n.amendsId ? ' · correction' : ''}</p>
+                  {[['S', n.subjective], ['O', n.objective], ['A', n.assessment], ['P', n.plan]].filter(([, v]) => v).map(([k, v]) => (
+                    <p key={k} className="mt-1 whitespace-pre-wrap text-slate-800"><span className="font-bold">{k}:</span> {v}</p>
+                  ))}
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
       </div>
 
       <div className="space-y-4">

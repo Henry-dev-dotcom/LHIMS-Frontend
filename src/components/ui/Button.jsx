@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 import clsx from 'clsx';
 
 const variants = {
-  primary: 'bg-clinical-500 text-white shadow-lift hover:bg-clinical-600',
+  primary: 'bg-clinical-600 text-white shadow-lift hover:bg-clinical-700',
   secondary: 'border border-slate-200 bg-white text-slate-700 shadow-sm hover:border-clinical-300 hover:bg-clinical-25 hover:text-clinical-800',
   danger: 'bg-danger text-white shadow-sm hover:bg-red-700',
   subtle: 'bg-slate-100 text-slate-700 hover:bg-slate-200',

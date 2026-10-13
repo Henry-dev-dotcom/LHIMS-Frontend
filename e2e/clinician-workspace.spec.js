@@ -96,9 +96,8 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   await expect(page.getByRole('heading', { name: `${first} Patient` })).toBeVisible();
   await expect(page.getByText('Allergy: Penicillin')).toBeVisible();
   await expect(page.getByLabel('Latest vitals')).toContainText('38.6');
-  await expect(page.getByRole('heading', { name: 'CurataAI Predictive Autopilot' })).toBeVisible();
-  await expect(page.getByText('This panel does not receive patient notes, call an AI service, or display mock clinical recommendations.')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Review and auto-fill (unavailable)' })).toBeDisabled();
+  await expect(page.getByRole('heading', { name: 'CurataAI Predictive Autopilot' })).toHaveCount(0);
+  await expect(page.getByText('This panel does not receive patient notes, call an AI service, or display mock clinical recommendations.')).toHaveCount(0);
   const noteEditorBox = await page.getByRole('textbox', { name: 'Clinical note' }).boundingBox();
   const diagnosisHeading = page.getByRole('heading', { name: 'Diagnoses' });
   await expect(diagnosisHeading).toBeVisible();
@@ -145,9 +144,8 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   await staged.getByRole('button', { name: /Remove Widal/ }).click();
   await expect(staged).not.toContainText('Widal');
 
-  /* ---- a draft keeps everything when the doctor leaves, and brings it back ---- */
-  await page.getByRole('button', { name: 'Save Draft' }).click();
-  await expect(page.getByText('Draft saved.')).toBeVisible();
+  /* ---- autosave keeps everything when the doctor leaves, and brings it back ---- */
+  await expect(page.getByText(/^Draft saved /)).toBeVisible();
   await page.getByRole('button', { name: 'Back to queue' }).click();
   await page.getByRole('tab', { name: /My Consultations/ }).click();
   await page.getByRole('button', { name: `Continue ${first} Patient` }).click();
@@ -197,7 +195,7 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   expect(note.subjective, 'unanswered prompts must not reach the record').not.toContain('Rash:');
   expect(note.assessment).toContain('Differentials considered: headache since monday');
   expect(record.data.suspendedAt).not.toBeNull();
-  expect(aiPosts, 'the disabled Autopilot panel must never send patient data').toEqual([]);
+  expect(aiPosts, 'the unavailable Autopilot integration must not send patient data').toEqual([]);
 
   /* ---- the lab signs off; the doctor reviews the results where they are ---- */
   const orderId = record.data.orders[0].id;

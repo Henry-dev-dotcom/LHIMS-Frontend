@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AlertTriangle, ArrowLeft, BedDouble, CheckCircle2, FlaskConical, History, PauseCircle, Save, Stethoscope } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, BedDouble, CheckCircle2, FlaskConical, History, PauseCircle, Stethoscope } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
@@ -27,10 +27,9 @@ import { AllergyOverrideModal, CompleteConfirmModal, DispositionTab, buildSummar
   becomes part of the permanent record when they save it, send the patient for tests, or
   complete the visit.
 
-  The bottom bar is the routing: it decides where the patient goes next.
-    Save Draft            keeps the patient where they are and keeps the work
-    Send to Diagnostics & Suspend sends the staged laboratory or imaging tests, parks the visit, and returns to the queue
-    Complete & Discharge  closes the visit
+  The bottom bar shows autosave status and routes the patient to the next step.
+    Send to Diagnostics & Suspend sends staged tests, parks the visit, and returns to the queue
+    Complete & Discharge closes the visit
 */
 
 const TABS = [
@@ -76,8 +75,11 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
   const [draft, setDraft] = useState(EMPTY_DRAFT);
   const [draftReady, setDraftReady] = useState(false);
   const [savedAt, setSavedAt] = useState(null);
+  const [draftSaveState, setDraftSaveState] = useState('idle');
   const draftRef = useRef(EMPTY_DRAFT);
   const dirty = useRef(false);
+  const draftVersion = useRef(0);
+  const draftSaveInFlight = useRef(false);
   const timer = useRef(null);
   const closed = useRef(false);
 
@@ -140,16 +142,35 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
 
   const saveDraftNow = useCallback(async ({ quiet = true } = {}) => {
     window.clearTimeout(timer.current);
-    if (closed.current || !dirty.current) return true;
+    if (closed.current || !dirty.current || draftSaveInFlight.current) return true;
+    const versionAtStart = draftVersion.current;
+    let savedThisVersion = false;
+    draftSaveInFlight.current = true;
+    setDraftSaveState('saving');
     try {
       const res = await encounterService.saveDraft(apiClient, encounterId, draftRef.current);
-      dirty.current = false;
+      savedThisVersion = true;
       setSavedAt(res?.updatedAt ? new Date(res.updatedAt) : new Date());
-      if (!quiet) toast('success', 'Draft saved.');
+      if (draftVersion.current === versionAtStart) {
+        dirty.current = false;
+        setDraftSaveState('saved');
+        if (!quiet) toast('success', 'Draft saved.');
+      } else {
+        // A newer edit arrived while this snapshot was being saved. Keep the status
+        // honest and let the latest version save after the debounce interval.
+        setDraftSaveState('saving');
+      }
       return true;
     } catch (e) {
+      setDraftSaveState('error');
       if (!quiet) toast('error', e?.message || 'The draft could not be saved.');
       return false;
+    } finally {
+      draftSaveInFlight.current = false;
+      if (savedThisVersion && draftVersion.current !== versionAtStart && dirty.current && !closed.current) {
+        window.clearTimeout(timer.current);
+        timer.current = window.setTimeout(() => saveDraftNow(), AUTOSAVE_MS);
+      }
     }
   }, [encounterId, toast]);
 
@@ -161,6 +182,8 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
     draftRef.current = next;
     setDraft(next);
     dirty.current = true;
+    draftVersion.current += 1;
+    setDraftSaveState('saving');
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => saveDraftNow(), AUTOSAVE_MS);
   }, [saveDraftNow]);
@@ -414,9 +437,11 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
       {/* The routing bar: where the patient goes next. */}
       {open && canConsult && (
         <div className="sticky bottom-[calc(var(--mobile-bottom-nav-space,6.75rem)+0.5rem)] z-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-lg backdrop-blur lg:bottom-2">
-          <div className="flex items-center gap-3">
-            <Button variant="secondary" disabled={busy || flow} onClick={() => saveDraftNow({ quiet: false })}><Save className="h-4 w-4" /> Save Draft</Button>
-            <span className="text-xs text-slate-500" aria-live="polite">{savedAt ? `Draft saved ${formatDateTime(savedAt)}` : 'Not saved yet'}</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <span role="status" className="text-xs text-slate-600" aria-live="polite">
+              {draftSaveState === 'saving' ? 'Saving draft…' : draftSaveState === 'error' ? 'Draft not saved' : savedAt ? `Draft saved ${formatDateTime(savedAt)}` : 'Draft auto-saves as you type'}
+            </span>
+            {draftSaveState === 'error' && <Button size="sm" variant="ghost" disabled={busy || flow} onClick={() => saveDraftNow({ quiet: false })}>Retry save</Button>}
           </div>
           <div className="flex flex-wrap gap-2">
             {inConsult && !paused && (
