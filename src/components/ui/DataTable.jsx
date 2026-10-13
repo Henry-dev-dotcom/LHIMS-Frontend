@@ -37,7 +37,7 @@ function MobileDetail({ column, row, compact = false }) {
 // Database ids (cuid) mean nothing to staff; older records used readable ids (ORD-2026-0001) that are worth showing.
 const MACHINE_ID = /^c[a-z0-9]{20,}$/;
 
-export const DataTable = memo(function DataTable({ columns, rows, emptyMessage = 'No records found.', dense = false, caption, rowBadge }) {
+export const DataTable = memo(function DataTable({ columns, rows, emptyMessage = 'No records found.', dense = false, caption, rowBadge, fixedLayout = false }) {
   const badgeFor = (row) => (rowBadge ? rowBadge(row) : row.id && !MACHINE_ID.test(row.id) ? row.id : null);
   const mobileColumns = columns.filter((column) => !column.mobileHidden);
   const actionColumn = mobileColumns.find(isActionColumn);
@@ -100,12 +100,13 @@ export const DataTable = memo(function DataTable({ columns, rows, emptyMessage =
         ))}
       </div>
 
-      <div className="hidden overflow-x-auto lg:block">
-        <table aria-label={caption || 'Records table'} className="min-w-full divide-y divide-slate-200 text-sm">
+      <div className={clsx('hidden lg:block', fixedLayout ? 'overflow-hidden' : 'overflow-x-auto')}>
+        <table aria-label={caption || 'Records table'} className={clsx('divide-y divide-slate-200 text-sm', fixedLayout ? 'w-full table-fixed' : 'min-w-full')}>
+          {fixedLayout && <colgroup>{columns.map((column) => <col key={column.key} style={column.width ? { width: column.width } : undefined} />)}</colgroup>}
           <thead className="bg-slate-50/90">
             <tr>
               {columns.map((column) => (
-                <th key={column.key} scope="col" className="whitespace-nowrap px-4 py-3.5 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500">
+                <th key={column.key} scope="col" className={clsx('whitespace-nowrap px-4 py-3.5 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-500', fixedLayout && 'overflow-hidden')}>
                   {column.label}
                 </th>
               ))}
@@ -124,7 +125,7 @@ export const DataTable = memo(function DataTable({ columns, rows, emptyMessage =
             ) : rows.map((row, index) => (
               <tr key={row.id || index} className="transition hover:bg-clinical-50/60">
                 {columns.map((column) => (
-                  <td key={column.key} className={clsx('whitespace-nowrap px-4 align-middle text-slate-700', dense ? 'py-2.5' : 'py-3.5')}>
+                  <td key={column.key} className={clsx('px-4 align-middle text-slate-700', dense ? 'py-2.5' : 'py-3.5', fixedLayout ? 'min-w-0 overflow-hidden' : 'whitespace-nowrap')}>
                     {renderCell(column, row) ?? '—'}
                   </td>
                 ))}

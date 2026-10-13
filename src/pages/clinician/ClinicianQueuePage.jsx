@@ -158,11 +158,12 @@ export function ClinicianQueuePage() {
     {
       key: 'patient',
       label: 'Patient',
+      width: '22%',
       mobilePrimary: true,
       render: (row) => (
-        <span>
-          <span className="font-semibold text-slate-900">{patientName(row.patient)}</span>
-          <span className="block text-xs text-slate-500">
+        <span className="block min-w-0">
+          <span className="block truncate font-semibold text-slate-900" title={patientName(row.patient)}>{patientName(row.patient)}</span>
+          <span className="block truncate text-xs text-slate-500">
             {[row.patient?.patientCode && `ID: ${row.patient.patientCode}`, [ageLabel(row.patient?.dateOfBirth), row.patient?.gender?.[0]].filter(Boolean).join(' ')].filter(Boolean).join(' • ')}
           </span>
         </span>
@@ -171,9 +172,10 @@ export function ClinicianQueuePage() {
     {
       key: 'chiefComplaint',
       label: 'Complaint',
+      width: '27%',
       render: (row) => (
-        <span className="flex flex-wrap items-center gap-2">
-          <span className="text-sm text-slate-800">{row.chiefComplaint || 'No complaint recorded'}</span>
+        <span className="flex min-w-0 flex-wrap items-center gap-2">
+          <span className="min-w-0 max-w-full truncate text-sm text-slate-800" title={row.chiefComplaint || 'No complaint recorded'}>{row.chiefComplaint || 'No complaint recorded'}</span>
           <TriageDot level={row.triageLevel} />
           {tab === 'reviewReady' && <ResultPriorityBadge priority={row.resultPriority} />}
         </span>
@@ -185,10 +187,11 @@ export function ClinicianQueuePage() {
     columns.push({
       key: 'tests',
       label: 'Tests',
+      width: '27%',
       render: (row) => (
-        <span className="text-sm">
-          <span className="font-semibold text-slate-900">{row.tests.ready} of {row.tests.total} back</span>
-          {row.tests.outstanding.length > 0 && <span className="block text-xs text-slate-500">Waiting on {row.tests.outstanding.slice(0, 2).join(', ')}{row.tests.outstanding.length > 2 ? ` +${row.tests.outstanding.length - 2} more` : ''}</span>}
+        <span className="block min-w-0 text-sm">
+          <span className="block truncate font-semibold text-slate-900">{row.tests.ready} of {row.tests.total} back</span>
+          {row.tests.outstanding.length > 0 && <span className="block truncate text-xs text-slate-500" title={`Waiting on ${row.tests.outstanding.join(', ')}`}>Waiting on {row.tests.outstanding.slice(0, 2).join(', ')}{row.tests.outstanding.length > 2 ? ' …' : ''}</span>}
         </span>
       )
     });
@@ -197,6 +200,7 @@ export function ClinicianQueuePage() {
   columns.push({
     key: 'wait',
     label: tab === 'new' ? 'Wait time' : tab === 'inConsultation' ? 'Seen for' : 'Sent for tests',
+    width: '12%',
     render: (row) => {
       const since = tab === 'new' ? row.triagedAt || row.startedAt : tab === 'inConsultation' ? row.consultationStartedAt || row.startedAt : row.suspendedAt;
       return <span className={`text-sm font-medium ${tab === 'new' ? waitClass(minutesSince(since)) : 'text-slate-600'}`}>{waitingSince(since)}</span>;
@@ -206,6 +210,7 @@ export function ClinicianQueuePage() {
   columns.push({
     key: 'action',
     label: 'Action',
+    width: '12%',
     render: (row) => tab === 'pendingDiagnosis' ? (
       <div className="flex flex-wrap gap-1.5">
         <Button
@@ -307,9 +312,10 @@ export function ClinicianQueuePage() {
           caption={active.label}
           rowBadge={(row) => row.encounterCode}
           emptyMessage={queue ? active.empty : 'Loading the queue…'}
-          rows={rows}
-          columns={columns}
-        />
+        rows={rows}
+        columns={columns}
+        fixedLayout={tab === 'pendingDiagnosis'}
+      />
       </div>
     </div>
   );
