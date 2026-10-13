@@ -20,7 +20,7 @@ import { PrescriptionsTab, lineIsBlank, lineIsComplete, toPrescriptionItem } fro
 import { AllergyOverrideModal, CompleteConfirmModal, DispositionTab, buildSummary } from './DispositionTab';
 
 /*
-  The consultation workspace: one screen for a visit, in four tabs.
+  The consultation workspace: three clinical work areas and a deliberate finish-visit step.
 
   Everything the clinician needs comes to this screen - they never go looking for labs or
   prescriptions in other modules. What they type is a draft that saves itself, and only
@@ -33,10 +33,9 @@ import { AllergyOverrideModal, CompleteConfirmModal, DispositionTab, buildSummar
 */
 
 const TABS = [
-  { id: 'consultation', label: 'Consultation & Diagnosis' },
-  { id: 'investigations', label: 'Diagnostic Tests' },
-  { id: 'prescriptions', label: 'Prescriptions' },
-  { id: 'disposition', label: 'Disposition' }
+  { id: 'consultation', label: 'Visit' },
+  { id: 'investigations', label: 'Tests & Results' },
+  { id: 'prescriptions', label: 'Medicines' }
 ];
 
 const EMPTY_DRAFT = {
@@ -63,6 +62,7 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
   const [busy, setBusy] = useState(false);
   const [flow, setFlow] = useState(false);
   const [tab, setTab] = useState(initialTab);
+  const [finishOpen, setFinishOpen] = useState(false);
   const [peek, setPeek] = useState(false);
   const [suspendOpen, setSuspendOpen] = useState(false);
   const [completeOpen, setCompleteOpen] = useState(false);
@@ -391,32 +391,15 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
         <div className="min-w-0 flex-1 space-y-4">
-          <div role="tablist" aria-label="Consultation" className="flex flex-wrap gap-1 border-b border-slate-200">
-            {TABS.map((item) => {
-              const selected = tab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  role="tab"
-                  id={`workspace-tab-${item.id}`}
-                  aria-selected={selected}
-                  aria-controls="workspace-panel"
-                  onClick={() => setTab(item.id)}
-                  className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition ${selected ? 'border-clinical-500 text-clinical-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
-                >
-                  {item.label}
-                  {item.id === 'investigations' && stagedCount > 0 && <span className="rounded-full bg-clinical-600 px-2 py-0.5 text-xs font-bold text-white" aria-label={`${stagedCount} waiting to be sent`}>{stagedCount}</span>}
-                </button>
-              );
-            })}
-          </div>
-
-          <div id="workspace-panel" role="tabpanel" aria-labelledby={`workspace-tab-${tab}`}>
-            {tab === 'consultation' && <ConsultationTab {...commonTabProps} saveNote={saveNote} latestVitals={latest} />}
-            {tab === 'investigations' && <InvestigationsTab {...commonTabProps} sendOrdersNow={sendOrdersNow} />}
-            {tab === 'prescriptions' && <PrescriptionsTab {...commonTabProps} issuePrescription={issuePrescription} />}
-            {tab === 'disposition' && (
+          {finishOpen ? (
+            <section aria-labelledby="finish-visit-heading" className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-clinical-700">Final step</p>
+                  <h3 id="finish-visit-heading" className="text-lg font-bold text-slate-900">Finish visit</h3>
+                </div>
+                <Button variant="secondary" onClick={() => setFinishOpen(false)}>Back to visit</Button>
+              </div>
               <DispositionTab
                 {...commonTabProps}
                 canAdmit={canAdmit}
@@ -427,8 +410,37 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
                 onBlood={() => setBloodOpen(true)}
                 readyMedicines={readyMedicines}
               />
-            )}
-          </div>
+            </section>
+          ) : (
+            <>
+              <div role="tablist" aria-label="Visit workspace" className="flex flex-wrap gap-1 border-b border-slate-200">
+                {TABS.map((item) => {
+                  const selected = tab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      role="tab"
+                      id={`workspace-tab-${item.id}`}
+                      aria-selected={selected}
+                      aria-controls="workspace-panel"
+                      onClick={() => setTab(item.id)}
+                      className={`flex min-h-11 items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition ${selected ? 'border-clinical-500 text-clinical-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+                    >
+                      {item.label}
+                      {item.id === 'investigations' && stagedCount > 0 && <span className="rounded-full bg-clinical-600 px-2 py-0.5 text-xs font-bold text-white" aria-label={`${stagedCount} waiting to be sent`}>{stagedCount}</span>}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div id="workspace-panel" role="tabpanel" aria-labelledby={`workspace-tab-${tab}`}>
+                {tab === 'consultation' && <ConsultationTab {...commonTabProps} saveNote={saveNote} latestVitals={latest} />}
+                {tab === 'investigations' && <InvestigationsTab {...commonTabProps} sendOrdersNow={sendOrdersNow} />}
+                {tab === 'prescriptions' && <PrescriptionsTab {...commonTabProps} issuePrescription={issuePrescription} />}
+              </div>
+            </>
+          )}
         </div>
 
         {peek && <QuickPeek patientId={patient.id} currentEncounterId={encounter.id} onClose={() => setPeek(false)} />}
@@ -447,10 +459,13 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
             {inConsult && !paused && (
               <Button variant="secondary" disabled={busy || flow} onClick={() => setSuspendOpen(true)}><FlaskConical className="h-4 w-4" /> Send to Diagnostics &amp; Suspend</Button>
             )}
-            {inConsult && disposition === 'ADMITTED' && (
+            {inConsult && !finishOpen && (
+              <Button variant="success" disabled={busy || flow} onClick={() => setFinishOpen(true)}>Finish visit</Button>
+            )}
+            {inConsult && finishOpen && disposition === 'ADMITTED' && (
               <Button variant="success" disabled={busy || flow || !canAdmit} onClick={openAdmit}><BedDouble className="h-4 w-4" /> Admit to Ward</Button>
             )}
-            {inConsult && disposition !== 'ADMITTED' && can(auth, P.COMPLETE) && (
+            {inConsult && finishOpen && disposition !== 'ADMITTED' && can(auth, P.COMPLETE) && (
               <Button variant="success" disabled={busy || flow} onClick={() => setCompleteOpen(true)}>
                 <CheckCircle2 className="h-4 w-4" /> {disposition === 'REFERRED' ? 'Complete & Refer' : disposition === 'DECEASED' ? 'Complete visit' : 'Complete & Discharge'}
               </Button>

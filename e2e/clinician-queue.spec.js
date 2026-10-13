@@ -5,8 +5,8 @@ import { API, signIn, signInAsHospitalDoctor, tag, watchForCrashes } from './hel
   The clinician's queue, end to end.
 
   A patient is registered and triaged, the doctor picks them up, sends them for a test,
-  and the lab signs the result off - and the patient moves New Patients -> Pending Labs ->
-  Review Ready on their own, with the doctor told. The lab and the clinician's queue are
+  and the lab signs the result off - and the patient moves Needs attention -> Awaiting results ->
+  Ready to review on their own, with the doctor told. The lab and the clinician's queue are
   driven through the real API, so this proves the two screens agree with the server rather
   than with each other.
 */
@@ -51,7 +51,7 @@ test('a patient moves through the clinician queue as their tests go out and come
   await page.getByRole('tab', { name: /Needs attention/ }).click();
   await expect(page.getByRole('row').filter({ hasText: `${first} Patient` })).toBeVisible();
 
-  // Sent for a test and paused: they appear under Pending Labs, with progress.
+  // Sent for a test and paused: they appear under Awaiting results, with progress.
   const ordered = await request.post(`${API}/encounters/${encounterId}/orders`, { ...auth(doctor), data: { items: [{ catalogItemId: 't1' }], urgency: 'URGENT' } });
   expect(ordered.status(), await ordered.text()).toBe(201);
   const orderId = (await ordered.json()).data.orders[0].id;
@@ -81,7 +81,7 @@ test('a patient moves through the clinician queue as their tests go out and come
   const pendingRow = page.getByRole('row').filter({ hasText: `${first} Patient` });
   await expect(pendingRow).toContainText('0 of 1 back');
   await expect(pendingRow).toContainText('Full Blood Count');
-  const pingButton = pendingRow.getByRole('button', { name: `Ping lab for ${first} Patient` });
+  const pingButton = pendingRow.getByRole('button', { name: `Ping diagnostics for ${first} Patient` });
   await expect(pingButton).toBeEnabled();
   await pingButton.click();
   await expect(page.getByText('Lab status request sent to 1 lab staff for 1 order.')).toBeVisible();
@@ -108,7 +108,7 @@ test('a patient moves through the clinician queue as their tests go out and come
   await expect(readyRow.getByText('Critical result', { exact: true })).toBeVisible();
 
   // Reviewing the results takes the visit back: they are in consultation again.
-  await page.getByRole('button', { name: `Review results ${first} Patient` }).click();
+  await page.getByRole('button', { name: `Review results for ${first} Patient` }).click();
   await expect(page.getByRole('heading', { name: `${first} Patient` })).toBeVisible();
   await page.getByRole('button', { name: /Back to queue/ }).click();
   await page.getByRole('tab', { name: /Needs attention/ }).click();

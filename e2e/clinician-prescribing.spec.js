@@ -45,8 +45,8 @@ async function consultingPatient(request, tokens, { first, dateOfBirth, allergy,
 
 async function openMyConsultation(page, first) {
   await signInAsHospitalDoctor(page);
-  await page.getByRole('tab', { name: /My Consultations/ }).click();
-  await page.getByRole('button', { name: `Continue ${first} Patient` }).click();
+  await page.getByRole('tab', { name: /Needs attention/ }).click();
+  await page.getByRole('button', { name: `Continue consultation for ${first} Patient` }).click();
 }
 
 test('a doctor prescribes from suggestions, overrides an allergy with a reason, and refers the patient', async ({ page, request }) => {
@@ -57,7 +57,7 @@ test('a doctor prescribes from suggestions, overrides an allergy with a reason, 
   await openMyConsultation(page, first);
 
   /* ---- suggestions come from the diagnosis, with the adult dose filled in ---- */
-  await page.getByRole('tab', { name: /^Prescriptions/ }).click();
+  await page.getByRole('tab', { name: 'Medicines' }).click();
   const suggestion = page.getByRole('listitem').filter({ hasText: 'Artemether-lumefantrine' }).first();
   await expect(suggestion).toContainText('4 tablets');
   await expect(suggestion).toContainText('in stock');
@@ -85,7 +85,7 @@ test('a doctor prescribes from suggestions, overrides an allergy with a reason, 
   expect(issued.data.prescriptions.at(0).items).toHaveLength(3);
 
   /* ---- disposition: refer, with follow-up words ---- */
-  await page.getByRole('tab', { name: /Disposition/ }).click();
+  await page.getByRole('button', { name: 'Finish visit' }).click();
   await page.getByRole('radio', { name: /Refer/ }).click();
   await page.getByLabel('Referred to').fill('Korle Bu Teaching Hospital, Medicine');
   await page.getByLabel('Reason for referral').fill('Persistent fever despite treatment');
@@ -96,7 +96,7 @@ test('a doctor prescribes from suggestions, overrides an allergy with a reason, 
   await expect(confirm).toContainText('Korle Bu Teaching Hospital');
   await confirm.getByRole('button', { name: 'Complete visit' }).click();
 
-  await expect(page.getByRole('tab', { name: /New Patients/ })).toBeVisible();
+  await expect(page.getByRole('tab', { name: /Needs attention/ })).toBeVisible();
   const done = await (await request.get(`${API}/encounters/${encounterId}`, auth(tokens.doctor))).json();
   expect(done.data.status).toBe('COMPLETED');
   expect(done.data.outcome).toBe('REFERRED');
@@ -111,9 +111,11 @@ test('the doctor cannot close a visit with tests still waiting to be sent', asyn
   const first = `Guard${tag()}`;
   const { encounterId } = await consultingPatient(request, tokens, { first, dateOfBirth: '1985-02-02' });
   await openMyConsultation(page, first);
-  await page.getByRole('tab', { name: /Investigations/ }).click();
+  await page.getByRole('tab', { name: 'Tests & Results' }).click();
   await page.getByRole('button', { name: /Chest review/ }).click();
 
+  await expect(page.getByRole('button', { name: 'Complete & Discharge' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Finish visit' }).click();
   await page.getByRole('button', { name: 'Complete & Discharge' }).click();
   const confirm = page.getByRole('dialog', { name: 'Complete this visit' });
   await expect(confirm).toContainText('waiting to be sent');
@@ -130,7 +132,7 @@ test('a child gets no pre-filled dose, and cannot be sent a medicine without one
   const born = new Date(Date.now() - 4 * 365 * 86_400_000).toISOString().slice(0, 10);
   await consultingPatient(request, tokens, { first, dateOfBirth: born });
   await openMyConsultation(page, first);
-  await page.getByRole('tab', { name: /^Prescriptions/ }).click();
+  await page.getByRole('tab', { name: 'Medicines' }).click();
 
   const suggestion = page.getByRole('listitem').filter({ hasText: 'Paracetamol' }).first();
   await expect(suggestion).toContainText('This patient is under 12');

@@ -104,10 +104,14 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   const diagnosisBox = await diagnosisHeading.boundingBox();
   expect(diagnosisBox.y).toBeGreaterThan(noteEditorBox.y);
 
-  await page.getByRole('tab', { name: 'Disposition' }).click();
+  await expect(page.getByRole('tab')).toHaveCount(3);
+  await expect(page.getByRole('button', { name: 'Complete & Discharge' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Finish visit' }).click();
+  await expect(page.getByRole('heading', { name: 'Finish visit' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Short-stay observation (backend support required)' })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Generate medical-excuse certificate (not connected)' })).toBeDisabled();
-  await page.getByRole('tab', { name: 'Consultation & Diagnosis' }).click();
+  await page.getByRole('button', { name: 'Back to visit' }).click();
+  await page.getByRole('tab', { name: 'Visit' }).click();
 
   /* ---- tab 1: a template, typing, and dictation ---- */
   await page.getByLabel('Insert a template').selectOption({ label: 'Acute fever protocol' });
