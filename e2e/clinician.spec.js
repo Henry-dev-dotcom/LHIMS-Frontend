@@ -12,15 +12,15 @@ test('a doctor sees their own orders, and can withdraw one they just sent', asyn
   const crashes = watchForCrashes(page);
   await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
 
-  await openFromMenu(page, 'Active Orders');
+  await openFromMenu(page, 'Orders');
   const rows = page.getByRole('row');
   await expect.poll(async () => rows.count(), { message: 'the doctor sees no active orders at all' }).toBeGreaterThan(1);
 
   // Send a fresh order, then take it back before anyone acts on it.
-  await openFromMenu(page, 'New Order');
+  await page.getByRole('button', { name: 'New Order' }).click();
   await expect(page.getByText('Matching existing patients', { exact: false })).toBeVisible();
 
-  await openFromMenu(page, 'Active Orders');
+  await openFromMenu(page, 'Orders');
   const submitted = page.getByRole('row').filter({ hasText: 'Submitted' }).first();
   await expect(submitted).toBeVisible();
   const orderId = (await submitted.innerText()).split(/\s/)[0];
@@ -46,7 +46,8 @@ test('the clinician dashboard and completed orders are populated too', async ({ 
     return [...text.matchAll(/(\d+)\s*\n\s*(ACTIVE|COMPLETED|PATIENTS)/gi)].some(([, n]) => Number(n) > 0);
   }, { message: 'every clinician dashboard counter is zero' }).toBe(true);
 
-  await openFromMenu(page, 'Completed Orders');
+  await openFromMenu(page, 'Orders');
+  await page.getByRole('button', { name: 'Completed Orders' }).click();
   await expect.poll(async () => page.getByRole('row').count()).toBeGreaterThan(1);
   crashes.assertNone();
 });
@@ -63,7 +64,7 @@ test('the clinician dashboard and completed orders are populated too', async ({ 
 test('submitting an order clears the form and returns to the first step', async ({ page }) => {
   const crashes = watchForCrashes(page);
   await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
-  await openFromMenu(page, 'New Order');
+  await page.getByRole('button', { name: 'New Order' }).click();
 
   // Step 1: pick the first patient offered.
   const firstPatient = page.getByRole('button', { name: /Select$/ }).first();
@@ -122,7 +123,7 @@ test('the Tests / Scans column is one width, and a long list is clipped with "..
   expect(made.status(), await made.text()).toBe(201);
 
   await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
-  await openFromMenu(page, 'Active Orders');
+  await openFromMenu(page, 'Orders');
 
   const cells = page.locator('table tbody tr td:nth-child(3)');
   await expect.poll(async () => cells.count(), { message: 'no orders were listed' }).toBeGreaterThan(1);

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Download, Eye, Search } from 'lucide-react';
+import { Clock, Download, Eye, Search } from 'lucide-react';
 import { useAppStore } from '../../store/AppStore';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
@@ -90,6 +90,7 @@ export function DoctorCompletedOrdersPage() {
         eyebrow="Clinician Portal"
         title="Completed Orders"
         description="A clean archive of finalized orders with direct result viewing and PDF/report download actions."
+        actions={<Button variant="secondary" onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'doctor-active-orders' })}><Clock className="h-4 w-4" /> Current Orders</Button>}
       />
 
       <div className="grid gap-3 md:grid-cols-4">

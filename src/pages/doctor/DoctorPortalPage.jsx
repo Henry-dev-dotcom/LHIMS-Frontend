@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, Building2, CheckCircle2, Clock, Download, Edit3, FileText, LineChart, Send, UserRound } from 'lucide-react';
+import { Bell, Building2, CheckCircle2, Clock, Download, Edit3, LineChart, Send, UserRound } from 'lucide-react';
 import { useAppStore } from '../../store/AppStore';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
@@ -200,12 +200,10 @@ export function DoctorPortalPage() {
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-5 min-w-0">
-          <Card title="Quick Actions" subtitle="Common clinician tasks are grouped here to reduce page clutter." compact>
+          <Card title="Clinical workspaces" subtitle="Current orders, released results and longitudinal trends are grouped by task." compact>
             <div className="grid gap-3 md:grid-cols-2">
-              <QuickAction active icon={Send} title="Create New Order" description="Request tests or scans for a patient." onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'doctor-new-order' })} />
-              <QuickAction icon={Clock} title="Active Orders" description="Follow pending and in-progress work." onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'doctor-active-orders' })} />
-              <QuickAction icon={FileText} title="Completed Results" description="Open finalized reports and PDFs." onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'doctor-completed-orders' })} />
-              <QuickAction icon={LineChart} title="Patient Trends" description="Review repeated investigations over time." onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'doctor-patient-trends' })} />
+              <QuickAction active icon={Clock} title="Orders" description="Track active requests or open finalized orders and reports." onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'doctor-active-orders' })} />
+              <QuickAction icon={LineChart} title="Patients & Results" description="Review released results and open patient trends when needed." onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'doctor-results' })} />
             </div>
           </Card>
 

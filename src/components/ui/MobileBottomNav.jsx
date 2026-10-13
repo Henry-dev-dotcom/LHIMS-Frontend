@@ -5,10 +5,9 @@ import { canAccessPage } from '../../utils/permissions';
 
 const ROLE_QUICK_LINKS = {
   doctor: [
-    { id: 'doctor-new-order', label: 'Order', icon: ClipboardList },
-    { id: 'doctor-active-orders', label: 'Active', icon: CheckCircle2 },
+    { id: 'doctor-active-orders', label: 'Orders', icon: CheckCircle2 },
     { id: 'doctor-results', label: 'Results', icon: ShieldCheck },
-    { id: 'doctor-patient-trends', label: 'Trends', icon: LineChart }
+    { id: 'doctor-prescriptions', label: 'Rx', icon: ClipboardList }
   ],
   receptionist: [
     { id: 'incoming-orders', label: 'Orders', icon: ClipboardList },

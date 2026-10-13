@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Eye, RotateCcw, Search } from 'lucide-react';
+import { CheckCircle2, ClipboardList, Eye, RotateCcw, Search } from 'lucide-react';
 import { useAppStore } from '../../store/AppStore';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
@@ -117,8 +117,14 @@ export function DoctorActiveOrdersPage() {
     <div className="space-y-5">
       <PageHeader
         eyebrow="Clinician Portal"
-        title="Active Orders"
-        description="Track submitted, confirmed, in-progress, and pending-review orders in a focused clinician workspace."
+        title="Orders"
+        description="Track current requests and open the completed archive when results have been released."
+        actions={(
+          <div className="flex flex-wrap gap-2">
+            <Button variant="secondary" onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'doctor-completed-orders' })}><CheckCircle2 className="h-4 w-4" /> Completed Orders</Button>
+            <Button onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'doctor-new-order' })}><ClipboardList className="h-4 w-4" /> New Order</Button>
+          </div>
+        )}
       />
 
       <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
@@ -133,7 +139,7 @@ export function DoctorActiveOrdersPage() {
       </div>
 
       <Card
-        title="My Active Orders"
+        title="Current orders"
         subtitle="Use filters to follow current work by status, urgency, patient, or test."
         actions={(
           <div className="flex flex-wrap items-center justify-end gap-2">

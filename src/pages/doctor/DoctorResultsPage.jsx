@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Download, Eye, Search } from 'lucide-react';
+import { Download, Eye, LineChart, Search } from 'lucide-react';
 import { useAppStore } from '../../store/AppStore';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
@@ -79,9 +79,10 @@ export function DoctorResultsPage() {
   return (
     <div>
       <PageHeader
-        eyebrow="Clinician Portal · Result Viewer"
-        title="Results Viewer"
-        description="Review released results on-screen with reference ranges and abnormal-value highlighting, then download a printable PDF report."
+        eyebrow="Clinician Portal"
+        title="Patients & Results"
+        description="Search released patient results, review reference ranges and abnormal values, and download printable reports."
+        actions={<Button variant="secondary" onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'doctor-patient-trends' })}><LineChart className="h-4 w-4" /> Patient Trends</Button>}
       />
       <Card
         title="Completed / Result-Available Orders"
