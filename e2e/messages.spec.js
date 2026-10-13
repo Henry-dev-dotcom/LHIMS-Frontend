@@ -30,14 +30,18 @@ test('the lab says something and the doctor sees it, and channels stay private',
     await openFromMenu(labPage, 'Messages');
 
     /* ---- The lab is offered its own channel and the shared one, not Finance ---- */
-    await expect(labPage.getByRole('button', { name: /All departments/ })).toBeVisible();
-    await expect(labPage.getByRole('button', { name: /^Laboratory/ })).toBeVisible();
-    await expect(labPage.getByRole('button', { name: /^Finance/ }),
+    const labChannels = labPage.getByRole('region', { name: 'Channels' });
+    const labDepartments = labPage.getByRole('region', { name: 'Message another department' });
+    await expect(labChannels.getByRole('button', { name: /All departments/ })).toBeVisible();
+    await expect(labChannels.getByRole('button', { name: /^Laboratory/ })).toBeVisible();
+    await expect(labChannels.getByRole('button', { name: /^Finance/ }),
       'the laboratory should not be offered the finance channel').toHaveCount(0);
+    // Finance's own channel is closed to the lab, but the lab can write to Finance privately.
+    await expect(labDepartments.getByRole('button', { name: /^Finance/ })).toBeVisible();
 
     /* ---- Say it in the shared channel ---- */
     await labPage.getByRole('button', { name: /All departments/ }).click();
-    await labPage.getByLabel('Message').fill(body);
+    await labPage.getByRole('textbox', { name: 'Message', exact: true }).fill(body);
     await labPage.getByRole('button', { name: /^Send/ }).click();
 
     const sent = labPage.getByText(body);
@@ -53,15 +57,32 @@ test('the lab says something and the doctor sees it, and channels stay private',
     await expect(doctorPage.getByText(body), 'the message never reached the other department').toBeVisible({ timeout: 30_000 });
 
     /* ---- The doctor's own channel is the clinical one, not the lab's ---- */
-    await expect(doctorPage.getByRole('button', { name: /^Clinicians/ })).toBeVisible();
-    await expect(doctorPage.getByRole('button', { name: /^Laboratory/ }),
+    const doctorChannels = doctorPage.getByRole('region', { name: 'Channels' });
+    await expect(doctorChannels.getByRole('button', { name: /^Clinicians/ })).toBeVisible();
+    await expect(doctorChannels.getByRole('button', { name: /^Laboratory/ }),
       'a clinician should not be offered the laboratory channel').toHaveCount(0);
 
     /* ---- Replying lands back with the lab without it doing anything ---- */
     const reply = `Understood, sending urines only ${tag()}`;
-    await doctorPage.getByLabel('Message').fill(reply);
+    await doctorPage.getByRole('textbox', { name: 'Message', exact: true }).fill(reply);
     await doctorPage.getByRole('button', { name: /^Send/ }).click();
     await expect(labPage.getByText(reply), 'the reply never arrived without a reload').toBeVisible({ timeout: 45_000 });
+
+    /* ---- A private note from the lab to Finance is not the clinicians' to read ---- */
+    const privateNote = `Reagent invoice query ${tag()}`;
+    await labDepartments.getByRole('button', { name: /^Finance/ }).click();
+    await labPage.getByRole('textbox', { name: 'Message', exact: true }).fill(privateNote);
+    await labPage.getByRole('button', { name: /^Send/ }).click();
+    await expect(labPage.getByRole('log', { name: 'Finance conversation' }).getByText(privateNote)).toBeVisible({ timeout: 20_000 });
+
+    await doctorPage.getByRole('region', { name: 'Message another department' }).getByRole('button', { name: /^Finance/ }).click();
+    await expect(doctorPage.getByRole('log', { name: 'Finance conversation' })).toBeVisible();
+    await doctorPage.getByRole('region', { name: 'Channels' }).getByRole('button', { name: /All departments/ }).click();
+    await expect(doctorPage.getByText(reply)).toBeVisible();
+    await expect(doctorPage.getByText(privateNote), 'a private department note leaked into another department').toHaveCount(0);
+    await doctorPage.getByRole('region', { name: 'Message another department' }).getByRole('button', { name: /^Finance/ }).click();
+    await expect(doctorPage.getByRole('log', { name: 'Finance conversation' })).toBeVisible();
+    await expect(doctorPage.getByText(privateNote), 'a private department note leaked into another department').toHaveCount(0);
 
     labCrashes.assertNone();
     doctorCrashes.assertNone();

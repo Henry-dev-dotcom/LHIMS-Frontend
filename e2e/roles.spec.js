@@ -5,7 +5,7 @@ import { signIn, watchForCrashes } from './helpers.js';
 // another role's), and every screen in that menu opens without crashing.
 const ROLES = [
   { username: 'admin', password: 'admin123', sees: 'User Management', notSees: 'Plans & Billing' },
-  { username: 'doctor', password: 'doctor123', sees: 'Orders', notSees: 'User Management' },
+  { username: 'doctor', password: 'doctor123', sees: 'Clinician Queue', notSees: 'User Management' },
   { username: 'nurse', password: 'nurse123', sees: 'OPD Visits', notSees: 'Invoices' },
   { username: 'reception', password: 'reception123', sees: 'Walk-Ins', notSees: 'Dispensing' },
   { username: 'lab', password: 'lab123', sees: 'Accepted Samples', notSees: 'Walk-Ins' },

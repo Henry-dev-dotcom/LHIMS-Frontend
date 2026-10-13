@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { openFromMenu, signIn, watchForCrashes } from './helpers.js';
+import { openFromMenu, signInAsDiagnosticCentreDoctor, watchForCrashes } from './helpers.js';
 
 /*
   A doctor's own workspace must actually show their work. It used to look fine
@@ -10,7 +10,7 @@ import { openFromMenu, signIn, watchForCrashes } from './helpers.js';
 
 test('a doctor sees their own orders, and can withdraw one they just sent', async ({ page }) => {
   const crashes = watchForCrashes(page);
-  await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
+  await signInAsDiagnosticCentreDoctor(page);
 
   await openFromMenu(page, 'Orders');
   const rows = page.getByRole('row');
@@ -37,7 +37,7 @@ test('a doctor sees their own orders, and can withdraw one they just sent', asyn
 
 test('the clinician dashboard and completed orders are populated too', async ({ page }) => {
   const crashes = watchForCrashes(page);
-  await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
+  await signInAsDiagnosticCentreDoctor(page);
 
   await openFromMenu(page, 'Clinician Dashboard');
   // The counters read 0 across the board when the doctor cannot be resolved.
@@ -63,7 +63,7 @@ test('the clinician dashboard and completed orders are populated too', async ({ 
 */
 test('submitting an order clears the form and returns to the first step', async ({ page }) => {
   const crashes = watchForCrashes(page);
-  await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
+  await signInAsDiagnosticCentreDoctor(page);
   await page.getByRole('button', { name: 'New Order' }).click();
 
   // Step 1: pick the first patient offered.
@@ -122,7 +122,7 @@ test('the Tests / Scans column is one width, and a long list is clipped with "..
   });
   expect(made.status(), await made.text()).toBe(201);
 
-  await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
+  await signInAsDiagnosticCentreDoctor(page);
   await openFromMenu(page, 'Orders');
 
   const cells = page.locator('table tbody tr td:nth-child(3)');

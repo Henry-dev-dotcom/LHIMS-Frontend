@@ -24,18 +24,23 @@ export async function signIn(page, { code = '', username, password }) {
   await expect(page.locator('#main-content')).toBeVisible();
 }
 
-/** The shared DEMO seed is a clinic profile; this browser-only override targets the hospital clinician portal. */
-export async function signInAsHospitalDoctor(page) {
+/*
+  Which clinician portal a doctor gets follows the facility's plan: a hospital gets the queue
+  and visit workspace, a diagnostic centre keeps the external-ordering portal. There is one demo
+  facility, so the kind is overridden in the browser's copy of the login response; the server
+  is untouched and every request still goes to it.
+*/
+async function signInDoctorAs(page, facilityKind) {
   const loginUrl = '**/api/auth/login';
   await page.route(loginUrl, async (route) => {
     const response = await route.fetch();
     const payload = await response.json();
     const user = payload?.data?.user;
     if (!user?.facility) throw new Error('The E2E login response did not include a facility profile.');
-    user.facility.facilityKind = 'HOSPITAL';
+    user.facility.facilityKind = facilityKind;
     user.subscription = {
       ...user.subscription,
-      plan: { ...user.subscription?.plan, facilityKind: 'HOSPITAL' }
+      plan: { ...user.subscription?.plan, facilityKind }
     };
     await route.fulfill({ response, body: JSON.stringify(payload) });
   });
@@ -45,6 +50,12 @@ export async function signInAsHospitalDoctor(page) {
     await page.unroute(loginUrl);
   }
 }
+
+/** A doctor in a hospital: lands on the clinician queue. */
+export const signInAsHospitalDoctor = (page) => signInDoctorAs(page, 'HOSPITAL');
+
+/** A doctor in a diagnostic centre: keeps the ordering portal (Clinician Dashboard, Orders, New Order). */
+export const signInAsDiagnosticCentreDoctor = (page) => signInDoctorAs(page, 'DIAGNOSTIC_CENTRE');
 
 /** Opens a page from the sidebar (desktop layout). */
 export async function openFromMenu(page, label) {

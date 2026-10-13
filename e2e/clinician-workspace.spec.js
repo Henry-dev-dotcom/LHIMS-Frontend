@@ -83,7 +83,7 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   });
 
   await signInAsHospitalDoctor(page);
-  await page.getByRole('button', { name: `Consult ${first} Patient` }).click();
+  await page.getByRole('button', { name: `Consult for ${first} Patient` }).click();
   for (const viewport of [{ width: 390, height: 844 }, { width: 768, height: 1024 }]) {
     await page.setViewportSize(viewport);
     await expect(page.getByRole('heading', { name: `${first} Patient` })).toBeVisible();
@@ -139,7 +139,7 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   await expect(page.getByRole('textbox', { name: 'Assessment' })).toHaveValue(/Differentials considered: headache since monday/);
 
   /* ---- tab 2: a bundle, then take one test off ---- */
-  await page.getByRole('tab', { name: /Investigations/ }).click();
+  await page.getByRole('tab', { name: /Tests & Results/ }).click();
   await page.getByRole('button', { name: /Acute fever panel/ }).click();
   await expect(page.getByText(/\d+ waiting to be sent/)).toBeVisible();
   const staged = page.getByLabel('Tests waiting to be sent');
@@ -151,12 +151,12 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   /* ---- autosave keeps everything when the doctor leaves, and brings it back ---- */
   await expect(page.getByText(/^Draft saved /)).toBeVisible();
   await page.getByRole('button', { name: 'Back to queue' }).click();
-  await page.getByRole('tab', { name: /My Consultations/ }).click();
-  await page.getByRole('button', { name: `Continue ${first} Patient` }).click();
+  await page.getByRole('tab', { name: /Needs attention/ }).click();
+  await page.getByRole('button', { name: `Continue consultation for ${first} Patient` }).click();
   await page.getByRole('button', { name: 'SOAP fields' }).click();
   await expect(page.getByRole('textbox', { name: 'Subjective (history)' })).toHaveValue(/Fever for \(days\): 3/);
   await expect(page.getByRole('textbox', { name: 'Assessment' })).toHaveValue(/Differentials considered: headache since monday/);
-  await page.getByRole('tab', { name: /Investigations/ }).click();
+  await page.getByRole('tab', { name: /Tests & Results/ }).click();
   await expect(page.getByLabel('Tests waiting to be sent')).toContainText('Malaria');
   await expect(page.getByLabel('Tests waiting to be sent')).not.toContainText('Widal');
 
@@ -166,20 +166,20 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   await page.getByRole('button', { name: 'Close history' }).click();
 
   /* ---- Send to Lab & Suspend ---- */
-  await page.getByRole('button', { name: /Send to Lab & Suspend/ }).click();
+  await page.getByRole('button', { name: /Send to Diagnostics & Suspend/ }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog).toContainText('2 tests will be sent now');
   await expect(dialog).toContainText('Your notes will be saved to the record');
   await dialog.getByRole('button', { name: 'Send and suspend' }).click();
 
   // Back on the queue: parked under Pending Labs, with their tests counted.
-  await expect(page.getByRole('tab', { name: /Pending Labs/ })).toBeVisible();
-  await page.getByRole('tab', { name: /Pending Labs/ }).click();
+  await expect(page.getByRole('tab', { name: /Awaiting results/ })).toBeVisible();
+  await page.getByRole('tab', { name: /Awaiting results/ }).click();
   const pending = page.getByRole('row').filter({ hasText: `${first} Patient` });
   await expect(pending).toContainText('0 of 2 back');
   await expect(pending.getByRole('button', { name: `Add tests for ${first} Patient` })).toBeVisible();
   await expect(pending.getByRole('button', { name: `Force resume ${first} Patient` })).toBeVisible();
-  await expect(pending.getByRole('button', { name: `Ping lab for ${first} Patient` })).toBeEnabled();
+  await expect(pending.getByRole('button', { name: `Ping diagnostics for ${first} Patient` })).toBeEnabled();
   for (const viewport of [{ width: 390, height: 844 }, { width: 768, height: 1024 }]) {
     await page.setViewportSize(viewport);
     const widths = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, page: document.documentElement.scrollWidth }));
@@ -187,9 +187,9 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   }
   await page.setViewportSize({ width: 1366, height: 900 });
   await pending.getByRole('button', { name: `Add tests for ${first} Patient` }).click();
-  await expect(page.getByRole('tab', { name: /Investigations/, selected: true })).toBeVisible();
+  await expect(page.getByRole('tab', { name: /Tests & Results/, selected: true })).toBeVisible();
   await page.getByRole('button', { name: 'Back to queue' }).click();
-  await page.getByRole('tab', { name: /Pending Labs/ }).click();
+  await page.getByRole('tab', { name: /Awaiting results/ }).click();
 
   // The note went into the record - without the prompts nobody answered.
   const record = await (await request.get(`${API}/encounters/${encounterId}`, auth(tokens.doctor))).json();
@@ -205,12 +205,12 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   const orderId = record.data.orders[0].id;
   await labSignsOffAll(request, tokens.lab, orderId);
   await page.getByRole('button', { name: 'Refresh the queue' }).click();
-  await page.getByRole('tab', { name: /Review Ready/ }).click();
+  await page.getByRole('tab', { name: /Ready to review/ }).click();
   await expect(page.getByRole('row').filter({ hasText: `${first} Patient` })).toContainText('2 of 2 back');
-  await page.getByRole('button', { name: `Review results ${first} Patient` }).click();
+  await page.getByRole('button', { name: `Review results for ${first} Patient` }).click();
 
   // Opened straight on the results.
-  await expect(page.getByRole('tab', { name: /Investigations/, selected: true })).toBeVisible();
+  await expect(page.getByRole('tab', { name: /Tests & Results/, selected: true })).toBeVisible();
   await expect(page.getByText('This visit', { exact: true })).toBeVisible();
   await expect(page.getByRole('cell', { name: 'Haemoglobin' }).first()).toBeVisible();
   await expect(page.getByText('12.8 g/dL').first()).toBeVisible();
