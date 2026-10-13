@@ -43,7 +43,7 @@ test('a patient moves through the clinician queue as their tests go out and come
   await expect(page.getByRole('row').filter({ hasText: `${first} Patient` })).toBeVisible();
 
   // Consult: the consultation starts and the visit workspace opens.
-  await page.getByRole('button', { name: `Consult ${first} Patient` }).click();
+  await page.getByRole('button', { name: `Consult for ${first} Patient` }).click();
   await expect(page.getByRole('heading', { name: `${first} Patient` })).toBeVisible();
   await page.getByRole('button', { name: /Back to queue/ }).click();
 
@@ -57,23 +57,14 @@ test('a patient moves through the clinician queue as their tests go out and come
   const orderId = (await ordered.json()).data.orders[0].id;
   expect((await request.post(`${API}/encounters/${encounterId}/suspend`, { ...auth(doctor), data: {} })).status()).toBe(200);
 
-  // The demo API may not yet include the additive queue flag or priority summary.
-  // Keep this UI regression deterministic while exercising the real row actions.
+  // The ping goes to the real server. Only the priority badge is forced: the test result has no
+  // reference range, so the server rightly calls it unclassified, and the badge still needs showing.
   await page.route('**/encounters/queue*', async (route) => {
     const response = await route.fetch();
     const payload = await response.json();
-    const pending = payload.data.pendingLabs?.find((item) => item.id === encounterId);
-    if (pending) pending.canPingLab = true;
     const ready = payload.data.reviewReady?.find((item) => item.id === encounterId);
     if (ready) ready.resultPriority = 'CRITICAL';
     await route.fulfill({ response, body: JSON.stringify(payload) });
-  });
-  await page.route(`**/encounters/${encounterId}/ping-lab`, async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ success: true, message: 'Lab status request sent', data: { status: 'DELIVERED', requestedAt: new Date().toISOString(), orderCount: 1, recipientCount: 1, notificationCount: 1 } })
-    });
   });
 
   await page.getByRole('button', { name: 'Refresh the queue' }).click();
@@ -84,7 +75,7 @@ test('a patient moves through the clinician queue as their tests go out and come
   const pingButton = pendingRow.getByRole('button', { name: `Ping diagnostics for ${first} Patient` });
   await expect(pingButton).toBeEnabled();
   await pingButton.click();
-  await expect(page.getByText('Lab status request sent to 1 lab staff for 1 order.')).toBeVisible();
+  await expect(page.getByText(/Diagnostic status request sent to \d+ staff for 1 order\./)).toBeVisible();
 
   // The lab signs the result off. Nothing on the doctor's side is told except by the server.
   const accepted = await request.post(`${API}/lab/samples/accept`, { ...auth(lab), data: { orderId } });
