@@ -140,8 +140,8 @@ export function MessagesPage() {
             <p className="text-sm text-slate-500">Loading…</p>
           ) : (
             <div className="space-y-3">
-              <div className="space-y-1.5" aria-label="Shared message channels">
-                <p className="px-2 text-[11px] font-bold uppercase tracking-wide text-slate-500">Channels</p>
+              <section className="space-y-1.5" aria-labelledby="shared-message-channels-heading">
+                <h3 id="shared-message-channels-heading" className="px-2 text-[11px] font-bold uppercase tracking-wide text-slate-600">Channels</h3>
                 {channels.map((channel) => (
                   <button
                     key={channel.key}
@@ -159,11 +159,11 @@ export function MessagesPage() {
                     <span className="mt-0.5 block text-xs text-slate-500">{channel.description}</span>
                   </button>
                 ))}
-                {channels.length === 0 && <p className="px-2 text-sm text-slate-500">No shared channels are open to you.</p>}
-              </div>
+                {channels.length === 0 && <p className="px-2 text-sm text-slate-600">No shared channels are open to you.</p>}
+              </section>
 
-              <div className="space-y-1.5 border-t border-slate-200 pt-3" aria-label="Other departments">
-                <p className="px-2 text-[11px] font-bold uppercase tracking-wide text-slate-500">Message another department</p>
+              <section className="space-y-1.5 border-t border-slate-200 pt-3" aria-labelledby="other-departments-heading">
+                <h3 id="other-departments-heading" className="px-2 text-[11px] font-bold uppercase tracking-wide text-slate-600">Message another department</h3>
                 {departments.map((department) => {
                   const key = `${DEPARTMENT_PREFIX}${department.key}`;
                   const selected = active === key;
@@ -178,38 +178,46 @@ export function MessagesPage() {
                       <Building2 className="mt-0.5 h-4 w-4 shrink-0 text-clinical-700" aria-hidden="true" />
                       <span className="min-w-0">
                         <span className="block font-bold text-slate-900">{department.name}</span>
-                        <span className="mt-0.5 block text-xs text-slate-500">{department.description}</span>
+                        <span className="mt-0.5 block text-xs text-slate-600">{department.description}</span>
                       </span>
                     </button>
                   );
                 })}
-                {departments.length === 0 && <p className="px-2 text-sm text-slate-500">No other departments are available.</p>}
-              </div>
+                {departments.length === 0 && <p className="px-2 text-sm text-slate-600">No other departments are available.</p>}
+              </section>
             </div>
           )}
         </Card>
 
         <Card title={activeName} subtitle={activeDescription}>
           <div className="flex h-[26rem] flex-col">
-            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+            <div
+              className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1"
+              role="log"
+              aria-label={activeDepartment ? `${activeDepartment.name} conversation` : `${activeChannel?.name || 'Selected channel'} conversation`}
+              aria-live="polite"
+              aria-relevant="additions text"
+              aria-atomic="false"
+              tabIndex={0}
+            >
               {messages.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
                     <MessagesSquare className="mx-auto h-8 w-8 text-slate-400" aria-hidden="true" />
                     <p className="mt-2 font-bold text-slate-900">Nothing here yet.</p>
-                    <p className="mt-1 text-sm text-slate-500">{activeDepartment ? `Start a private conversation with ${activeDepartment.name}.` : 'Say something — it stays for 24 hours.'}</p>
+                    <p className="mt-1 text-sm text-slate-600">{activeDepartment ? `Start a private conversation with ${activeDepartment.name}.` : 'Say something — it stays for 24 hours.'}</p>
                   </div>
                 </div>
               ) : messages.map((message) => {
                 const mine = message.sender?.name === me;
                 return (
                   <div key={message.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[85%] rounded-2xl px-3 py-2 ${mine ? 'bg-clinical-500 text-white' : 'bg-slate-100 text-slate-900'}`}>
-                      <p className={`text-[11px] font-bold ${mine ? 'text-clinical-50' : 'text-slate-600'}`}>
+                    <div className={`max-w-[85%] rounded-2xl px-3 py-2 ${mine ? 'bg-clinical-700 text-white' : 'bg-slate-100 text-slate-900'}`}>
+                      <p className={`text-[11px] font-bold ${mine ? 'text-white' : 'text-slate-600'}`}>
                         {mine ? 'You' : message.sender?.name || 'Someone'}
                       </p>
                       <p className="mt-0.5 whitespace-pre-wrap text-sm leading-6">{message.body}</p>
-                      <p className={`mt-1 text-[10px] font-semibold ${mine ? 'text-clinical-100' : 'text-slate-500'}`}>
+                      <p className={`mt-1 text-[10px] font-semibold ${mine ? 'text-white' : 'text-slate-600'}`}>
                         {formatDateTime(message.createdAt)} · {expiresIn(message.expiresAt)}
                       </p>
                     </div>

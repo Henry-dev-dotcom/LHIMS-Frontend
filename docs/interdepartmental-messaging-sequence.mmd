@@ -1,0 +1,70 @@
+sequenceDiagram
+    autonumber
+    actor Staff as Staff member
+    participant UI as Messages UI
+    participant API as LHIMS API
+    participant Auth as Authentication and permissions
+    participant Val as Request validation
+    participant Svc as Messaging service
+    participant DB as Tenant database
+
+    Staff->>UI: Open Department messages
+    UI->>API: GET /api/messages/channels
+    API->>Auth: Authenticate and require MESSAGES_READ
+    Auth-->>API: Staff identity and facility context
+    API->>Svc: Resolve channels and recipients
+    Svc->>DB: Remove expired rows and count unexpired group rows
+    DB-->>Svc: Counts where recipientDepartment is null
+    Svc-->>API: Role-visible channels and own department
+    Svc-->>API: Other departments excluding own department
+    API-->>UI: 200 success envelope
+
+    Staff->>UI: Select recipient department
+    UI->>API: GET /api/messages/departments/FINANCE?limit=100
+    API->>Auth: Authenticate and require MESSAGES_READ
+    API->>Val: Validate department key and limit
+    Val-->>API: Valid request
+    API->>Svc: Read selected department thread
+    Svc->>Svc: Derive own department from authenticated role
+    Svc->>Svc: Reject unmapped role or self-directed target
+    Svc->>DB: Query both sender-recipient directions
+    DB-->>Svc: Unexpired pair messages in current facility
+    Svc-->>API: Thread messages ordered oldest first
+    API-->>UI: 200 success envelope
+    UI->>UI: Render labeled keyboard-focusable message log
+
+    loop Every 15 seconds while thread is active
+        UI->>API: GET /api/messages/departments/FINANCE?limit=100
+        API->>Auth: Authenticate and require MESSAGES_READ
+        API->>Svc: Re-read only this department pair
+        Svc->>DB: Filter expiry and apply facility tenant scope
+        DB-->>Svc: Current pair messages
+        Svc-->>API: Refreshed conversation
+        API-->>UI: 200 success envelope
+    end
+
+    Staff->>UI: Compose a message. Enter sends. Shift Enter adds a line
+    UI->>API: POST /api/messages with recipientDepartment and body
+    API->>Auth: Authenticate and require MESSAGES_SEND
+    API->>Val: Validate one destination and a body from 1 to 2000 characters
+    Val-->>API: Valid request
+    API->>Svc: Derive sender department and check recipient
+    Svc->>DB: Create message with 24 hour expiry
+    DB-->>Svc: Created message with sender summary
+    Svc-->>API: New message row
+    API-->>UI: 201 success envelope
+    UI->>UI: Clear draft and keep keyboard focus
+    UI->>API: GET /api/messages/departments/FINANCE?limit=100
+    UI->>API: GET /api/messages/channels
+    API-->>UI: Updated thread and channel summary
+
+    opt Staff selects a shared channel instead
+        UI->>API: GET /api/messages/ALL?limit=100
+        API->>Auth: Authenticate and require MESSAGES_READ
+        API->>Val: Validate channel and limit
+        API->>Svc: Read shared-channel messages
+        Svc->>DB: Query unexpired rows where recipientDepartment is null
+        DB-->>Svc: Shared-channel messages
+        Svc-->>API: Channel messages
+        API-->>UI: 200 success envelope
+    end
