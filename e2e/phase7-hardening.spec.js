@@ -17,6 +17,8 @@ for (const viewport of [
       const overflow = await page.evaluate(() => ({ width: window.innerWidth, scrollWidth: document.documentElement.scrollWidth }));
       expect(overflow.scrollWidth, `horizontal overflow at ${viewport.width}px`).toBeLessThanOrEqual(overflow.width + 1);
       const refresh = page.getByRole('button', { name: 'Refresh' });
+      // Refresh is disabled while the board loads, and a disabled button cannot take focus.
+      await expect(refresh).toBeEnabled();
       await refresh.focus();
       await expect(refresh).toBeFocused();
       await page.keyboard.press('Tab');
