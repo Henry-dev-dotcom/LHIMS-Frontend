@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { AlertTriangle, ArrowLeft, ArrowRightLeft, History, LogOut, Save } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRightLeft, BedDouble, FileText, History, LogOut, Save } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { FormField, inputClass } from '../../components/ui/FormField';
@@ -30,13 +30,13 @@ import { IP, bedDots } from './wardUtils';
   from whichever tab the clinician is on.
 */
 
+// Three tabs. A ward round - vitals, fluids and the day's note - happens on one screen; the
+// medicine chart and the results each have their own. The full record and the bed history are
+// opened from the header, because nobody needs them on every round.
 const TABS = [
-  ['flowsheet', 'Vitals & flowsheet'],
-  ['rounds', "Doctor's rounds"],
-  ['mar', 'Medication chart'],
-  ['results', 'Orders & results'],
-  ['record', 'Clinical record'],
-  ['beds', 'Bed history']
+  ['round', 'Round'],
+  ['mar', 'Medicines'],
+  ['results', 'Results & orders']
 ];
 
 export function InpatientWorkspace({ admissionId, onClose }) {
@@ -49,7 +49,9 @@ export function InpatientWorkspace({ admissionId, onClose }) {
   const [wards, setWards] = useState([]);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const [tab, setTab] = useState('flowsheet');
+  const [tab, setTab] = useState('round');
+  const [recordOpen, setRecordOpen] = useState(false);
+  const [bedsOpen, setBedsOpen] = useState(false);
   const [peek, setPeek] = useState(false);
   const [moveOpen, setMoveOpen] = useState(false);
   const [dischargeOpen, setDischargeOpen] = useState(false);
@@ -170,6 +172,10 @@ export function InpatientWorkspace({ admissionId, onClose }) {
           </div>
           <div className="flex flex-col items-start gap-2 lg:items-end">
             <StatusBadge status={active ? 'Admitted' : admission.status === 'DISCHARGED' ? `Discharged ${formatDateTime(admission.dischargedAt)}` : 'Cancelled'} />
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Stay record">
+              <Button variant="ghost" size="sm" aria-pressed={recordOpen} onClick={() => setRecordOpen((v) => !v)}><FileText className="h-4 w-4" /> Full record</Button>
+              <Button variant="ghost" size="sm" onClick={() => setBedsOpen(true)}><BedDouble className="h-4 w-4" /> Bed history</Button>
+            </div>
             {active && (
               <div className="flex flex-wrap gap-2" role="group" aria-label="Ward actions">
                 <Button variant="secondary" disabled={busy} onClick={saveUpdates}><Save className="h-4 w-4" /> Save updates{unsaved ? ' •' : ''}</Button>
@@ -182,35 +188,51 @@ export function InpatientWorkspace({ admissionId, onClose }) {
         {admission.dischargeSummary && <p className="mt-3 rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-700"><span className="font-semibold">Discharge ({admission.dischargeOutcome?.toLowerCase().replace(/_/g, ' ')}):</span> {admission.dischargeSummary}</p>}
       </Card>
 
-      <div role="tablist" aria-label="Stay sections" className="flex flex-wrap gap-2">
-        {TABS.map(([id, label]) => (
-          <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold ${tab === id ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
-            {label}{id === 'rounds' && unsaved ? ' •' : ''}
-          </button>
-        ))}
-      </div>
+      {recordOpen ? (
+        <div className="space-y-3">
+          <Button variant="secondary" onClick={() => setRecordOpen(false)}><ArrowLeft className="h-4 w-4" /> Back to chart</Button>
+        </div>
+      ) : (
+        <div role="tablist" aria-label="Stay sections" className="flex flex-wrap gap-2">
+          {TABS.map(([id, label]) => (
+            <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)}
+              className={`rounded-full px-4 py-2 text-sm font-semibold ${tab === id ? 'bg-clinical-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
+              {label}{id === 'round' && unsaved ? ' •' : ''}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
         <div className="min-w-0 flex-1">
-          {tab === 'flowsheet' && <FlowsheetTab admission={admission} encounter={encounter} auth={auth} open={active} busy={busy} act={act} toast={toast} onChanged={changed} />}
-          {tab === 'rounds' && <RoundsTab encounter={encounter} auth={auth} open={active} busy={busy} note={note} setNote={setNote} onSave={saveNote} />}
-          {tab === 'mar' && <MedicationTab admission={admission} auth={auth} toast={toast} onChanged={changed} />}
-          {tab === 'results' && <ResultsTab admission={admission} encounter={encounter} auth={auth} open={active} busy={busy} act={act} toast={toast} newResults={flags?.newResults || 0} onChanged={changed} />}
-          {tab === 'record' && <EncounterWorkspace encounterId={admission.encounter.id} key={admission.encounter.id} />}
-          {tab === 'beds' && (
-            <Card title="Bed history">
-              <ul className="divide-y divide-slate-100 text-sm">
-                {admission.bedAssignments.map((b) => (
-                  <li key={b.id} className="py-2"><span className="font-semibold">{b.ward.name}, bed {b.bed.label}</span> · {formatDateTime(b.startedAt)} – {b.endedAt ? formatDateTime(b.endedAt) : 'now'}{b.reason ? ` · ${b.reason}` : ''}{b.assignedBy ? ` · ${b.assignedBy.name}` : ''}</li>
-                ))}
-              </ul>
-            </Card>
+          {recordOpen && <EncounterWorkspace encounterId={admission.encounter.id} key={admission.encounter.id} />}
+          {!recordOpen && tab === 'round' && (
+            // A doctor's round reads the trends and writes the note, so the note comes straight after
+            // the graphs; a nurse charts vitals and fluids first and finds the notes below.
+            auth?.role === 'doctor' ? (
+              <FlowsheetTab admission={admission} encounter={encounter} auth={auth} open={active} busy={busy} act={act} toast={toast} onChanged={changed}
+                afterTrends={<RoundsTab encounter={encounter} auth={auth} open={active} busy={busy} note={note} setNote={setNote} onSave={saveNote} />} />
+            ) : (
+              <div className="space-y-4">
+                <FlowsheetTab admission={admission} encounter={encounter} auth={auth} open={active} busy={busy} act={act} toast={toast} onChanged={changed} />
+                <RoundsTab encounter={encounter} auth={auth} open={active} busy={busy} note={note} setNote={setNote} onSave={saveNote} />
+              </div>
+            )
           )}
+          {!recordOpen && tab === 'mar' && <MedicationTab admission={admission} auth={auth} toast={toast} onChanged={changed} />}
+          {!recordOpen && tab === 'results' && <ResultsTab admission={admission} encounter={encounter} auth={auth} open={active} busy={busy} act={act} toast={toast} newResults={flags?.newResults || 0} onChanged={changed} />}
         </div>
         {peek && <QuickPeek patientId={patient.id} currentEncounterId={admission.encounter.id} onClose={() => setPeek(false)} />}
       </div>
 
+      <Modal open={bedsOpen} title="Bed history" onClose={() => setBedsOpen(false)}
+        footer={<Button variant="secondary" onClick={() => setBedsOpen(false)}>Close</Button>}>
+        <ul className="divide-y divide-slate-100 text-sm">
+          {admission.bedAssignments.map((b) => (
+            <li key={b.id} className="py-2"><span className="font-semibold">{b.ward.name}, bed {b.bed.label}</span> · {formatDateTime(b.startedAt)} – {b.endedAt ? formatDateTime(b.endedAt) : 'now'}{b.reason ? ` · ${b.reason}` : ''}{b.assignedBy ? ` · ${b.assignedBy.name}` : ''}</li>
+          ))}
+        </ul>
+      </Modal>
       <MoveModal open={moveOpen} admission={admission} wards={wards} onClose={() => setMoveOpen(false)} busy={busy}
         onMove={async (payload) => { if (await run(() => inpatientService.transfer(apiClient, admission.id, payload), 'Patient moved.')) { setMoveOpen(false); load(); } }} />
       <DischargeModal open={dischargeOpen} hasDiagnosis={admission.encounter.diagnoses.length > 0} onClose={() => setDischargeOpen(false)} busy={busy}

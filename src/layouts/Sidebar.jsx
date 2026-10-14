@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { ChevronRight, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, X } from 'lucide-react';
 import { useAppStore } from '../store/AppStore';
-import { getNavForRole, groupNavItems } from '../utils/permissions';
+import { buildMenu } from '../data/navLayouts';
 import { ALL_ROLES } from '../data/roles';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 
@@ -14,8 +14,16 @@ export function Sidebar() {
   const closeButtonRef = useRef(null);
   const drawerRef = useRef(null);
   useFocusTrap(drawerRef, state.ui.sidebarOpen);
-  const allItems = getNavForRole(role, state.auth?.modules, state.auth);
-  const groups = groupNavItems(allItems);
+  const menu = buildMenu(state.auth ? { ...state.auth, role } : { role });
+  const groups = menu.layout ? {} : menu.groups;
+  const moreHasCurrent = Object.values(menu.more).some((items) => items.some((item) => item.id === state.currentPage));
+  const [moreOpen, setMoreOpen] = useState(() => readMoreOpen());
+  const showMore = moreOpen || moreHasCurrent;
+  const toggleMore = () => {
+    const next = !showMore;
+    setMoreOpen(next);
+    writeMoreOpen(next);
+  };
 
   useEffect(() => {
     if (!state.ui.sidebarOpen) return undefined;
@@ -63,38 +71,51 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto overscroll-contain px-3 py-4 pb-[calc(2rem+env(safe-area-inset-bottom))]">
-        {Object.entries(groups).length === 0 && <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-500">No matching menu items.</div>}
-        {Object.entries(groups).map(([section, items]) => (
-          <div key={section} className="mb-5">
-            <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">{section}</p>
-            <div className="space-y-0.5">
-              {items.map((item) => {
-                const Icon = item.icon;
-                const active = state.currentPage === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    aria-current={active ? 'page' : undefined}
-                    onClick={() => {
-                      dispatch({ type: 'NAVIGATE', pageId: item.id });
-                      dispatch({ type: 'CLOSE_SIDEBAR' });
-                    }}
-                    className={clsx(
-                      'group flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium transition duration-150',
-                      active ? 'bg-clinical-50 font-semibold text-clinical-800' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                    )}
-                  >
-                    <span className={clsx('grid h-8 w-8 shrink-0 place-items-center rounded-lg transition', active ? 'bg-clinical-500 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700')}>
-                      <Icon className="h-4 w-4" />
-                    </span>
-                    <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                    <ChevronRight className={clsx('h-4 w-4 shrink-0 transition', active ? 'text-clinical-500' : 'text-slate-300 group-hover:text-slate-400')} />
-                  </button>
-                );
-              })}
+        {menu.layout ? (
+          <>
+            <div className="mb-4 space-y-0.5">
+              {menu.primary.map((item) => <NavButton key={item.id} item={item} active={state.currentPage === item.id} dispatch={dispatch} />)}
             </div>
-          </div>
-        ))}
+            {Object.keys(menu.more).length > 0 && (
+              <div className="border-t border-slate-100 pt-3">
+                <button
+                  type="button"
+                  aria-expanded={showMore}
+                  aria-controls="sidebar-more"
+                  onClick={toggleMore}
+                  className="flex min-h-11 w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+                >
+                  More
+                  <ChevronDown className={clsx('h-4 w-4 transition', showMore ? 'rotate-180' : '')} aria-hidden="true" />
+                </button>
+                {showMore && (
+                  <div id="sidebar-more" className="mt-2">
+                    {Object.entries(menu.more).map(([section, items]) => (
+                      <div key={section} className="mb-4">
+                        <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">{section}</p>
+                        <div className="space-y-0.5">
+                          {items.map((item) => <NavButton key={item.id} item={item} active={state.currentPage === item.id} dispatch={dispatch} />)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {Object.entries(groups).length === 0 && <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-500">No matching menu items.</div>}
+            {Object.entries(groups).map(([section, items]) => (
+              <div key={section} className="mb-5">
+                <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">{section}</p>
+                <div className="space-y-0.5">
+                  {items.map((item) => <NavButton key={item.id} item={item} active={state.currentPage === item.id} dispatch={dispatch} />)}
+                </div>
+              </div>
+            ))}
+          </>
+        )}
       </nav>
     </>
   );
@@ -133,5 +154,46 @@ export function Sidebar() {
         </aside>
       </div>
     </>
+  );
+}
+
+const MORE_KEY = 'curatamed-nav-more-open';
+
+function readMoreOpen() {
+  try {
+    return window.localStorage.getItem(MORE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function writeMoreOpen(open) {
+  try {
+    window.localStorage.setItem(MORE_KEY, open ? '1' : '0');
+  } catch {
+    // The menu still works for this visit; it just will not remember.
+  }
+}
+
+function NavButton({ item, active, dispatch }) {
+  const Icon = item.icon;
+  return (
+    <button
+      aria-current={active ? 'page' : undefined}
+      onClick={() => {
+        dispatch({ type: 'NAVIGATE', pageId: item.id });
+        dispatch({ type: 'CLOSE_SIDEBAR' });
+      }}
+      className={clsx(
+        'group flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm font-medium transition duration-150',
+        active ? 'bg-clinical-50 font-semibold text-clinical-800' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+      )}
+    >
+      <span className={clsx('grid h-8 w-8 shrink-0 place-items-center rounded-lg transition', active ? 'bg-clinical-500 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700')}>
+        <Icon className="h-4 w-4" />
+      </span>
+      <span className="min-w-0 flex-1 truncate">{item.label}</span>
+      <ChevronRight className={clsx('h-4 w-4 shrink-0 transition', active ? 'text-clinical-500' : 'text-slate-300 group-hover:text-slate-400')} />
+    </button>
   );
 }

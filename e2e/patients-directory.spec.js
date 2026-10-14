@@ -47,7 +47,7 @@ test('a doctor finds a patient, opens their record for a reason, and files a doc
 
   /* ---- finding them, every way a clinician might have them ---- */
   await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
-  await openFromMenu(page, 'Patients Directory');
+  await openFromMenu(page, 'Patients');
   const search = page.getByLabel('Search patients');
   const row = page.getByRole('row').filter({ hasText: `${first} Mensah` });
 

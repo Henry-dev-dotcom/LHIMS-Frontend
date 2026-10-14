@@ -52,10 +52,15 @@ test('a ward round: red dot, tick the doses, fluids, rounds note, results review
   await expect(tile.locator('[data-dot="yellow"]')).toHaveCount(0);
   await expect(page.getByRole('heading', { name: `Round ward ${t}` })).toBeVisible();
 
-  // Open the stay: four working tabs and the action bar.
+  // Open the stay: three tabs, the action bar, and the full record and bed history in the header.
   await tile.click();
   await expect(page.getByRole('heading', { name: `${first} Ward` })).toBeVisible();
-  for (const name of ['Vitals & flowsheet', "Doctor's rounds", 'Medication chart', 'Orders & results']) await expect(page.getByRole('tab', { name })).toBeVisible();
+  await expect(page.getByRole('tab')).toHaveCount(3);
+  for (const name of ['Round', 'Medicines', 'Results & orders']) await expect(page.getByRole('tab', { name })).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Round' })).toHaveAttribute('aria-selected', 'true');
+  await page.getByRole('button', { name: 'Bed history' }).click();
+  await expect(page.getByRole('dialog', { name: 'Bed history' })).toContainText('R1');
+  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click();
   await expect(page.getByRole('group', { name: 'Ward actions' })).toBeVisible();
 
   for (const viewport of [{ width: 390, height: 844 }, { width: 768, height: 1024 }]) {
@@ -63,7 +68,7 @@ test('a ward round: red dot, tick the doses, fluids, rounds note, results review
     const widths = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, page: document.documentElement.scrollWidth }));
     expect(widths.page, `Inpatient chart should not overflow at ${viewport.width}px`).toBeLessThanOrEqual(widths.viewport + 1);
     await expect(page.getByRole('heading', { name: `${first} Ward` })).toBeVisible();
-    await expect(page.getByRole('tab', { name: 'Vitals & flowsheet' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Round' })).toBeVisible();
     await expect(page.getByRole('group', { name: 'Ward actions' })).toBeVisible();
   }
   await page.setViewportSize({ width: 1366, height: 900 });
@@ -86,7 +91,7 @@ test('a ward round: red dot, tick the doses, fluids, rounds note, results review
   await expect(todayRow).toContainText('+450 mL');
 
   // Medication chart: a held dose needs a reason; every other open box is ticked with its confirmation.
-  await page.getByRole('tab', { name: 'Medication chart' }).click();
+  await page.getByRole('tab', { name: 'Medicines' }).click();
   await expect(page.getByRole('row', { name: /Ceftriaxone/ })).toBeVisible();
   const open = page.getByRole('button', { name: /Ceftriaxone.*: (due now|overdue)$/i });
   await expect(open.first()).toBeVisible();
@@ -124,13 +129,14 @@ test('a ward round: red dot, tick the doses, fluids, rounds note, results review
   page = await (await browser.newContext()).newPage();
   const doctorCrashes = watchForCrashes(page);
   await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
-  await openFromMenu(page, 'Ward Board');
+  await openFromMenu(page, 'Wards');
   const flagged = page.getByRole('button', { name: new RegExp(`${first} Ward.*1 new result to review`) });
   await expect(flagged.locator('[data-dot="yellow"]')).toBeVisible();
   await flagged.click();
 
-  // Doctor's rounds: nothing from an earlier day to copy yet; write today's note.
-  await page.getByRole('tab', { name: "Doctor's rounds" }).click();
+  // The round: vitals, fluids and today's note on one tab. Nothing from an earlier day to copy yet.
+  await expect(page.getByRole('tab', { name: 'Round' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('heading', { name: 'Fluid balance' })).toBeVisible();
   await expect(page.getByRole('button', { name: /Copy yesterday/ })).toBeDisabled();
   await page.getByRole('textbox', { name: 'Assessment' }).fill('Improving on IV antibiotics.');
   await expect(page.getByText('Not saved yet')).toBeVisible();
@@ -139,7 +145,7 @@ test('a ward round: red dot, tick the doses, fluids, rounds note, results review
   await expect(page.getByText('Improving on IV antibiotics.').first()).toBeVisible();
 
   // Orders & results: review the result, and the dot is gone.
-  await page.getByRole('tab', { name: 'Orders & results' }).click();
+  await page.getByRole('tab', { name: 'Results & orders' }).click();
   await expect(page.getByText('1 new result', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Mark results reviewed' }).click();
   await expect(page.getByText('Results marked as reviewed.')).toBeVisible();

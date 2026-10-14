@@ -1,7 +1,8 @@
 import clsx from 'clsx';
-import { Bell, CalendarDays, CheckCircle2, ClipboardList, CreditCard, FlaskConical, Home, LineChart, Menu, ScanLine, Search, Settings, ShieldCheck, UsersRound } from 'lucide-react';
+import { BedDouble, Bell, MessageSquare, CalendarDays, CheckCircle2, ClipboardList, CreditCard, FlaskConical, Home, LineChart, Menu, ScanLine, Search, Settings, ShieldCheck, UsersRound } from 'lucide-react';
 import { useAppStore } from '../../store/AppStore';
 import { canAccessPage } from '../../utils/permissions';
+import { bottomBarFor } from '../../data/navLayouts';
 
 const ROLE_QUICK_LINKS = {
   doctor: [
@@ -41,13 +42,17 @@ const ROLE_QUICK_LINKS = {
   ]
 };
 
+const BOTTOM_BAR_ICONS = { 'patients-directory': UsersRound, 'ward-board': BedDouble, messages: MessageSquare };
+
 export function MobileBottomNav() {
   const { state, dispatch } = useAppStore();
   const role = state.auth?.role;
   if (!state.auth || state.currentPage === 'login') return null;
 
   const landing = state.auth?.landing || 'overview';
-  const roleLinks = (ROLE_QUICK_LINKS[role] || []).filter((item) => item.id !== landing && canAccessPage(role, item.id, state.auth?.modules, state.auth));
+  // A person with an arranged menu gets the same few places here; everyone else keeps the role's shortcuts.
+  const arranged = bottomBarFor(state.auth)?.map((item) => ({ ...item, icon: BOTTOM_BAR_ICONS[item.id] || Search }));
+  const roleLinks = (arranged || ROLE_QUICK_LINKS[role] || []).filter((item) => item.id !== landing && canAccessPage(role, item.id, state.auth?.modules, state.auth));
   const links = [
     { id: landing, label: 'Home', icon: Home },
     ...roleLinks.slice(0, 3),
