@@ -97,6 +97,36 @@ This file is how that spec is built, in order, on top of what already exists.
 * **Flaky test probe:** `scan.spec.js` and `ward-chart.spec.js` each passed twice consecutively in a late-run probe (**4/4**). The full 54-test desktop run also passed without reproducing the reported late-run failure.
 * **Static QA:** route, auth, UI polish, workflow integrity, and all Phase 6–9 mobile hardening scripts passed. The durable checks live in `e2e/phase7-hardening.spec.js`; direct ward-board role refusal checks live in `e2e/roles.spec.js`.
 
+#### Phase 7 hardening — second pass, 2026-10-14
+
+Re-run against the current portal (worklist queue, department messaging, six-item doctor menu,
+three-tab ward chart). Each check is a spec that runs with the suite.
+
+* **Full journey** (`e2e/patient-journey.spec.js`): one patient through every hand-over, each
+  person in their own browser session: the doctor sends her for a blood count and pauses the
+  visit; the lab's sign-off brings her back; the doctor reviews and admits her from Finish visit;
+  the nurse charts her fluids on the ward; the doctor discharges her and the bed goes for cleaning;
+  the cashier finds the invoice for her ward nights.
+* **Accessibility** (`e2e/accessibility.spec.js`, `@axe-core/playwright` 4.13.0): the queue, all
+  three visit tabs, patients, ward board, all three ward-chart tabs, emergency, clinics and
+  messages scanned against WCAG 2.1 A/AA in the light and the dark theme, with patients waiting
+  at every triage colour. Serious or critical findings fail the test. Fixed to get there:
+  * green action buttons were white on #059669 (3.8:1); the success colour is now #047857 (5.5:1);
+  * the orange (2.8:1) and green (3.8:1) triage badges, and yellow became unreadable in the dark
+    theme, which recolours slate text. Orange and yellow now use their own dark text and green is
+    #047857: 5.6, 11.1 and 5.5:1;
+  * the count on the test-bundle chips was faded below 4.5:1;
+  * in the dark theme a hovered table row or list item turned pale under light text; every pale
+    hover now has a dark equivalent.
+* **Phone and tablet** (`e2e/clinician-layout.spec.js`): at 375 and 768 px every doctor screen -
+  queue, each visit tab, the six menu items reached through the phone drawer, each ward-chart tab
+  and a page under More - fits without the page scrolling sideways.
+* **Role regression** (`e2e/clinician-access.spec.js`): nurse, reception, lab, scan, billing and
+  pharmacy are sent back to their own landing page when they type the address of a clinical page
+  they may not open; the server refuses them the queue, ward board and patient directory data.
+  Nurses and reception may read the queue (it is a view of the visits they already work from) but
+  are never sent the doctor's result flags - checked against a patient whose result is back.
+
 ## Out of scope unless asked
 Speech recognition servers (dictation uses the browser's own), automatic billing rules beyond
 what the existing visit-completion already does, and any change to other roles' screens.

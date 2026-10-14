@@ -167,7 +167,7 @@ export function InvestigationsTab({ encounter, auth, open, busy, draft, updateDr
                       title={items.map((i) => i.name).join(', ') + (missing ? ` (${missing} more not offered here)` : '')}
                       className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 ${active ? 'border-clinical-600 bg-clinical-600 text-white' : 'border-slate-200 bg-white text-slate-700 hover:border-clinical-300 hover:bg-clinical-25'}`}
                     >
-                      {set.label} <span className="opacity-70">· {items.length}</span>
+                      {set.label} <span className={active ? 'text-clinical-100' : 'text-slate-500'}>· {items.length}</span>
                     </button>
                   );
                 })}

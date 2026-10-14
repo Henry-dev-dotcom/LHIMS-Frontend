@@ -1,11 +1,13 @@
 // Shared labels and helpers for the Outpatient (OPD) pages.
 
-// South African Triage Scale colours, used in Ghanaian emergency care.
+// South African Triage Scale colours, used in Ghanaian emergency care. Text colours are chosen to
+// stay readable (4.5:1 or better) in both themes; the dark theme recolours slate text, so the
+// light badges use their own dark shade instead.
 export const TRIAGE = {
   RED: { label: 'Red · Emergency', short: 'Red', className: 'bg-red-600 text-white' },
-  ORANGE: { label: 'Orange · Very urgent', short: 'Orange', className: 'bg-orange-500 text-white' },
-  YELLOW: { label: 'Yellow · Urgent', short: 'Yellow', className: 'bg-yellow-300 text-slate-900' },
-  GREEN: { label: 'Green · Routine', short: 'Green', className: 'bg-emerald-600 text-white' }
+  ORANGE: { label: 'Orange · Very urgent', short: 'Orange', className: 'bg-orange-500 text-orange-950' },
+  YELLOW: { label: 'Yellow · Urgent', short: 'Yellow', className: 'bg-yellow-300 text-yellow-950' },
+  GREEN: { label: 'Green · Routine', short: 'Green', className: 'bg-emerald-700 text-white' }
 };
 
 export const STATUS = {
