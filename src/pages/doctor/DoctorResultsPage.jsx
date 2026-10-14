@@ -39,7 +39,7 @@ function DetailedResultModal({ order, data, dispatch, onClose }) {
               <DataTable
                 columns={[
                   { key: 'name', label: 'Parameter', width: '32%' },
-                  { key: 'value', label: 'Value', width: '18%', render: (row) => <span className="break-words font-bold text-slate-900">{row.value} {row.unit}</span> },
+                  { key: 'value', label: 'Value', width: '18%', render: (row) => <span className="wrap-break-word font-bold text-slate-900">{row.value} {row.unit}</span> },
                   { key: 'referenceRange', label: 'Reference Range', width: '32%' },
                   { key: 'flag', label: 'Flag', width: '18%', render: (row) => <StatusBadge status={row.flag} /> }
                 ]}
@@ -92,10 +92,10 @@ export function DoctorResultsPage() {
         <DataTable
           columns={[
             { key: 'id', label: 'Order ID', width: '14%', render: (order) => <span className="break-all font-bold text-slate-900" title={order.id}>{order.id}</span> },
-            { key: 'patient', label: 'Patient', width: '19%', render: (order) => <div className="min-w-0"><p className="break-words font-bold" title={order.patient?.fullName}>{order.patient?.fullName}</p><p className="break-all text-xs text-slate-500">{order.patient?.id}</p></div> },
+            { key: 'patient', label: 'Patient', width: '19%', render: (order) => <div className="min-w-0"><p className="wrap-break-word font-bold" title={order.patient?.fullName}>{order.patient?.fullName}</p><p className="break-all text-xs text-slate-500">{order.patient?.id}</p></div> },
             { key: 'items', label: 'Tests / Scans', width: '21%', render: (order) => <ClippedList items={order.items} limit={2} /> },
             { key: 'status', label: 'Status', width: '14%', render: (order) => <StatusBadge status={order.status} /> },
-            { key: 'released', label: 'Released', width: '17%', render: (order) => <span className="break-words">{formatDateTime(order.updatedAt)}</span> },
+            { key: 'released', label: 'Released', width: '17%', render: (order) => <span className="wrap-break-word">{formatDateTime(order.updatedAt)}</span> },
             { key: 'actions', label: 'Actions', width: '15%', render: (order) => <div className="grid min-w-0 gap-2 [&_button]:w-full [&_button]:justify-center"><Button variant="secondary" onClick={() => setSelectedOrder(order)}><Eye className="h-4 w-4" /> View</Button><Button onClick={() => { const report = getReportForOrder(data, order.id); if (report) dispatch({ type: 'MARK_REPORT_DOWNLOADED', reportId: report.id }); openReportPrintWindow({ ...order, resultReport: report }); }}><Download className="h-4 w-4" /> PDF</Button></div> }
           ]}
           rows={orders}

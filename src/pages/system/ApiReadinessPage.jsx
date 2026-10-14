@@ -140,7 +140,7 @@ export function ApiReadinessPage() {
               <CompactInfoBox label="Status"><StatusBadge status="Live mode active" /></CompactInfoBox>
             </div>
             <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
-              <strong>Important:</strong> The workspace always talks to the backend at <code className="rounded bg-white/70 px-1 py-0.5">VITE_API_BASE_URL</code>. Update the deployment environment to point at a different server.
+              <strong>Important:</strong> The workspace always talks to the backend at <code className="rounded-sm bg-white/70 px-1 py-0.5">VITE_API_BASE_URL</code>. Update the deployment environment to point at a different server.
             </div>
           </Card>
 
@@ -232,7 +232,7 @@ export function ApiReadinessPage() {
                 ['Auth + Roles', 'JWT login, refresh tokens, role middleware and permission guards'],
                 ['Core APIs', 'Patients, orders, lab, scan, billing, finance, admin and results']
               ].map(([title, body]) => (
-                <div key={title} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div key={title} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
                   <div className="mb-2 flex items-center gap-2 text-sm font-bold text-slate-900"><CheckCircle2 className="h-4 w-4 text-clinical-600" /> {title}</div>
                   <p className="text-sm leading-6 text-slate-500">{body}</p>
                 </div>

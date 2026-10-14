@@ -7,7 +7,7 @@ export function FilterPanel({ title = 'Filters', children, className, defaultOpe
   return (
     <details
       className={clsx(
-        'group rounded-[1.25rem] border border-slate-200/80 bg-white/95 p-3 shadow-sm backdrop-blur-xl lg:rounded-[1.5rem]',
+        'group rounded-[1.25rem] border border-slate-200/80 bg-white/95 p-3 shadow-xs backdrop-blur-xl lg:rounded-3xl',
         className
       )}
       open={defaultOpen}
@@ -21,7 +21,7 @@ export function FilterPanel({ title = 'Filters', children, className, defaultOpe
           {defaultOpen ? 'Open' : 'Tap'}
         </span>
       </summary>
-      <div className="mt-3 grid max-h-[46dvh] min-w-0 gap-2 overflow-y-auto overscroll-contain [&>*]:min-w-0 [&_.clinical-input]:w-full [&_button]:w-full lg:max-h-none lg:overflow-visible lg:[&_button]:w-auto">
+      <div className="mt-3 grid max-h-[46dvh] min-w-0 gap-2 overflow-y-auto overscroll-contain *:min-w-0 [&_.clinical-input]:w-full [&_button]:w-full lg:max-h-none lg:overflow-visible lg:[&_button]:w-auto">
         {children}
       </div>
     </details>

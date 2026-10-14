@@ -55,9 +55,9 @@ export function ReceptionWorkflowNav() {
               type="button"
               onClick={() => dispatch({ type: 'NAVIGATE', pageId: tab.id })}
               className={clsx(
-                'group flex min-h-[4rem] min-w-[10.25rem] snap-start items-center gap-2.5 rounded-2xl border px-3 py-2 text-left transition duration-200 sm:min-w-0',
+                'group flex min-h-16 min-w-41 snap-start items-center gap-2.5 rounded-2xl border px-3 py-2 text-left transition duration-200 sm:min-w-0',
                 active
-                  ? 'border-clinical-200 bg-clinical-50/90 shadow-sm ring-2 ring-clinical-100'
+                  ? 'border-clinical-200 bg-clinical-50/90 shadow-xs ring-2 ring-clinical-100'
                   : 'border-slate-200/80 bg-white/80 hover:border-clinical-200 hover:bg-slate-50'
               )}
             >

@@ -234,7 +234,7 @@ const WIZARD_STEPS = [
 function OrderHeaderProgress({ step, canReach, onStepChange }) {
   return (
     <nav className="w-full" aria-label="Order progress">
-      <ol className="flex max-w-4xl items-center gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white/90 p-1.5 shadow-sm sm:gap-2">
+      <ol className="flex max-w-4xl items-center gap-1 overflow-x-auto rounded-2xl border border-slate-200 bg-white/90 p-1.5 shadow-xs sm:gap-2">
         {WIZARD_STEPS.map((item, index) => {
           const isCurrent = step === item.id;
           const isDone = step > item.id;
@@ -253,7 +253,7 @@ function OrderHeaderProgress({ step, canReach, onStepChange }) {
                 </span>
                 <span className={`hidden truncate text-xs font-bold sm:block ${isCurrent ? 'text-clinical-700' : isDone ? 'text-slate-700' : 'text-slate-500'}`}>{item.label}</span>
               </button>
-              {index < WIZARD_STEPS.length - 1 && <span className={`h-0.5 flex-1 rounded ${step > item.id ? 'bg-clinical-300' : 'bg-slate-200'}`} />}
+              {index < WIZARD_STEPS.length - 1 && <span className={`h-0.5 flex-1 rounded-sm ${step > item.id ? 'bg-clinical-300' : 'bg-slate-200'}`} />}
             </li>
           );
         })}
@@ -264,7 +264,7 @@ function OrderHeaderProgress({ step, canReach, onStepChange }) {
 
 function PatientModeHeaderSwitch({ patientMode, onChange }) {
   return (
-    <div className="grid w-full min-w-0 max-w-full grid-cols-2 sm:max-w-[28rem] gap-1 rounded-2xl border border-slate-200 bg-white/95 p-1 shadow-sm">
+    <div className="grid w-full min-w-0 max-w-full grid-cols-2 sm:max-w-md gap-1 rounded-2xl border border-slate-200 bg-white/95 p-1 shadow-xs">
       <button
         type="button"
         onClick={() => onChange('existing')}
@@ -422,7 +422,7 @@ export function DoctorNewOrderPage() {
         actions={null}
       />
 
-      <section className="overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/80 p-3 shadow-soft backdrop-blur sm:p-5">
+      <section className="overflow-hidden rounded-4xl border border-slate-200/80 bg-white/80 p-3 shadow-soft backdrop-blur-sm sm:p-5">
         <div className="mb-4">
           <OrderHeaderProgress step={step} canReach={canReach} onStepChange={goToStep} />
         </div>
@@ -432,7 +432,7 @@ export function DoctorNewOrderPage() {
         )}
 
         {step === 1 && (
-          <div className="rounded-[1.5rem] border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+          <div className="rounded-3xl border border-slate-200 bg-white p-3 shadow-xs sm:p-4">
             {patientMode === 'existing' ? (
               <div className="space-y-3">
                 <div className="relative">
@@ -592,7 +592,7 @@ export function DoctorNewOrderPage() {
           </div>
         )}
 
-        <div className="flex items-center justify-between gap-3 rounded-3xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+        <div className="flex items-center justify-between gap-3 rounded-3xl border border-slate-200 bg-white p-3 shadow-xs sm:p-4">
           <Button type="button" variant="secondary" onClick={goBack} disabled={step === 1}><ArrowLeft className="h-4 w-4" /> Back</Button>
           <p className="hidden text-xs font-semibold uppercase tracking-[0.08em] text-slate-500 sm:block">{activeStep.label}</p>
           {/*

@@ -20,7 +20,7 @@ if (!header.includes('PAGE_HEADER_EVENT') || !header.includes('pageHeader') || !
 if (sidebar.includes('accessSummary') || sidebar.includes('Search menu...') || sidebar.includes('value={query}')) {
   failures.push('Sidebar must not show the removed workspace description/search block.');
 }
-if (!metricCard.includes('compact = true') || !metricCard.includes('min-h-[4.5rem]')) {
+if (!metricCard.includes('compact = true') || !metricCard.includes('min-h-18')) {
   failures.push('Metric cards must default to compact height for the moved stat section.');
 }
 

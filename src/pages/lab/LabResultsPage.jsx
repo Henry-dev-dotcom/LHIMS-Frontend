@@ -51,7 +51,7 @@ function VersionTimelineModal({ open, result, onClose }) {
               {amendment.parameters?.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {amendment.parameters.map((parameter, index) => (
-                    <span key={`${amendment.id}-${parameter.name}-${index}`} className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-600 shadow-sm">
+                    <span key={`${amendment.id}-${parameter.name}-${index}`} className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-600 shadow-xs">
                       {parameter.name}: {parameter.value} {parameter.unit}
                     </span>
                   ))}

@@ -13,7 +13,7 @@ export function NetworkStatusBanner() {
     : 'Saved screens may still open, but live records, uploads, and delivery actions need network access.';
 
   return (
-    <section className="mobile-system-banner mx-3 mt-2 rounded-[1.15rem] border border-amber-200/80 bg-amber-50/95 px-3 py-2 text-amber-950 shadow-sm backdrop-blur-xl sm:mx-5 lg:mx-8 print:hidden" role="status" aria-live="polite">
+    <section className="mobile-system-banner mx-3 mt-2 rounded-[1.15rem] border border-amber-200/80 bg-amber-50/95 px-3 py-2 text-amber-950 shadow-xs backdrop-blur-xl sm:mx-5 lg:mx-8 print:hidden" role="status" aria-live="polite">
       <div className="mx-auto flex max-w-[1540px] items-start gap-2.5">
         <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
         <div className="min-w-0">

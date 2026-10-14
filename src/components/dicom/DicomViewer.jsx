@@ -373,7 +373,7 @@ export function DicomViewer({ sources = [], title, onClose }) {
             {info ? Object.entries(info).filter(([, value]) => value !== '' && value != null).map(([key, value]) => (
               <div key={key} className="border-b border-slate-800 py-1 last:border-b-0">
                 <span className="block text-slate-500">{key.replace(/([A-Z])/g, ' $1').toLowerCase()}</span>
-                <span className="break-words font-semibold text-slate-200">{String(value)}</span>
+                <span className="wrap-break-word font-semibold text-slate-200">{String(value)}</span>
               </div>
             )) : <p className="text-slate-500">Nothing to show.</p>}
           </div>

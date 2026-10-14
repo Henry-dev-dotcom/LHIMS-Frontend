@@ -43,15 +43,15 @@ export function ResultDetail({ test }) {
         <table className="w-full table-fixed text-left text-sm">
           <colgroup><col className="w-[28%]" /><col className="w-[26%]" /><col className="w-[30%]" /><col className="w-[16%]" /></colgroup>
           <thead className="bg-slate-50 text-[11px] uppercase tracking-wide text-slate-500">
-            <tr><th className="break-words px-2 py-2 sm:px-3">Test</th><th className="break-words px-2 py-2 sm:px-3">Result</th><th className="break-words px-2 py-2 sm:px-3">Reference</th><th className="px-2 py-2 sm:px-3"><span className="sr-only">Flag</span></th></tr>
+            <tr><th className="wrap-break-word px-2 py-2 sm:px-3">Test</th><th className="wrap-break-word px-2 py-2 sm:px-3">Result</th><th className="wrap-break-word px-2 py-2 sm:px-3">Reference</th><th className="px-2 py-2 sm:px-3"><span className="sr-only">Flag</span></th></tr>
           </thead>
           <tbody>
             {test.lab.parameters.map((p) => (
               <tr key={p.name} className="border-t border-slate-100">
-                <td className="break-words px-2 py-2 font-medium text-slate-800 sm:px-3">{p.name}</td>
-                <td className="break-words px-2 py-2 text-slate-900 sm:px-3">{p.value ?? '—'} {p.unit || ''}</td>
-                <td className="break-words px-2 py-2 text-slate-500 sm:px-3">{p.referenceRange || '—'}</td>
-                <td className="break-words px-2 py-2 sm:px-3"><FlagChip flag={p.flag} /></td>
+                <td className="wrap-break-word px-2 py-2 font-medium text-slate-800 sm:px-3">{p.name}</td>
+                <td className="wrap-break-word px-2 py-2 text-slate-900 sm:px-3">{p.value ?? '—'} {p.unit || ''}</td>
+                <td className="wrap-break-word px-2 py-2 text-slate-500 sm:px-3">{p.referenceRange || '—'}</td>
+                <td className="wrap-break-word px-2 py-2 sm:px-3"><FlagChip flag={p.flag} /></td>
               </tr>
             ))}
           </tbody>

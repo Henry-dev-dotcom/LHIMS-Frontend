@@ -17,16 +17,16 @@ export function MetricCard({ label, value, icon: Icon, tone = 'blue', helper, co
   };
   return (
     <div className={clsx(
-      'metric-card group relative min-w-0 overflow-hidden border border-slate-200/70 bg-white shadow-soft transition duration-200 hover:-translate-y-0.5 hover:shadow-panel sm:min-h-[4.5rem]',
-      compact ? 'min-h-[4.6rem] rounded-[1rem] p-2.5 sm:rounded-2xl sm:p-3' : 'min-h-[5rem] rounded-[1.2rem] p-3.5'
+      'metric-card group relative min-w-0 overflow-hidden border border-slate-200/70 bg-white shadow-soft transition duration-200 hover:-translate-y-0.5 hover:shadow-panel sm:min-h-18',
+      compact ? 'min-h-[4.6rem] rounded-2xl p-2.5 sm:rounded-2xl sm:p-3' : 'min-h-20 rounded-[1.2rem] p-3.5'
     )}>
-      <div className={clsx('absolute top-0 h-0.5 rounded-b-full bg-gradient-to-r', compact ? 'inset-x-2 sm:inset-x-3' : 'inset-x-3.5', bars[tone] || bars.blue)} />
+      <div className={clsx('absolute top-0 h-0.5 rounded-b-full bg-linear-to-r', compact ? 'inset-x-2 sm:inset-x-3' : 'inset-x-3.5', bars[tone] || bars.blue)} />
       <div className={clsx('flex h-full items-start justify-between', compact ? 'gap-1.5 sm:gap-2' : 'gap-2.5')}>
         <div className="min-w-0 flex-1">
           <p
             className={clsx(
-              'metric-card-label break-words font-semibold uppercase leading-[1.2] text-slate-500',
-              compact ? 'text-[9px] tracking-[0.08em] sm:text-[11px] sm:tracking-[0.1em]' : 'text-[11px] tracking-[0.1em]'
+              'metric-card-label wrap-break-word font-semibold uppercase leading-[1.2] text-slate-500',
+              compact ? 'text-[9px] tracking-[0.08em] sm:text-[11px] sm:tracking-widest' : 'text-[11px] tracking-widest'
             )}
             title={label}
           >

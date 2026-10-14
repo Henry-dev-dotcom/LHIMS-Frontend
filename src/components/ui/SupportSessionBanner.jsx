@@ -9,7 +9,7 @@ export function SupportSessionBanner() {
   const support = state.auth?.support;
   if (!support) return null;
   return (
-    <section className="mx-3 mt-2 rounded-[1.15rem] border border-violet-200 bg-violet-50 px-3 py-2 text-violet-950 shadow-sm sm:mx-5 lg:mx-8 print:hidden" role="status">
+    <section className="mx-3 mt-2 rounded-[1.15rem] border border-violet-200 bg-violet-50 px-3 py-2 text-violet-950 shadow-xs sm:mx-5 lg:mx-8 print:hidden" role="status">
       <div className="mx-auto flex max-w-[1540px] flex-wrap items-center gap-2.5">
         <LifeBuoy className="h-4 w-4 shrink-0" aria-hidden="true" />
         <div className="min-w-0 flex-1">
@@ -18,7 +18,7 @@ export function SupportSessionBanner() {
             {support.operatorName} is viewing {state.auth?.facility?.name} as {state.auth?.userName}. Reason: {support.reason}. Nothing can be changed, and this visit is in the facility&apos;s audit log.
           </p>
         </div>
-        <button type="button" className="rounded-xl bg-white/80 px-3 py-1.5 text-xs font-bold shadow-sm hover:bg-white" onClick={() => dispatch({ type: 'LOGOUT' })}>
+        <button type="button" className="rounded-xl bg-white/80 px-3 py-1.5 text-xs font-bold shadow-xs hover:bg-white" onClick={() => dispatch({ type: 'LOGOUT' })}>
           End support session
         </button>
       </div>

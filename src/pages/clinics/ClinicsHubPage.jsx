@@ -66,7 +66,7 @@ export function ClinicsHubPage() {
   return (
     <div className="space-y-4">
       {all.length > 1 && (
-        <nav aria-label="Choose a clinic" className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+        <nav aria-label="Choose a clinic" className="rounded-2xl border border-slate-200 bg-white p-3 shadow-xs">
           <div className="flex flex-wrap gap-x-6 gap-y-3">
             {groups.map((group) => (
               <div key={group.label} className="min-w-0">

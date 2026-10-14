@@ -164,7 +164,7 @@ function OrderCard({ order, selected, onSelect, canSeeFinance }) {
     <button
       type="button"
       onClick={() => onSelect(order.id)}
-      className={`w-full rounded-[1.45rem] border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-clinical-200 hover:shadow-lift ${selected ? 'border-clinical-400 ring-4 ring-clinical-100' : 'border-slate-200'} ${isCancelled ? 'opacity-80' : ''}`}
+      className={`w-full rounded-[1.45rem] border bg-white p-4 text-left shadow-xs transition hover:-translate-y-0.5 hover:border-clinical-200 hover:shadow-lift ${selected ? 'border-clinical-400 ring-4 ring-clinical-100' : 'border-slate-200'} ${isCancelled ? 'opacity-80' : ''}`}
     >
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
@@ -214,7 +214,7 @@ function BoardColumn({ column, orders, onSelect, selectedOrderId }) {
           <p className="text-sm font-bold text-slate-900">{column.title}</p>
           <p className="text-xs font-semibold text-slate-500">{column.description}</p>
         </div>
-        <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-slate-700 shadow-sm">{orders.filter((order) => order.status === column.id).length}</span>
+        <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-slate-700 shadow-xs">{orders.filter((order) => order.status === column.id).length}</span>
       </div>
       <div className="space-y-2">
         {columnOrders.length === 0 ? (
@@ -224,7 +224,7 @@ function BoardColumn({ column, orders, onSelect, selectedOrderId }) {
             key={order.id}
             type="button"
             onClick={() => onSelect(order.id)}
-            className={`w-full rounded-2xl border bg-white p-3 text-left shadow-sm transition hover:border-clinical-200 ${selectedOrderId === order.id ? 'border-clinical-400 ring-2 ring-clinical-100' : 'border-slate-100'}`}
+            className={`w-full rounded-2xl border bg-white p-3 text-left shadow-xs transition hover:border-clinical-200 ${selectedOrderId === order.id ? 'border-clinical-400 ring-2 ring-clinical-100' : 'border-slate-100'}`}
           >
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-bold text-slate-900">{order.id}</span>
@@ -269,7 +269,7 @@ function OrderDetailsPanel({ order, canSeeFinance }) {
   if (!order) {
     return (
       <Card title="Order detail" subtitle="Select an order from any section to view focused details, timeline, billing and delivery information.">
-        <div className="grid place-items-center rounded-[1.5rem] bg-slate-50 p-10 text-center text-slate-500">
+        <div className="grid place-items-center rounded-3xl bg-slate-50 p-10 text-center text-slate-500">
           <UserRound className="mb-3 h-8 w-8 text-slate-400" />
           <p className="text-sm font-bold">No order selected yet.</p>
         </div>
@@ -426,7 +426,7 @@ export function OrderRegistryPage() {
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search by order ID, patient, doctor, hospital, test name, catalog ID, status..."
                 aria-label="Search orders by ID, patient, doctor, hospital, test name, catalog ID, or status"
-                className="w-full bg-transparent text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-500"
+                className="w-full bg-transparent text-sm font-semibold text-slate-800 outline-hidden placeholder:text-slate-500"
               />
             </div>
             <div className="text-xs font-bold text-slate-500">
@@ -453,7 +453,7 @@ export function OrderRegistryPage() {
             >
               <div className="grid gap-4">
                 {filteredOrders.length === 0 ? (
-                  <div className="rounded-[1.5rem] bg-slate-50 p-10 text-center text-sm font-semibold text-slate-500">No orders found in this section.</div>
+                  <div className="rounded-3xl bg-slate-50 p-10 text-center text-sm font-semibold text-slate-500">No orders found in this section.</div>
                 ) : filteredOrders.map((order) => (
                   <OrderCard key={order.id} order={order} selected={selectedOrder?.id === order.id} onSelect={setSelectedOrderId} canSeeFinance={canSeeFinance} />
                 ))}

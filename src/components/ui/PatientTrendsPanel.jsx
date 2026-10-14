@@ -171,7 +171,7 @@ function PatientProgressChart({ rows, parameterName, compact = false }) {
 
   if (numericRows.length < 2) {
     return (
-      <div className="flex min-h-[11rem] items-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5 text-sm font-semibold text-slate-500">
+      <div className="flex min-h-44 items-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5 text-sm font-semibold text-slate-500">
         This parameter needs at least two finalized numeric results before a progress line can be generated.
       </div>
     );
@@ -196,13 +196,13 @@ function PatientProgressChart({ rows, parameterName, compact = false }) {
   const points = numericRows.map((row, index) => `${xFor(index)},${yFor(Number(row.value))}`).join(' ');
 
   return (
-    <div className={`rounded-3xl border border-clinical-100 bg-gradient-to-br from-clinical-50 to-white ${compact ? 'p-4' : 'p-5'}`}>
+    <div className={`rounded-3xl border border-clinical-100 bg-linear-to-br from-clinical-50 to-white ${compact ? 'p-4' : 'p-5'}`}>
       <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wider text-clinical-700">{parameterName || 'Patient progress line chart'}</p>
           <p className="mt-1 text-sm text-slate-500">Finalized values plotted in visit/release order.</p>
         </div>
-        <div className="rounded-2xl bg-white px-4 py-3 text-left shadow-sm md:text-right">
+        <div className="rounded-2xl bg-white px-4 py-3 text-left shadow-xs md:text-right">
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Change</p>
           <p className={`font-semibold ${change > 0 ? 'text-amber-700' : change < 0 ? 'text-clinical-700' : 'text-slate-900'}`}>{change > 0 ? '+' : ''}{change.toFixed(2)} {unit}</p>
         </div>
@@ -261,10 +261,10 @@ function PatientProgressChart({ rows, parameterName, compact = false }) {
 function ParameterTrendCard({ chart, onView }) {
   const { latest } = getTrendSummary(chart.rows);
   return (
-    <div className="flex min-w-0 flex-col rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
+    <div className="flex min-w-0 flex-col rounded-3xl border border-slate-200 bg-white p-3 shadow-xs">
       <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <p className="break-words font-semibold text-slate-950">{chart.parameter.name}</p>
+          <p className="wrap-break-word font-semibold text-slate-950">{chart.parameter.name}</p>
           <p className="text-xs font-semibold text-slate-500">{chart.parameter.unit || 'No unit'} · Ref: {chart.parameter.referenceRange || '—'}</p>
         </div>
         <div className="rounded-2xl bg-slate-50 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-500">

@@ -3,7 +3,7 @@ import { CheckCircle2, Loader2 } from 'lucide-react';
 import { SiteLayout } from './SiteLayout';
 import { fieldErrors, publicService } from '../../services/publicService';
 
-const inputClass = 'mt-1 w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-clinical-400 focus:ring-4 focus:ring-clinical-100';
+const inputClass = 'mt-1 w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-hidden focus:border-clinical-400 focus:ring-4 focus:ring-clinical-100';
 
 export function DemoRequestPage() {
   const [form, setForm] = useState({ name: '', organisation: '', email: '', phone: '', facilityType: '', message: '', website: '' });

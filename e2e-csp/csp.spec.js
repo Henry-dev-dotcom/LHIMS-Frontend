@@ -121,3 +121,26 @@ test('fonts are served with the app and nothing is fetched from a font service',
 
   expect(external, `fetched from a font service: ${external.join(', ')}`).toEqual([]);
 });
+
+/*
+  A browser too old for the styles is told so, plainly, instead of getting a broken page.
+
+  The check runs from its own file (the policy allows no inline script). A current browser must
+  see nothing; one whose CSS lacks the colour features must see the notice.
+*/
+test('a browser too old for the styles is told to update, and a current one is not', async ({ browser }) => {
+  const current = await browser.newPage();
+  await current.goto('/#/login');
+  await expect(current.locator('#login-username')).toBeVisible();
+  await expect(current.locator('#browser-too-old')).toHaveCount(0);
+  await current.close();
+
+  const old = await browser.newPage();
+  await old.addInitScript(() => {
+    const real = window.CSS.supports.bind(window.CSS);
+    window.CSS.supports = (property, value) => (/oklch|color-mix/.test(String(value)) ? false : real(property, value));
+  });
+  await old.goto('/#/login');
+  await expect(old.getByRole('alert').filter({ hasText: 'This browser is too old for CurataMed.' })).toBeVisible();
+  await old.close();
+});

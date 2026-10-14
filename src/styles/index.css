@@ -1,75 +1,208 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-:root {
-  color-scheme: light;
-  font-family: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --color-primary: #0891b2;
-  --color-primary-deep: #155e75;
-  --color-accent: #059669;
-  --color-background: #ecfeff;
-  --color-foreground: #164e63;
-  --color-muted: #e8f1f6;
-  --color-border: #a5f3fc;
-  --shadow-clinical: 0 8px 24px rgba(15, 78, 92, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.85);
-  --shadow-clinical-hover: 0 14px 32px rgba(8, 145, 178, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --clinical-grid: rgba(15, 23, 42, 0.045);
-  --public-ambient-background:
-    radial-gradient(1200px 700px at 75% -10%, rgba(34, 211, 238, 0.10), transparent 60%),
-    radial-gradient(900px 600px at 10% 110%, rgba(45, 212, 191, 0.08), transparent 60%),
-    linear-gradient(180deg, #050b18, #04070f);
+@theme {
+  --color-clinical-25: #f7fcfd;
+  --color-clinical-50: #ecfeff;
+  --color-clinical-100: #cff9fe;
+  --color-clinical-200: #a5f0fc;
+  --color-clinical-300: #67e2f9;
+  --color-clinical-400: #22ccee;
+  --color-clinical-500: #0891b2;
+  --color-clinical-600: #0e7490;
+  --color-clinical-700: #155e75;
+  --color-clinical-800: #164e63;
+  --color-clinical-900: #0f3a4d;
+
+  --color-emerald-25: #f4fbf7;
+
+  --color-success: #047857;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --color-ink: #0f172a;
+
+  --font-sans:
+    Atkinson Hyperlegible, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, Segoe UI, sans-serif;
+
+  --shadow-soft:
+    0 8px 24px rgba(15, 78, 92, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --shadow-panel: 0 12px 32px rgba(15, 23, 42, 0.08);
+  --shadow-lift: 0 8px 22px rgba(8, 145, 178, 0.12);
+  --shadow-insetline: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+
+  --background-image-app-radial: radial-gradient(
+    circle at top left,
+    rgba(8, 145, 178, 0.05),
+    transparent 32%
+  );
+  --background-image-card-sheen: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(247, 252, 253, 0.94)
+  );
 }
 
-* {
-  box-sizing: border-box;
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
 }
 
-html {
-  width: 100%;
-  scroll-behavior: smooth;
+@utility clinical-panel {
+  @apply border border-cyan-100/90 bg-white/95;
+  box-shadow: var(--shadow-clinical);
+  transition:
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+
+  &:focus-within {
+    border-color: rgb(103 226 249 / 0.9);
+    box-shadow: var(--shadow-clinical-hover);
+  }
 }
 
-body {
-  margin: 0;
-  width: 100%;
-  min-width: 320px;
-  background:
-    radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.14), transparent 32%),
-    radial-gradient(circle at 100% 0%, rgba(5, 150, 105, 0.06), transparent 28%),
-    #f7fbfc;
-  color: var(--color-foreground);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: geometricPrecision;
+@utility clinical-input {
+  @apply w-full rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 shadow-xs outline-hidden transition placeholder:text-slate-500 focus:border-clinical-400 focus:ring-4 focus:ring-clinical-100;
 }
 
-@keyframes loading-shimmer {
-  0% { background-position: 140% 0; }
-  100% { background-position: -40% 0; }
+@utility clinical-kbd {
+  @apply rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-500;
 }
 
-.loading-skeleton {
-  background: linear-gradient(100deg, #e6eef1 25%, #f8fbfc 45%, #e6eef1 65%);
-  background-size: 220% 100%;
-  animation: loading-shimmer 1.8s ease-in-out infinite;
+@utility clinical-eyebrow {
+  @apply text-[11px] font-bold uppercase tracking-[0.14em] text-clinical-700;
 }
 
-button, input, textarea, select {
-  max-width: 100%;
-  font: inherit;
+@utility clinical-page-section {
+  @apply rounded-4xl border border-slate-200/70 bg-white shadow-soft;
 }
 
-img, svg, video, canvas {
-  max-width: 100%;
+@utility clinical-action-bar {
+  @apply sticky bottom-4 z-20 mx-auto flex w-fit max-w-full flex-wrap justify-center gap-2 rounded-3xl border border-slate-200/70 bg-white/95 px-3 py-2 shadow-panel backdrop-blur-xl;
 }
 
-#root {
-  min-height: 100vh;
-  width: 100%;
-  min-width: 0;
+@utility clinical-soft-divider {
+  @apply h-px w-full bg-linear-to-r from-transparent via-slate-200 to-transparent;
 }
 
-/* Base-layer sizing defaults; component utility classes must be able to override them. */
+@layer utilities {
+  :root {
+    color-scheme: light;
+    font-family:
+      'Atkinson Hyperlegible',
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      sans-serif;
+    --color-primary: #0891b2;
+    --color-primary-deep: #155e75;
+    --color-accent: #059669;
+    --color-background: #ecfeff;
+    --color-foreground: #164e63;
+    --color-muted: #e8f1f6;
+    --color-border: #a5f3fc;
+    --shadow-clinical:
+      0 8px 24px rgba(15, 78, 92, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    --shadow-clinical-hover:
+      0 14px 32px rgba(8, 145, 178, 0.13),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    --clinical-grid: rgba(15, 23, 42, 0.045);
+    --public-ambient-background:
+      radial-gradient(
+        1200px 700px at 75% -10%,
+        rgba(34, 211, 238, 0.1),
+        transparent 60%
+      ),
+      radial-gradient(
+        900px 600px at 10% 110%,
+        rgba(45, 212, 191, 0.08),
+        transparent 60%
+      ),
+      linear-gradient(180deg, #050b18, #04070f);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    width: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    width: 100%;
+    min-width: 320px;
+    background:
+      radial-gradient(
+        circle at 0% 0%,
+        rgba(34, 211, 238, 0.14),
+        transparent 32%
+      ),
+      radial-gradient(
+        circle at 100% 0%,
+        rgba(5, 150, 105, 0.06),
+        transparent 28%
+      ),
+      #f7fbfc;
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+  }
+
+  @keyframes loading-shimmer {
+    0% {
+      background-position: 140% 0;
+    }
+    100% {
+      background-position: -40% 0;
+    }
+  }
+
+  .loading-skeleton {
+    background: linear-gradient(100deg, #e6eef1 25%, #f8fbfc 45%, #e6eef1 65%);
+    background-size: 220% 100%;
+    animation: loading-shimmer 1.8s ease-in-out infinite;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    max-width: 100%;
+    font: inherit;
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    max-width: 100%;
+  }
+
+  #root {
+    min-height: 100vh;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Base-layer sizing defaults; component utility classes must be able to override them. */
+}
 @layer base {
   /* Intrinsic sizing guardrails: prevent long content from forcing grid/flex tracks wider than their portal. */
   :where(#root :is(.grid, .flex) > *, #root :is(.grid, .flex) > * > *) {
@@ -80,284 +213,277 @@ img, svg, video, canvas {
     overflow-wrap: anywhere;
   }
 }
-.public-ambient {
-  position: relative;
-  isolation: isolate;
-  background:
-    radial-gradient(900px 520px at 78% -12%, rgba(34, 211, 238, 0.08), transparent 64%),
-    #060b15;
-  color: #eaf6ff;
-}
-.public-ambient::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: '';
-  pointer-events: none;
-  opacity: 0.7;
-  background: radial-gradient(560px 420px at 0% 36%, rgba(45, 212, 191, 0.07), transparent 70%);
-}
-.public-ambient > * {
-  position: relative;
-  z-index: 1;
-}
-.public-site-header {
-  box-shadow: 0 8px 28px rgba(1, 7, 18, 0.18);
-}
-.public-ambient .public-site-header a,
-.public-ambient .public-site-header button {
-  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
-}
-.public-ambient .public-site-header a:hover,
-.public-ambient .public-site-header button:hover {
-  transform: translateY(-1px);
-}
-.public-ambient #main-content h1,
-.public-ambient #main-content h2,
-.public-ambient #main-content h3 {
-  text-wrap: balance;
-}
-.public-ambient #main-content > section {
-  animation: public-page-enter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.public-ambient #main-content > section {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  border-top: 1px solid rgba(148, 197, 255, 0.16);
-  background: transparent;
-}
-.public-ambient .bg-white:not(input):not(select):not(textarea) {
-  background: #0d1728 !important;
-  border-color: rgba(148, 197, 255, 0.14) !important;
-  color: #eaf6ff !important;
-  box-shadow: 0 12px 30px rgba(1, 7, 18, 0.22);
-}
-.public-ambient .bg-white:not(input):not(select):not(textarea):hover {
-  border-color: rgba(103, 232, 249, 0.42) !important;
-}
-.public-ambient .bg-white .text-slate-900,
-.public-ambient .bg-white .text-slate-800,
-.public-ambient .bg-white .text-slate-700,
-.public-ambient .bg-white .text-slate-600,
-.public-ambient .bg-white .text-slate-500 {
-  color: #b9c8dc !important;
-}
-.public-ambient .bg-white .text-slate-900,
-.public-ambient .bg-white .text-slate-800 {
-  color: #f4f8fc !important;
-}
-.public-ambient .bg-slate-100 {
-  background: rgba(148, 197, 255, 0.1) !important;
-  color: #b9c8dc !important;
-}
-.public-ambient .border-slate-200,
-.public-ambient .border-slate-200\/80 {
-  border-color: rgba(148, 197, 255, 0.14) !important;
-}
-.public-ambient .text-clinical-700 {
-  color: #67e8f9 !important;
-}
-.public-ambient footer a:hover,
-.public-ambient footer button:hover {
-  color: #f4f8fc !important;
-}
-.public-ambient input,
-.public-ambient select,
-.public-ambient textarea {
-  border-color: rgba(148, 197, 255, 0.28) !important;
-  background: #f7fbff !important;
-  color: #132238 !important;
-  transition: border-color 180ms ease, box-shadow 180ms ease;
-}
-.public-ambient input::placeholder,
-.public-ambient textarea::placeholder {
-  color: #60728a !important;
-}
-.public-ambient input:focus,
-.public-ambient select:focus,
-.public-ambient textarea:focus {
-  border-color: #22d3ee !important;
-  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.14) !important;
-}
-.skip-link {
-  position: fixed;
-  top: 0.75rem;
-  left: 0.75rem;
-  z-index: 50;
-  transform: translateY(-160%);
-  border: 1px solid rgba(103, 232, 249, 0.5);
-  border-radius: 0.75rem;
-  background: #0d1728;
-  padding: 0.65rem 0.9rem;
-  color: #eaf6ff;
-  font-size: 0.875rem;
-  font-weight: 700;
-  transition: transform 180ms ease;
-}
-.skip-link:focus {
-  transform: translateY(0);
-}
-@keyframes public-page-enter {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .public-ambient #main-content > section {
-    animation: none;
+@layer utilities {
+  .public-ambient {
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(
+        900px 520px at 78% -12%,
+        rgba(34, 211, 238, 0.08),
+        transparent 64%
+      ),
+      #060b15;
+    color: #eaf6ff;
+  }
+  .public-ambient::before {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    content: '';
+    pointer-events: none;
+    opacity: 0.7;
+    background: radial-gradient(
+      560px 420px at 0% 36%,
+      rgba(45, 212, 191, 0.07),
+      transparent 70%
+    );
+  }
+  .public-ambient > * {
+    position: relative;
+    z-index: 1;
+  }
+  .public-site-header {
+    box-shadow: 0 8px 28px rgba(1, 7, 18, 0.18);
   }
   .public-ambient .public-site-header a,
-  .public-ambient .public-site-header button,
-  .skip-link {
-    transition: none;
+  .public-ambient .public-site-header button {
+    transition:
+      color 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease,
+      transform 180ms ease;
   }
-}
-@media (prefers-reduced-transparency: reduce) {
+  .public-ambient .public-site-header a:hover,
+  .public-ambient .public-site-header button:hover {
+    transform: translateY(-1px);
+  }
+  .public-ambient #main-content h1,
+  .public-ambient #main-content h2,
+  .public-ambient #main-content h3 {
+    text-wrap: balance;
+  }
+  .public-ambient #main-content > section {
+    animation: public-page-enter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .public-ambient #main-content > section {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border-top: 1px solid rgba(148, 197, 255, 0.16);
+    background: transparent;
+  }
   .public-ambient .bg-white:not(input):not(select):not(textarea) {
     background: #0d1728 !important;
+    border-color: rgba(148, 197, 255, 0.14) !important;
+    color: #eaf6ff !important;
+    box-shadow: 0 12px 30px rgba(1, 7, 18, 0.22);
+  }
+  .public-ambient .bg-white:not(input):not(select):not(textarea):hover {
+    border-color: rgba(103, 232, 249, 0.42) !important;
+  }
+  .public-ambient .bg-white .text-slate-900,
+  .public-ambient .bg-white .text-slate-800,
+  .public-ambient .bg-white .text-slate-700,
+  .public-ambient .bg-white .text-slate-600,
+  .public-ambient .bg-white .text-slate-500 {
+    color: #b9c8dc !important;
+  }
+  .public-ambient .bg-white .text-slate-900,
+  .public-ambient .bg-white .text-slate-800 {
+    color: #f4f8fc !important;
+  }
+  .public-ambient .bg-slate-100 {
+    background: rgba(148, 197, 255, 0.1) !important;
+    color: #b9c8dc !important;
+  }
+  .public-ambient .border-slate-200,
+  .public-ambient .border-slate-200\/80 {
+    border-color: rgba(148, 197, 255, 0.14) !important;
+  }
+  .public-ambient .text-clinical-700 {
+    color: #67e8f9 !important;
+  }
+  .public-ambient footer a:hover,
+  .public-ambient footer button:hover {
+    color: #f4f8fc !important;
+  }
+  .public-ambient input,
+  .public-ambient select,
+  .public-ambient textarea {
+    border-color: rgba(148, 197, 255, 0.28) !important;
+    background: #f7fbff !important;
+    color: #132238 !important;
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+  .public-ambient input::placeholder,
+  .public-ambient textarea::placeholder {
+    color: #60728a !important;
+  }
+  .public-ambient input:focus,
+  .public-ambient select:focus,
+  .public-ambient textarea:focus {
+    border-color: #22d3ee !important;
+    box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.14) !important;
+  }
+  .skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 50;
+    transform: translateY(-160%);
+    border: 1px solid rgba(103, 232, 249, 0.5);
+    border-radius: 0.75rem;
+    background: #0d1728;
+    padding: 0.65rem 0.9rem;
+    color: #eaf6ff;
+    font-size: 0.875rem;
+    font-weight: 700;
+    transition: transform 180ms ease;
+  }
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+  @keyframes public-page-enter {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .public-ambient #main-content > section {
+      animation: none;
+    }
+    .public-ambient .public-site-header a,
+    .public-ambient .public-site-header button,
+    .skip-link {
+      transition: none;
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .public-ambient .bg-white:not(input):not(select):not(textarea) {
+      background: #0d1728 !important;
+    }
+  }
+
+  @supports (height: 100dvh) {
+    #root {
+      min-height: 100dvh;
+    }
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 3px solid rgba(8, 145, 178, 0.35);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: rgba(8, 145, 178, 0.18);
   }
 }
 
-@supports (height: 100dvh) {
-  #root {
-    min-height: 100dvh;
-  }
-}
-
-button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
-  outline: 3px solid rgba(8, 145, 178, 0.35);
-  outline-offset: 2px;
-}
-
-::selection {
-  background: rgba(8, 145, 178, 0.18);
-}
-
-@layer components {
-  .clinical-panel {
-    @apply border border-cyan-100/90 bg-white/95;
-    box-shadow: var(--shadow-clinical);
-    transition: box-shadow 180ms ease, border-color 180ms ease;
-  }
-
-  .clinical-panel:focus-within {
-    border-color: rgb(103 226 249 / 0.9);
-    box-shadow: var(--shadow-clinical-hover);
-  }
-
-  .clinical-input {
-    @apply w-full rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-800 shadow-sm outline-none transition placeholder:text-slate-500 focus:border-clinical-400 focus:ring-4 focus:ring-clinical-100;
-  }
-
-  .clinical-kbd {
-    @apply rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-500;
-  }
-
-  .clinical-eyebrow {
-    @apply text-[11px] font-bold uppercase tracking-[0.14em] text-clinical-700;
-  }
-}
 
 
+@layer utilities {
+  /* Mobile one-line summary strip: keeps all page information cards horizontal and compact. */
+  @media (max-width: 767px) {
+    .grid:has(> .metric-card),
+    .grid:has(> .clinical-stat-card) {
+      display: grid !important;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(5.2rem, 1fr);
+      grid-template-columns: none !important;
+      gap: 0.45rem !important;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 0.15rem;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+    }
 
-/* Mobile one-line summary strip: keeps all page information cards horizontal and compact. */
-@media (max-width: 767px) {
-  .grid:has(> .metric-card),
-  .grid:has(> .clinical-stat-card) {
-    display: grid !important;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(5.2rem, 1fr);
-    grid-template-columns: none !important;
-    gap: 0.45rem !important;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: 0.15rem;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-  }
+    .grid:has(> .metric-card) > .metric-card,
+    .grid:has(> .clinical-stat-card) > .clinical-stat-card {
+      scroll-snap-align: start;
+    }
 
-  .grid:has(> .metric-card) > .metric-card,
-  .grid:has(> .clinical-stat-card) > .clinical-stat-card {
-    scroll-snap-align: start;
-  }
+    .grid:has(> .metric-card) > .metric-card {
+      min-height: 3.85rem;
+      padding: 0.55rem 0.45rem;
+    }
 
-  .grid:has(> .metric-card) > .metric-card {
-    min-height: 3.85rem;
-    padding: 0.55rem 0.45rem;
-  }
+    .grid:has(> .metric-card) > .metric-card .metric-card-icon {
+      display: none;
+    }
 
-  .grid:has(> .metric-card) > .metric-card .metric-card-icon {
-    display: none;
-  }
+    .grid:has(> .metric-card) > .metric-card .metric-card-label {
+      max-width: 100%;
+      letter-spacing: 0.075em;
+      line-height: 1.05;
+      text-align: left;
+      word-break: normal;
+      overflow-wrap: anywhere;
+    }
 
-  .grid:has(> .metric-card) > .metric-card .metric-card-label {
-    max-width: 100%;
-    letter-spacing: 0.075em;
-    line-height: 1.05;
-    text-align: left;
-    word-break: normal;
-    overflow-wrap: anywhere;
-  }
+    .grid:has(> .metric-card) > .metric-card .metric-card-value {
+      margin-top: 0.35rem;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
 
-  .grid:has(> .metric-card) > .metric-card .metric-card-value {
-    margin-top: 0.35rem;
-    font-size: 1.2rem;
-    line-height: 1;
+    .grid:has(> .clinical-stat-card) > .clinical-stat-card {
+      min-height: 3.85rem;
+      border-radius: 1rem;
+      padding: 0.6rem 0.55rem !important;
+    }
+
+    .grid:has(> .clinical-stat-card) > .clinical-stat-card > div:first-child {
+      margin-bottom: 0.15rem;
+      display: block;
+    }
+
+    .grid:has(> .clinical-stat-card) > .clinical-stat-card h2,
+    .grid:has(> .clinical-stat-card) > .clinical-stat-card p:first-child {
+      font-size: 0.73rem;
+      line-height: 1.05rem;
+      letter-spacing: -0.01em;
+      overflow-wrap: anywhere;
+    }
+
+    .grid:has(> .clinical-stat-card) > .clinical-stat-card h2 + p,
+    .grid:has(> .clinical-stat-card) > .clinical-stat-card p + p {
+      margin-top: 0.3rem;
+      font-size: 1rem;
+      line-height: 1;
+      font-weight: 900;
+      color: rgb(15 23 42);
+    }
+
+    .grid:has(> .clinical-stat-card)
+      > .clinical-stat-card
+      .min-w-0
+      + .min-w-0:empty,
+    .grid:has(> .clinical-stat-card) > .clinical-stat-card > .min-w-0:empty {
+      display: none;
+    }
   }
 
-  .grid:has(> .clinical-stat-card) > .clinical-stat-card {
-    min-height: 3.85rem;
-    border-radius: 1rem;
-    padding: 0.6rem 0.55rem !important;
-  }
-
-  .grid:has(> .clinical-stat-card) > .clinical-stat-card > div:first-child {
-    margin-bottom: 0.15rem;
-    display: block;
-  }
-
-  .grid:has(> .clinical-stat-card) > .clinical-stat-card h2,
-  .grid:has(> .clinical-stat-card) > .clinical-stat-card p:first-child {
-    font-size: 0.73rem;
-    line-height: 1.05rem;
-    letter-spacing: -0.01em;
-    overflow-wrap: anywhere;
-  }
-
-  .grid:has(> .clinical-stat-card) > .clinical-stat-card h2 + p,
-  .grid:has(> .clinical-stat-card) > .clinical-stat-card p + p {
-    margin-top: 0.3rem;
-    font-size: 1rem;
-    line-height: 1;
-    font-weight: 900;
-    color: rgb(15 23 42);
-  }
-
-  .grid:has(> .clinical-stat-card) > .clinical-stat-card .min-w-0 + .min-w-0:empty,
-  .grid:has(> .clinical-stat-card) > .clinical-stat-card > .min-w-0:empty {
-    display: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-@layer components {
-  .clinical-page-section {
-    @apply rounded-[2rem] border border-slate-200/70 bg-white shadow-soft;
-  }
-
-  .clinical-action-bar {
-    @apply sticky bottom-4 z-20 mx-auto flex w-fit max-w-full flex-wrap justify-center gap-2 rounded-[1.5rem] border border-slate-200/70 bg-white/95 px-3 py-2 shadow-panel backdrop-blur-xl;
-  }
-
-  .clinical-soft-divider {
-    @apply h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent;
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
@@ -435,6 +561,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .clinical-panel,
   .rounded-\[1\.75rem\],
   .rounded-\[2rem\],
+  .rounded-4xl,
   .rounded-3xl {
     border-radius: 12px !important;
   }
@@ -1256,7 +1383,7 @@ html[data-theme='dark'] thead.bg-slate-50\/90 {
   background-color: #172337 !important;
 }
 
-html[data-theme='dark'] .shadow-sm,
+html[data-theme='dark'] .shadow-xs,
 html[data-theme='dark'] .shadow-card,
 html[data-theme='dark'] .shadow-panel,
 html[data-theme='dark'] .shadow-soft {

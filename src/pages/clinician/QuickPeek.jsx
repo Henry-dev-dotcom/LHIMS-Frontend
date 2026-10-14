@@ -34,12 +34,12 @@ export function QuickPeek({ patientId, currentEncounterId, onClose }) {
   }, [patientId, currentEncounterId]);
 
   return (
-    <aside aria-label="Quick-peek history" className="flex min-w-0 w-full flex-col rounded-2xl border border-slate-200 bg-white shadow-sm lg:w-80 lg:shrink-0">
+    <aside aria-label="Quick-peek history" className="flex min-w-0 w-full flex-col rounded-2xl border border-slate-200 bg-white shadow-xs lg:w-80 lg:shrink-0">
       <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
         <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900"><History className="h-4 w-4 text-clinical-600" aria-hidden="true" /> Last {LATEST} visits</h3>
         <button type="button" onClick={onClose} aria-label="Close history" className="rounded-lg p-1 text-slate-500 hover:bg-slate-100"><X className="h-4 w-4" /></button>
       </div>
-      <div className="min-w-0 max-h-[70vh] space-y-4 overflow-y-auto p-4 [overflow-wrap:anywhere]">
+      <div className="min-w-0 max-h-[70vh] space-y-4 overflow-y-auto p-4 wrap-anywhere">
         {error && <p role="alert" className="text-sm font-semibold text-red-600">{error}</p>}
         {!error && visits === null && <p className="text-sm text-slate-500">Loading history…</p>}
         {visits?.length === 0 && <p className="text-sm text-slate-500">No earlier visits on record.</p>}

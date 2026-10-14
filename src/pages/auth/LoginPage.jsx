@@ -45,8 +45,8 @@ export function LoginPage({ initialCode = '' }) {
   return (
     <div className="getlabs-login login-shell public-ambient login-page min-h-screen p-3 text-slate-900 sm:p-4">
       <div className="mx-auto flex min-h-[calc(100dvh-2rem)] w-full items-center justify-center">
-        <main className="login-panel grid w-full overflow-hidden rounded-[1.5rem] border lg:aspect-[5/3] lg:w-[76vw] lg:max-w-6xl lg:grid-cols-[1.1fr_0.9fr]">
-          <section className="login-hero relative min-h-[27rem] overflow-hidden bg-clinical-700 p-6 sm:p-8 lg:min-h-0 lg:px-8 lg:pb-8 lg:pt-10">
+        <main className="login-panel grid w-full overflow-hidden rounded-3xl border lg:aspect-5/3 lg:w-[76vw] lg:max-w-6xl lg:grid-cols-[1.1fr_0.9fr]">
+          <section className="login-hero relative min-h-108 overflow-hidden bg-clinical-700 p-6 sm:p-8 lg:min-h-0 lg:px-8 lg:pb-8 lg:pt-10">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(255,255,255,0.14),transparent_30%)]" />
             <div className="absolute -bottom-20 -right-10 h-72 w-72 rounded-full bg-clinical-500/40 blur-3xl" />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[42%] opacity-75" aria-hidden="true">
@@ -74,9 +74,9 @@ export function LoginPage({ initialCode = '' }) {
               <div>
                 <div className="mb-12 inline-flex max-w-full items-center gap-2 sm:mb-12">
                   <img src={`${import.meta.env.BASE_URL}icons/curatamed-mark.png`} alt="" aria-hidden="true" className="h-10 w-10 shrink-0 object-contain sm:h-11 sm:w-11" />
-                  <img src={`${import.meta.env.BASE_URL}icons/curatamed-wordmark-light.png`} alt="CurataMed" className="h-8 w-auto max-w-[11rem] object-contain sm:h-9" />
+                  <img src={`${import.meta.env.BASE_URL}icons/curatamed-wordmark-light.png`} alt="CurataMed" className="h-8 w-auto max-w-44 object-contain sm:h-9" />
                 </div>
-                <h2 className="getlabs-serif mt-0 max-w-xl text-3xl leading-[1.08] tracking-[-0.035em] !text-white sm:text-4xl lg:text-[clamp(1.85rem,2.75vw,2.5rem)]">
+                <h2 className="getlabs-serif mt-0 max-w-xl text-3xl leading-[1.08] tracking-[-0.035em] text-white! sm:text-4xl lg:text-[clamp(1.85rem,2.75vw,2.5rem)]">
                   Run your <span className="text-cyan-200">whole hospital,</span><br className="hidden lg:block" />{' '}
                   or only the <span className="text-cyan-200">departments</span><br className="hidden lg:block" />{' '}
                   you need.
@@ -88,7 +88,7 @@ export function LoginPage({ initialCode = '' }) {
 
               <div className="mt-6 grid gap-2 text-[11px] sm:grid-cols-2 sm:text-xs">
                 {['Outpatients, wards & theatre', 'Laboratory & imaging', 'Pharmacy & stores', 'Billing & NHIS claims'].map((item) => (
-                  <div key={item} className="flex min-h-9 items-center gap-1 rounded-full border border-white/20 bg-white/[0.08] px-2 py-1.5 text-[10px] text-white shadow-sm backdrop-blur-sm sm:px-2 sm:text-[10px]">
+                  <div key={item} className="flex min-h-9 items-center gap-1 rounded-full border border-white/20 bg-white/8 px-2 py-1.5 text-[10px] text-white shadow-xs backdrop-blur-xs sm:px-2 sm:text-[10px]">
                     <CheckCircle2 className="h-3 w-3 shrink-0 text-teal-200" />
                     <span className="font-semibold">{item}</span>
                   </div>

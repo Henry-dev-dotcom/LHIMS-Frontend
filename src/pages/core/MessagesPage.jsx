@@ -190,7 +190,7 @@ export function MessagesPage() {
         </Card>
 
         <Card title={activeName} subtitle={activeDescription}>
-          <div className="flex h-[26rem] flex-col">
+          <div className="flex h-104 flex-col">
             <div
               className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1"
               role="log"

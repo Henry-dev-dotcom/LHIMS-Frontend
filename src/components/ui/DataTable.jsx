@@ -29,7 +29,7 @@ function MobileDetail({ column, row, compact = false }) {
   return (
     <div className={clsx('min-w-0 rounded-2xl bg-slate-50 px-3 py-2', compact && 'rounded-xl px-2.5 py-2')}>
       <dt className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{column.label}</dt>
-      <dd className="mt-1 min-w-0 break-words text-sm font-semibold leading-5 text-slate-800">{renderCell(column, row) ?? '—'}</dd>
+      <dd className="mt-1 min-w-0 wrap-break-word text-sm font-semibold leading-5 text-slate-800">{renderCell(column, row) ?? '—'}</dd>
     </div>
   );
 }
@@ -47,7 +47,7 @@ export const DataTable = memo(function DataTable({ columns, rows, emptyMessage =
   const extraColumns = nonActionDetails.slice(4);
 
   return (
-    <div className="min-w-0 overflow-hidden rounded-[1.2rem] border border-slate-200/80 bg-white shadow-sm sm:rounded-[1.35rem]">
+    <div className="min-w-0 overflow-hidden rounded-[1.2rem] border border-slate-200/80 bg-white shadow-xs sm:rounded-[1.35rem]">
       {caption && <div className="border-b border-slate-100 bg-slate-50/80 px-4 py-3 text-xs font-bold text-slate-500">{caption}</div>}
 
       <div className="block divide-y divide-slate-100 lg:hidden">
@@ -63,7 +63,7 @@ export const DataTable = memo(function DataTable({ columns, rows, emptyMessage =
             <div className="mb-3 flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{primaryColumn?.label || `Record ${index + 1}`}</p>
-                <div className="mt-1 min-w-0 break-words text-base font-bold leading-6 text-slate-900">
+                <div className="mt-1 min-w-0 wrap-break-word text-base font-bold leading-6 text-slate-900">
                   {primaryColumn ? renderCell(primaryColumn, row) ?? '—' : `Record ${index + 1}`}
                 </div>
               </div>
@@ -91,7 +91,7 @@ export const DataTable = memo(function DataTable({ columns, rows, emptyMessage =
             {actionColumn && (
               <div className="mt-3 min-w-0 rounded-2xl bg-clinical-50/70 px-3 py-2">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-clinical-700">{actionColumn.label}</p>
-                <div className="mt-2 grid min-w-0 gap-2 [&_*]:min-w-0 [&_button]:w-full [&_button]:justify-center">
+                <div className="mt-2 grid min-w-0 gap-2 **:min-w-0 [&_button]:w-full [&_button]:justify-center">
                   {renderCell(actionColumn, row) ?? '—'}
                 </div>
               </div>

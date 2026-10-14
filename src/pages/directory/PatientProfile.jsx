@@ -149,7 +149,7 @@ function VisitHistory({ encounters, onOpen }) {
             type="button"
             onClick={() => onOpen(e)}
             aria-label={`Open the visit of ${day(e.startedAt)}, ${e.encounterCode}`}
-            className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-clinical-300 hover:shadow-md"
+            className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-xs transition hover:border-clinical-300 hover:shadow-md"
           >
             <span className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-sm font-bold text-slate-900">{day(e.startedAt)} · {VISIT_TYPE[e.type] || e.type}{e.clinic && e.clinic !== 'GENERAL' ? ` · ${e.clinic.toLowerCase().replace(/_/g, ' ')}` : ''}</span>

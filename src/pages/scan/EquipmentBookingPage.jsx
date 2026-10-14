@@ -99,7 +99,7 @@ export function EquipmentBookingPage() {
         <div className="space-y-6">
           <Card title="Equipment list" subtitle="Imaging machines and room status for scheduling.">
             <div className="grid gap-3 md:grid-cols-2">
-              {equipment.map((item) => <div key={item.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><div className="flex items-center justify-between gap-3"><p className="font-bold text-slate-900">{item.machine}</p><StatusBadge status={item.status} /></div><p className="mt-1 text-sm font-semibold text-slate-500">{item.modality} · {item.room}</p></div>)}
+              {equipment.map((item) => <div key={item.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs"><div className="flex items-center justify-between gap-3"><p className="font-bold text-slate-900">{item.machine}</p><StatusBadge status={item.status} /></div><p className="mt-1 text-sm font-semibold text-slate-500">{item.modality} · {item.room}</p></div>)}
             </div>
           </Card>
           <Card title="Today’s imaging board" subtitle="Calendar-like room view grouped by machine and time.">

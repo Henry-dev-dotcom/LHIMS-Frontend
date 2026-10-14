@@ -9,8 +9,8 @@ export function WorkspaceHydrationBanner() {
   return (
     <section
       className={timedOut
-        ? 'mx-3 mt-2 rounded-[1.15rem] border border-amber-200/80 bg-amber-50/95 px-3 py-2 text-amber-950 shadow-sm sm:mx-5 lg:mx-8'
-        : 'mx-3 mt-2 rounded-[1.15rem] border border-clinical-200/80 bg-clinical-50/95 px-3 py-2 text-clinical-950 shadow-sm sm:mx-5 lg:mx-8'}
+        ? 'mx-3 mt-2 rounded-[1.15rem] border border-amber-200/80 bg-amber-50/95 px-3 py-2 text-amber-950 shadow-xs sm:mx-5 lg:mx-8'
+        : 'mx-3 mt-2 rounded-[1.15rem] border border-clinical-200/80 bg-clinical-50/95 px-3 py-2 text-clinical-950 shadow-xs sm:mx-5 lg:mx-8'}
       role={timedOut ? 'alert' : 'status'}
       aria-live="polite"
     >
@@ -26,7 +26,7 @@ export function WorkspaceHydrationBanner() {
         {timedOut && (
           <button
             type="button"
-            className="inline-flex min-h-9 shrink-0 items-center justify-center gap-2 rounded-xl bg-white/85 px-3 py-1.5 text-xs font-bold shadow-sm ring-1 ring-amber-200 transition hover:bg-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-200"
+            className="inline-flex min-h-9 shrink-0 items-center justify-center gap-2 rounded-xl bg-white/85 px-3 py-1.5 text-xs font-bold shadow-xs ring-1 ring-amber-200 transition hover:bg-white focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-amber-200"
             onClick={() => dispatch({ type: 'RETRY_HYDRATION' })}
           >
             <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
