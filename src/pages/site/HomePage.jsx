@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowRight, ArrowUpRight, BedDouble, Check, CreditCard, Database, FlaskConical, Lock, Package, Receipt, ShieldCheck, Smartphone, Users } from 'lucide-react';
 import { goTo } from '../../services/publicService';
+import '../../styles/landingFonts';
 import '../../styles/landing.css';
 
 /*
