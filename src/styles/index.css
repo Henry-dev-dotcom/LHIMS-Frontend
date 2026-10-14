@@ -1297,6 +1297,12 @@ html[data-theme='dark'] .border-clinical-200 {
   border-color: #24526b !important;
 }
 
+/* Every pale hover gets a dark one: a pale hover under the dark theme's light text left a
+ hovered table row or list item unreadable. */
+html[data-theme='dark'] .hover\:bg-slate-50:hover,
+html[data-theme='dark'] .hover\:bg-slate-50\/70:hover,
+html[data-theme='dark'] .hover\:bg-clinical-25:hover,
+html[data-theme='dark'] .hover\:bg-clinical-50\/60:hover,
 html[data-theme='dark'] .hover\:bg-clinical-50:hover,
 html[data-theme='dark'] .hover\:bg-slate-100:hover,
 html[data-theme='dark'] .hover\:bg-white:hover {

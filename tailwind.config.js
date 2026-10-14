@@ -20,7 +20,8 @@ export default {
         emerald: {
           25: '#f4fbf7'
         },
-        success: '#059669',
+        // Deep enough for white button text to read (5.5:1; the lighter #059669 was 3.8:1).
+        success: '#047857',
         warning: '#d97706',
         danger: '#dc2626',
         ink: '#0f172a'

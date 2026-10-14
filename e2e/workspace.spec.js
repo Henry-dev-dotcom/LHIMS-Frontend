@@ -34,8 +34,10 @@ test('an address for a page the role may not open falls back to their own landin
   await page.goto('/#/app/hr-admin');
   await page.reload();
 
-  await expect(page.getByRole('heading', { name: 'Queue', level: 1 })).toBeVisible();
-  expect(page.url()).toContain('#/app/lab-queue');
+  // The lab's landing page is Incoming Labs. ("Queue" used to match only because the header's
+  // fallback title, Lab Order Queue, showed for a moment before the page set its own.)
+  await expect.poll(() => page.url()).toContain('#/app/lab-queue');
+  await expect(page.getByRole('heading', { name: 'Incoming Labs', level: 1 })).toBeVisible();
   crashes.assertNone();
 });
 
