@@ -90,3 +90,34 @@ test('the home page loads under the policy with no violations', async ({ page, c
   const violations = await page.evaluate(() => window.__csp || []);
   expect(violations, `the policy blocked: ${violations.join(' | ')}`).toEqual([]);
 });
+
+/*
+  The fonts come with the app, not from Google.
+
+  They used to load from fonts.googleapis.com, so a first visit waited on another company's
+  servers and, on a slow line, the page took seconds longer to count as loaded. Now no request may
+  leave for a font service, and every typeface has to be in use from the app's own files - checked
+  on the sign-in page (the app's fonts) and the home page (the website's).
+*/
+test('fonts are served with the app and nothing is fetched from a font service', async ({ page }) => {
+  const external = [];
+  page.on('request', (request) => {
+    if (/fonts\.(googleapis|gstatic)\.com/.test(request.url())) external.push(request.url());
+  });
+  const loaded = async (families) => page.evaluate(async (names) => {
+    await document.fonts.ready;
+    // Ask for each face so it loads, then report the ones that came from this site.
+    await Promise.all(names.map((name) => document.fonts.load(`700 16px "${name}"`)));
+    return names.filter((name) => [...document.fonts].some((face) => face.family.replace(/"/g, '') === name && face.status === 'loaded'));
+  }, families);
+
+  await page.goto('/#/login');
+  await expect(page.locator('#login-username')).toBeVisible();
+  expect(await loaded(['Atkinson Hyperlegible', 'Plus Jakarta Sans'])).toEqual(['Atkinson Hyperlegible', 'Plus Jakarta Sans']);
+
+  await page.goto('/');
+  await expect(page.locator('.cm h1').first()).toBeVisible();
+  expect(await loaded(['Inter', 'Space Grotesk'])).toEqual(['Inter', 'Space Grotesk']);
+
+  expect(external, `fetched from a font service: ${external.join(', ')}`).toEqual([]);
+});

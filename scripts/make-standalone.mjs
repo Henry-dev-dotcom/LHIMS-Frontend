@@ -20,7 +20,9 @@ function escapeForInlineScript(jsText) {
 }
 
 for (const css of cssFiles) {
-  const cssText = fs.readFileSync(path.join(assetDir, css), 'utf8');
+  // The stylesheet lives in assets/ and names its fonts relative to itself (url(./x.woff2)). Once it
+  // is inlined into a page one folder up, those names must say assets/ or every font is missing.
+  const cssText = fs.readFileSync(path.join(assetDir, css), 'utf8').replace(/url\(\.\/(?!assets\/)/g, 'url(./assets/');
   html = html.replace(
     new RegExp(`<link[^>]+${css.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^>]*>`, 'g'),
     `<style>\n${cssText}\n</style>`
