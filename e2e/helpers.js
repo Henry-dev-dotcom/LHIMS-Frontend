@@ -44,11 +44,10 @@ async function signInDoctorAs(page, facilityKind) {
     };
     await route.fulfill({ response, body: JSON.stringify(payload) });
   });
-  try {
-    await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
-  } finally {
-    await page.unroute(loginUrl);
-  }
+  // The override stays for the life of the page. Removing it here switched request interception
+  // off at the very moment the app, just signed in, was fetching the first page's code, and a
+  // request caught in between was never released: the page sat on its loading skeleton.
+  await signIn(page, { code: 'DEMO', username: 'doctor', password: 'doctor123' });
 }
 
 /** A doctor in a hospital: lands on the clinician queue. */

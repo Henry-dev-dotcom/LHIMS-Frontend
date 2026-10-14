@@ -18,7 +18,9 @@ export function ToastHost() {
 
   useEffect(() => {
     if (!toast) return undefined;
-    const timer = window.setTimeout(() => dispatch({ type: 'CLEAR_TOAST' }), 2800);
+    // Clears this message only. A timer that fires just after a newer message has replaced
+    // this one (before the cleanup below has run) must not take the newer one with it.
+    const timer = window.setTimeout(() => dispatch({ type: 'CLEAR_TOAST', toast }), 2800);
     return () => window.clearTimeout(timer);
   }, [toast, dispatch]);
 

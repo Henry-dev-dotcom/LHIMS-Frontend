@@ -299,6 +299,8 @@ function reducer(state, action) {
     case 'SHOW_TOAST':
       return { ...state, ui: { ...state.ui, toast: action.toast } };
     case 'CLEAR_TOAST':
+      // A timer names the message it belongs to; a newer message is left alone.
+      if (action.toast && action.toast !== state.ui.toast) return state;
       return { ...state, ui: { ...state.ui, toast: null } };
     case 'ADD_SAMPLE_LOG': {
       if (!action.payload.orderId) return { ...state, ui: { ...state.ui, toast: toast('error', 'Select an order before logging a sample.') } };
