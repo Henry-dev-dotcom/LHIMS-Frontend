@@ -144,6 +144,11 @@ export const PAGE_META = {
     description: 'Drug list, stock by batch and expiry, receiving, adjustments and the stock ledger.',
     requirements: ['Drug list', 'Receive batches', 'Adjust and write off', 'Stock history', 'Reorder and expiry alerts']
   },
+  clinics: {
+    title: 'Clinics', section: 'Clinics',
+    description: 'Every clinic this facility runs on one page: choose the clinic and its list opens below.',
+    requirements: ['Clinic chooser', 'Only switched-on clinics', 'Remembers the last clinic']
+  },
   'clinician-queue': {
     title: 'Clinician Queue', section: 'Clinician',
     description: 'Patients waiting for the doctor, out for tests, and ready for review, with the visit workspace opened from the queue.',

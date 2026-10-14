@@ -160,6 +160,8 @@ export const NAV_ITEMS = [
   { id: 'gustav-supply-requests', label: 'Gustav Biomed Requests', icon: PackageOpen, roles: ['billing','admin'], section: 'Stores' },
   { id: 'store-requests', label: 'Request Supplies', icon: PackageOpen, roles: ['nurse','doctor','pharmacist','receptionist','lab','scan','billing','admin'], section: 'Stores' },
   { id: 'insurance-claims', label: 'Insurance Claims', icon: ShieldCheck, roles: ['billing','admin'], section: 'Claims' },
+  // One page for every clinic; menus that list clinics one by one leave it out (hidden).
+  { id: 'clinics', label: 'Clinics', icon: Stethoscope, roles: ['nurse','doctor','receptionist','admin'], section: 'Clinics', hidden: true },
   { id: 'clinic-antenatal', label: 'Antenatal Clinic', icon: HeartHandshake, roles: ['nurse','doctor','receptionist','admin'], section: 'Maternity' },
   { id: 'clinic-postnatal', label: 'Postnatal Clinic', icon: Baby, roles: ['nurse','doctor','receptionist','admin'], section: 'Maternity' },
   { id: 'maternity-register', label: 'Maternity Register', icon: BookHeart, roles: ['nurse','doctor','admin'], section: 'Maternity' },

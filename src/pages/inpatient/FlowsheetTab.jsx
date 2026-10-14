@@ -62,7 +62,7 @@ function Trend({ series, points }) {
   );
 }
 
-export function FlowsheetTab({ admission, encounter, auth, open, busy, act, toast, onChanged }) {
+export function FlowsheetTab({ admission, encounter, auth, open, busy, act, toast, onChanged, afterTrends = null }) {
   const readings = useMemo(() => [...(encounter.vitalSigns || [])].reverse(), [encounter.vitalSigns]);
   return (
     <div className="space-y-4">
@@ -73,6 +73,7 @@ export function FlowsheetTab({ admission, encounter, auth, open, busy, act, toas
           ))}
         </div>
       </Card>
+      {afterTrends}
       <VitalsCard encounter={encounter} auth={auth} open={open} busy={busy} act={async (fn, msg) => { const ok = await act(fn, msg); if (ok) onChanged?.(); return ok; }} latest={encounter.vitalSigns?.[0]} />
       <FluidBalance admission={admission} auth={auth} toast={toast} onChanged={onChanged} />
     </div>

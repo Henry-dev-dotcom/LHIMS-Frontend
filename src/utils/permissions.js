@@ -41,7 +41,9 @@ const PAGE_MODULE_OVERRIDES = {
   'clinic-dental': 'dental',
   'clinic-eye': 'eye',
   'clinic-physiotherapy': 'physiotherapy',
-  'clinic-dietetics': 'dietetics'
+  'clinic-dietetics': 'dietetics',
+  // The Clinics page lists only the clinics that are switched on; it needs no module of its own.
+  clinics: null
 };
 
 const HOSPITAL_LEGACY_CLINICIAN_PAGES = new Set([
