@@ -38,7 +38,7 @@ export function ServiceWorkerUpdateBanner() {
   };
 
   return (
-    <section className="mobile-system-banner mx-3 mt-2 rounded-[1.15rem] border border-clinical-200/80 bg-clinical-50/95 px-3 py-2 text-clinical-950 shadow-sm backdrop-blur-xl sm:mx-5 lg:mx-8 print:hidden" role="status" aria-live="polite">
+    <section className="mobile-system-banner mx-3 mt-2 rounded-[1.15rem] border border-clinical-200/80 bg-clinical-50/95 px-3 py-2 text-clinical-950 shadow-xs backdrop-blur-xl sm:mx-5 lg:mx-8 print:hidden" role="status" aria-live="polite">
       <div className="mx-auto flex max-w-[1540px] flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-2.5">
           <DownloadCloud className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />

@@ -25,7 +25,7 @@ export function ClippedList({ items = [], limit = 3, empty = '—' }) {
       aria-label={more ? `${names.length} items: ${full}` : undefined}
       // One fixed width, whatever is in it; two lines at most so a row cannot
       // grow tall either.
-      className="line-clamp-2 block w-[22rem] max-w-full whitespace-normal break-words text-sm font-semibold leading-5 text-slate-700"
+      className="line-clamp-2 block w-88 max-w-full whitespace-normal wrap-break-word text-sm font-semibold leading-5 text-slate-700"
     >
       {shown.join(', ')}{more ? ', ...' : ''}
     </span>

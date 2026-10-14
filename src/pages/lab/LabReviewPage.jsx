@@ -41,7 +41,7 @@ function AttachmentReviewBlock({ files = [] }) {
             <div className="flex items-start gap-3">
               <FileText className="mt-1 h-5 w-5 shrink-0 text-clinical-700" />
               <div className="min-w-0 flex-1">
-                <p className="break-words text-sm font-bold text-slate-900">{file.name || file.fileName || 'Imported result document'}</p>
+                <p className="wrap-break-word text-sm font-bold text-slate-900">{file.name || file.fileName || 'Imported result document'}</p>
                 <p className="text-xs font-semibold text-slate-500">{file.testName || 'Lab result'} · {formatFileSize(file.size || file.fileSize)}</p>
               </div>
               {(file.dataUrl || file.url) && <Button size="sm" variant="secondary" onClick={() => openResultAttachment(file)}>Open</Button>}

@@ -20,7 +20,7 @@ const checks = [
     message: 'Price catalog rows must open details from the View/View-Edit action.'
   },
   {
-    pass: (header.includes('z-20') || header.includes('z-[90]')) && sidebar.includes('z-40') && appShell.includes('overflow-x-hidden'),
+    pass: (header.includes('z-20') || header.includes('z-90')) && sidebar.includes('z-40') && appShell.includes('lg:ml-76'),
     message: 'Header/sidebar shell must prevent the page header from covering the left navigation during horizontal movement.'
   },
   {

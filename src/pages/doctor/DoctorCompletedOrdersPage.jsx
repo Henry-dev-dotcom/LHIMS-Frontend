@@ -97,7 +97,7 @@ export function DoctorCompletedOrdersPage() {
         {[
           ['Completed', summary.all], ['Lab Results', summary.lab], ['Scan Reports', summary.scan], ['Abnormal Flags', summary.abnormal]
         ].map(([label, value]) => (
-          <div key={label} className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+          <div key={label} className="rounded-2xl border border-slate-200 bg-white p-3 shadow-xs">
             <p className="text-xl font-bold text-slate-900">{value}</p>
             <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{label}</p>
           </div>

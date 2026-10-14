@@ -448,7 +448,7 @@ export function ClinicianWorkspace({ encounterId, onClose, initialTab = 'consult
 
       {/* The routing bar: where the patient goes next. */}
       {open && canConsult && (
-        <div className="sticky bottom-[calc(var(--mobile-bottom-nav-space,6.75rem)+0.5rem)] z-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-lg backdrop-blur lg:bottom-2">
+        <div className="sticky bottom-[calc(var(--mobile-bottom-nav-space,6.75rem)+0.5rem)] z-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-lg backdrop-blur-sm lg:bottom-2">
           <div className="flex flex-wrap items-center gap-3">
             <span role="status" className="text-xs text-slate-600" aria-live="polite">
               {draftSaveState === 'saving' ? 'Saving draft…' : draftSaveState === 'error' ? 'Draft not saved' : savedAt ? `Draft saved ${formatDateTime(savedAt)}` : 'Draft auto-saves as you type'}

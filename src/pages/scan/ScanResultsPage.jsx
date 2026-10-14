@@ -85,7 +85,7 @@ function ReverseResultModal({ open, result, onClose, onConfirm, submitting }) {
 
 function ScanResultCard({ row, onOpen }) {
   return (
-    <article className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-clinical-200 hover:bg-slate-50/70">
+    <article className="rounded-3xl border border-slate-200 bg-white p-4 shadow-xs transition hover:border-clinical-200 hover:bg-slate-50/70">
       <div className="grid gap-4 xl:grid-cols-[minmax(220px,0.9fr)_minmax(320px,1.2fr)_minmax(260px,0.9fr)]">
         <div className="min-w-0">
           <p className="truncate text-base font-bold text-slate-900">{row.order?.patient?.fullName || 'Unknown patient'}</p>

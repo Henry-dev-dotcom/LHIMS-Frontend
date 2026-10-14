@@ -97,7 +97,7 @@ function LoginPanel({ activate, token, onSuccess }) {
   return (
     <main className="grid min-h-screen place-items-center bg-slate-50 px-4 py-10">
       <section className="w-full max-w-md overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5">
-        <div className="border-b border-slate-100 bg-gradient-to-r from-clinical-50 to-white px-7 py-6 sm:px-8">
+        <div className="border-b border-slate-100 bg-linear-to-r from-clinical-50 to-white px-7 py-6 sm:px-8">
           <img src={`${import.meta.env.BASE_URL}icons/curatamed-logo.png`} alt="CurataMed" className="mb-5 h-10 w-auto object-contain object-left" />
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-clinical-700"><ShieldCheck className="h-4 w-4" /> Partner workspace</div>
           <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-950">{activate ? 'Set up your access' : 'Gustav Biomed service desk'}</h1>
@@ -231,7 +231,7 @@ export function VendorPortalPage() {
     setCounts({});
   };
 
-  if (sessionLoading) return <main className="grid min-h-screen place-items-center bg-slate-50"><div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-600 shadow-sm"><RefreshCw className="h-4 w-4 animate-spin motion-reduce:animate-none text-clinical-600" />Checking secure vendor access…</div></main>;
+  if (sessionLoading) return <main className="grid min-h-screen place-items-center bg-slate-50"><div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-600 shadow-xs"><RefreshCw className="h-4 w-4 animate-spin motion-reduce:animate-none text-clinical-600" />Checking secure vendor access…</div></main>;
   if (!user) return <LoginPanel activate={activationRoute} token={activationToken} onSuccess={(profile) => { setUser(profile); window.location.hash = '#/vendor'; }} />;
 
   return (
@@ -260,7 +260,7 @@ export function VendorPortalPage() {
         <div className="flex items-start gap-3 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm leading-6 text-sky-950"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-sky-700" /><p><strong>Limited partner access.</strong> This workspace shows only requests assigned to Gustav Biomed. Patient records and internal facility notes are not included. Do not add patient information to status updates.</p></div>
 
         <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Request summary">
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Total requests</p><p className="mt-1 text-2xl font-extrabold text-slate-950">{totalCount}</p></div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs"><p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Total requests</p><p className="mt-1 text-2xl font-extrabold text-slate-950">{totalCount}</p></div>
           <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-4"><p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Needs action</p><p className="mt-1 text-2xl font-extrabold text-amber-950">{activeCount}</p></div>
           <div className="rounded-2xl border border-sky-200 bg-sky-50/60 p-4"><p className="text-xs font-semibold uppercase tracking-wide text-sky-800">Scheduled</p><p className="mt-1 text-2xl font-extrabold text-sky-950">{Number(counts.SCHEDULED || 0)}</p></div>
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4"><p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Completed</p><p className="mt-1 text-2xl font-extrabold text-emerald-950">{Number(counts.COMPLETED || 0)}</p></div>
@@ -269,7 +269,7 @@ export function VendorPortalPage() {
         {notice && <div role="status" className="flex items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900"><span className="flex items-center gap-2"><Check className="h-4 w-4" />{notice}</span><button type="button" className="rounded-lg p-1 hover:bg-emerald-100" aria-label="Dismiss notice" onClick={() => setNotice('')}><X className="h-4 w-4" /></button></div>}
         {error && <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{error}</div>}
 
-        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs">
           <div className="border-b border-slate-100 p-4 sm:p-5">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div><h2 className="text-lg font-bold text-slate-950">Request queue</h2><p className="mt-0.5 text-xs text-slate-500">Select a request to review its details and available actions.</p></div>
@@ -279,14 +279,14 @@ export function VendorPortalPage() {
               </div>
             </div>
             <div className="mt-4 flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Filter by request status">
-              {FILTERS.map(([key, label]) => <button key={key} type="button" aria-pressed={status === key} onClick={() => setStatus(key)} className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition focus:outline-none focus-visible:ring-4 focus-visible:ring-clinical-200 ${status === key ? 'bg-clinical-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{label}{key !== 'ALL' && <span className="ml-1.5 opacity-75">{Number(counts[key] || 0)}</span>}</button>)}
+              {FILTERS.map(([key, label]) => <button key={key} type="button" aria-pressed={status === key} onClick={() => setStatus(key)} className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition focus:outline-hidden focus-visible:ring-4 focus-visible:ring-clinical-200 ${status === key ? 'bg-clinical-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{label}{key !== 'ALL' && <span className="ml-1.5 opacity-75">{Number(counts[key] || 0)}</span>}</button>)}
             </div>
           </div>
 
-          <div className="grid min-h-[26rem] lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+          <div className="grid min-h-104 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
             <div className="border-b border-slate-100 lg:border-b-0 lg:border-r">
               {loading && requests.length === 0 ? <div className="flex h-48 items-center justify-center gap-2 text-sm text-slate-500"><RefreshCw className="h-4 w-4 animate-spin motion-reduce:animate-none" />Loading requests…</div> : requests.length === 0 ? <div className="px-6 py-16 text-center"><Activity className="mx-auto h-8 w-8 text-slate-300" /><p className="mt-3 font-semibold text-slate-700">No matching requests</p><p className="mt-1 text-sm text-slate-500">Try another status or search term.</p></div> : <div className="divide-y divide-slate-100">
-                {requests.map((request) => <button key={request.id} type="button" onClick={() => setSelectedId(request.id)} aria-pressed={selectedId === request.id} className={`block w-full p-4 text-left transition hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-clinical-200 sm:p-5 ${selectedId === request.id ? 'bg-clinical-25' : 'bg-white'}`}>
+                {requests.map((request) => <button key={request.id} type="button" onClick={() => setSelectedId(request.id)} aria-pressed={selectedId === request.id} className={`block w-full p-4 text-left transition hover:bg-slate-50 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-clinical-200 sm:p-5 ${selectedId === request.id ? 'bg-clinical-25' : 'bg-white'}`}>
                   <div className="flex items-center justify-between gap-3"><span className="rounded-lg bg-slate-100 px-2 py-1 font-mono text-xs font-bold text-slate-700">{request.requestCode}</span><StatusPill status={request.status} /></div>
                   <div className="mt-3"><RequestSummary request={request} /></div>
                   <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500"><span className="inline-flex items-center gap-1.5"><Building2 className="h-3.5 w-3.5" />{request.facility?.name || 'LHIMS facility'}{request.facility?.code ? ` · ${request.facility.code}` : ''}</span><span>{request.requestingUnit}</span><span>{formatDate(request.createdAt)}</span></div>

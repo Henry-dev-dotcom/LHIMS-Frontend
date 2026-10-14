@@ -83,7 +83,7 @@ function ParameterRangeEditor({ parameters, onChange, disabled }) {
             No parameters defined yet. Add each result parameter for this lab test.
           </div>
         ) : rows.map((parameter, index) => (
-          <div key={`${parameter.name || 'parameter'}-${index}-mobile`} className="rounded-[1.35rem] border border-slate-200 bg-white p-3 shadow-sm">
+          <div key={`${parameter.name || 'parameter'}-${index}-mobile`} className="rounded-[1.35rem] border border-slate-200 bg-white p-3 shadow-xs">
             <div className="mb-3 flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Parameter {index + 1}</p>
@@ -163,7 +163,7 @@ function ParameterRangeEditor({ parameters, onChange, disabled }) {
 
 function ConfigReadinessCard({ label, ok, detail }) {
   return (
-    <div className="rounded-[1.25rem] border border-slate-200 bg-white p-3 shadow-sm">
+    <div className="rounded-[1.25rem] border border-slate-200 bg-white p-3 shadow-xs">
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs font-bold text-slate-900">{label}</p>
         <StatusBadge status={ok ? 'Ready' : 'Needs Setup'} />

@@ -241,18 +241,18 @@ export function ReceptionWalkInsPage() {
       </Card>}
 
       {section === 'request' && <form onSubmit={submitWalkInRequest} className="mx-auto w-full max-w-5xl space-y-5">
-        <section className="overflow-visible rounded-[2rem] border border-slate-200/80 bg-white/80 p-3 shadow-soft backdrop-blur sm:p-5">
-          <div className="mb-4 flex flex-col gap-3 rounded-[1.5rem] bg-clinical-25 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <section className="overflow-visible rounded-4xl border border-slate-200/80 bg-white/80 p-3 shadow-soft backdrop-blur-sm sm:p-5">
+          <div className="mb-4 flex flex-col gap-3 rounded-3xl bg-clinical-25 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-clinical-600">Walk-in request workspace</p>
               <h2 className="mt-1 text-xl font-bold tracking-tight text-slate-900">{activeRequestStep.label}</h2>
               <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">Only one request window is shown at a time. Continue moves the receptionist through the same Walk-in Request section without stacking all forms on the screen.</p>
             </div>
-            <span className="inline-flex w-fit items-center rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm ring-1 ring-slate-200">Step {requestStep} of {REQUEST_STEPS.length}</span>
+            <span className="inline-flex w-fit items-center rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-xs ring-1 ring-slate-200">Step {requestStep} of {REQUEST_STEPS.length}</span>
           </div>
 
           <nav aria-label="Walk-in request progress">
-            <ol className="flex items-center gap-1 overflow-x-auto rounded-3xl border border-slate-200 bg-white p-2 shadow-sm sm:gap-2 sm:p-3">
+            <ol className="flex items-center gap-1 overflow-x-auto rounded-3xl border border-slate-200 bg-white p-2 shadow-xs sm:gap-2 sm:p-3">
               {REQUEST_STEPS.map((item, index) => {
                 const isCurrent = requestStep === item.id;
                 const isDone = requestStep > item.id;
@@ -271,7 +271,7 @@ export function ReceptionWalkInsPage() {
                       </span>
                       <span className={`hidden truncate text-sm font-bold sm:block ${isCurrent ? 'text-clinical-700' : isDone ? 'text-slate-700' : 'text-slate-500'}`}>{item.label}</span>
                     </button>
-                    {index < REQUEST_STEPS.length - 1 && <span className={`h-0.5 flex-1 rounded ${requestStep > item.id ? 'bg-clinical-300' : 'bg-slate-200'}`} />}
+                    {index < REQUEST_STEPS.length - 1 && <span className={`h-0.5 flex-1 rounded-sm ${requestStep > item.id ? 'bg-clinical-300' : 'bg-slate-200'}`} />}
                   </li>
                 );
               })}
@@ -411,7 +411,7 @@ export function ReceptionWalkInsPage() {
               </Card>
             </div>}
 
-            <div className="flex items-center justify-between gap-3 rounded-3xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+            <div className="flex items-center justify-between gap-3 rounded-3xl border border-slate-200 bg-white p-3 shadow-xs sm:p-4">
               <Button type="button" variant="secondary" onClick={goRequestBack} disabled={requestStep === 1}><ArrowLeft className="h-4 w-4" /> Back</Button>
               <p className="hidden text-xs font-semibold uppercase tracking-[0.08em] text-slate-500 sm:block">{activeRequestStep.label}</p>
               {requestStep < REQUEST_STEPS.length ? (

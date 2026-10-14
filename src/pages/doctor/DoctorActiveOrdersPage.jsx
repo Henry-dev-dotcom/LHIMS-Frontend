@@ -131,7 +131,7 @@ export function DoctorActiveOrdersPage() {
         {[
           ['All Active', summary.all], ['Submitted', summary.submitted], ['In Progress', summary.inProgress], ['Pending Review', summary.review], ['Urgent', summary.urgent]
         ].map(([label, value]) => (
-          <div key={label} className="flex min-h-[3rem] items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+          <div key={label} className="flex min-h-12 items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-xs">
             <p className="text-lg font-bold leading-none text-slate-900">{value}</p>
             <p className="truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{label}</p>
           </div>
@@ -143,9 +143,9 @@ export function DoctorActiveOrdersPage() {
         subtitle="Use filters to follow current work by status, urgency, patient, or test."
         actions={(
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <div className="relative w-full sm:w-64"><Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-500" /><input className={`${inputClass} h-10 !w-full py-2 pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search order, patient, test..." aria-label="Search order, patient, test" /></div>
-            <select className={`${inputClass} h-10 !w-full py-2 sm:!w-40`} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} aria-label="Filter by status"><option value="">All statuses</option>{statusOptions.map((status) => <option key={status}>{status}</option>)}</select>
-            <select className={`${inputClass} h-10 !w-full py-2 sm:!w-40`} value={urgencyFilter} onChange={(event) => setUrgencyFilter(event.target.value)} aria-label="Filter by urgency"><option value="">All urgency</option><option>Routine</option><option>Urgent</option></select>
+            <div className="relative w-full sm:w-64"><Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-500" /><input className={`${inputClass} h-10 w-full! py-2 pl-9`} value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search order, patient, test..." aria-label="Search order, patient, test" /></div>
+            <select className={`${inputClass} h-10 w-full! py-2 sm:w-40!`} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} aria-label="Filter by status"><option value="">All statuses</option>{statusOptions.map((status) => <option key={status}>{status}</option>)}</select>
+            <select className={`${inputClass} h-10 w-full! py-2 sm:w-40!`} value={urgencyFilter} onChange={(event) => setUrgencyFilter(event.target.value)} aria-label="Filter by urgency"><option value="">All urgency</option><option>Routine</option><option>Urgent</option></select>
           </div>
         )}
       >

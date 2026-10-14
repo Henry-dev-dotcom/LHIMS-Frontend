@@ -90,7 +90,7 @@ export function PricingPage() {
                   role="radio"
                   aria-checked="false"
                   onClick={() => chooseKind(k.key)}
-                  className="rounded-3xl border border-slate-200 bg-white p-6 text-left transition hover:border-clinical-400 hover:shadow-lift focus:outline-none focus-visible:ring-4 focus-visible:ring-clinical-100"
+                  className="rounded-3xl border border-slate-200 bg-white p-6 text-left transition hover:border-clinical-400 hover:shadow-lift focus:outline-hidden focus-visible:ring-4 focus-visible:ring-clinical-100"
                 >
                   <span className="text-xl font-bold text-slate-900">{k.name}</span>
                   <span className="mt-2 block text-sm leading-6 text-slate-600">{k.summary}</span>

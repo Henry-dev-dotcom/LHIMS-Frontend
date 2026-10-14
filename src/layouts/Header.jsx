@@ -201,7 +201,7 @@ export function Header() {
   const unread = roleNotifications.filter((item) => !item.read && item.status !== 'Delivered').length;
 
   return (
-    <header className="relative z-[90] border-b border-white/60 bg-white/85 px-3 py-2 shadow-sm backdrop-blur-2xl sm:px-5 lg:px-8 print:hidden">
+    <header className="relative z-90 border-b border-white/60 bg-white/85 px-3 py-2 shadow-xs backdrop-blur-2xl sm:px-5 lg:px-8 print:hidden">
       <div className="lg:hidden">
         <div className="rounded-[1.35rem] border border-slate-200/70 bg-white/95 px-3 py-2.5 shadow-card">
           <div className="flex items-center justify-between gap-2">
@@ -210,10 +210,10 @@ export function Header() {
               <span className="truncate">{pageHeader?.eyebrow || roleInfo?.label || 'Workspace'}</span>
             </div>
 
-            <div className="relative z-[95] flex shrink-0 items-center gap-1.5">
+            <div className="relative z-95 flex shrink-0 items-center gap-1.5">
               <div ref={notificationMobileTriggerRef} className="relative">
                 <button
-                  className="relative grid h-9 w-9 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-600 shadow-sm transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-95"
+                  className="relative grid h-9 w-9 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-600 shadow-xs transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-95"
                   title="Role notifications"
                   type="button"
                   aria-label={unread > 0 ? `${unread} unread notifications` : 'Open notifications'}
@@ -226,7 +226,7 @@ export function Header() {
               </div>
 
               <button
-                className="grid h-9 w-9 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-600 shadow-sm transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-95"
+                className="grid h-9 w-9 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-600 shadow-xs transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-95"
                 type="button"
                 title="Home"
                 aria-label="Go home"
@@ -237,7 +237,7 @@ export function Header() {
 
               <div ref={userMenuRef} className="relative">
                 <button
-                  className="grid h-9 w-9 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-700 shadow-sm transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-800 active:scale-95"
+                  className="grid h-9 w-9 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-700 shadow-xs transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-800 active:scale-95"
                   title="User menu"
                   type="button"
                   aria-label="Open user menu"
@@ -245,7 +245,7 @@ export function Header() {
                   aria-expanded={userMenuOpen}
                   onClick={() => setUserMenuOpen((value) => !value)}
                 >
-                  <span className="grid h-7 w-7 place-items-center rounded-xl bg-clinical-600 text-xs font-semibold text-white shadow-sm">{userInitial}</span>
+                  <span className="grid h-7 w-7 place-items-center rounded-xl bg-clinical-600 text-xs font-semibold text-white shadow-xs">{userInitial}</span>
                 </button>
               </div>
             </div>
@@ -260,7 +260,7 @@ export function Header() {
                 <div ref={screenGuideRef} className="relative mt-1.5 inline-block text-xs font-semibold leading-5 text-slate-500">
                   <button
                     type="button"
-                    className="inline-flex min-h-0 cursor-pointer items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-500 shadow-sm transition duration-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-[0.98]"
+                    className="inline-flex min-h-0 cursor-pointer items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-500 shadow-xs transition duration-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-[0.98]"
                     aria-label="Open screen guide"
                     aria-expanded={screenGuideOpen}
                     aria-controls="mobile-screen-guide-panel"
@@ -273,11 +273,11 @@ export function Header() {
                     id="mobile-screen-guide-panel"
                     role="status"
                     className={clsx(
-                      'pointer-events-none absolute left-0 top-[calc(100%+0.45rem)] z-[140] w-[min(20rem,calc(100vw-2rem))] origin-top-left rounded-2xl border border-clinical-100 bg-white p-3 text-xs font-semibold leading-5 text-slate-600 opacity-0 shadow-lift ring-1 ring-slate-950/5 backdrop-blur-xl transition duration-200 ease-out',
+                      'pointer-events-none absolute left-0 top-[calc(100%+0.45rem)] z-140 w-[min(20rem,calc(100vw-2rem))] origin-top-left rounded-2xl border border-clinical-100 bg-white p-3 text-xs font-semibold leading-5 text-slate-600 opacity-0 shadow-lift ring-1 ring-slate-950/5 backdrop-blur-xl transition duration-200 ease-out',
                       screenGuideOpen ? 'pointer-events-auto translate-y-0 scale-100 opacity-100' : '-translate-y-1 scale-[0.98] opacity-0'
                     )}
                   >
-                    <p className="break-words">{pageHeader.description}</p>
+                    <p className="wrap-break-word">{pageHeader.description}</p>
                   </div>
                 </div>
               )
@@ -306,11 +306,11 @@ export function Header() {
               )}
             </div>
           </div>
-          <div className="relative z-[95] flex shrink-0 flex-col items-end gap-2 pt-0.5">
+          <div className="relative z-95 flex shrink-0 flex-col items-end gap-2 pt-0.5">
             <div className="flex items-center gap-2">
             <div ref={notificationDesktopTriggerRef} className="relative">
               <button
-                className="relative grid h-10 w-10 place-items-center rounded-2xl border border-slate-200/80 bg-white/90 text-slate-600 shadow-sm transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-700"
+                className="relative grid h-10 w-10 place-items-center rounded-2xl border border-slate-200/80 bg-white/90 text-slate-600 shadow-xs transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-700"
                 title="Role notifications"
                 type="button"
                 aria-label={unread > 0 ? `${unread} unread notifications` : 'Open notifications'}
@@ -326,7 +326,7 @@ export function Header() {
             </Button>
             <div ref={userMenuRef} className="relative">
               <button
-                className="flex h-11 items-center gap-2 rounded-2xl border border-slate-200/80 bg-white/95 px-3 text-slate-700 shadow-sm transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-800"
+                className="flex h-11 items-center gap-2 rounded-2xl border border-slate-200/80 bg-white/95 px-3 text-slate-700 shadow-xs transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-800"
                 title="User menu"
                 type="button"
                 aria-label="Open user menu"
@@ -334,16 +334,16 @@ export function Header() {
                 aria-expanded={userMenuOpen}
                 onClick={() => setUserMenuOpen((value) => !value)}
               >
-                <span className="grid h-7 w-7 place-items-center rounded-xl bg-clinical-600 text-xs font-semibold text-white shadow-sm">{userInitial}</span>
+                <span className="grid h-7 w-7 place-items-center rounded-xl bg-clinical-600 text-xs font-semibold text-white shadow-xs">{userInitial}</span>
                 <span className="hidden min-w-0 text-left lg:block">
-                  <span className="block max-w-[8rem] truncate text-xs font-semibold text-slate-900">{state.auth?.userName || 'User'}</span>
-                  <span className="block max-w-[8rem] truncate text-[10px] font-bold capitalize text-slate-500">{state.auth?.username || role || 'workspace'}</span>
+                  <span className="block max-w-32 truncate text-xs font-semibold text-slate-900">{state.auth?.userName || 'User'}</span>
+                  <span className="block max-w-32 truncate text-[10px] font-bold capitalize text-slate-500">{state.auth?.username || role || 'workspace'}</span>
                 </span>
                 <ChevronDown className="h-4 w-4 text-slate-500" />
               </button>
             </div>
           </div>
-          {pageHeader?.actions && <div className="flex w-full max-w-full flex-wrap justify-end gap-2 xl:max-w-[28rem]">{pageHeader.actions}</div>}
+          {pageHeader?.actions && <div className="flex w-full max-w-full flex-wrap justify-end gap-2 xl:max-w-md">{pageHeader.actions}</div>}
           </div>
         </div>
       </div>
@@ -360,20 +360,20 @@ export function Header() {
         <>
           <button
             type="button"
-            className="getlabs-floating-overlay fixed inset-0 z-[129] bg-slate-950/40 backdrop-blur-sm md:hidden"
+            className="getlabs-floating-overlay fixed inset-0 z-129 bg-slate-950/40 backdrop-blur-xs md:hidden"
             aria-label="Close user menu"
             onClick={() => setUserMenuOpen(false)}
           />
           <div
           ref={userDropdownRef}
-          className="getlabs-floating-panel fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-[130] max-h-[calc(86dvh-env(safe-area-inset-bottom))] overflow-hidden rounded-[1.5rem] border border-slate-200/80 bg-white shadow-lift ring-1 ring-slate-950/5 md:inset-x-auto md:bottom-auto md:right-[var(--user-menu-right)] md:top-[var(--user-menu-top)] md:w-[calc(100vw-1.5rem)] md:max-w-72 md:rounded-3xl"
+          className="getlabs-floating-panel fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-130 max-h-[calc(86dvh-env(safe-area-inset-bottom))] overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-lift ring-1 ring-slate-950/5 md:inset-x-auto md:bottom-auto md:right-(--user-menu-right) md:top-(--user-menu-top) md:w-[calc(100vw-1.5rem)] md:max-w-72 md:rounded-3xl"
           style={{ '--user-menu-top': `${userMenuPosition.top}px`, '--user-menu-right': `${userMenuPosition.right}px` }}
           role="dialog"
           aria-label="User session menu"
         >
           <div className="border-b border-slate-100 bg-slate-50/80 p-4">
             <div className="flex items-center gap-3">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-clinical-500 text-lg font-semibold text-white shadow-sm">{userInitial}</div>
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-clinical-500 text-lg font-semibold text-white shadow-xs">{userInitial}</div>
               <div className="min-w-0">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Signed in as</p>
                 <p className="truncate text-base font-semibold text-slate-950">{state.auth?.userName || 'User'}</p>

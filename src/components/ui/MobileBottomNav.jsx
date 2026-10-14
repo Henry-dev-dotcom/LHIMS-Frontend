@@ -61,11 +61,11 @@ export function MobileBottomNav() {
   const activeIndex = links.findIndex((item) => (item.id === '__menu__' ? state.ui.sidebarOpen : state.currentPage === item.id));
 
   return (
-    <nav className="mobile-bottom-nav fixed inset-x-2 bottom-[calc(0.5rem+env(safe-area-inset-bottom))] z-40 rounded-[1.5rem] border border-white/70 bg-white/95 p-1.5 shadow-panel backdrop-blur-xl sm:inset-x-3 lg:hidden print:hidden" aria-label="Mobile quick navigation">
+    <nav className="mobile-bottom-nav fixed inset-x-2 bottom-[calc(0.5rem+env(safe-area-inset-bottom))] z-40 rounded-3xl border border-white/70 bg-white/95 p-1.5 shadow-panel backdrop-blur-xl sm:inset-x-3 lg:hidden print:hidden" aria-label="Mobile quick navigation">
       <div className="relative grid grid-cols-5 gap-0 overflow-hidden rounded-[1.15rem]">
         {activeIndex >= 0 && (
           <span
-            className="mobile-bottom-nav-pill pointer-events-none absolute inset-y-0 z-0 rounded-2xl bg-clinical-500 shadow-sm"
+            className="mobile-bottom-nav-pill pointer-events-none absolute inset-y-0 z-0 rounded-2xl bg-clinical-500 shadow-xs"
             aria-hidden="true"
             style={{ width: '20%', transform: `translateX(${activeIndex * 100}%)` }}
           />
@@ -85,8 +85,8 @@ export function MobileBottomNav() {
               aria-current={active ? 'page' : undefined}
               aria-label={item.id === '__menu__' ? 'Open full navigation menu' : `Go to ${item.label}`}
               className={clsx(
-                'relative z-10 flex min-h-[3.25rem] min-w-0 flex-col items-center justify-center rounded-2xl px-1 text-[10px] font-semibold transition duration-200 active:scale-95',
-                active ? 'bg-clinical-600/0 text-white shadow-sm' : 'text-slate-500 hover:bg-clinical-50 hover:text-clinical-700'
+                'relative z-10 flex min-h-13 min-w-0 flex-col items-center justify-center rounded-2xl px-1 text-[10px] font-semibold transition duration-200 active:scale-95',
+                active ? 'bg-clinical-600/0 text-white shadow-xs' : 'text-slate-500 hover:bg-clinical-50 hover:text-clinical-700'
               )}
             >
               <Icon className={clsx('mb-0.5 h-4 w-4 shrink-0 transition-transform duration-200', active && 'scale-110')} />

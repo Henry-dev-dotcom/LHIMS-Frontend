@@ -42,7 +42,7 @@ if (!metricCard.includes('compact = true') || !metricCard.includes('min-h-[4.5re
 }
 
 const doctorActive = read('src/pages/doctor/DoctorActiveOrdersPage.jsx');
-if (!doctorActive.includes('rounded-2xl border border-slate-200 bg-white p-3 shadow-sm')) {
+if (!doctorActive.includes('rounded-2xl border border-slate-200 bg-white p-3 shadow-xs')) {
   failures.push('Doctor active-order summary cards were not reduced.');
 }
 

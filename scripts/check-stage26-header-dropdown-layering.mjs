@@ -12,7 +12,7 @@ const checks = [
     message: 'Header user menu must render through a React portal so it cannot sit under page content.'
   },
   {
-    pass: header.includes('z-[90]') && header.includes('overflow-visible') && header.includes('z-[130]'),
+    pass: header.includes('z-90') && header.includes('overflow-visible') && header.includes('z-130'),
     message: 'Header shell and user dropdown must use visible overflow and elevated z-index layering.'
   },
   {
@@ -20,11 +20,11 @@ const checks = [
     message: 'User menu must have its own outside-click ref and fixed viewport positioning.'
   },
   {
-    pass: notificationDrawer.includes('createPortal(') && notificationDrawer.includes('document.body') && notificationDrawer.includes('z-[130]') && !notificationDrawer.includes('lg:absolute'),
+    pass: notificationDrawer.includes('createPortal(') && notificationDrawer.includes('document.body') && notificationDrawer.includes('z-130') && !notificationDrawer.includes('lg:absolute'),
     message: 'Notification drawer must be portal-rendered and fixed above the page, not absolute inside the header.'
   },
   {
-    pass: appShell.includes('relative z-0') && modal.includes('z-[150]'),
+    pass: appShell.includes('relative z-0') && modal.includes('z-150'),
     message: 'Main page and modal stacking order must keep header menus above content while preserving modal priority.'
   },
   {

@@ -223,8 +223,8 @@ export function ConsultationTab({ encounter, auth, open, busy, act, draft, updat
         <DiagnosesCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} />
 
         {savedNotes.length > 0 && (
-          <details className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
-            <summary className="cursor-pointer list-none rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clinical-600">
+          <details className="rounded-3xl border border-slate-200 bg-white p-4 shadow-xs">
+            <summary className="cursor-pointer list-none rounded-lg focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clinical-600">
               <span className="block text-sm font-bold text-slate-900">Saved notes ({savedNotes.length})</span>
               <span className="mt-1 block text-xs text-slate-600">Latest: {formatDateTime(savedNotes[0].createdAt)} · expand to review or correct with a new note</span>
             </summary>
@@ -243,11 +243,11 @@ export function ConsultationTab({ encounter, auth, open, busy, act, draft, updat
       </div>
 
       <div className="space-y-4">
-        <details className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+        <details className="rounded-3xl border border-slate-200 bg-white p-4 shadow-xs">
           <summary className="cursor-pointer text-sm font-bold text-slate-900">Record vitals</summary>
           <div className="mt-3"><VitalsCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} latest={latestVitals} /></div>
         </details>
-        <details className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+        <details className="rounded-3xl border border-slate-200 bg-white p-4 shadow-xs">
           <summary className="cursor-pointer text-sm font-bold text-slate-900">Record an allergy</summary>
           <div className="mt-3"><AllergiesCard encounter={encounter} auth={auth} busy={busy} act={act} /></div>
         </details>

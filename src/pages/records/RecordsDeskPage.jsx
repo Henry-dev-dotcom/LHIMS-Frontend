@@ -181,7 +181,7 @@ export function RecordsDeskPage() {
                 aria-label="Search patient by name, hospital number, phone or membership number"
               />
             </div>
-            <div className="mt-3 max-h-[26rem] space-y-1.5 overflow-y-auto">
+            <div className="mt-3 max-h-104 space-y-1.5 overflow-y-auto">
               {matches.map((candidate) => (
                 <button
                   key={candidate.id}

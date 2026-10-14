@@ -205,7 +205,7 @@ export function PatientRecordsPage() {
 
       <div className="mb-5 grid gap-4 md:grid-cols-4">
         {metrics.map((metric) => (
-          <div key={metric.label} className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+          <div key={metric.label} className="rounded-2xl border border-slate-200 bg-white p-3 shadow-xs">
             <p className="text-xl font-bold text-slate-900">{metric.value}</p>
             <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">{metric.label}</p>
           </div>

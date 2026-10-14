@@ -122,9 +122,9 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="curata-sidebar fixed inset-y-0 left-0 z-40 hidden h-screen w-[19rem] flex-col border-r border-slate-200/80 bg-white print:hidden lg:flex">{content}</aside>
+      <aside className="curata-sidebar fixed inset-y-0 left-0 z-40 hidden h-screen w-76 flex-col border-r border-slate-200/80 bg-white print:hidden lg:flex">{content}</aside>
       <div
-        className={clsx('fixed inset-0 z-[120] bg-slate-950/55 backdrop-blur-sm transition-opacity print:hidden lg:hidden', state.ui.sidebarOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0')}
+        className={clsx('fixed inset-0 z-120 bg-slate-950/55 backdrop-blur-xs transition-opacity print:hidden lg:hidden', state.ui.sidebarOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0')}
         role="presentation"
         aria-hidden={!state.ui.sidebarOpen}
         onClick={() => dispatch({ type: 'CLOSE_SIDEBAR' })}
@@ -132,7 +132,7 @@ export function Sidebar() {
         <aside
           ref={drawerRef}
           className={clsx(
-            'curata-sidebar flex h-full w-[19rem] max-w-[88vw] transform flex-col bg-white shadow-2xl transition-transform duration-200 ease-out',
+            'curata-sidebar flex h-full w-76 max-w-[88vw] transform flex-col bg-white shadow-2xl transition-transform duration-200 ease-out',
             state.ui.sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           )}
           onClick={(event) => event.stopPropagation()}
@@ -143,7 +143,7 @@ export function Sidebar() {
         >
           <button
             ref={closeButtonRef}
-            className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-2xl bg-slate-100 text-slate-600 transition hover:bg-slate-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-clinical-200"
+            className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-2xl bg-slate-100 text-slate-600 transition hover:bg-slate-200 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-clinical-200"
             type="button"
             onClick={() => dispatch({ type: 'CLOSE_SIDEBAR' })}
             aria-label="Close menu"

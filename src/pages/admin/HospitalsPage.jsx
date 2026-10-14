@@ -125,7 +125,7 @@ function buildDefaultFacility(data) {
 
 function StatCard({ icon: Icon, label, value }) {
   return (
-    <div className="getlabs-lab-card flex min-h-[78px] items-center gap-3 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="getlabs-lab-card flex min-h-[78px] items-center gap-3 rounded-3xl border border-slate-200 bg-white p-4 shadow-xs">
       <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-clinical-50 text-clinical-700">
         <Icon className="h-5 w-5" />
       </div>
@@ -160,11 +160,11 @@ function FacilityCard({ facility, selected, onSelect }) {
     <button
       type="button"
       onClick={onSelect}
-      className={`w-full rounded-3xl border p-4 text-left shadow-sm transition ${selected ? 'border-clinical-300 bg-clinical-50/70 ring-2 ring-clinical-100' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'}`}
+      className={`w-full rounded-3xl border p-4 text-left shadow-xs transition ${selected ? 'border-clinical-300 bg-clinical-50/70 ring-2 ring-clinical-100' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'}`}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="break-words text-lg font-bold leading-tight text-slate-900">{facility.name}</p>
+          <p className="wrap-break-word text-lg font-bold leading-tight text-slate-900">{facility.name}</p>
           <p className="mt-1 text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">{facility.code || facility.id} · {facility.type}</p>
         </div>
         <StatusBadge status={facility.status || 'Active'} />
@@ -183,7 +183,7 @@ function FacilityCard({ facility, selected, onSelect }) {
           <p className="mt-1 font-bold text-slate-900">{facility.catalogItemIds?.length || 0}</p>
         </div>
       </div>
-      <p className="mt-4 line-clamp-2 break-words text-sm text-slate-500">{facility.address || 'No address added yet.'}</p>
+      <p className="mt-4 line-clamp-2 wrap-break-word text-sm text-slate-500">{facility.address || 'No address added yet.'}</p>
     </button>
   );
 }
@@ -330,7 +330,7 @@ function FacilityForm({ value, catalog, onChange }) {
                 onClick={() => toggleListItem('catalogItemIds', item.id)}
                 className={`rounded-2xl border p-3 text-left transition ${selected ? 'border-clinical-200 bg-clinical-50' : 'border-slate-200 bg-slate-50 hover:bg-white'}`}
               >
-                <span className="block break-words text-sm font-bold text-slate-900">{item.name}</span>
+                <span className="block wrap-break-word text-sm font-bold text-slate-900">{item.name}</span>
                 <span className="mt-1 block text-xs font-bold uppercase tracking-[0.12em] text-slate-500">{item.department || item.type}</span>
               </button>
             );
@@ -484,12 +484,12 @@ export function HospitalsPage() {
                 <div key={hospital.id} className="rounded-2xl border border-slate-200 bg-white p-3">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="break-words font-bold text-slate-900">{hospital.name}</p>
+                      <p className="wrap-break-word font-bold text-slate-900">{hospital.name}</p>
                       <p className="text-xs font-bold text-slate-500">{hospital.id}</p>
                     </div>
                     <StatusBadge status={hospital.accountStatus || 'Active'} />
                   </div>
-                  <p className="mt-2 break-words text-xs text-slate-500">{hospital.billingContact || hospital.phone || hospital.address || 'No contact added.'}</p>
+                  <p className="mt-2 wrap-break-word text-xs text-slate-500">{hospital.billingContact || hospital.phone || hospital.address || 'No contact added.'}</p>
                 </div>
               ))}
               {!(data.hospitals || []).length && <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">No hospital partners have been added yet.</p>}
@@ -517,12 +517,12 @@ export function HospitalsPage() {
                   <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     <div className="rounded-2xl bg-slate-50 p-3">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Contact</p>
-                      <p className="mt-1 break-words font-bold text-slate-900">{selectedFacility.contactPerson || 'Not added'}</p>
-                      <p className="break-words text-xs text-slate-500">{selectedFacility.phone || selectedFacility.email || '—'}</p>
+                      <p className="mt-1 wrap-break-word font-bold text-slate-900">{selectedFacility.contactPerson || 'Not added'}</p>
+                      <p className="wrap-break-word text-xs text-slate-500">{selectedFacility.phone || selectedFacility.email || '—'}</p>
                     </div>
                     <div className="rounded-2xl bg-slate-50 p-3">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Admin lead</p>
-                      <p className="mt-1 break-words font-bold text-slate-900">{selectedFacility.administrator || 'Not assigned'}</p>
+                      <p className="mt-1 wrap-break-word font-bold text-slate-900">{selectedFacility.administrator || 'Not assigned'}</p>
                     </div>
                     <div className="rounded-2xl bg-slate-50 p-3">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Departments</p>

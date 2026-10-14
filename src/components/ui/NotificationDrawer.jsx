@@ -94,18 +94,18 @@ export function NotificationDrawer({ open, notifications = [], onClose, onMarkDe
   if (!open || typeof document === 'undefined') return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[130] pointer-events-none print:hidden">
-      <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-sm md:hidden pointer-events-auto" onMouseDown={onClose} aria-hidden="true" />
+    <div className="fixed inset-0 z-130 pointer-events-none print:hidden">
+      <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-xs md:hidden pointer-events-auto" onMouseDown={onClose} aria-hidden="true" />
       <div
         ref={drawerRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="notification-drawer-title"
         tabIndex={-1}
-        className="pointer-events-auto fixed inset-x-0 bottom-0 grid max-h-[calc(88dvh-env(safe-area-inset-bottom))] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-t-[1.65rem] border border-slate-200 bg-white shadow-panel ring-1 ring-slate-950/5 md:inset-x-auto md:bottom-auto md:right-[var(--drawer-right)] md:top-[var(--drawer-top)] md:w-[calc(100vw-1.5rem)] md:max-w-[26rem] md:rounded-[1.75rem]"
+        className="pointer-events-auto fixed inset-x-0 bottom-0 grid max-h-[calc(88dvh-env(safe-area-inset-bottom))] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-t-[1.65rem] border border-slate-200 bg-white shadow-panel ring-1 ring-slate-950/5 md:inset-x-auto md:bottom-auto md:right-(--drawer-right) md:top-(--drawer-top) md:w-[calc(100vw-1.5rem)] md:max-w-104 md:rounded-[1.75rem]"
         style={{ '--drawer-top': `${drawerPosition.top}px`, '--drawer-right': `${drawerPosition.right}px` }}
       >
-        <div className="border-b border-slate-100 bg-gradient-to-br from-white to-clinical-50 px-4 pb-3 pt-2.5 md:px-5 md:py-4">
+        <div className="border-b border-slate-100 bg-linear-to-br from-white to-clinical-50 px-4 pb-3 pt-2.5 md:px-5 md:py-4">
           <div className="mx-auto mb-2 h-1.5 w-12 rounded-full bg-slate-200 md:hidden" aria-hidden="true" />
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
@@ -121,15 +121,15 @@ export function NotificationDrawer({ open, notifications = [], onClose, onMarkDe
           {notifications.length === 0 ? (
             <div className="rounded-2xl bg-slate-50 p-5 text-sm font-semibold text-slate-500">No notifications for this workspace.</div>
           ) : notifications.slice(0, 12).map((note) => (
-            <div data-notification-item key={note.id} className="mb-2 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+            <div data-notification-item key={note.id} className="mb-2 rounded-2xl border border-slate-100 bg-white p-4 shadow-xs">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex min-w-0 items-start gap-3">
                   <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-clinical-50 text-clinical-700">
                     {String(note.channel || note.type || '').toLowerCase().includes('sms') ? <MessageSquareText className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="break-words text-sm font-semibold text-slate-900">{note.title || note.channel || 'Notification'}</p>
-                    <p className="mt-1 break-words text-xs leading-5 text-slate-500">{note.message || note.body || note.status || 'No details supplied.'}</p>
+                    <p className="wrap-break-word text-sm font-semibold text-slate-900">{note.title || note.channel || 'Notification'}</p>
+                    <p className="mt-1 wrap-break-word text-xs leading-5 text-slate-500">{note.message || note.body || note.status || 'No details supplied.'}</p>
                   </div>
                 </div>
                 <div className="shrink-0"><StatusBadge status={note.status || (note.read ? 'Delivered' : 'Queued')} /></div>

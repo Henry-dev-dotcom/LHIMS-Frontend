@@ -60,7 +60,7 @@ export function MedicationTab({ admission, auth, toast, onChanged }) {
       actions={(
         <div className="flex items-center gap-1">
           <Button size="sm" variant="ghost" aria-label="Previous day" onClick={() => setDay(shiftDay(shown, -1))}><ChevronLeft className="h-4 w-4" /></Button>
-          <span className="min-w-[5.5rem] text-center text-sm font-semibold text-slate-800" aria-live="polite">{dayLabel(shown, chart.today)}</span>
+          <span className="min-w-22 text-center text-sm font-semibold text-slate-800" aria-live="polite">{dayLabel(shown, chart.today)}</span>
           <Button size="sm" variant="ghost" aria-label="Next day" disabled={isToday} onClick={() => setDay(shiftDay(shown, 1))}><ChevronRight className="h-4 w-4" /></Button>
           <Button size="sm" variant="ghost" aria-label="Refresh chart" onClick={load}><RefreshCw className="h-4 w-4" /></Button>
         </div>

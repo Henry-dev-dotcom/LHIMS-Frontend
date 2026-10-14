@@ -56,7 +56,7 @@ export function SubscriptionBanner() {
   const { Icon } = notice;
 
   return (
-    <section className={`mx-3 mt-2 rounded-[1.15rem] border px-3 py-2 shadow-sm sm:mx-5 lg:mx-8 print:hidden ${notice.tone}`} role={s.readOnly || s.status === 'PAST_DUE' ? 'alert' : 'status'}>
+    <section className={`mx-3 mt-2 rounded-[1.15rem] border px-3 py-2 shadow-xs sm:mx-5 lg:mx-8 print:hidden ${notice.tone}`} role={s.readOnly || s.status === 'PAST_DUE' ? 'alert' : 'status'}>
       <div className="mx-auto flex max-w-[1540px] flex-wrap items-center gap-2.5">
         <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
         <div className="min-w-0 flex-1">
@@ -64,7 +64,7 @@ export function SubscriptionBanner() {
           <p className="mt-0.5 text-xs font-semibold leading-5 opacity-80">{notice.detail}</p>
         </div>
         {isAdmin && state.currentPage !== 'subscription' && (
-          <button type="button" className="rounded-xl bg-white/80 px-3 py-1.5 text-xs font-bold shadow-sm hover:bg-white" onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'subscription' })}>
+          <button type="button" className="rounded-xl bg-white/80 px-3 py-1.5 text-xs font-bold shadow-xs hover:bg-white" onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'subscription' })}>
             Subscription &amp; billing
           </button>
         )}

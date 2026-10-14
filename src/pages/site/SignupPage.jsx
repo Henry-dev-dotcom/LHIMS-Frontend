@@ -8,7 +8,7 @@ import { useAppStore } from '../../store/AppStore';
 import { money } from '../../utils/formatters';
 
 const FACILITY_TYPES = ['Hospital', 'Clinic', 'Health centre', 'Maternity home', 'Diagnostic centre', 'Other'];
-const inputClass = 'mt-1 w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-clinical-400 focus:ring-4 focus:ring-clinical-100';
+const inputClass = 'mt-1 w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-hidden focus:border-clinical-400 focus:ring-4 focus:ring-clinical-100';
 
 function Field({ label, error, help, children }) {
   return (

@@ -151,7 +151,7 @@ export function DicomViewerPage() {
       />
 
       {dragging && (
-        <div className="pointer-events-none fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/60 p-6">
+        <div className="pointer-events-none fixed inset-0 z-200 flex items-center justify-center bg-slate-950/60 p-6">
           <p className="rounded-3xl bg-white px-6 py-4 text-lg font-bold text-slate-900 shadow-lift">Drop the images to open them</p>
         </div>
       )}
@@ -167,7 +167,7 @@ export function DicomViewerPage() {
               <p className="mt-1 text-xs text-slate-500">Attach images when writing a report, or open a disc with the buttons above.</p>
             </div>
           ) : (
-            <div className="max-h-[22rem] space-y-1.5 overflow-y-auto">
+            <div className="max-h-88 space-y-1.5 overflow-y-auto">
               {studies.map(({ acceptance, order }) => {
                 const selected = acceptance.id === attachedId && !localSources.length;
                 return (
@@ -197,7 +197,7 @@ export function DicomViewerPage() {
           )}
         </Card>
 
-        <div className="min-h-[34rem]">
+        <div className="min-h-136">
           {sources.length === 0 ? (
             <Card title="Nothing open" subtitle="Choose a study on the left, or open a disc or folder.">
               <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center">
@@ -209,7 +209,7 @@ export function DicomViewerPage() {
               </div>
             </Card>
           ) : (
-            <div className="h-[36rem]"><DicomViewer sources={sources} title={title} /></div>
+            <div className="h-144"><DicomViewer sources={sources} title={title} /></div>
           )}
         </div>
       </div>

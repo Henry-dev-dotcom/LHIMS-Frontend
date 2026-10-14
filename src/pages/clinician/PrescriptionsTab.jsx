@@ -116,8 +116,8 @@ export function PrescriptionsTab({ encounter, auth, open, busy, draft, updateDra
                   <li key={s.id} className="rounded-2xl border border-slate-200 p-3">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="break-words text-sm font-bold text-slate-900">{[drug?.genericName || s.name, drug?.strength || s.strength, drug?.dosageForm || s.dosageForm].filter(Boolean).join(' ')}</p>
-                        <p className="break-words text-xs text-slate-600">For {s.reason.toLowerCase()} · {s.dose ? `${s.dose}, ` : ''}{s.route.toLowerCase()}, {s.frequency.toLowerCase()}{s.durationDays ? ` for ${s.durationDays} days` : ''}</p>
+                        <p className="wrap-break-word text-sm font-bold text-slate-900">{[drug?.genericName || s.name, drug?.strength || s.strength, drug?.dosageForm || s.dosageForm].filter(Boolean).join(' ')}</p>
+                        <p className="wrap-break-word text-xs text-slate-600">For {s.reason.toLowerCase()} · {s.dose ? `${s.dose}, ` : ''}{s.route.toLowerCase()}, {s.frequency.toLowerCase()}{s.durationDays ? ` for ${s.durationDays} days` : ''}</p>
                         {s.note && <p className="mt-1 text-xs text-slate-500">{s.note}</p>}
                         {drug && <p className={`mt-1 text-xs font-semibold ${drug.onHand > 0 ? 'text-emerald-700' : 'text-red-600'}`}>{drug.onHand > 0 ? `${drug.onHand} in stock` : 'Out of stock'}</p>}
                         {missing && <p className="mt-1 text-xs font-semibold text-slate-500">Not in your pharmacy list.</p>}

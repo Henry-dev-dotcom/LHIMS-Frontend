@@ -20,15 +20,15 @@ export function FormField({ label, help, error, required = false, children, clas
 
   return (
     <label className={clsx('block min-w-0', className)}>
-      <span className="block min-w-0 break-words text-xs font-semibold text-slate-600">
+      <span className="block min-w-0 wrap-break-word text-xs font-semibold text-slate-600">
         {label}
         {required && <span className="text-red-500" aria-hidden="true"> *</span>}
       </span>
-      <div className="mt-2 min-w-0 [&>*]:min-w-0">{control}</div>
+      <div className="mt-2 min-w-0 *:min-w-0">{control}</div>
       {error ? (
-        <span id={errorId} role="alert" className="mt-1.5 block break-words text-xs font-semibold leading-5 text-red-600">{error}</span>
+        <span id={errorId} role="alert" className="mt-1.5 block wrap-break-word text-xs font-semibold leading-5 text-red-600">{error}</span>
       ) : (
-        help && <span id={helpId} className="mt-1.5 block break-words text-xs leading-5 text-slate-500">{help}</span>
+        help && <span id={helpId} className="mt-1.5 block wrap-break-word text-xs leading-5 text-slate-500">{help}</span>
       )}
     </label>
   );
