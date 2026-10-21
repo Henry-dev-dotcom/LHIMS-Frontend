@@ -3,6 +3,7 @@ import { Building2, CheckCircle2, KeyRound, Loader2, ShieldCheck, UserRound } fr
 import { useAppStore } from '../../store/AppStore';
 import { Button } from '../../components/ui/Button';
 import { ToastHost } from '../../components/ui/ToastHost';
+import { InstallAppButton } from '../../components/ui/InstallAppButton';
 import '../../styles/getlabs-theme.css';
 
 /*
@@ -138,7 +139,7 @@ export function LoginPage({ initialCode = '' }) {
                 Sessions are secured with httpOnly cookies. Contact your system administrator if you need an account or a password reset.
               </p>
               <p className="mt-3 text-xs leading-5 text-slate-300">
-                New to CurataMed? <a href="#/pricing" className="font-semibold text-clinical-700 underline">Start a free trial</a> · <a href="#/home" className="font-semibold text-clinical-700 underline">About CurataMed</a>
+                New to CurataMed? <a href="#/pricing" className="font-semibold text-clinical-700 underline">Start a free trial</a> · <a href="#/home" className="font-semibold text-clinical-700 underline">About CurataMed</a> · <InstallAppButton />
               </p>
               <p className="mt-2 text-[11px] leading-5 text-slate-400">
                 Supplier partner? <a href="#/vendor" className="font-semibold text-clinical-700 underline">Vendor Portal</a>

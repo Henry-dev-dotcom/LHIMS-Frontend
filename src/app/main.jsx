@@ -4,6 +4,7 @@ import App from './App';
 import '../styles/fonts';
 import '../styles/index.css';
 import { registerServiceWorker } from '../utils/registerServiceWorker';
+import '../utils/pwaInstall';
 import { applyTheme, getPreferredTheme } from '../utils/theme';
 
 applyTheme(getPreferredTheme());
