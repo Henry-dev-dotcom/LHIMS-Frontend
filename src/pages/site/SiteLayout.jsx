@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { goTo } from '../../services/publicService';
+import { InstallAppButton } from '../../components/ui/InstallAppButton';
 
 const LINKS = [
   { path: 'features', label: 'Departments' },
@@ -34,6 +35,7 @@ export function SiteLayout({ active, children }) {
           </a>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Website">
             {LINKS.map((l) => link(l.path, l.label))}
+            <InstallAppButton className={`rounded-xl px-3 py-2 text-sm font-semibold ${isLanding ? 'text-clinical-700 hover:bg-clinical-50' : 'text-cyan-200 hover:bg-white/10'}`} />
             <a href="#/login" className={`rounded-xl px-3 py-2 text-sm font-semibold ${isLanding ? 'text-slate-600 hover:bg-slate-100' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}>Sign in</a>
             <a href="#/pricing" className="ml-1 rounded-xl bg-clinical-500 px-4 py-2 text-sm font-semibold text-white shadow-lift hover:bg-clinical-600">Start free trial</a>
           </nav>
@@ -44,6 +46,7 @@ export function SiteLayout({ active, children }) {
         {open && (
           <nav className={`flex flex-col gap-1 border-t px-4 py-3 md:hidden ${isLanding ? 'border-slate-200' : 'border-white/10'}`} aria-label="Website">
             {LINKS.map((l) => link(l.path, l.label))}
+            <InstallAppButton className={`rounded-xl px-3 py-2 text-left text-sm font-semibold ${isLanding ? 'text-clinical-700' : 'text-cyan-200'}`} />
             <a href="#/login" className={`rounded-xl px-3 py-2 text-sm font-semibold ${isLanding ? 'text-slate-600' : 'text-slate-300'}`}>Sign in</a>
             <a href="#/pricing" onClick={() => setOpen(false)} className="rounded-xl bg-clinical-500 px-4 py-2 text-center text-sm font-semibold text-white">Start free trial</a>
           </nav>
