@@ -120,7 +120,7 @@ export function MessagesPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex h-[calc(100dvh-11rem)] min-h-0 flex-col gap-4 overflow-hidden lg:h-[calc(100dvh-10rem)]">
       <PageHeader
         eyebrow="Messages"
         title="Department messages"
@@ -132,14 +132,19 @@ export function MessagesPage() {
         )}
       />
 
-      {error && <p role="alert" className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p>}
+      {error && <p role="alert" className="shrink-0 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p>}
 
-      <div className="grid gap-4 lg:grid-cols-[17rem_1fr]">
-        <Card title="Channels & departments" subtitle="Choose a shared space or contact another team." compact>
+      <div className="grid min-h-0 flex-1 gap-4 overflow-hidden lg:grid-cols-[17rem_minmax(0,1fr)]">
+        <Card
+          title="Channels & departments"
+          subtitle="Choose a shared space or contact another team."
+          compact
+          className="min-h-0 overflow-hidden lg:flex lg:flex-col lg:[&>div:last-child]:min-h-0 lg:[&>div:last-child]:flex-1"
+        >
           {loading ? (
             <p className="text-sm text-slate-500">Loading…</p>
           ) : (
-            <div className="space-y-3">
+            <div className="min-h-0 space-y-3 overflow-y-auto overscroll-contain pr-1">
               <section className="space-y-1.5" aria-labelledby="shared-message-channels-heading">
                 <h3 id="shared-message-channels-heading" className="px-2 text-[11px] font-bold uppercase tracking-wide text-slate-600">Channels</h3>
                 {channels.map((channel) => (
@@ -189,8 +194,12 @@ export function MessagesPage() {
           )}
         </Card>
 
-        <Card title={activeName} subtitle={activeDescription}>
-          <div className="flex h-104 flex-col">
+        <Card
+          title={activeName}
+          subtitle={activeDescription}
+          className="min-h-0 overflow-hidden lg:flex lg:flex-col lg:[&>div:last-child]:min-h-0 lg:[&>div:last-child]:flex-1"
+        >
+          <div className="flex h-full min-h-0 flex-col">
             <div
               className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1"
               role="log"
