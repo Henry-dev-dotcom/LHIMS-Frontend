@@ -139,12 +139,12 @@ export function MessagesPage() {
           title="Channels & departments"
           subtitle="Choose a shared space or contact another team."
           compact
-          className="min-h-0 overflow-hidden lg:flex lg:flex-col lg:[&>div:last-child]:min-h-0 lg:[&>div:last-child]:flex-1"
+          className="min-h-0 max-h-full overflow-y-auto overscroll-contain"
         >
           {loading ? (
             <p className="text-sm text-slate-500">Loading…</p>
           ) : (
-            <div className="h-full min-h-0 space-y-3 overflow-y-auto overscroll-contain pr-1">
+            <div className="space-y-3 pr-1">
               <section className="space-y-1.5" aria-labelledby="shared-message-channels-heading">
                 <h3 id="shared-message-channels-heading" className="px-2 text-[11px] font-bold uppercase tracking-wide text-slate-600">Channels</h3>
                 {channels.map((channel) => (
