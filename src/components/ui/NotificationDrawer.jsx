@@ -137,7 +137,7 @@ export function NotificationDrawer({ open, notifications = [], onClose, onMarkDe
               <div className="mt-3 flex flex-col gap-2 text-[11px] font-semibold text-slate-500 sm:flex-row sm:items-center sm:justify-between">
                 <span>{formatDateTime(note.createdAt || note.timestamp)}</span>
                 {onMarkDelivered && note.status !== 'Delivered' && (
-                  <button onClick={() => onMarkDelivered(note.id)} className="inline-flex min-h-9 items-center justify-center gap-1 rounded-full bg-emerald-50 px-3 py-1.5 font-semibold text-emerald-700 ring-1 ring-emerald-200 sm:min-h-0">
+                  <button onClick={() => onMarkDelivered(note.id)} className="inline-flex min-h-11 items-center justify-center gap-1 rounded-full bg-emerald-50 px-3 py-2 font-semibold text-emerald-700 ring-1 ring-emerald-200">
                     <CheckCheck className="h-3.5 w-3.5" /> mark delivered
                   </button>
                 )}

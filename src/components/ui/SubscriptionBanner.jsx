@@ -32,7 +32,7 @@ export function SubscriptionBanner() {
     };
   } else if (s.status === 'PAST_DUE') {
     notice = {
-      tone: 'border-amber-200 bg-amber-50 text-amber-950',
+      tone: 'border-amber-300 bg-amber-100 text-amber-950',
       Icon: AlertTriangle,
       title: 'Subscription payment overdue',
       detail: `The renewal payment did not go through. ${isAdmin ? 'Pay' : 'Your administrator needs to pay'} by ${formatDate(s.graceEndsAt)}, or records become read-only.`
@@ -64,7 +64,7 @@ export function SubscriptionBanner() {
           <p className="mt-0.5 text-xs font-semibold leading-5 opacity-80">{notice.detail}</p>
         </div>
         {isAdmin && state.currentPage !== 'subscription' && (
-          <button type="button" className="rounded-xl bg-white/80 px-3 py-1.5 text-xs font-bold shadow-xs hover:bg-white" onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'subscription' })}>
+          <button type="button" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white/90 px-3 py-2 text-xs font-bold shadow-xs hover:bg-white" onClick={() => dispatch({ type: 'NAVIGATE', pageId: 'subscription' })}>
             Subscription &amp; billing
           </button>
         )}

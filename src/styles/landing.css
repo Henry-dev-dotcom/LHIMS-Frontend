@@ -38,12 +38,7 @@
 .cm-b2 { width: 38vw; height: 38vw; right: -8vw; top: 22vh; background: radial-gradient(circle, rgba(56, 189, 248, 0.16), transparent 65%); animation-delay: -8s; }
 .cm-b3 { width: 34vw; height: 34vw; left: 24vw; bottom: -18vw; background: radial-gradient(circle, rgba(45, 212, 191, 0.14), transparent 65%); animation-delay: -16s; }
 @keyframes cm-drift { from { transform: translate(0, 0) scale(1); } to { transform: translate(4vw, -3vh) scale(1.12); } }
-.cm-grid { position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: 0.5;
-  background-image: linear-gradient(rgba(120, 190, 255, 0.05) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(120, 190, 255, 0.05) 1px, transparent 1px);
-  background-size: 64px 64px;
-  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 30%, transparent 75%);
-          mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 30%, transparent 75%); }
+.cm-grid { display: none; }
 .cm-ecg { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.55; }
 .cm-noise { position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: 0.05; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
@@ -93,8 +88,7 @@
 .cm-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 10px var(--teal); animation: cm-pulse 2s infinite; }
 @keyframes cm-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
 .cm h1 { font-family: var(--font-d); font-size: clamp(2.7rem, 5.4vw, 4.4rem); line-height: 1.04; letter-spacing: -0.035em; font-weight: 700; margin: 26px 0 22px; color: var(--ink); }
-.cm-grad { background: linear-gradient(100deg, var(--cyan) 10%, var(--teal) 55%, #7ef0d4 90%);
-  -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cm-grad { color: var(--cyan); }
 .cm-lede { color: var(--muted); font-size: 1.13rem; line-height: 1.65; max-width: 34em; }
 .cm-ctas { display: flex; gap: 14px; margin-top: 34px; flex-wrap: wrap; }
 .cm-note { margin-top: 16px; color: #7389a8; font-size: 0.83rem; display: flex; align-items: center; gap: 8px; }
@@ -156,8 +150,7 @@
 .cm-step { position: relative; padding: 34px 30px; border-radius: var(--radius); background: var(--glass);
   border: 1px solid var(--line); backdrop-filter: blur(14px); overflow: hidden; }
 .cm-n { font-family: var(--font-d); font-size: 4.2rem; font-weight: 700; line-height: 1; letter-spacing: -0.04em;
-  background: linear-gradient(180deg, rgba(34, 211, 238, 0.85), rgba(34, 211, 238, 0.05));
-  -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 20px; }
+  color: var(--cyan); margin-bottom: 20px; }
 .cm-step h3 { font-family: var(--font-d); font-size: 1.15rem; font-weight: 600; margin-bottom: 10px; }
 .cm-step p { color: var(--muted); font-size: 0.92rem; line-height: 1.65; }
 .cm-step::after { content: ''; position: absolute; top: 44px; right: -8px; width: 60px; height: 1px;

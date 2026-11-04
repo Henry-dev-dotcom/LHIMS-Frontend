@@ -359,7 +359,7 @@ export function ReceptionWalkInsPage() {
                 <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-500">Common walk-in requests</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {COMMON_WALK_IN_ITEMS.map((id) => getById(state.data.catalog, id)).filter(Boolean).map((item) => (
-                    <button key={item.id} type="button" onClick={() => toggleItem(item.id)} className={`rounded-full px-3 py-1.5 text-xs font-bold ring-1 transition ${selectedItems.includes(item.id) ? 'bg-clinical-600 text-white ring-clinical-600' : 'bg-white text-slate-700 ring-slate-200 hover:bg-clinical-50 hover:text-clinical-700'}`}>
+                    <button key={item.id} type="button" onClick={() => toggleItem(item.id)} className={`inline-flex min-h-11 items-center justify-center rounded-full px-3 py-2 text-xs font-bold ring-1 transition ${selectedItems.includes(item.id) ? 'bg-clinical-600 text-white ring-clinical-600' : 'bg-white text-slate-700 ring-slate-200 hover:bg-clinical-50 hover:text-clinical-700'}`}>
                       {selectedItems.includes(item.id) ? 'Added · ' : ''}{item.name}
                     </button>
                   ))}
@@ -378,7 +378,7 @@ export function ReceptionWalkInsPage() {
                 {chosenItems.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {chosenItems.map((item) => (
-                      <button key={item.id} type="button" onClick={() => toggleItem(item.id)} className="inline-flex items-center gap-2 rounded-full bg-clinical-50 px-3 py-1.5 text-xs font-bold text-clinical-700 ring-1 ring-clinical-200 hover:bg-red-50 hover:text-red-600 hover:ring-red-200" title="Remove selected item">
+                      <button key={item.id} type="button" onClick={() => toggleItem(item.id)} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-clinical-50 px-3 py-2 text-xs font-bold text-clinical-700 ring-1 ring-clinical-200 hover:bg-red-50 hover:text-red-600 hover:ring-red-200" title="Remove selected item">
                         {item.id} · {item.name} · {money(item.price)}
                         <X className="h-3.5 w-3.5" />
                       </button>

@@ -1157,7 +1157,7 @@ summary:focus-visible {
   padding: 1.5rem;
   background: #09101a;
   color: #fff;
-  font-family: 'Plus Jakarta Sans', 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif;
+  font-family: Atkinson Hyperlegible, ui-sans-serif, system-ui, sans-serif;
 }
 .curata-loading-screen::before {
   position: absolute;
@@ -1167,13 +1167,7 @@ summary:focus-visible {
   background: radial-gradient(ellipse at center, rgba(28, 231, 214, 0.075), transparent 62%);
 }
 .curata-loading-grid {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
+  display: none;
 }
 .curata-loading-content {
   position: relative;

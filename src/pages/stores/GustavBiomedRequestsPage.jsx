@@ -179,7 +179,7 @@ export function GustavBiomedRequestsPage({ mode = 'supplies' }) {
           {request.statusNote && <p className="max-w-48 text-xs text-slate-500"><span className="font-semibold">Internal:</span> {request.statusNote}</p>}
           {request.vendorStatusNote && <p className="max-w-48 text-xs text-clinical-800"><span className="font-semibold">Gustav Biomed:</span> {request.vendorStatusNote}</p>}
           {canManage && (NEXT_STATUSES[request.status] || []).length > 0 && (
-            <select aria-label={`Update ${request.requestCode} status`} className={`${inputClass} min-w-36 py-1.5 text-xs`} value="" onChange={(event) => updateStatus(request, event.target.value)}>
+            <select aria-label={`Update ${request.requestCode} status`} className={`${inputClass} min-h-11 min-w-36 py-2 text-xs`} value="" onChange={(event) => updateStatus(request, event.target.value)}>
               <option value="">Update status…</option>
               {NEXT_STATUSES[request.status].map((status) => <option key={status} value={status}>{STATUS_LABELS[status]?.[0] || status}</option>)}
             </select>
