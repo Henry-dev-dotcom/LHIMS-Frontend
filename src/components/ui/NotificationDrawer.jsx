@@ -112,7 +112,7 @@ export function NotificationDrawer({ open, notifications = [], onClose, onMarkDe
               <p id="notification-drawer-title" className="flex items-center gap-2 text-sm font-semibold text-slate-950"><BellRing className="h-4 w-4 text-clinical-600" /> Delivery & role notifications</p>
               <p className="mt-1 text-xs leading-5 text-slate-500">In-platform, email and SMS delivery events for this workspace.</p>
             </div>
-            <Button ref={closeButtonRef} variant="subtle" size="sm" className="h-9 w-9 shrink-0 p-0" onClick={() => onCloseRef.current?.()} aria-label="Close notifications">
+            <Button ref={closeButtonRef} variant="subtle" size="sm" className="h-11 w-11 shrink-0 p-0 sm:h-9 sm:w-9" onClick={() => onCloseRef.current?.()} aria-label="Close notifications">
               <X className="h-4 w-4" />
             </Button>
           </div>

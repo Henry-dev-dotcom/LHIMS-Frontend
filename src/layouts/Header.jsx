@@ -213,7 +213,7 @@ export function Header() {
             <div className="relative z-95 flex shrink-0 items-center gap-1.5">
               <div ref={notificationMobileTriggerRef} className="relative">
                 <button
-                  className="relative grid h-9 w-9 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-600 shadow-xs transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-95"
+                  className="relative grid h-11 w-11 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-600 shadow-xs transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-95"
                   title="Role notifications"
                   type="button"
                   aria-label={unread > 0 ? `${unread} unread notifications` : 'Open notifications'}
@@ -226,7 +226,7 @@ export function Header() {
               </div>
 
               <button
-                className="grid h-9 w-9 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-600 shadow-xs transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-95"
+                className="grid h-11 w-11 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-600 shadow-xs transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-95"
                 type="button"
                 title="Home"
                 aria-label="Go home"
@@ -237,11 +237,12 @@ export function Header() {
 
               <div ref={userMenuRef} className="relative">
                 <button
-                  className="grid h-9 w-9 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-700 shadow-xs transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-800 active:scale-95"
+                  className="grid h-11 w-11 place-items-center rounded-2xl border border-slate-200/80 bg-white/95 text-slate-700 shadow-xs transition hover:border-clinical-200 hover:bg-clinical-50 hover:text-clinical-800 active:scale-95"
                   title="User menu"
                   type="button"
                   aria-label="Open user menu"
                   aria-haspopup="dialog"
+                  aria-controls="user-session-menu"
                   aria-expanded={userMenuOpen}
                   onClick={() => setUserMenuOpen((value) => !value)}
                 >
@@ -260,7 +261,7 @@ export function Header() {
                 <div ref={screenGuideRef} className="relative mt-1.5 inline-block text-xs font-semibold leading-5 text-slate-500">
                   <button
                     type="button"
-                    className="inline-flex min-h-0 cursor-pointer items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-500 shadow-xs transition duration-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-[0.98]"
+                    className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full bg-slate-100 px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-500 shadow-xs transition duration-200 hover:bg-clinical-50 hover:text-clinical-700 active:scale-[0.98]"
                     aria-label="Open screen guide"
                     aria-expanded={screenGuideOpen}
                     aria-controls="mobile-screen-guide-panel"
@@ -331,6 +332,7 @@ export function Header() {
                 type="button"
                 aria-label="Open user menu"
                 aria-haspopup="dialog"
+                aria-controls="user-session-menu"
                 aria-expanded={userMenuOpen}
                 onClick={() => setUserMenuOpen((value) => !value)}
               >
@@ -365,6 +367,7 @@ export function Header() {
             onClick={() => setUserMenuOpen(false)}
           />
           <div
+          id="user-session-menu"
           ref={userDropdownRef}
           className="getlabs-floating-panel fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-130 max-h-[calc(86dvh-env(safe-area-inset-bottom))] overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-lift ring-1 ring-slate-950/5 md:inset-x-auto md:bottom-auto md:right-(--user-menu-right) md:top-(--user-menu-top) md:w-[calc(100vw-1.5rem)] md:max-w-72 md:rounded-3xl"
           style={{ '--user-menu-top': `${userMenuPosition.top}px`, '--user-menu-right': `${userMenuPosition.right}px` }}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Building2, CheckCircle2, KeyRound, Loader2, ShieldCheck, UserRound } from 'lucide-react';
 import { useAppStore } from '../../store/AppStore';
 import { Button } from '../../components/ui/Button';
@@ -23,16 +23,26 @@ function readRememberedFacilityCode() {
 }
 
 export function LoginPage({ initialCode = '' }) {
-  const { dispatch } = useAppStore();
+  const { state, dispatch } = useAppStore();
   // A facility sign-in link (#/login/CODE) fills in the code.
   const [facilityCode, setFacilityCode] = useState(() => String(initialCode || readRememberedFacilityCode()).toUpperCase().replace(/[^A-Z0-9]/g, ''));
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+
+  useEffect(() => {
+    if (state.ui?.toast?.type === 'error') setFormError(state.ui.toast.message);
+  }, [state.ui?.toast]);
 
   function submitCredentials(event) {
     event.preventDefault();
-    if (submitting || !username.trim() || !password) return;
+    if (submitting) return;
+    if (!username.trim() || !password) {
+      setFormError('Enter your username and password to continue.');
+      return;
+    }
+    setFormError('');
     setSubmitting(true);
     const code = facilityCode.trim().toUpperCase();
     // The code is remembered by the command layer, and only once the sign-in
@@ -104,7 +114,8 @@ export function LoginPage({ initialCode = '' }) {
               <h2 className="getlabs-serif mt-1.5 text-[1.45rem] leading-tight tracking-[-0.035em] text-slate-900 sm:text-2xl">Open your workspace.</h2>
               <p className="mt-2 max-w-sm text-xs leading-5 text-slate-300 sm:text-sm">Sign in with the staff account issued by your administrator.</p>
 
-              <form onSubmit={submitCredentials} className="login-form mt-6 space-y-3 rounded-2xl border p-4 sm:p-5">
+              <form onSubmit={submitCredentials} className="login-form mt-6 space-y-3 rounded-2xl border p-4 sm:p-5" noValidate>
+                {formError && <p id="login-form-feedback" role="alert" aria-live="assertive" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-xs font-semibold leading-5 text-red-800">{formError}</p>}
                 <label className="block" htmlFor="login-facility">
                   <span className="mb-1.5 flex items-center gap-2 text-xs font-semibold"><Building2 className="h-3.5 w-3.5" aria-hidden="true" /> Facility code</span>
                   <input
@@ -115,20 +126,20 @@ export function LoginPage({ initialCode = '' }) {
                     spellCheck={false}
                     autoFocus={!facilityCode}
                     placeholder="e.g. KBTH"
-                    aria-describedby="login-facility-hint"
+                    aria-describedby={formError ? 'login-facility-hint login-form-feedback' : 'login-facility-hint'}
                     value={facilityCode}
-                    onChange={(event) => setFacilityCode(event.target.value.toUpperCase())}
+                    onChange={(event) => { setFacilityCode(event.target.value.toUpperCase()); setFormError(''); }}
                     className="getlabs-input uppercase tracking-[0.08em]"
                   />
-                  <span id="login-facility-hint" className="mt-1.5 block text-[11px]">The code your hospital or clinic was given.</span>
+                  <span id="login-facility-hint" className="mt-1.5 block text-[11px]">The code your hospital or clinic was given. Leave blank only for platform-operator access.</span>
                 </label>
                 <label className="block" htmlFor="login-username">
                   <span className="mb-1.5 flex items-center gap-2 text-xs font-semibold"><UserRound className="h-3.5 w-3.5" aria-hidden="true" /> Username</span>
-                  <input id="login-username" name="username" autoComplete="username" autoFocus={Boolean(facilityCode)} value={username} onChange={(event) => setUsername(event.target.value)} className="getlabs-input" />
+                  <input id="login-username" name="username" autoComplete="username" autoFocus={Boolean(facilityCode)} required aria-invalid={Boolean(formError)} aria-describedby={formError ? 'login-form-feedback' : undefined} value={username} onChange={(event) => { setUsername(event.target.value); setFormError(''); }} className="getlabs-input" />
                 </label>
                 <label className="block" htmlFor="login-password">
                   <span className="mb-1.5 flex items-center gap-2 text-xs font-semibold"><KeyRound className="h-3.5 w-3.5" aria-hidden="true" /> Password</span>
-                  <input id="login-password" name="password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="getlabs-input" />
+                  <input id="login-password" name="password" type="password" autoComplete="current-password" required aria-invalid={Boolean(formError)} aria-describedby={formError ? 'login-form-feedback' : undefined} value={password} onChange={(event) => { setPassword(event.target.value); setFormError(''); }} className="getlabs-input" />
                 </label>
                 <Button className="getlabs-primary-button w-full justify-center" type="submit" disabled={submitting || !username.trim() || !password}>
                   {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />} {submitting ? 'Signing in…' : 'Sign in'}
