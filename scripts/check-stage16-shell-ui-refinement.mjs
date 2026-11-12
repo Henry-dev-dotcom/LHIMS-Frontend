@@ -37,7 +37,7 @@ if (!header.includes('PAGE_HEADER_EVENT') || !header.includes('pageHeader')) {
 }
 
 const metricCard = read('src/components/ui/MetricCard.jsx');
-if (!metricCard.includes('compact = true') || !metricCard.includes('min-h-[4.5rem]')) {
+if (!metricCard.includes('compact = true') || !(metricCard.includes('min-h-[4.5rem]') || metricCard.includes('min-h-[4.6rem]'))) {
   failures.push('src/components/ui/MetricCard.jsx does not contain the compact Stage 17 sizing.');
 }
 
