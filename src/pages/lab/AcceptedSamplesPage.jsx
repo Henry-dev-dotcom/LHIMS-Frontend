@@ -10,7 +10,7 @@ import { useAppStore } from '../../store/AppStore';
 import { formatDateTime, money } from '../../utils/formatters';
 import { getLabOrders } from '../../utils/orderViews';
 import { acceptedQueue, awaitingResult, paymentStateFor, queueMatches, requestedBy } from '../../utils/diagnosticWorkflow';
-import { escapeHtml, printDocument } from '../../utils/printDocument';
+import { escapeHtml, facilityLetterhead, printDocument } from '../../utils/printDocument';
 
 /*
   Accepted Samples - the second of the laboratory's three tabs.
@@ -58,10 +58,12 @@ function reportHtml({ order, row, parameters, resultText, comment, facilityName,
         <td>${escapeHtml(flagFor(parameter, parameter.value))}</td>
       </tr>`).join('');
 
+  const lh = facilityLetterhead();
   return `
+    ${lh.html}
     <header>
       <div>
-        <h1>${escapeHtml(facilityName)}</h1>
+        ${lh.hideName ? '' : `<h1>${escapeHtml(facilityName)}</h1>`}
         <div class="sub">Laboratory Report — ${escapeHtml(row.name)}</div>
       </div>
       <div class="meta">Order ${escapeHtml(order.id)}<br>${escapeHtml(formatDateTime(new Date().toISOString()))}</div>

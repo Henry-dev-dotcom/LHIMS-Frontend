@@ -8,6 +8,7 @@ import { useAppStore } from '../../store/AppStore';
 import { apiClient } from '../../store/commands';
 import { messageService } from '../../services/messageService';
 import { formatDateTime } from '../../utils/formatters';
+import { OPEN_MESSAGE_EVENT, consumePendingMessage } from '../../hooks/useNotificationCenter';
 
 /*
   Shared channels keep their existing role-aware access. Private department
@@ -50,7 +51,7 @@ export function MessagesPage() {
       setChannels(list);
       setDepartments(result?.directDepartments || []);
       setOwnDepartment(result?.ownDepartment || null);
-      setActive((current) => current || list[0]?.key || '');
+      setActive((current) => current || pendingOpen.current || list[0]?.key || '');
       setError('');
     } catch (caught) {
       setError(caught?.message || 'The channels could not be loaded.');
@@ -75,6 +76,13 @@ export function MessagesPage() {
   }, []);
 
   useEffect(() => { loadChannels(); }, [loadChannels]);
+
+  // A notification clicked while this page is already open switches the conversation.
+  useEffect(() => {
+    const onOpen = (event) => { if (event.detail) { pendingOpen.current = ''; consumePendingMessage(); setActive(event.detail); } };
+    window.addEventListener(OPEN_MESSAGE_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_MESSAGE_EVENT, onOpen);
+  }, []);
 
   useEffect(() => {
     if (!active) return undefined;

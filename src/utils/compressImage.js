@@ -18,7 +18,7 @@ export function compressImage(file, { maxBytes = 200 * 1024, maxDimension = 512,
           dataUrl = canvas.toDataURL('image/webp', currentQuality);
         }
         URL.revokeObjectURL(image.src);
-        if (dataUrl.length * 0.75 > maxBytes) return reject(new Error('The image is still larger than 200 KB. Choose a simpler logo.'));
+        if (dataUrl.length * 0.75 > maxBytes) return reject(new Error(`The image is still larger than ${Math.round(maxBytes / 1024)} KB. Choose a simpler image.`));
         resolve(dataUrl);
       };
       image.src = URL.createObjectURL(file);

@@ -48,6 +48,8 @@ export function SetupPage() {
         email: result.facility.email || '',
         address: result.facility.address || '',
         logoDataUrl: result.facility.logoDataUrl || null,
+        letterheadDataUrl: result.facility.letterheadDataUrl || null,
+        deltaCheckOptIn: Boolean(result.facility.deltaCheckOptIn),
         allowSupportAccess: result.facility.allowSupportAccess,
         receptionConfirmsOrders: result.facility.receptionConfirmsOrders
       });
@@ -84,6 +86,20 @@ export function SetupPage() {
     try {
       const dataUrl = await compressImage(file, { maxBytes: MAX_LOGO_BYTES });
       setProfile((p) => ({ ...p, logoDataUrl: dataUrl }));
+    } catch (error) {
+      setProfileError(error?.message || 'The image could not be compressed.');
+    }
+  }
+
+  async function chooseLetterhead(event) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) return setProfileError('Choose a PNG, JPEG or WebP image.');
+    setProfileError('');
+    try {
+      const dataUrl = await compressImage(file, { maxBytes: 300 * 1024, maxDimension: 1400 });
+      setProfile((p) => ({ ...p, letterheadDataUrl: dataUrl }));
     } catch (error) {
       setProfileError(error?.message || 'The image could not be compressed.');
     }
@@ -225,6 +241,22 @@ export function SetupPage() {
               <span className="text-xs text-slate-500">PNG, JPEG or WebP, up to 200 KB. A square image works best.</span>
             </div>
           </div>
+          <div className="sm:col-span-2">
+            <p className="text-sm font-semibold text-slate-700">Letterhead for results</p>
+            <p className="mt-1 text-xs text-slate-500">Printed across the top of every laboratory and imaging result your facility issues. Without one, the logo and contact details above are used.</p>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              {profile.letterheadDataUrl ? <img src={profile.letterheadDataUrl} alt="Letterhead preview" className="max-h-20 max-w-full rounded-2xl border border-slate-200 bg-white object-contain p-1" /> : <div className="grid h-14 w-40 place-items-center rounded-2xl border border-dashed border-slate-300 text-slate-400"><ImagePlus className="h-5 w-5" /></div>}
+              <label className="cursor-pointer rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-clinical-300">
+                Choose letterhead<input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={chooseLetterhead} />
+              </label>
+              {profile.letterheadDataUrl && <Button variant="ghost" size="sm" onClick={() => setProfile((p) => ({ ...p, letterheadDataUrl: null }))}><Trash2 className="h-3.5 w-3.5" /> Remove</Button>}
+              <span className="text-xs text-slate-500">PNG, JPEG or WebP, up to 300 KB. A wide banner works best.</span>
+            </div>
+          </div>
+          <label className="flex items-start gap-3 text-sm text-slate-700 sm:col-span-2">
+            <input type="checkbox" className="mt-1" checked={profile.deltaCheckOptIn} onChange={(e) => setProfile((p) => ({ ...p, deltaCheckOptIn: e.target.checked }))} />
+            <span><strong>Join delta check sharing.</strong> Lets your laboratory ask other joined facilities for a patient&rsquo;s earlier results, and lets them ask you. Nothing is shared without a person in your laboratory approving each request, and only values, units, flags and dates leave: no name, clinician or order. Every request is in your Audit Log.</span>
+          </label>
           <label className="flex items-start gap-3 text-sm text-slate-700 sm:col-span-2">
             <input type="checkbox" className="mt-1" checked={profile.allowSupportAccess} onChange={(e) => setProfile((p) => ({ ...p, allowSupportAccess: e.target.checked }))} />
             <span><strong>Allow CurataMed support to look in when you ask for help.</strong> Support can then open a 30-minute, read-only view of your facility. Every visit, with the reason, appears in your Audit Log. Untick to refuse all support access.</span>

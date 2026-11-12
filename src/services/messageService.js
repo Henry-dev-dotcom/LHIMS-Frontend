@@ -10,5 +10,6 @@ export const messageService = {
   // would arrive up to half a minute late - or, with unlucky timing, not on this
   // poll at all.
   list: async (client, channel, params = {}) => client.request(`/messages/${channel}${buildQuery(params)}`, { cache: false }),
+  inbox: async (client) => client.request('/messages/inbox', { cache: false }),
   send: async (client, payload) => client.request('/messages', { method: 'POST', body: payload })
 };

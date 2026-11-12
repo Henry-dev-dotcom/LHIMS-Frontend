@@ -10,7 +10,7 @@ import { useAppStore } from '../../store/AppStore';
 import { formatDateTime, money } from '../../utils/formatters';
 import { getScanOrders } from '../../utils/orderViews';
 import { acceptedQueue, awaitingResult, paymentStateFor, queueMatches, requestedBy } from '../../utils/diagnosticWorkflow';
-import { escapeHtml, printDocument } from '../../utils/printDocument';
+import { escapeHtml, printDocument, facilityLetterhead } from '../../utils/printDocument';
 
 /*
   Accepted Scans - the second of the imaging unit's three tabs.
@@ -38,10 +38,12 @@ function readAsDataUrl(file) {
 }
 
 function reportHtml({ order, row, reportText, comment, facilityName, reportedBy }) {
+  const lh = facilityLetterhead();
   return `
+    ${lh.html}
     <header>
       <div>
-        <h1>${escapeHtml(facilityName)}</h1>
+        ${lh.hideName ? '' : `<h1>${escapeHtml(facilityName)}</h1>`}
         <div class="sub">Imaging Report — ${escapeHtml(row.name)}</div>
       </div>
       <div class="meta">Order ${escapeHtml(order.id)}<br>${escapeHtml(formatDateTime(new Date().toISOString()))}</div>

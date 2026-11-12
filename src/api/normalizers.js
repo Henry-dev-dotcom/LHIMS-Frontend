@@ -22,7 +22,8 @@ export const ROLE_FROM_API = {
   RECEPTIONIST: 'receptionist',
   LAB_STAFF: 'lab',
   SCAN_STAFF: 'scan',
-  BILLING_STAFF: 'billing'
+  BILLING_STAFF: 'billing',
+  CLAIMS_OFFICER: 'claims'
 };
 
 export const ROLE_TO_API = Object.fromEntries(Object.entries(ROLE_FROM_API).map(([api, local]) => [local, api]));
@@ -51,6 +52,10 @@ export function normalizeAuthUser(apiUser) {
         code: apiUser.facility.code,
         name: apiUser.facility.name,
         logoDataUrl: apiUser.facility.logoDataUrl || null,
+        letterheadDataUrl: apiUser.facility.letterheadDataUrl || null,
+        phone: apiUser.facility.phone || '',
+        email: apiUser.facility.email || '',
+        address: apiUser.facility.address || '',
         // null only for a facility whose administrator has not finished setup yet.
         onboardingCompletedAt: apiUser.facility.onboardingCompletedAt,
         // Whether a clinician's order waits for reception before the lab can see
@@ -560,6 +565,8 @@ export function normalizeNotification(notification, orderCodeById = {}) {
     status: latestDelivery ? (['SENT', 'DELIVERED'].includes(latestDelivery.status) ? 'Delivered' : enumLabel(latestDelivery.status)) : 'Delivered',
     read: Boolean(notification.isRead),
     deliveryType: enumLabel(type),
+    type,
+    personal: Boolean(notification.recipientUserId),
     entityId: notification.order?.orderCode || orderCodeById[notification.orderId] || notification.orderId || '',
     createdAt: notification.createdAt
   };

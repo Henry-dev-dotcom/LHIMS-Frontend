@@ -8,7 +8,7 @@ const checks = [
   ['src/layouts/Sidebar.jsx', 'Hospital management system'],
   ['src/components/ui/DataTable.jsx', 'md:hidden'],
   ['src/components/ui/WorkflowTimeline.jsx', 'Order workflow'],
-  ['src/components/ui/NotificationDrawer.jsx', 'Delivery & role notifications'],
+  ['src/components/ui/NotificationDrawer.jsx', 'Clear all'],
   ['docs/section-14-ui-ux-polish.md', 'Final UI/UX Polish']
 ];
 
