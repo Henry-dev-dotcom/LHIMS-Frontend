@@ -243,10 +243,8 @@ export function ConsultationTab({ encounter, auth, open, busy, act, draft, updat
       </div>
 
       <div className="space-y-4">
-        <details className="rounded-3xl border border-slate-200 bg-white p-4 shadow-xs">
-          <summary className="cursor-pointer text-sm font-bold text-slate-900">Record vitals</summary>
-          <div className="mt-3"><VitalsCard encounter={encounter} auth={auth} open={open} busy={busy} act={act} latest={latestVitals} /></div>
-        </details>
+        {/* Read-only: the nurse enters vitals; they show here once recorded. */}
+        <VitalsCard encounter={encounter} auth={auth} open={false} busy={busy} act={act} latest={latestVitals} />
         <details className="rounded-3xl border border-slate-200 bg-white p-4 shadow-xs">
           <summary className="cursor-pointer text-sm font-bold text-slate-900">Record an allergy</summary>
           <div className="mt-3"><AllergiesCard encounter={encounter} auth={auth} busy={busy} act={act} /></div>

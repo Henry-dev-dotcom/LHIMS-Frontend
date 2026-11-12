@@ -258,7 +258,8 @@ export function VitalsCard({ encounter, auth, open, busy, act, latest }) {
   const [values, setValues] = useState({});
   const [triageLevel, setTriageLevel] = useState(encounter.triageLevel || '');
   const [notes, setNotes] = useState('');
-  const canRecord = open && (can(auth, P.TRIAGE) || can(auth, P.CONSULT));
+  // Vitals are taken by nursing; clinicians only see what the nurse recorded.
+  const canRecord = open && can(auth, P.TRIAGE);
   const triaging = encounter.status === 'WAITING_TRIAGE';
 
   async function save(completeTriage) {
@@ -273,7 +274,7 @@ export function VitalsCard({ encounter, auth, open, busy, act, latest }) {
   }
 
   return (
-    <Card title="Vitals & triage" subtitle={vitalsSummary(latest)}>
+    <Card title={canRecord ? 'Vitals & triage' : 'Vitals (recorded by nursing)'} subtitle={vitalsSummary(latest)}>
       {canRecord && (
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">

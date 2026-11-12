@@ -1,4 +1,4 @@
-import { isValidElement, useEffect, useMemo, useRef, useState } from 'react';
+import { isValidElement, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 import { gsap } from 'gsap/gsap-core';
@@ -10,6 +10,7 @@ import { MobileActionBar } from '../components/ui/MobileActionBar';
 import { PAGE_HEADER_EVENT } from '../components/ui/PageHeader';
 import { useAppStore } from '../store/AppStore';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useNotificationCenter } from '../hooks/useNotificationCenter';
 import { PAGE_META } from '../routes/routeRegistry';
 import { ALL_ROLES } from '../data/roles';
 import { getPreferredTheme, setThemePreference } from '../utils/theme';
@@ -192,13 +193,7 @@ export function Header() {
     );
   }, { dependencies: [userMenuOpen], revertOnUpdate: true });
 
-  const roleNotifications = useMemo(() => {
-    return (state.data.notifications || []).filter((item) => {
-      const audience = item.audience || item.role || item.channel;
-      return !audience || audience === role || audience === 'all' || ['Email', 'SMS', 'In-Platform'].includes(audience);
-    });
-  }, [state.data.notifications, role]);
-  const unread = roleNotifications.filter((item) => !item.read && item.status !== 'Delivered').length;
+  const { items: roleNotifications, unread, open: openNotification, clearAll: clearNotifications } = useNotificationCenter({ auth: state.auth, notifications: state.data.notifications, dispatch, currentPage: state.currentPage });
 
   return (
     <header className="relative z-90 border-b border-white/60 bg-white/85 px-3 py-2 shadow-xs backdrop-blur-2xl sm:px-5 lg:px-8 print:hidden">

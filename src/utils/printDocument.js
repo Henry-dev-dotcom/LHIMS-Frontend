@@ -11,6 +11,8 @@
   blocks the popup there is nothing to print to, so the caller is told.
 */
 
+import { getStoredSession } from '../api/config';
+
 /** Escapes a value for use in HTML text or an attribute. */
 export function escapeHtml(value) {
   return String(value ?? '')
@@ -81,4 +83,97 @@ export function printDocument(title, body) {
   armPrintButtons(win);
   win.focus();
   return true;
+}
+
+/*
+  Printing on a receipt (thermal) printer.
+
+  The slip the laboratory attaches to a sample is printed on the same narrow roll
+  the cashier's receipts use, so it is laid out as one centred column: no tables,
+  no side-by-side blocks, monospaced digits, and a page as wide as the paper and
+  as long as its content. The width is a choice - 58 mm and 80 mm rolls are both
+  common - remembered per browser.
+*/
+const WIDTH_KEY = 'lhims.thermalWidthMm';
+export const THERMAL_WIDTHS = [58, 80];
+
+export function getThermalWidth() {
+  try {
+    const stored = Number(window.localStorage.getItem(WIDTH_KEY));
+    return THERMAL_WIDTHS.includes(stored) ? stored : 80;
+  } catch {
+    return 80;
+  }
+}
+
+export function setThermalWidth(mm) {
+  try { window.localStorage.setItem(WIDTH_KEY, String(mm)); } catch { /* the choice then lasts for this print only */ }
+}
+
+const thermalStyles = (mm) => `
+  * { box-sizing: border-box; }
+  @page { size: ${mm}mm auto; margin: 0; }
+  html, body { width: ${mm}mm; margin: 0; padding: 0; }
+  body { padding: 3mm 3mm 6mm; color: #000; background: #fff;
+         font-family: "Courier New", ui-monospace, Menlo, Consolas, monospace; font-size: ${mm === 58 ? 10 : 11.5}px; line-height: 1.35; }
+  .c { text-align: center; }
+  .b { font-weight: 700; }
+  .big { font-size: 1.25em; }
+  .row { display: flex; justify-content: space-between; gap: 6px; }
+  .row > span:last-child { text-align: right; word-break: break-word; }
+  .rule { border: 0; border-top: 1px dashed #000; margin: 5px 0; }
+  .item { margin: 4px 0; }
+  .wrap { word-break: break-word; overflow-wrap: anywhere; }
+  .no-print { margin: 0 0 8px; padding: 6px 3mm; background: #f1f5f9; font-family: system-ui, sans-serif; width: auto; }
+  .no-print button { padding: 8px 14px; border: 0; border-radius: 8px; background: #0284c7; color: #fff; font-weight: 700; cursor: pointer; }
+  @media print { .no-print { display: none; } }
+`;
+
+/** Opens a receipt-printer document. `body` is already-escaped HTML. Returns false when the popup was blocked. */
+export function printThermalDocument(title, body, widthMm = getThermalWidth()) {
+  const mm = THERMAL_WIDTHS.includes(widthMm) ? widthMm : 80;
+  const win = window.open('', '_blank', `width=${Math.round(mm * 4.2) + 60},height=800`);
+  if (!win) return false;
+  win.document.write(
+    `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapeHtml(title)}</title>`
+    + `<style>${thermalStyles(mm)}</style></head><body>`
+    + '<div class="no-print"><button data-print>Print</button></div>'
+    + `${body}</body></html>`
+  );
+  win.document.close();
+  armPrintButtons(win);
+  win.focus();
+  return true;
+}
+
+/*
+  The facility's own letterhead at the top of an issued result.
+
+  An administrator can upload a wide letterhead banner, which is printed as
+  supplied (it normally carries the name and address, so the plain-text name is
+  dropped). Without one, the small logo and contact line are used above the
+  name. Styles are inline so the block works in any document template. Images
+  are data URLs the server has already validated; they are still escaped here.
+*/
+export function facilityLetterhead(facility) {
+  let source = facility;
+  if (!source) {
+    try { source = getStoredSession()?.user?.facility; } catch { source = null; }
+  }
+  if (!source) return { html: '', hideName: false };
+  const safeImage = (value) => (typeof value === 'string' && /^data:image\/(png|jpeg|webp);base64,/.test(value) ? escapeHtml(value) : '');
+  const banner = safeImage(source.letterheadDataUrl);
+  if (banner) {
+    return {
+      html: `<div style="margin:0 0 14px"><img src="${banner}" alt="${escapeHtml(source.name || 'Letterhead')}" style="display:block;width:100%;max-height:34mm;object-fit:contain"></div>`,
+      hideName: true
+    };
+  }
+  const logo = safeImage(source.logoDataUrl);
+  const contact = [source.address, source.phone, source.email].filter(Boolean).map(escapeHtml).join(' &middot; ');
+  if (!logo && !contact) return { html: '', hideName: false };
+  return {
+    html: `<div style="display:flex;align-items:center;gap:12px;margin:0 0 10px">${logo ? `<img src="${logo}" alt="" style="height:52px;width:52px;object-fit:contain">` : ''}<div style="font-size:12px;color:#475569;line-height:1.5">${contact}</div></div>`,
+    hideName: false
+  };
 }

@@ -52,7 +52,8 @@ import {
   Archive,
   CalendarCheck,
   IdCard,
-  FolderLock
+  FolderLock,
+  GitCompareArrows
 } from 'lucide-react';
 
 export const ROLES = [
@@ -108,6 +109,13 @@ export const ROLES = [
     accessSummary: 'Manages invoices, price catalog, payment status, outstanding balances and revenue reports.'
   },
   {
+    id: 'claims',
+    label: 'Claims Officer',
+    subtitle: 'Insurance claims vetting and entry',
+    landing: 'insurance-claims',
+    accessSummary: 'Prepares claims from completed visits, vets and corrects them, submits monthly batches and records scheme decisions and payments.'
+  },
+  {
     id: 'admin',
     label: 'Admin',
     subtitle: 'System oversight and configuration',
@@ -152,6 +160,8 @@ export const NAV_ITEMS = [
   { id: 'sample-log', label: 'Sample Log', icon: Database, roles: ['admin'], section: 'Laboratory', hidden: true },
   { id: 'lab-review', label: 'Review & Sign-off', icon: ShieldCheck, roles: ['admin'], section: 'Laboratory', hidden: true },
   { id: 'lab-rejections', label: 'Rejected / Retest', icon: History, roles: ['lab','admin'], section: 'Laboratory', hidden: true },
+  { id: 'lab-tests', label: 'Test Menu', icon: ListChecks, roles: ['lab','admin'], section: 'Laboratory' },
+  { id: 'lab-delta-check', label: 'Delta Check', icon: GitCompareArrows, roles: ['lab','admin'], section: 'Laboratory' },
   { id: 'lab-analyzers', label: 'Analyzers', icon: Cpu, roles: ['lab','admin'], section: 'Laboratory' },
   { id: 'lab-analyzer-performance', label: 'Analyzer Performance & QC', icon: Gauge, roles: ['lab','admin'], section: 'Laboratory' },
   { id: 'lab-maintenance-requests', label: 'Analyzer Maintenance', icon: Wrench, roles: ['lab','admin'], section: 'Laboratory' },
@@ -174,19 +184,19 @@ export const NAV_ITEMS = [
   /* The records desk. CurataMed's receptionist is its front-office role, which is
      where registration and check-in already lived, so this belongs to them. */
   /* Every department talks to the others, so this belongs to all of them. */
-  { id: 'messages', label: 'Messages', icon: MessagesSquare, roles: ['doctor','nurse','receptionist','lab','scan','billing','pharmacist','admin'], section: 'Messages' },
+  { id: 'messages', label: 'Messages', icon: MessagesSquare, roles: ['doctor','nurse','receptionist','lab','scan','billing','pharmacist','claims','admin'], section: 'Messages' },
   { id: 'records-desk', label: 'Registration & Check-in', icon: ClipboardCheck, roles: ['receptionist','admin'], section: 'Records' },
   { id: 'patients-directory', label: 'Patients Directory', icon: UsersRound, roles: ['doctor','nurse','receptionist','admin'], section: 'Medical Records' },
   { id: 'medical-records', label: 'Medical Records', icon: FolderLock, roles: ['doctor','nurse','receptionist','admin'], section: 'Medical Records' },
-  { id: 'my-hr', label: 'My Rota & Leave', icon: CalendarCheck, roles: ['doctor','nurse','pharmacist','receptionist','lab','scan','billing','admin'], section: 'HR' },
-  { id: 'duty-rota', label: 'Duty Rota', icon: CalendarDays, roles: ['doctor','nurse','pharmacist','receptionist','lab','scan','billing','admin'], section: 'HR' },
+  { id: 'my-hr', label: 'My Rota & Leave', icon: CalendarCheck, roles: ['doctor','nurse','pharmacist','receptionist','lab','scan','billing','claims','admin'], section: 'HR' },
+  { id: 'duty-rota', label: 'Duty Rota', icon: CalendarDays, roles: ['doctor','nurse','pharmacist','receptionist','lab','scan','billing','claims','admin'], section: 'HR' },
   { id: 'hr-admin', label: 'HR Admin', icon: IdCard, roles: ['admin'], section: 'HR' },
   { id: 'mortuary', label: 'Mortuary', icon: Archive, roles: ['nurse','doctor','admin'], section: 'Mortuary' },
   { id: 'blood-bank', label: 'Blood Bank', icon: Droplets, roles: ['lab','doctor','nurse','admin'], section: 'Blood Bank' },
   { id: 'stores', label: 'Stores & Procurement', icon: Warehouse, roles: ['billing','admin'], section: 'Stores' },
   { id: 'gustav-supply-requests', label: 'Gustav Biomed Requests', icon: PackageOpen, roles: ['billing','admin'], section: 'Stores' },
   { id: 'store-requests', label: 'Request Supplies', icon: PackageOpen, roles: ['nurse','doctor','pharmacist','receptionist','lab','scan','billing','admin'], section: 'Stores' },
-  { id: 'insurance-claims', label: 'Insurance Claims', icon: ShieldCheck, roles: ['billing','admin'], section: 'Claims' },
+  { id: 'insurance-claims', label: 'Insurance Claims', icon: ShieldCheck, roles: ['billing','claims','admin'], section: 'Claims' },
   // One page for every clinic; menus that list clinics one by one leave it out (hidden).
   { id: 'clinics', label: 'Clinics', icon: Stethoscope, roles: ['nurse','doctor','receptionist','admin'], section: 'Clinics', hidden: true },
   { id: 'clinic-antenatal', label: 'Antenatal Clinic', icon: HeartHandshake, roles: ['nurse','doctor','receptionist','admin'], section: 'Maternity' },
@@ -245,7 +255,7 @@ export const NAV_ITEMS = [
   */
   { id: 'finance-desk', label: 'Cashier', icon: Wallet, roles: ['billing','admin'], section: 'Finance' },
   { id: 'invoices', label: 'Invoices', icon: CreditCard, roles: ['billing','admin'], section: 'Finance' },
-  { id: 'price-catalog', label: 'Price Catalog', icon: ClipboardList, roles: ['billing','receptionist','admin'], section: 'Finance' },
+  { id: 'price-catalog', label: 'Price Catalog', icon: ClipboardList, roles: ['billing','receptionist','claims','admin'], section: 'Finance' },
   { id: 'finance-shift', label: 'Shift Start / Close', icon: Clock, roles: ['billing','admin'], section: 'Accounting' },
   { id: 'float-tracker', label: 'Float Tracker', icon: CreditCard, roles: ['billing','admin'], section: 'Accounting' },
   { id: 'expenses', label: 'Expenses', icon: ClipboardList, roles: ['billing','admin'], section: 'Accounting' },
@@ -278,6 +288,7 @@ export const ROLE_DASHBOARD_REQUIREMENTS = {
   receptionist: ['Incoming Orders Queue', 'Patient Check-In', 'Order Confirmation Panel', 'Appointment Scheduler', 'Walk-in Registration', 'Walk-in Test Requests', 'Direct Walk-in Invoice Creation', 'Daily Visit Log', 'Duplicate Patient Resolution', 'Reception Results Inbox'],
   lab: ['Queue', 'Accepted Samples', 'Results'],
   scan: ['Scan Order Queue', 'Equipment/Room Booking', 'Image Upload', 'Radiologist Report Field', 'Comparison to Prior Scans', 'Review & Sign-off', 'Internal Technician Notes'],
+  claims: ['Scheme Memberships', 'Claims To Prepare', 'Claim Vetting', 'Claim Correction', 'Monthly Batches', 'Scheme Decisions', 'Scheme Payments'],
   billing: ['Test/Scan Price Catalog', 'Invoice Generator', 'Payment Status Tracker', 'Payment Method Log', 'Outstanding Balances Report', 'Insurance Claim Reference', 'Cashier Float', 'Expenses', 'Account Ledger', 'Billing Analytics', 'Revenue Summary', 'Refund/Adjustment Tool'],
   admin: ['User Management', 'Diagnostic Facility Management', 'Hospital/Partner Management', 'Facility Feature Customization', 'Catalog Management', 'Department Management', 'System-Wide Reporting Dashboard', 'Audit Log', 'Notification Settings', 'Data Export']
 };

@@ -260,6 +260,16 @@ export const PAGE_META = {
     description: 'Register analyzers that file their own results, issue and rotate their keys, and upload a run exported from an instrument.',
     requirements: ['Register an analyzer', 'Key shown once', 'Rotate or disable a key', 'Upload a run']
   },
+  'lab-tests': {
+    title: 'Test Menu', section: 'Laboratory',
+    description: 'Add, edit or remove the laboratory tests, with the parameters each reports and their reference ranges.',
+    requirements: ['Add a test', 'Edit test details', 'Parameters and units', 'Reference ranges by age and sex', 'Remove or retire a test']
+  },
+  'lab-delta-check': {
+    title: 'Delta Check', section: 'Laboratory',
+    description: "Compare a patient's results with their earlier results at other facilities, with that facility's consent.",
+    requirements: ['Ask another facility', 'Answer requests', 'Consent before sharing', 'Compare with earlier values', 'Audit trail']
+  },
   'lab-analyzer-mapping': {
     title: 'Analyzer Test Mapping', section: 'Laboratory',
     description: "Point each analyzer's own test codes at our test fields, with unit conversion, and map the codes instruments have already sent.",

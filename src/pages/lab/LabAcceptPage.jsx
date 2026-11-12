@@ -10,7 +10,7 @@ import { useAppStore } from '../../store/AppStore';
 import { formatDateTime, money } from '../../utils/formatters';
 import { getLabOrders } from '../../utils/orderViews';
 import { departmentTests, paymentStateFor, pendingTests, requestedBy } from '../../utils/diagnosticWorkflow';
-import { escapeHtml, printDocument } from '../../utils/printDocument';
+import { THERMAL_WIDTHS, escapeHtml, getThermalWidth, printThermalDocument, setThermalWidth } from '../../utils/printDocument';
 
 /*
   Accepting samples - the second half of the Incoming tab.
@@ -26,35 +26,30 @@ import { escapeHtml, printDocument } from '../../utils/printDocument';
 */
 
 function acceptanceSlipHtml({ order, samples, facilityName }) {
-  const rows = samples.map((sample, index) => `
-    <tr>
-      <td>${index + 1}</td>
-      <td>${escapeHtml(sample.testName)}</td>
-      <td>${escapeHtml(sample.sampleCode)}</td>
-      <td class="sign"></td>
-    </tr>`).join('');
+  const items = samples.map((sample, index) => `
+    <div class="item">
+      <div class="b wrap">${index + 1}. ${escapeHtml(sample.testName)}</div>
+      <div class="row"><span>Accession</span><span class="b">${escapeHtml(sample.sampleCode)}</span></div>
+      ${sample.sampleType ? `<div class="row"><span>Sample</span><span>${escapeHtml(sample.sampleType)}</span></div>` : ''}
+    </div>`).join('<hr class="rule">');
 
   return `
-    <header>
-      <div>
-        <h1>${escapeHtml(facilityName)}</h1>
-        <div class="sub">Laboratory — Accepted Samples</div>
-      </div>
-      <div class="meta">Order ${escapeHtml(order.id)}<br>${escapeHtml(formatDateTime(new Date().toISOString()))}</div>
-    </header>
-    <dl>
-      <div><dt>Patient:</dt><dd>${escapeHtml(order.patient?.fullName || '—')}</dd></div>
-      <div><dt>Hospital ID:</dt><dd>${escapeHtml(order.patient?.id || '—')}</dd></div>
-      <div><dt>Gender:</dt><dd>${escapeHtml(order.patient?.gender || '—')}</dd></div>
-      <div><dt>Date of birth:</dt><dd>${escapeHtml(order.patient?.dateOfBirth || '—')}</dd></div>
-      <div><dt>Requested by:</dt><dd>${escapeHtml(requestedBy(order))}</dd></div>
-      <div><dt>Requested:</dt><dd>${escapeHtml(order.createdAt ? formatDateTime(order.createdAt) : '—')}</dd></div>
-    </dl>
-    <table>
-      <thead><tr><th>#</th><th>Test</th><th>Accession No.</th><th>Done by</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <footer>Attach this slip to the samples. Tests not listed here are still waiting in the incoming queue.</footer>`;
+    <div class="c b big wrap">${escapeHtml(facilityName)}</div>
+    <div class="c">LAB SAMPLE SLIP</div>
+    <hr class="rule">
+    <div class="row"><span>Order</span><span class="b">${escapeHtml(order.id)}</span></div>
+    <div class="row"><span>Date</span><span>${escapeHtml(formatDateTime(new Date().toISOString()))}</span></div>
+    <hr class="rule">
+    <div class="b wrap">${escapeHtml(order.patient?.fullName || '-')}</div>
+    <div class="row"><span>ID</span><span>${escapeHtml(order.patient?.id || '-')}</span></div>
+    <div class="row"><span>Sex</span><span>${escapeHtml(order.patient?.gender || '-')}</span></div>
+    <div class="row"><span>DOB</span><span>${escapeHtml(order.patient?.dateOfBirth || '-')}</span></div>
+    <div class="row"><span>From</span><span>${escapeHtml(requestedBy(order))}</span></div>
+    <hr class="rule">
+    ${items}
+    <hr class="rule">
+    <div class="c">Attach to the sample.</div>
+    <div class="c">Tests not listed are still waiting.</div>`;
 }
 
 export function LabAcceptPage() {
@@ -65,6 +60,7 @@ export function LabAcceptPage() {
   const [error, setError] = useState('');
   const [rejecting, setRejecting] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [slipWidth, setSlipWidth] = useState(() => getThermalWidth());
 
   const orderId = state.ui.activeLabAcceptOrderId;
   const order = useMemo(() => getLabOrders(data).find((candidate) => candidate.id === orderId) || null, [data, orderId]);
@@ -258,9 +254,14 @@ export function LabAcceptPage() {
         description="Print this slip and attach it to the samples."
         footer={(
           <>
+            <label className="flex items-center gap-2 text-xs font-semibold text-slate-600">Paper
+              <select aria-label="Receipt paper width" className="rounded-xl border border-slate-200 px-2 py-1.5 text-sm" value={slipWidth} onChange={(e) => { const mm = Number(e.target.value); setSlipWidth(mm); setThermalWidth(mm); }}>
+                {THERMAL_WIDTHS.map((mm) => <option key={mm} value={mm}>{mm} mm</option>)}
+              </select>
+            </label>
             <Button variant="secondary" onClick={closePrintout}>Close</Button>
             <Button onClick={() => {
-              const ok = printDocument(`Accepted samples ${order.id}`, acceptanceSlipHtml({ order, samples: printout?.samples || [], facilityName }));
+              const ok = printThermalDocument(`Accepted samples ${order.id}`, acceptanceSlipHtml({ order, samples: printout?.samples || [], facilityName }), slipWidth);
               if (!ok) setError('The printout could not open. Allow pop-ups for this site and try again.');
             }}>
               <Printer className="h-4 w-4" /> Print slip

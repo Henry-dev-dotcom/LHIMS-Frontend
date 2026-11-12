@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeft, FilePlus2, RefreshCw, Send } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, FilePlus2, Pencil, RefreshCw, Send, Trash2 } from 'lucide-react';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -155,6 +155,7 @@ export function ClaimsPage() {
               ...(manage && ['DRAFT', 'QUERIED'].includes(tab) ? [{ key: 'pick', label: 'Select', render: (row) => <input type="checkbox" aria-label={`Select ${row.claimCode}`} className="h-4 w-4" checked={selected.includes(row.id)} onChange={() => toggle(row.id)} /> }] : []),
               { key: 'patient', label: 'Patient', mobilePrimary: true, render: (row) => <span><span className="font-semibold">{patientName(row.patient)}</span><span className="block text-xs text-slate-500">{row.claimCode} · {row.membershipNumber}</span></span> },
               { key: 'date', label: 'Visit', render: (row) => formatDay(row.attendanceDate) },
+              ...(['DRAFT', 'QUERIED'].includes(tab) ? [{ key: 'vetted', label: 'Vetting', render: (row) => (row.vettedAt ? <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700"><BadgeCheck className="h-3.5 w-3.5" /> Vetted</span> : <span className="text-xs font-semibold text-amber-700">Not vetted</span>) }] : []),
               { key: 'claimed', label: 'Claimed', render: (row) => money(row.claimedAmount) },
               { key: 'approved', label: tab === 'PAID' ? 'Paid' : 'Approved', render: (row) => (tab === 'PAID' ? money(row.paidAmount) : row.approvedAmount != null ? money(row.approvedAmount) : '—') },
               { key: 'status', label: 'Status', render: (row) => <StatusPill status={row.status} /> },
@@ -169,6 +170,7 @@ export function ClaimsPage() {
 function ClaimDetail({ id, auth, toast }) {
   const [claim, setClaim] = useState(null);
   const [modal, setModal] = useState('');
+  const [vetResult, setVetResult] = useState(null);
   const load = useCallback(() => claimsService.claim(apiClient, id).then(setClaim).catch((e) => toast('error', e?.message || 'The claim could not be loaded.')), [id, toast]);
   useEffect(() => { load(); }, [load]);
   if (!claim) return <Card><p className="text-sm text-slate-500">Loading claim…</p></Card>;
@@ -195,6 +197,9 @@ function ClaimDetail({ id, auth, toast }) {
             <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">{patientName(claim.patient)}</h2>
             <p className="mt-1 text-sm text-slate-600">{claim.patient.patientCode} · member {claim.membershipNumber} · visit {claim.encounter.encounterCode} on {formatDay(claim.attendanceDate)}</p>
             <p className="mt-2 text-sm text-slate-800"><span className="font-semibold">Diagnoses:</span> {claim.diagnoses.map((d) => `${d.code ? `${d.code} ` : ''}${d.description}`).join('; ')}</p>
+            {claim.vettedAt && ['DRAFT', 'QUERIED'].includes(s) && <p className="mt-2 inline-flex items-center gap-1 rounded-2xl bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800"><BadgeCheck className="h-4 w-4" /> Vetted {formatDateTime(claim.vettedAt)}{claim.vettedBy ? ` by ${claim.vettedBy.name}` : ''}{claim.vetNote ? ` · ${claim.vetNote}` : ''}</p>}
+            {vetResult && !vetResult.vetted && <ul role="alert" className="mt-2 list-disc rounded-2xl bg-red-50 py-2 pl-7 pr-3 text-sm text-red-800">{vetResult.problems.map((p) => <li key={p}>{p}</li>)}</ul>}
+            {vetResult?.warnings?.length > 0 && <ul className="mt-2 list-disc rounded-2xl bg-amber-50 py-2 pl-7 pr-3 text-sm text-amber-900">{vetResult.warnings.map((w) => <li key={w}>{w}</li>)}</ul>}
             {claim.queryNote && <p className="mt-2 rounded-2xl bg-amber-50 px-3 py-2 text-sm text-amber-900"><span className="font-semibold">Scheme query:</span> {claim.queryNote}</p>}
             {claim.rejectionReason && <p className="mt-2 rounded-2xl bg-red-50 px-3 py-2 text-sm text-red-800"><span className="font-semibold">{s === 'CANCELLED' ? 'Cancelled' : 'Rejected'}:</span> {claim.rejectionReason}</p>}
           </div>
@@ -202,6 +207,8 @@ function ClaimDetail({ id, auth, toast }) {
             <StatusPill status={s} />
             <p className="text-sm text-slate-700">Claimed <span className="font-bold">{money(claim.claimedAmount)}</span>{claim.approvedAmount != null ? ` · approved ${money(claim.approvedAmount)}` : ''}{Number(claim.paidAmount) > 0 ? ` · paid ${money(claim.paidAmount)} (${claim.paymentReference})` : ''}</p>
             <div className="flex flex-wrap gap-2">
+              {manage && ['DRAFT', 'QUERIED'].includes(s) && <Button variant="secondary" onClick={() => setModal('edit')}><Pencil className="h-4 w-4" /> Edit claim</Button>}
+              {manage && ['DRAFT', 'QUERIED'].includes(s) && <Button variant="secondary" onClick={async () => { try { const r = await claimsService.vet(apiClient, claim.id); setVetResult({ vetted: r.vetted, problems: r.problems, warnings: r.warnings }); setClaim(r.claim); toast(r.vetted ? 'success' : 'error', r.vetted ? 'Claim vetted.' : 'Claim failed vetting.'); } catch (e) { toast('error', e?.message || 'Vetting did not run.'); } }}><BadgeCheck className="h-4 w-4" /> Vet claim</Button>}
               {manage && ['DRAFT', 'QUERIED'].includes(s) && <Button onClick={() => act(async () => { await claimsService.submit(apiClient, [claim.id]); return claimsService.claim(apiClient, claim.id); }, 'Claim submitted.')}><Send className="h-4 w-4" /> Submit</Button>}
               {manage && ['DRAFT', 'QUERIED'].includes(s) && <Button variant="secondary" onClick={() => { const r = window.prompt('Why is this claim being cancelled?'); if (r && r.trim().length >= 3) act(() => claimsService.cancel(apiClient, claim.id, r.trim()), 'Claim cancelled; the invoices are back with the patient.'); }}>Cancel claim</Button>}
               {decide && s === 'SUBMITTED' && <Button variant="secondary" onClick={() => { const n = window.prompt('What did the scheme ask?'); if (n && n.trim().length >= 3) act(() => claimsService.query(apiClient, claim.id, n.trim()), 'Query recorded.'); }}>Record query</Button>}
@@ -225,6 +232,7 @@ function ClaimDetail({ id, auth, toast }) {
         <p className="mt-2 text-xs text-slate-500">Prepared {formatDateTime(claim.createdAt)}{claim.createdBy ? ` by ${claim.createdBy.name}` : ''}{claim.submittedAt ? ` · submitted ${formatDateTime(claim.submittedAt)}` : ''}{claim.decidedAt ? ` · decided ${formatDateTime(claim.decidedAt)}` : ''}</p>
       </Card>
 
+      <EditClaimModal open={modal === 'edit'} claim={claim} onClose={() => setModal('')} onSave={(payload) => act(() => { setVetResult(null); return claimsService.update(apiClient, claim.id, payload); }, 'Claim updated. Vet it again before submitting.')} />
       <DecisionModal open={modal === 'decide'} claim={claim} onClose={() => setModal('')} onSave={(payload) => act(() => claimsService.decide(apiClient, claim.id, payload), 'Decision recorded.')} />
       <PaymentModal open={modal === 'pay'} claim={claim} onClose={() => setModal('')} onSave={(payload) => act(() => claimsService.pay(apiClient, claim.id, payload), 'Payment applied to the invoices.')} />
     </div>
@@ -288,6 +296,61 @@ function PaymentModal({ open, claim, onClose, onSave }) {
         <FormField label="Amount paid" required help={short ? 'Less than approved.' : undefined}><input type="number" step="0.01" min="0" className={inputClass} value={form.amount} onChange={set('amount')} /></FormField>
         <FormField label="Payment reference" required><input className={inputClass} value={form.reference} onChange={set('reference')} maxLength={80} placeholder="Remittance / transfer ref" /></FormField>
         <FormField label="Date received"><input type="date" className={inputClass} value={form.paidAt} onChange={set('paidAt')} /></FormField>
+      </div>
+    </Modal>
+  );
+}
+
+function EditClaimModal({ open, claim, onClose, onSave }) {
+  const [diagnoses, setDiagnoses] = useState([]);
+  const [lines, setLines] = useState({});
+  const [removed, setRemoved] = useState([]);
+  useEffect(() => {
+    if (!open) return;
+    setDiagnoses(claim.diagnoses.map((d) => ({ code: d.code || '', description: d.description || '', type: d.type || '' })));
+    setLines(Object.fromEntries(claim.lines.map((l) => [l.id, { description: l.description, tariffCode: l.tariffCode || '', quantity: String(l.quantity), unitPrice: money(l.unitPrice) }])));
+    setRemoved([]);
+  }, [open, claim]);
+  if (!open) return null;
+  const kept = claim.lines.filter((l) => !removed.includes(l.id));
+  const total = kept.reduce((sum, l) => sum + Number(lines[l.id]?.quantity || 0) * Number(lines[l.id]?.unitPrice || 0), 0);
+  const setLine = (id, key) => (e) => setLines((c) => ({ ...c, [id]: { ...c[id], [key]: e.target.value } }));
+  const setDx = (index, key) => (e) => setDiagnoses((c) => c.map((d, i) => (i === index ? { ...d, [key]: e.target.value } : d)));
+  const validDx = diagnoses.filter((d) => d.description.trim());
+  const ready = validDx.length > 0 && kept.length > 0 && kept.every((l) => Number(lines[l.id]?.quantity) >= 1 && lines[l.id]?.description.trim() && lines[l.id]?.unitPrice !== '');
+  const save = () => onSave({
+    diagnoses: validDx.map((d) => ({ code: d.code.trim() || 'N/A', description: d.description.trim(), type: d.type || undefined })),
+    lines: kept.map((l) => ({ id: l.id, description: lines[l.id].description.trim(), tariffCode: lines[l.id].tariffCode.trim() || null, quantity: Number(lines[l.id].quantity), unitPrice: Number(lines[l.id].unitPrice) })),
+    ...(removed.length ? { removeLineIds: removed } : {})
+  });
+  return (
+    <Modal open title="Edit claim" description="Correct diagnoses and lines before the claim goes out. Editing clears any earlier vetting." onClose={onClose}
+      footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button disabled={!ready} onClick={save}>Save claim ({money(total)})</Button></>}>
+      <div className="space-y-4">
+        <section aria-label="Diagnoses" className="space-y-2">
+          <h4 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">Diagnoses</h4>
+          {diagnoses.map((d, i) => (
+            <div key={i} className="grid gap-2 sm:grid-cols-[7rem_1fr_auto]">
+              <input aria-label="ICD-10 code" className={inputClass} placeholder="ICD-10" value={d.code} onChange={setDx(i, 'code')} maxLength={20} />
+              <input aria-label="Diagnosis" className={inputClass} placeholder="Diagnosis" value={d.description} onChange={setDx(i, 'description')} maxLength={300} />
+              <Button size="sm" variant="secondary" aria-label="Remove diagnosis" disabled={diagnoses.length === 1} onClick={() => setDiagnoses((c) => c.filter((_, k) => k !== i))}><Trash2 className="h-3.5 w-3.5" /></Button>
+            </div>
+          ))}
+          <Button size="sm" variant="secondary" onClick={() => setDiagnoses((c) => [...c, { code: '', description: '', type: '' }])}>Add diagnosis</Button>
+        </section>
+        <section aria-label="Lines" className="space-y-2">
+          <h4 className="text-xs font-bold uppercase tracking-[0.08em] text-slate-500">Lines</h4>
+          {kept.map((l) => (
+            <div key={l.id} className="grid gap-2 rounded-2xl border border-slate-200 p-3 sm:grid-cols-[1fr_8rem_5rem_7rem_auto]">
+              <input aria-label="Description" className={inputClass} value={lines[l.id]?.description ?? ''} onChange={setLine(l.id, 'description')} maxLength={300} />
+              <input aria-label="Tariff code" className={inputClass} placeholder="Tariff code" value={lines[l.id]?.tariffCode ?? ''} onChange={setLine(l.id, 'tariffCode')} maxLength={40} />
+              <input aria-label="Quantity" type="number" min="1" className={inputClass} value={lines[l.id]?.quantity ?? ''} onChange={setLine(l.id, 'quantity')} />
+              <input aria-label="Unit price" type="number" min="0" step="0.01" className={inputClass} value={lines[l.id]?.unitPrice ?? ''} onChange={setLine(l.id, 'unitPrice')} />
+              <Button size="sm" variant="secondary" aria-label={`Remove ${l.description}`} disabled={kept.length === 1} onClick={() => setRemoved((c) => [...c, l.id])}><Trash2 className="h-3.5 w-3.5" /></Button>
+            </div>
+          ))}
+          {removed.length > 0 && <p className="text-xs text-slate-500">{removed.length} line{removed.length === 1 ? '' : 's'} will be taken off this claim; an invoice with no lines left returns to the patient.</p>}
+        </section>
       </div>
     </Modal>
   );

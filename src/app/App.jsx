@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { AppStoreProvider, useAppStore } from '../store/AppStore';
 import { LoginPage } from '../pages/auth/LoginPage';
+import { isStandalone } from '../utils/pwaInstall';
 import { AppShell } from '../layouts/AppShell';
 import { ReportVerificationPage } from '../pages/public/ReportVerificationPage';
 import { PatientPortalAccessPage } from '../pages/public/PatientPortalAccessPage';
@@ -106,6 +107,8 @@ function AppContent() {
        site carries "Sign in" in its header and footer, which is the one click
        this costs staff; a facility that wants to skip it can bookmark #/login.
     */
+    // The installed app is the facility workspace only: never the marketing website.
+    if (isStandalone()) return <LoginPage />;
     const Page = SITE_PAGES[route.path] || (!route.path ? HomePage : null);
     if (Page) {
       return (

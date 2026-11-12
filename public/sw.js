@@ -4,7 +4,7 @@
 // yields the directory the SW is registered under ("/frontend/" or "/").
 const BASE_PATH = new URL('./', self.location).pathname;
 
-const CACHE_VERSION = 'diagnosis-center-phase9-v2';
+const CACHE_VERSION = 'diagnosis-center-phase9-v3';
 const APP_SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const INDEX_URL = `${BASE_PATH}index.html`;
@@ -14,7 +14,9 @@ const APP_SHELL_URLS = [
   INDEX_URL,
   OFFLINE_URL,
   `${BASE_PATH}manifest.webmanifest`,
-  `${BASE_PATH}icons/icon.svg`
+  `${BASE_PATH}icons/icon.svg`,
+  `${BASE_PATH}icons/app-icon-192.png`,
+  `${BASE_PATH}icons/app-icon-512.png`
 ];
 
 self.addEventListener('install', (event) => {
