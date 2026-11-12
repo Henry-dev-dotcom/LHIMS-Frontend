@@ -25,12 +25,15 @@ export function OverviewPage() {
         title="Hospital command workspace"
         description="Every department this facility has switched on, in one place: outpatients and wards, theatre and maternity, laboratory and imaging, pharmacy and stores, billing, claims, reporting and audit."
       />
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-        <MetricCard label="Patients" value={patients.length} icon={UsersRound} tone="blue" />
-        <MetricCard label="Orders" value={orders.length} icon={ClipboardList} tone="purple" />
-        <MetricCard label="Lab routed" value={labOrders} icon={FlaskConical} tone="green" />
-        <MetricCard label="Scan routed" value={scanOrders} icon={ScanLine} tone="yellow" />
-        {canSeeFinance ? <MetricCard label="Outstanding" value={money(outstanding)} icon={CreditCard} tone="red" /> : <MetricCard label="Open invoices" value={invoices.filter((invoice) => invoice.status !== 'Paid').length} icon={CreditCard} tone="red" />}
+      <div className="dashboard-metric-shell">
+        <div id="dashboard-metrics" className="dashboard-metric-row grid gap-3 md:grid-cols-2 xl:grid-cols-5" aria-label="Hospital activity metrics" aria-describedby="dashboard-metrics-hint">
+          <MetricCard label="Patients" value={patients.length} icon={UsersRound} tone="blue" />
+          <MetricCard label="Orders" value={orders.length} icon={ClipboardList} tone="slate" />
+          <MetricCard label="Lab routed" value={labOrders} icon={FlaskConical} tone="green" />
+          <MetricCard label="Scan routed" value={scanOrders} icon={ScanLine} tone="yellow" />
+          {canSeeFinance ? <MetricCard label="Outstanding" value={money(outstanding)} icon={CreditCard} tone="red" /> : <MetricCard label="Open invoices" value={invoices.filter((invoice) => invoice.status !== 'Paid').length} icon={CreditCard} tone="red" />}
+        </div>
+        <p id="dashboard-metrics-hint" className="mt-1 px-1 text-[11px] font-semibold text-slate-500 sm:hidden">Swipe to see all metrics</p>
       </div>
 
       <div className="mt-4">

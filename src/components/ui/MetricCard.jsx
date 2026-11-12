@@ -3,20 +3,20 @@ import clsx from 'clsx';
 export function MetricCard({ label, value, icon: Icon, tone = 'blue', helper, compact = true }) {
   const tones = {
     blue: 'bg-clinical-50 text-clinical-700 ring-clinical-100',
+    slate: 'bg-slate-100 text-slate-700 ring-slate-200',
     green: 'bg-emerald-50 text-emerald-700 ring-emerald-100',
     yellow: 'bg-amber-50 text-amber-700 ring-amber-100',
-    red: 'bg-red-50 text-red-700 ring-red-100',
-    purple: 'bg-purple-50 text-purple-700 ring-purple-100'
+    red: 'bg-red-50 text-red-700 ring-red-100'
   };
   const bars = {
     blue: 'from-clinical-500 to-clinical-300',
+    slate: 'from-slate-500 to-slate-300',
     green: 'from-emerald-500 to-emerald-300',
     yellow: 'from-amber-500 to-amber-300',
-    red: 'from-red-500 to-red-300',
-    purple: 'from-purple-500 to-purple-300'
+    red: 'from-red-500 to-red-300'
   };
   return (
-    <div className={clsx(
+    <div role="group" aria-label={`${label}: ${value}`} className={clsx(
       'metric-card group relative min-w-0 overflow-hidden border border-slate-200/70 bg-white shadow-soft transition duration-200 hover:-translate-y-0.5 hover:shadow-panel sm:min-h-18',
       compact ? 'min-h-[4.6rem] rounded-2xl p-2.5 sm:rounded-2xl sm:p-3' : 'min-h-20 rounded-[1.2rem] p-3.5'
     )}>

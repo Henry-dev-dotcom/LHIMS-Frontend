@@ -279,7 +279,7 @@ export function VendorPortalPage() {
               </div>
             </div>
             <div className="mt-4 flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Filter by request status">
-              {FILTERS.map(([key, label]) => <button key={key} type="button" aria-pressed={status === key} onClick={() => setStatus(key)} className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition focus:outline-hidden focus-visible:ring-4 focus-visible:ring-clinical-200 ${status === key ? 'bg-clinical-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{label}{key !== 'ALL' && <span className="ml-1.5 opacity-75">{Number(counts[key] || 0)}</span>}</button>)}
+              {FILTERS.map(([key, label]) => <button key={key} type="button" aria-pressed={status === key} onClick={() => setStatus(key)} className={`inline-flex min-h-11 shrink-0 items-center justify-center rounded-full px-3 py-2 text-xs font-semibold transition focus:outline-hidden focus-visible:ring-4 focus-visible:ring-clinical-200 ${status === key ? 'bg-clinical-700 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>{label}{key !== 'ALL' && <span className="ml-1.5 opacity-75">{Number(counts[key] || 0)}</span>}</button>)}
             </div>
           </div>
 

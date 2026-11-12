@@ -115,7 +115,7 @@ export function NotificationDrawer({ open, notifications = [], onClose, onOpen, 
             {notifications.length > 0 && (
               <Button variant="subtle" size="sm" className="shrink-0" onClick={() => onClearAll?.()}><Trash2 className="h-4 w-4" /> Clear all</Button>
             )}
-            <Button ref={closeButtonRef} variant="subtle" size="sm" className="h-9 w-9 shrink-0 p-0" onClick={() => onCloseRef.current?.()} aria-label="Close notifications">
+            <Button ref={closeButtonRef} variant="subtle" size="sm" className="h-11 w-11 shrink-0 p-0 sm:h-9 sm:w-9" onClick={() => onCloseRef.current?.()} aria-label="Close notifications">
               <X className="h-4 w-4" />
             </Button>
           </div>

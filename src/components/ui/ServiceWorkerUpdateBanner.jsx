@@ -51,7 +51,7 @@ export function ServiceWorkerUpdateBanner() {
           <Button size="sm" onClick={applyUpdate} className="w-full sm:w-auto">Update now</Button>
           <button
             type="button"
-            className="grid h-9 w-9 place-items-center rounded-2xl border border-clinical-200 bg-white/80 text-clinical-800 transition hover:bg-white"
+            className="grid h-11 w-11 place-items-center rounded-2xl border border-clinical-200 bg-white/80 text-clinical-800 transition hover:bg-white sm:h-9 sm:w-9"
             aria-label="Dismiss update notice"
             onClick={() => setDismissed(true)}
           >

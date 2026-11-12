@@ -18,7 +18,7 @@ export function SupportSessionBanner() {
             {support.operatorName} is viewing {state.auth?.facility?.name} as {state.auth?.userName}. Reason: {support.reason}. Nothing can be changed, and this visit is in the facility&apos;s audit log.
           </p>
         </div>
-        <button type="button" className="rounded-xl bg-white/80 px-3 py-1.5 text-xs font-bold shadow-xs hover:bg-white" onClick={() => dispatch({ type: 'LOGOUT' })}>
+        <button type="button" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white/90 px-3 py-2 text-xs font-bold shadow-xs hover:bg-white" onClick={() => dispatch({ type: 'LOGOUT' })}>
           End support session
         </button>
       </div>
