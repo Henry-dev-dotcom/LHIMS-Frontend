@@ -17,7 +17,7 @@ const checks = [
     message: 'Frontend version must be bumped to Phase 6 / 12.17.0 or newer.'
   },
   {
-    pass: dataTable.includes('lg:hidden') && dataTable.includes('lg:block') && dataTable.includes('[&_*]:min-w-0'),
+    pass: dataTable.includes('lg:hidden') && dataTable.includes('lg:block') && dataTable.includes('**:min-w-0'),
     message: 'DataTable must keep card rendering active through tablet widths and guard mobile action overflow.'
   },
   {
@@ -25,15 +25,15 @@ const checks = [
     message: 'Mobile header descriptions must use a no-shift animated screen guide dropdown.'
   },
   {
-    pass: mobileActionBar.includes('max-h-[42dvh]') && mobileActionBar.includes('overflow-y-auto') && mobileActionBar.includes('[&>*]:min-w-0'),
+    pass: mobileActionBar.includes('max-h-[42dvh]') && mobileActionBar.includes('overflow-y-auto') && mobileActionBar.includes('*:min-w-0'),
     message: 'MobileActionBar must cap tall action stacks and prevent child overflow.'
   },
   {
-    pass: filterPanel.includes('max-h-[46dvh]') && filterPanel.includes('lg:max-h-none') && filterPanel.includes('[&>*]:min-w-0'),
+    pass: filterPanel.includes('max-h-[46dvh]') && filterPanel.includes('lg:max-h-none') && filterPanel.includes('*:min-w-0'),
     message: 'FilterPanel must be scroll-safe on phones while returning to normal desktop behavior.'
   },
   {
-    pass: formField.includes('break-words') && formField.includes('[&>*]:min-w-0'),
+    pass: formField.includes('wrap-break-word') && formField.includes('*:min-w-0'),
     message: 'FormField labels/help and nested controls must wrap safely on small screens.'
   },
   {
