@@ -30,7 +30,7 @@ const checks = [
     message: 'index.html must include mobile viewport, theme, install and manifest metadata.'
   },
   {
-    pass: exists('public/manifest.webmanifest') && manifest.includes('display') && manifest.includes('standalone') && manifest.includes('orientation') && manifest.includes('/icons/icon.svg'),
+    pass: exists('public/manifest.webmanifest') && manifest.includes('display') && manifest.includes('standalone') && manifest.includes('orientation') && (manifest.includes('/icons/icon.svg') || manifest.includes('/icons/app-icon-192.png')),
     message: 'A web app manifest with install/mobile metadata and an icon must exist.'
   },
   {
