@@ -78,12 +78,19 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   const encounterId = await startVisit(request, tokens, patientId, 'Severe headache and fever');
 
   const aiPosts = [];
+  const curataAiPostBodies = [];
   page.on('request', (browserRequest) => {
-    if (browserRequest.method() === 'POST' && new URL(browserRequest.url()).pathname.toLowerCase().includes('curataai')) aiPosts.push(browserRequest.url());
+    if (browserRequest.method() !== 'POST') return;
+    const path = new URL(browserRequest.url()).pathname;
+    if (path.toLowerCase().includes('curataai')) aiPosts.push(browserRequest.url());
+    if (path.endsWith('/curataai/note-formatting')) curataAiPostBodies.push(browserRequest.postData() || '');
   });
 
   await signInAsHospitalDoctor(page);
   await page.getByRole('button', { name: `Consult for ${first} Patient` }).click();
+  const curataAiStatus = page.getByRole('status').filter({ hasText: 'CurataAI note formatting · unavailable' });
+  await expect(curataAiStatus).toContainText('turned off');
+  await expect(page.getByRole('button', { name: 'Format note with CurataAI (unavailable)' })).toBeDisabled();
   for (const viewport of [{ width: 390, height: 844 }, { width: 768, height: 1024 }]) {
     await page.setViewportSize(viewport);
     await expect(page.getByRole('heading', { name: `${first} Patient` })).toBeVisible();
@@ -200,6 +207,7 @@ test('a doctor works a visit from notes to results', async ({ page, request }) =
   expect(note.assessment).toContain('Differentials considered: headache since monday');
   expect(record.data.suspendedAt).not.toBeNull();
   expect(aiPosts, 'the unavailable Autopilot integration must not send patient data').toEqual([]);
+  expect(curataAiPostBodies, 'typing and saving a note must not send it to CurataAI while disabled').toEqual([]);
 
   /* ---- the lab signs off; the doctor reviews the results where they are ---- */
   const orderId = record.data.orders[0].id;
