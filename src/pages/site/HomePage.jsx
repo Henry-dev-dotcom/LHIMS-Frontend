@@ -59,6 +59,9 @@ function beat(u) {
   return 0.13 * g(0.14, 0.045) - 0.09 * g(0.34, 0.014) + g(0.37, 0.011) - 0.17 * g(0.4, 0.014) + 0.26 * g(0.56, 0.055);
 }
 
+/** Beats per second the heartbeat line scrolls; kept slow so it stays in the background. */
+const HEARTBEAT_SPEED = 0.45;
+
 /** The heartbeat line that runs behind the page. Stops drawing when the page is left. */
 function HeartbeatCanvas() {
   const ref = useRef(null);
@@ -126,7 +129,7 @@ function HeartbeatCanvas() {
     } else {
       const start = performance.now();
       const loop = (now) => {
-        draw(((now - start) / 1000) * 1.1);
+        draw(((now - start) / 1000) * HEARTBEAT_SPEED);
         raf = requestAnimationFrame(loop);
       };
       raf = requestAnimationFrame(loop);
