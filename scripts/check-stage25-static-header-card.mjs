@@ -9,7 +9,7 @@ const failures = [];
 if (source.includes('sticky top-0 z-20')) {
   failures.push('Header.jsx still uses sticky top-0 on the page heading card.');
 }
-if (!(source.includes('relative z-20 border-b border-white/60') || source.includes('relative z-[90] border-b border-white/60'))) {
+if (!(source.includes('relative z-20 border-b border-white/60') || source.includes('relative z-[90] border-b border-white/60') || source.includes('relative z-90 border-b border-white/60'))) {
   failures.push('Header.jsx does not contain the expected static/relative header class.');
 }
 

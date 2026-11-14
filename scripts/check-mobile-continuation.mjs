@@ -16,15 +16,15 @@ const checks = [
     message: 'Frontend package and lockfile versions must be bumped for Phase 6 continuation.'
   },
   {
-    pass: toast.includes('bottom-[calc(6.25rem+env(safe-area-inset-bottom))]') && toast.includes('break-words'),
+    pass: toast.includes('bottom-[calc(6.25rem+env(safe-area-inset-bottom))]') && toast.includes('wrap-break-word'),
     message: 'ToastHost must sit above the mobile bottom nav and wrap long messages.'
   },
   {
-    pass: header.includes("document.body.style.overflow = 'hidden'") && header.includes('pointerdown') && header.includes('Close user menu') && header.includes('backdrop-blur-sm md:hidden'),
+    pass: header.includes("document.body.style.overflow = 'hidden'") && header.includes('pointerdown') && header.includes('Close user menu') && header.includes('backdrop-blur-xs md:hidden'),
     message: 'Mobile user menu must lock background scroll, close on pointer/outside interaction, and include a mobile backdrop.'
   },
   {
-    pass: modal.includes('w-full min-w-0 grid-rows') && modal.includes('[&_*]:min-w-0') && modal.includes('grid min-w-0 gap-2'),
+    pass: modal.includes('w-full min-w-0 grid-rows') && modal.includes('**:min-w-0') && modal.includes('grid min-w-0 gap-2'),
     message: 'Mobile modal content and footers must prevent nested overflow.'
   },
   {
