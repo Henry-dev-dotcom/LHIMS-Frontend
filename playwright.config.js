@@ -56,7 +56,9 @@ export default defineConfig({
   webServer: [
     {
       // Fresh database every run, then the API with generous rate limits.
-      command: 'npx prisma migrate reset --force --skip-generate && npx tsx src/server.ts',
+      // Prisma 7's `migrate reset` no longer seeds (and dropped --skip-generate),
+      // so the demo data is seeded explicitly.
+      command: 'npx prisma migrate reset --force && npx prisma db seed && npx tsx src/server.ts',
       cwd: backendDir,
       url: `${E2E.apiUrl}/ready`,
       reuseExistingServer: false,
@@ -66,8 +68,8 @@ export default defineConfig({
       env: {
         NODE_ENV: 'development',
         DATABASE_URL: databaseUrl,
-        // schema.prisma declares directUrl for Neon's pooler, and `migrate reset`
-        // uses it in preference to the pooled url. Left unset it falls back to
+        // The backend's prisma.config.ts points the CLI at DIRECT_URL (Neon's
+        // unpooled url) before DATABASE_URL. Left unset it falls back to
         // the developer's own .env - which pointed the reset at the DEVELOPMENT
         // database and left this one empty. Both must name the e2e database.
         DIRECT_URL: databaseUrl,

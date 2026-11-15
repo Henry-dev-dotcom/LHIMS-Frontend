@@ -41,6 +41,9 @@ export function MessagesPage() {
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const endRef = useRef(null);
+  // A conversation a notification asked to open before this page mounted (read once).
+  const pendingOpen = useRef(null);
+  if (pendingOpen.current === null) pendingOpen.current = consumePendingMessage();
 
   const me = state.auth?.userName || '';
 

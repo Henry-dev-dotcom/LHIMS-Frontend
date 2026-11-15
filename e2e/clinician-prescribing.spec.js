@@ -79,7 +79,8 @@ test('a doctor prescribes from suggestions, overrides an allergy with a reason, 
   await expect(warning.getByRole('button', { name: 'Prescribe anyway' })).toBeDisabled();
   await warning.getByLabel(/Reason for prescribing anyway/).fill('Tolerated amoxicillin before; documented in the notes');
   await warning.getByRole('button', { name: 'Prescribe anyway' }).click();
-  await expect(page.getByText('Prescribed on this visit')).toBeVisible();
+  // The "Prescribed on this visit" card is always shown; the confirmation means the save finished.
+  await expect(page.getByText('Prescription sent to the pharmacy.')).toBeVisible();
   const issued = await (await request.get(`${API}/encounters/${encounterId}`, auth(tokens.doctor))).json();
   expect(issued.data.prescriptions.at(0).allergyOverride).toContain('Tolerated');
   expect(issued.data.prescriptions.at(0).items).toHaveLength(3);

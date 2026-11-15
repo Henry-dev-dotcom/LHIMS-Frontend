@@ -73,7 +73,8 @@ test('a server that cannot be reached says so in words', async ({ page }) => {
   await page.locator('input[type="password"]').fill('lab123');
   await page.getByRole('button', { name: 'Sign in' }).click();
 
-  await expect(page.getByText('We could not reach the server', { exact: false })).toBeVisible();
+  // The sign-in form repeats the error toast in its own alert; check the form's.
+  await expect(page.locator('#login-form-feedback')).toContainText('We could not reach the server');
   await expect(page.getByText('aborted', { exact: false })).toHaveCount(0);
   crashes.assertNone();
 });
@@ -89,7 +90,7 @@ test('a slow server is described as waking, not as a failure', async ({ page }) 
   await page.locator('input[type="password"]').fill('lab123');
   await page.getByRole('button', { name: 'Sign in' }).click();
 
-  await expect(page.getByText('may be starting up', { exact: false })).toBeVisible({ timeout: 20_000 });
+  await expect(page.locator('#login-form-feedback')).toContainText('may be starting up', { timeout: 20_000 });
   await expect(page.getByText('aborted', { exact: false })).toHaveCount(0);
   crashes.assertNone();
 });
