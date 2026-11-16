@@ -30,8 +30,7 @@ export function SiteLayout({ active, children }) {
       <header className={`public-site-header sticky top-0 z-20 border-b ${isLanding ? 'border-slate-200/80 bg-white/90 backdrop-blur-xl' : 'border-white/10 bg-slate-950/85'}`}>
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <a href="#/home" className="flex items-center gap-2.5" aria-label="CurataMed home">
-            <img src={`${import.meta.env.BASE_URL}icons/curatamed-mark.png`} alt="" aria-hidden="true" className="h-9 w-9 object-contain" />
-            <img src={`${import.meta.env.BASE_URL}icons/curatamed-wordmark-light.png`} alt="CurataMed — Health Facility Management System" className="h-7 w-auto object-contain" />
+            <img src={`${import.meta.env.BASE_URL}icons/${isLanding ? 'curatamed-logo.png' : 'curatamed-logo-on-dark.png'}`} alt="CurataMed — Health Facility Management System" className="h-9 w-auto" />
           </a>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Website">
             {LINKS.map((l) => link(l.path, l.label))}
