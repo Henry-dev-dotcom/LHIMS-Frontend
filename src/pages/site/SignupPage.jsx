@@ -111,7 +111,7 @@ export function SignupPage() {
           <p className="mt-3 text-slate-600">Your free trial has started. Staff sign in with this facility code — write it down and share it with your team:</p>
           <p className="mx-auto mt-5 w-fit rounded-3xl bg-white px-8 py-4 font-mono text-4xl font-bold tracking-[0.2em] text-clinical-800 ring-1 ring-slate-200" aria-label={`Facility code ${done.facility.code.split('').join(' ')}`}>{done.facility.code}</p>
           <p className="mt-3 text-sm text-slate-500">Direct sign-in link for your staff: <span className="break-all font-semibold">{`${window.location.origin}${window.location.pathname}#/login/${done.facility.code}`}</span></p>
-          <button type="button" onClick={enter} className="mt-8 rounded-2xl bg-clinical-500 px-6 py-3 text-sm font-semibold text-white shadow-lift hover:bg-clinical-600">Go to my hospital</button>
+          <button type="button" onClick={enter} className="mt-8 rounded-2xl bg-clinical-500 px-6 py-3 text-sm font-semibold text-white shadow-lift hover:bg-clinical-600">Go to my facility</button>
         </section>
       </SiteLayout>
     );
@@ -121,7 +121,7 @@ export function SignupPage() {
     <SiteLayout active="signup">
       <section className="mx-auto grid max-w-6xl gap-8 px-4 py-12 lg:grid-cols-[1fr_20rem]">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">Create your hospital on CurataMed</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-white">Create your facility on CurataMed</h1>
           <p className="mt-2 text-slate-300">It takes about two minutes. You become the administrator and can add your staff straight after.</p>
           <form onSubmit={submit} noValidate className="mt-8 space-y-8">
             <fieldset className="grid gap-4 sm:grid-cols-2">
@@ -156,7 +156,7 @@ export function SignupPage() {
 
             {formError && <p role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{formError}</p>}
             <button type="submit" disabled={submitting || !plan} className="inline-flex items-center gap-2 rounded-2xl bg-clinical-500 px-6 py-3 text-sm font-semibold text-white shadow-lift hover:bg-clinical-600 disabled:opacity-60">
-              {submitting && <Loader2 className="h-4 w-4 animate-spin" />} {submitting ? 'Creating your hospital…' : 'Create my hospital and start the trial'}
+              {submitting && <Loader2 className="h-4 w-4 animate-spin" />} {submitting ? 'Creating your facility…' : 'Create my facility and start the trial'}
             </button>
           </form>
         </div>

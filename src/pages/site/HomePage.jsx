@@ -42,7 +42,7 @@ const STATS = [
 
 const STEPS = [
   { title: 'Choose your departments', text: 'Pick a plan and any extra departments on the pricing page. You see the price as you go — pay only for what you use.' },
-  { title: 'Sign up in two minutes', text: 'Create your hospital and your administrator account. Your free trial starts at once — no card needed.' },
+  { title: 'Sign up in two minutes', text: 'Create your facility and your administrator account. Your free trial starts at once — no card needed.' },
   { title: 'Set up and start', text: 'Add your details, staff and price list with the setup checklist, then register your first patient.' }
 ];
 
@@ -233,7 +233,7 @@ export function HomePage() {
       <header className={`cm-nav${scrolled ? ' scrolled' : ''}`}>
         <div className="cm-nav-inner">
           <a className="cm-logo" href="#/home" aria-label="CurataMed home">
-            <img src={logo} alt="CurataMed — Hospital Management System" />
+            <img src={logo} alt="CurataMed — Health Facility Management System" />
           </a>
           <nav className="cm-links" aria-label="Website">
             {NAV_LINKS.map((l) => <a key={l.href} href={l.href}>{l.label}</a>)}
@@ -263,9 +263,9 @@ export function HomePage() {
         <section className="cm-hero">
           <div className="cm-wrap cm-hero-grid">
             <div>
-              <span className="cm-eyebrow cm-reveal"><span className="cm-dot" />Hospital management system</span>
-              <h1 className="cm-reveal d1">Run your whole hospital on <span className="cm-grad">one system.</span></h1>
-              <p className="cm-lede cm-reveal d2">From the front desk to the ward, the lab and the cashier. Pay only for the departments you use, and add more as you grow.</p>
+              <span className="cm-eyebrow cm-reveal"><span className="cm-dot" />For hospitals, clinics, labs &amp; diagnostic centres</span>
+              <h1 className="cm-reveal d1">Run your whole facility on <span className="cm-grad">one system.</span></h1>
+              <p className="cm-lede cm-reveal d2">Hospitals, clinics, health centres, maternity homes and diagnostic centres — from the front desk to the lab, the ward and the cashier. Pay only for the departments you use, and add more as you grow.</p>
               <div className="cm-ctas cm-reveal d3">
                 <a className="cm-btn cm-btn-primary" href="#/pricing">
                   Build your plan and start free
@@ -312,7 +312,7 @@ export function HomePage() {
           <div className="cm-wrap">
             <div className="cm-head cm-reveal">
               <span className="cm-eyebrow"><span className="cm-dot" />Why CurataMed</span>
-              <h2>Everything a hospital needs.<br />Nothing it doesn’t.</h2>
+              <h2>Everything your facility needs.<br />Nothing it doesn’t.</h2>
               <p>Modular by design — start with the departments you need today and switch the rest on when you’re ready.</p>
             </div>
             <div className="cm-bento">
@@ -332,7 +332,7 @@ export function HomePage() {
                 <span className="cm-glow" />
                 <span className="cm-icon"><Lock size={21} strokeWidth={1.8} aria-hidden="true" /></span>
                 <h3>Your data stays yours</h3>
-                <p>Each hospital’s records are kept separate, every chart is logged, and nothing is deleted.</p>
+                <p>Each facility’s records are kept separate, every chart is logged, and nothing is deleted.</p>
               </div>
               <div className="cm-card wide cm-reveal d2">
                 <span className="cm-glow" />
@@ -370,7 +370,7 @@ export function HomePage() {
           <div className="cm-wrap">
             <div className="cm-panel cm-reveal">
               <h2>Ready when you are</h2>
-              <p>Start a free trial today, or talk to us first about moving your hospital over.</p>
+              <p>Start a free trial today, or talk to us first about moving your facility over.</p>
               <div className="cm-row">
                 <a className="cm-btn cm-btn-primary" href="#/pricing">See pricing</a>
                 <a className="cm-btn cm-btn-ghost" href="#/demo">Talk to us</a>
@@ -382,7 +382,7 @@ export function HomePage() {
 
       <footer className="cm-footer">
         <div className="cm-wrap cm-foot">
-          <small>© {new Date().getFullYear()} CurataMed. Hospital management for Ghana and beyond. Prices in Ghana cedis (GH₵).</small>
+          <small>© {new Date().getFullYear()} CurataMed. Health facility management for Ghana and beyond. Prices in Ghana cedis (GH₵).</small>
           <div className="cm-foot-links">
             <a href="#/features">Departments</a>
             <a href="#/pricing">Pricing</a>

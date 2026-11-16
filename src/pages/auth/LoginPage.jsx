@@ -88,7 +88,7 @@ export function LoginPage({ initialCode = '' }) {
                   <img src={`${import.meta.env.BASE_URL}icons/curatamed-wordmark-light.png`} alt="CurataMed" className="h-8 w-auto max-w-44 object-contain sm:h-9" />
                 </div>
                 <h2 className="getlabs-serif mt-0 max-w-xl text-3xl leading-[1.08] tracking-[-0.035em] text-white! sm:text-4xl lg:text-[clamp(1.85rem,2.75vw,2.5rem)]">
-                  Run your <span className="text-cyan-200">whole hospital,</span><br className="hidden lg:block" />{' '}
+                  Run your <span className="text-cyan-200">whole facility,</span><br className="hidden lg:block" />{' '}
                   or only the <span className="text-cyan-200">departments</span><br className="hidden lg:block" />{' '}
                   you need.
                 </h2>
@@ -131,7 +131,7 @@ export function LoginPage({ initialCode = '' }) {
                     onChange={(event) => { setFacilityCode(event.target.value.toUpperCase()); setFormError(''); }}
                     className="getlabs-input uppercase tracking-[0.08em]"
                   />
-                  <span id="login-facility-hint" className="mt-1.5 block text-[11px]">The code your hospital or clinic was given. Leave blank only for platform-operator access.</span>
+                  <span id="login-facility-hint" className="mt-1.5 block text-[11px]">The code your facility was given. Leave blank only for platform-operator access.</span>
                 </label>
                 <label className="block" htmlFor="login-username">
                   <span className="mb-1.5 flex items-center gap-2 text-xs font-semibold"><UserRound className="h-3.5 w-3.5" aria-hidden="true" /> Username</span>

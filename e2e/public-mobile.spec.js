@@ -20,7 +20,7 @@ test('@mobile the website works on a phone', async ({ page }) => {
 test('@mobile a demo request can be sent from a phone', async ({ page }) => {
   await page.goto('/#/demo');
   await page.getByLabel(/^Your name/).fill('Dr Ama Owusu');
-  await page.getByLabel(/^Hospital or clinic/).fill('Owusu Memorial');
+  await page.getByLabel(/^Facility name/).fill('Owusu Memorial');
   await page.getByLabel(/^Email/).fill('ama@owusu.e2e.test');
   await page.getByRole('button', { name: 'Send request' }).click();
   await expect(page.getByRole('heading', { name: 'Thank you' })).toBeVisible();

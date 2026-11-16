@@ -14,7 +14,7 @@ export function WorkspaceLoading() {
 
         <header className="curata-loading-brand">
           <h1>Curata<span>Med</span></h1>
-          <p>Hospital Management System</p>
+          <p>Health Facility Management System</p>
         </header>
 
         <div className="curata-loading-progress">

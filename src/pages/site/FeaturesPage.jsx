@@ -13,7 +13,7 @@ export function FeaturesPage() {
     <SiteLayout active="features">
       <section className="mx-auto max-w-6xl px-4 py-12">
         <p className="text-xs font-bold uppercase tracking-[0.12em] text-cyan-300">Departments</p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">Switch on what your hospital needs</h1>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">Switch on what your facility needs</h1>
         <p className="mt-3 max-w-2xl text-slate-300">Each department can be switched on or off on its own. Plans bundle the common ones; anything else can be added for a monthly price.</p>
         {loading && <p className="mt-8 text-sm text-slate-500">Loading departments…</p>}
         {error && <p role="alert" className="mt-8 rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>}

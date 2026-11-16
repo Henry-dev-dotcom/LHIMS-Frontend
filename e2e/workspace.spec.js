@@ -130,7 +130,7 @@ test('the plain address shows the website even after somebody has signed in here
 
   // Arrive cold: the website.
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: /Run your whole hospital/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Run your whole facility/i })).toBeVisible();
 
   // Sign in and out, which is what used to poison it.
   await signIn(page, { code: 'DEMO', username: 'lab', password: 'lab123' });
@@ -140,7 +140,7 @@ test('the plain address shows the website even after somebody has signed in here
 
   // Open the plain address again: still the website, not the form.
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: /Run your whole hospital/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Run your whole facility/i })).toBeVisible();
 
   // And the way in is still one click away.
   await page.getByRole('link', { name: 'Sign in' }).first().click();

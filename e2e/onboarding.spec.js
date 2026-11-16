@@ -12,7 +12,7 @@ test('a new hospital signs up, sets up, registers a patient and pays', async ({ 
 
   // Website → plan builder.
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Run your whole hospital on one system.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Run your whole facility on one system.' })).toBeVisible();
   await page.getByRole('link', { name: 'Build your plan and start free' }).click();
   // The builder asks what kind of facility this is before it shows any price.
   // One plan is sold for a clinic, so choosing the kind selects it.
@@ -26,7 +26,7 @@ test('a new hospital signs up, sets up, registers a patient and pays', async ({ 
 
   // Sign-up form. The price carried across must be the one they were quoted,
   // not the plan's own price: this is the last number seen before committing.
-  await expect(page.getByRole('heading', { name: 'Create your hospital on CurataMed' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Create your facility on CurataMed' })).toBeVisible();
   const chosen = page.locator('aside', { hasText: 'Your plan' });
   await expect(chosen).toContainText('Add-on: Maternity');
   await expect(chosen).toContainText('GH₵800.00');
@@ -40,17 +40,17 @@ test('a new hospital signs up, sets up, registers a patient and pays', async ({ 
   await page.getByLabel(/^Password/).fill('short');
   await page.getByLabel(/^Confirm password/).fill('short');
   await page.getByRole('checkbox', { name: /authorised to register/ }).check();
-  await page.getByRole('button', { name: 'Create my hospital and start the trial' }).click();
+  await page.getByRole('button', { name: 'Create my facility and start the trial' }).click();
   await expect(page.getByText('Use at least 10 characters')).toBeVisible();
   await page.getByLabel(/^Password/).fill(password);
   await page.getByLabel(/^Confirm password/).fill(password);
-  await page.getByRole('button', { name: 'Create my hospital and start the trial' }).click();
+  await page.getByRole('button', { name: 'Create my facility and start the trial' }).click();
 
   await expect(page.getByRole('heading', { name: `${facilityName} is ready` })).toBeVisible();
   const code = (await page.getByLabel(/^Facility code/).innerText()).trim();
   expect(code).toMatch(/^[A-Z0-9]{3,}$/);
   await expect(page.getByText(`#/login/${code}`)).toBeVisible();
-  await page.getByRole('button', { name: 'Go to my hospital' }).click();
+  await page.getByRole('button', { name: 'Go to my facility' }).click();
 
   // Setup checklist.
   await expect(page.getByRole('heading', { name: /Welcome to CurataMed/ })).toBeVisible();

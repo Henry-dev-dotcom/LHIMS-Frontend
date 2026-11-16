@@ -1,5 +1,5 @@
 {
-  "name": "CurataMed Hospital Management System",
+  "name": "CurataMed Health Facility Management System",
   "short_name": "CurataMed",
   "description": "CurataMed facility workspace: outpatients, wards, laboratory, imaging, pharmacy, billing and claims.",
   "start_url": "./#/login",

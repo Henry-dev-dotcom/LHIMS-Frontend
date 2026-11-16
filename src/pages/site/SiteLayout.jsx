@@ -30,7 +30,8 @@ export function SiteLayout({ active, children }) {
       <header className={`public-site-header sticky top-0 z-20 border-b ${isLanding ? 'border-slate-200/80 bg-white/90 backdrop-blur-xl' : 'border-white/10 bg-slate-950/85'}`}>
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
           <a href="#/home" className="flex items-center gap-2.5" aria-label="CurataMed home">
-            <img src={`${import.meta.env.BASE_URL}icons/${isLanding ? 'curatamed-logo.png' : 'curatamed-logo-on-dark.png'}`} alt="CurataMed — Hospital Management System" className="h-9 w-auto" />
+            <img src={`${import.meta.env.BASE_URL}icons/curatamed-mark.png`} alt="" aria-hidden="true" className="h-9 w-9 object-contain" />
+            <img src={`${import.meta.env.BASE_URL}icons/curatamed-wordmark-light.png`} alt="CurataMed — Health Facility Management System" className="h-7 w-auto object-contain" />
           </a>
           <nav className="hidden items-center gap-1 md:flex" aria-label="Website">
             {LINKS.map((l) => link(l.path, l.label))}
@@ -54,7 +55,7 @@ export function SiteLayout({ active, children }) {
 
       <footer className={`mt-16 border-t backdrop-blur-xl ${isLanding ? 'border-slate-200 bg-white' : 'border-white/10 bg-slate-950/60'}`}>
         <div className={`mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm sm:flex-row sm:items-center sm:justify-between ${isLanding ? 'text-slate-500' : 'text-slate-400'}`}>
-          <p>© {new Date().getFullYear()} CurataMed · Hospital management for Ghana and beyond. Prices in Ghana cedis (GHS).</p>
+          <p>© {new Date().getFullYear()} CurataMed · Health facility management for Ghana and beyond. Prices in Ghana cedis (GHS).</p>
           <div className="flex flex-wrap gap-4">
             <a href="#/features" className="hover:text-slate-900">Departments</a>
             <a href="#/pricing" className="hover:text-slate-900">Pricing</a>
