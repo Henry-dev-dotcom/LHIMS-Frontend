@@ -1,6 +1,6 @@
-# CurataMed Frontend — Hospital Management System
+# CurataMed Frontend — Health Facility Management System
 
-CurataMed is a modular hospital management system for outpatient, ward, theatre, maternity, laboratory, imaging, pharmacy, billing and claims workflows.
+CurataMed is a modular management system for hospitals, clinics, health centres, maternity homes and diagnostic centres, covering outpatient, ward, theatre, maternity, laboratory, imaging, pharmacy, billing and claims workflows.
 
 ## Development
 
